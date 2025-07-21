@@ -1,145 +1,77 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>91 Club Big Small Game</title>
+  <meta charset="UTF-8">
+  <title>Wingo Big-Small Game</title>
   <style>
     body {
-      margin: 0;
-      padding: 0;
-      background: linear-gradient(to right, green, red);
       font-family: Arial, sans-serif;
       text-align: center;
+      background: #222;
       color: white;
+      padding-top: 50px;
     }
-
-    .container {
-      background-color: rgba(0, 0, 0, 0.7);
-      padding: 30px;
-      margin: 60px auto;
-      width: 90%;
-      max-width: 400px;
-      border-radius: 20px;
-      box-shadow: 0 0 20px #00ff00;
+    .game-box {
+      background: #333;
+      padding: 20px;
+      border-radius: 15px;
+      display: inline-block;
+      box-shadow: 0 0 10px #0f0;
     }
-
-    h2 {
-      margin-bottom: 10px;
-    }
-
     button {
-      font-size: 22px;
-      padding: 12px 28px;
+      padding: 10px 20px;
+      font-size: 20px;
       margin: 10px;
       border: none;
-      border-radius: 12px;
+      border-radius: 10px;
       cursor: pointer;
-      transition: 0.3s ease;
     }
-
-    .big-btn {
-      background-color: #28a745;
-      color: white;
-    }
-
-    .small-btn {
-      background-color: #dc3545;
-      color: white;
-    }
-
-    .big-btn:hover,
-    .small-btn:hover {
-      opacity: 0.85;
-    }
-
-    #result, #timer {
-      font-size: 26px;
+    .big-btn { background: #1e90ff; color: white; }
+    .small-btn { background: #ff6347; color: white; }
+    .result {
+      font-size: 24px;
       margin-top: 20px;
-      font-weight: bold;
+      color: #00ff00;
     }
-
-    #patternInfo {
-      margin-top: 10px;
-      font-size: 18px;
-      color: #ffc107;
+    .period {
+      font-size: 20px;
+      margin-bottom: 15px;
+      color: #ccc;
     }
   </style>
 </head>
 <body>
 
-  <div class="container">
-    <h2>🟢🔴 91 Club Big Small Wingo</h2>
-    <p>Choose: Big or Small</p>
-    <button class="big-btn" onclick="makeChoice('Big')">Big</button>
-    <button class="small-btn" onclick="makeChoice('Small')">Small</button>
-    <div id="timer">⏱️ 60</div>
-    <div id="result"></div>
-    <div id="patternInfo"></div>
+  <div class="game-box">
+    <div class="period">Period: <span id="periodNumber">100001</span></div>
+    <button class="big-btn" onclick="selectChoice('Big')">Big</button>
+    <button class="small-btn" onclick="selectChoice('Small')">Small</button>
+
+    <div class="result" id="resultText">Select Big or Small</div>
   </div>
 
   <script>
-    const patterns = {
-      1: ["Small","Small","Small","Small","Small","Small","Small","Small","Small","Small","Small"],
-      2: ["Big","Big","Big","Big","Big","Big","Big","Big","Big","Big","Big"],
-      3: ["Big","Small","Big","Small","Big","Small","Big","Small","Big","Small","Big","Small","Big","Small","Big","Small","Big","Small","Big","Small","Big","Small"],
-      4: ["Big","Big","Small","Small","Big","Big","Small","Small","Big","Big","Small","Small","Big","Big","Small","Small"]
-    };
+    let period = 100001;
 
-    let currentPattern = Math.ceil(Math.random() * 4);
-    let step = 0;
-    let userChoice = null;
-    let countdown = 60;
-    let interval;
-
-    function startTimer() {
-      document.getElementById("result").innerHTML = "";
-      document.getElementById("patternInfo").innerHTML = "";
-      document.getElementById("timer").innerHTML = "⏱️ 60";
-      countdown = 60;
-      interval = setInterval(() => {
-        countdown--;
-        document.getElementById("timer").innerHTML = "⏱️ " + countdown;
-        if (countdown <= 0) {
-          clearInterval(interval);
-          showResult();
-        }
-      }, 1000);
-    }
-
-    function makeChoice(choice) {
-      userChoice = choice;
-    }
-
-    function showResult() {
-      const pattern = patterns[currentPattern];
-      const correct = pattern[step] || "Big"; // fallback
-
-      const resultDiv = document.getElementById("result");
-      const infoDiv = document.getElementById("patternInfo");
-
-      if (!userChoice) {
-        resultDiv.innerHTML = "⚠️ No selection!";
-        resultDiv.style.color = "yellow";
-      } else if (userChoice === correct) {
-        resultDiv.innerHTML = "✅ Right!";
-        resultDiv.style.color = "lightgreen";
+    function selectChoice(userChoice) {
+      const result = Math.random() < 0.5 ? 'Small' : 'Big';
+      const resultText = document.getElementById('resultText');
+      if (userChoice === result) {
+        resultText.textContent = `You Win! Result was: ${result}`;
       } else {
-        resultDiv.innerHTML = "❌ Wrong!";
-        resultDiv.style.color = "red";
+        resultText.textContent = `You Lose! Result was: ${result}`;
       }
 
-      infoDiv.innerHTML = `Pattern: ${currentPattern} | Step: ${step + 1} | Result: ${correct}`;
-      step++;
-      userChoice = null;
-
-      if (step >= pattern.length) {
-        step = 0;
-        currentPattern = Math.ceil(Math.random() * 4);
-      }
-
-      setTimeout(startTimer, 3000); // next round in 3 seconds
+      // Increase period number
+      period++;
+      document.getElementById('periodNumber').textContent = period;
     }
 
-    startTimer(); // Start game
+    // Optional: Auto-increment every 60 seconds
+    // setInterval(() => {
+    //   period++;
+    //   document.getElementById('periodNumber').textContent = period;
+    // },2025072110001201);
   </script>
 
 </body>
