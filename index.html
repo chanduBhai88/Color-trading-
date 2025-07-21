@@ -1,141 +1,73 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <title>Wingo Big/Small Color Game</title>
+  <title>Wingo 1 Minute Game</title>
   <style>
-    body {
-      background: #0a0a0a;
-      color: white;
-      font-family: Arial, sans-serif;
-      text-align: center;
-      padding: 20px;
-    }
-
-    h1 {
-      color: #00e6e6;
-    }
-
-    .buttons, .bigsmall {
-      margin: 20px 0;
-    }
-
-    button {
-      padding: 12px 20px;
-      margin: 8px;
-      font-size: 18px;
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
-    }
-
-    .red { background: red; color: white; }
-    .green { background: green; color: white; }
-    .violet { background: violet; color: white; }
-    .big { background: orange; }
-    .small { background: skyblue; }
-
-    .result, .score, .timer {
-      margin-top: 20px;
-      font-size: 20px;
-    }
-
-    .number-show {
-      font-size: 32px;
-      margin-top: 10px;
-      color: yellow;
-    }
+    body { font-family: Arial; text-align: center; padding: 20px; }
+    .result { font-size: 30px; font-weight: bold; margin-top: 20px; }
+    button { padding: 10px 20px; font-size: 16px; margin: 5px; }
   </style>
 </head>
 <body>
+  <h1>🎯 Wingo Color Trading Game</h1>
+  <p>Round ends every 60 seconds</p>
 
-  <h1>BDG Wingo Color + Big/Small Game (Demo)</h1>
+  <div id="timer">⏱ Time left: 60s</div>
 
-  <div class="buttons">
-    <button class="red" onclick="setColor('Red')">Red</button>
-    <button class="green" onclick="setColor('Green')">Green</button>
-    <button class="violet" onclick="setColor('Violet')">Violet</button>
-  </div>
+  <h3>Choose:</h3>
+  <button onclick="choose('Big')">Big (6-9)</button>
+  <button onclick="choose('Small')">Small (0-5)</button>
+  <button onclick="choose('Red')">Red</button>
+  <button onclick="choose('Green')">Green</button>
 
-  <div class="bigsmall">
-    <button class="big" onclick="setSize('Big')">Big</button>
-    <button class="small" onclick="setSize('Small')">Small</button>
-  </div>
-
-  <div class="number-show" id="numberShow">Waiting...</div>
-  <div class="result" id="result">Make your prediction</div>
-  <div class="score" id="score">Score: 0</div>
-  <div class="timer" id="timer">Next round in: 10s</div>
+  <div class="result" id="result">Waiting...</div>
 
   <script>
-    let chosenColor = null;
-    let chosenSize = null;
-    let score = 0;
-    let timer = 10;
+    let timeLeft = 60;
+    let interval;
+    let userChoice = null;
 
-    function setColor(color) {
-      chosenColor = color;
-      updateStatus();
+    function choose(choice) {
+      userChoice = choice;
+      document.getElementById("result").innerText = "You chose: " + choice;
     }
 
-    function setSize(size) {
-      chosenSize = size;
-      updateStatus();
+    function startTimer() {
+      interval = setInterval(() => {
+        timeLeft--;
+        document.getElementById("timer").innerText = "⏱ Time left: " + timeLeft + "s";
+
+        if (timeLeft <= 0) {
+          clearInterval(interval);
+          runResult();
+          setTimeout(() => {
+            timeLeft = 60;
+            document.getElementById("result").innerText = "Waiting...";
+            startTimer();
+          }, 5000);
+        }
+      }, 1000);
     }
 
-    function updateStatus() {
-      document.getElementById('result').textContent =
-        `Prediction: ${chosenColor || 'None'} & ${chosenSize || 'None'}`;
-    }
+    function runResult() {
+      const number = Math.floor(Math.random() * 10); // Random 0-9
+      const color = number % 2 === 0 ? 'Green' : 'Red';
+      const size = number >= 5 ? 'Big' : 'Small';
+      const predicted = (number === 0 || number === 1) ? "000" : (number === 9 ? "100" : "");
 
-    function getColor(number) {
-      if (number === 0 || number === 5) return "Violet";
-      return number % 2 === 0 ? "Green" : "Red";
-    }
+      let message = `🎲 Number: ${number}\nColor: ${color}\nSize: ${size}`;
+      if (predicted) message += `\nPredicted: ${predicted}`;
 
-    function getSize(number) {
-      return number < 5 ? "Small" : "Big";
-    }
-
-    function playRound() {
-      const number = Math.floor(Math.random() * 10);
-      const color = getColor(number);
-      const size = getSize(number);
-
-      document.getElementById('numberShow').textContent = `Number: ${number}`;
-      let resultMsg = `Color: ${color}, Size: ${size} — `;
-
-      let win = false;
-      if (chosenColor === color) {
-        score += 10;
-        resultMsg += "✅ Color match! ";
-        win = true;
-      }
-      if (chosenSize === size) {
-        score += 10;
-        resultMsg += "✅ Size match!";
-        win = true;
-      }
-      if (!win) {
-        resultMsg += "❌ No match.";
-      }
-
-      document.getElementById('result').textContent = resultMsg;
-      document.getElementById('score').textContent = `Score: ${score}`;
-      chosenColor = null;
-      chosenSize = null;
-    }
-
-    setInterval(() => {
-      if (timer > 0) {
-        document.getElementById('timer').textContent = `Next round in: ${timer}s`;
-        timer--;
+      if (userChoice === color || userChoice === size) {
+        message += `\n✅ You Win!`;
       } else {
-        playRound();
-        timer = 60;
+        message += `\n❌ You Lose!`;
       }
-    }, 1000);
-  </script>
 
+      document.getElementById("result").innerText = message;
+    }
+
+    startTimer();
+  </script>
 </body>
 </html>
