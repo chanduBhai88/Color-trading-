@@ -2,114 +2,92 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Wingo 1 Minute Game</title>
+  <title>Wingo Color Trading Game</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: linear-gradient(to bottom, #043927, #0b6623);
-      color: white;
+      background-color: #202124;
+      color: #fff;
       text-align: center;
-      padding: 30px;
+      padding: 50px;
     }
-    .card {
-      background: #1f1f1f;
-      border-radius: 20px;
-      padding: 30px;
-      max-width: 400px;
-      margin: auto;
-      box-shadow: 0 0 15px #00ff88;
+    .box {
+      background: #333;
+      padding: 20px;
+      border-radius: 10px;
+      display: inline-block;
     }
-    button {
-      padding: 12px 24px;
+    input, button {
+      padding: 10px;
       margin: 10px;
-      border-radius: 12px;
-      border: none;
-      font-size: 18px;
-      cursor: pointer;
-      transition: 0.3s;
-    }
-    .big { background: #28a745; }
-    .small { background: #dc3545; }
-    .big:hover, .small:hover {
-      transform: scale(1.05);
+      font-size: 16px;
     }
     .result {
-      font-size: 24px;
+      font-size: 30px;
       margin-top: 20px;
-      font-weight: bold;
     }
     .timer {
-      font-size: 36px;
-      margin-top: 20px;
+      font-size: 24px;
+      color: #0f0;
     }
   </style>
 </head>
 <body>
-  <div class="card">
-    <h1>Wingo Big-Small Game</h1>
-    <p>Select your prediction:</p>
-    <button class="big" onclick="makePrediction('Big')">Big</button>
-    <button class="small" onclick="makePrediction('Small')">Small</button>
+  <div class="box">
+    <h2>🎯 Wingo Color Trading 1 Minute Game 🎯</h2>
 
-    <div class="timer" id="timer">60</div>
-    <div class="result" id="resultText">Result will appear here</div>
-    <div class="result" id="finalResult"></div>
+    <input type="number" id="startNumber" placeholder="Enter Predicted Number" />
+    <button onclick="resetGame()">Reset Game</button>
+
+    <div class="timer" id="timerDisplay">60</div>
+    <div class="result" id="result">Result: --</div>
+    <div id="currentNumber">Current Number: --</div>
   </div>
 
   <script>
-    let timeLeft = 60;
-    let userChoice = '';
-    let result = '';
-    const timerEl = document.getElementById("timer");
-    const resultText = document.getElementById("resultText");
-    const finalResult = document.getElementById("finalResult");
-
-    function startTimer() {
-      const timer = setInterval(() => {
-        timeLeft--;
-        timerEl.textContent = timeLeft;
-
-        if (timeLeft <= 0) {
-          clearInterval(timer);
-          generateResult();
-        }
-      }, 1000);
-    }
-
-    function makePrediction(choice) {
-      userChoice = choice;
-      resultText.textContent = "You selected: " + userChoice;
-    }
-
-    function generateResult() {
-      result = Math.random() > 0.5 ? 'Big' : 'Small';
-      resultText.textContent = "Game Result: " + result;
-
-      if (userChoice === result) {
-        finalResult.textContent = "✅ You Win!";
-        finalResult.style.color = '#00ff00';
-      } else {
-        finalResult.textContent = "❌ You Lose!";
-        finalResult.style.color = '#ff4444';
-      }
-
-      setTimeout(() => {
-        resetGame();
-      }, 5000);
-    }
+    let timer = 60;
+    let interval;
+    let current = 11000;
 
     function resetGame() {
-      timeLeft = 60;
-      userChoice = '';
-      result = '';
-      timerEl.textContent = "60";
-      resultText.textContent = "Result will appear here";
-      finalResult.textContent = "";
+      const input = document.getElementById('startNumber').value;
+      if (!input || isNaN(input)) {
+        alert("Predicted number daaliye (11000 se 10999 ke beech)");
+        return;
+      }
+
+      current = parseInt(input);
+      if (current < 10999 || current > 11000) {
+        alert("Sirf 11000 se 10999 tak valid range hai!");
+        return;
+      }
+
+      clearInterval(interval);
       startTimer();
     }
 
-    // Start first round
-    startTimer();
+    function startTimer() {
+      timer = 60;
+      document.getElementById('timerDisplay').innerText = timer;
+      interval = setInterval(() => {
+        timer--;
+        document.getElementById('timerDisplay').innerText = timer;
+
+        // Auto result show
+        const resultType = Math.random() > 0.5 ? "BIG" : "SMALL";
+        document.getElementById('result').innerText = "Result: " + resultType;
+
+        // Show current predicted number
+        document.getElementById('currentNumber').innerText = "Current Number: " + current;
+
+        current--;
+
+        if (timer <= 0 || current < 10999) {
+          clearInterval(interval);
+          document.getElementById('timerDisplay').innerText = "Time Over";
+        }
+      }, 1000);
+    }
   </script>
 </body>
 </html>
