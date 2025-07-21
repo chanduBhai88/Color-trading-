@@ -1,71 +1,76 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>91 Club Pattern Game</title>
+  <title>91 Club Big Small Game</title>
   <style>
     body {
       margin: 0;
       padding: 0;
-      background-image: url('https://i.imgur.com/8gE9M3V.jpg'); /* Replace with your own image URL if needed */
+      background-color: orange;
       background-size: cover;
       background-position: center;
       font-family: Arial, sans-serif;
-      color: white;
       text-align: center;
+      color: white;
     }
 
     .container {
       background-color: rgba(0, 0, 0, 0.6);
       padding: 30px;
-      margin: 50px auto;
+      margin: 60px auto;
       width: 90%;
       max-width: 400px;
       border-radius: 20px;
-      box-shadow: 0 0 20px lime;
+      box-shadow: 0 0 20px #ffcc00;
+    }
+
+    h2 {
+      margin-bottom: 10px;
     }
 
     button {
-      font-size: 20px;
-      padding: 15px 30px;
+      font-size: 22px;
+      padding: 12px 28px;
       margin: 10px;
       border: none;
-      border-radius: 15px;
+      border-radius: 12px;
       cursor: pointer;
-      transition: 0.3s;
+      transition: 0.3s ease;
     }
 
     .big-btn {
-      background-color: green;
+      background-color: #28a745;
       color: white;
     }
 
     .small-btn {
-      background-color: orange;
+      background-color: #ff5722;
       color: white;
     }
 
     .big-btn:hover,
     .small-btn:hover {
-      opacity: 0.8;
+      opacity: 0.85;
     }
 
     #result {
-      font-size: 24px;
+      font-size: 26px;
       margin-top: 20px;
+      font-weight: bold;
     }
 
     #patternInfo {
       margin-top: 10px;
       font-size: 18px;
-      color: #00ffcc;
+      color: #ffc107;
     }
   </style>
 </head>
 <body>
 
   <div class="container">
-    <h2>🔥 91 Club Big Small Game</h2>
-    <p>Choose: Big or Small</p>
+    <h2>🔥 91 Club Big Small</h2>
+    <p>Click and Test Your Luck!</p>
     <button class="big-btn" onclick="checkResult('Big')">Big</button>
     <button class="small-btn" onclick="checkResult('Small')">Small</button>
     <div id="result"></div>
@@ -74,10 +79,10 @@
 
   <script>
     const patterns = {
-      1: Array(100).fill("Small"),
-      2: Array(100).fill("Big"),
-      3: Array.from({length: 100}, (_, i) => i % 2 === 0 ? "Big" : "Small"),
-      4: Array.from({length: 100}, (_, i) => Math.floor(i/2) % 2 === 0 ? "Big" : "Small"),
+      1: ["Small","Small","Small","Small","Small","Small","Small","Small","Small","Small","Small"],
+      2: ["Big","Big","Big","Big","Big","Big","Big","Big","Big","Big","Big"],
+      3: ["Big","Small","Big","Small","Big","Small","Big","Small","Big","Small","Big","Small","Big","Small","Big","Small","Big","Small","Big","Small","Big","Small"],
+      4: ["Big","Big","Small","Small","Big","Big","Small","Small","Big","Big","Small","Small","Big","Big","Small","Small"]
     };
 
     let currentPattern = Math.ceil(Math.random() * 4);
@@ -87,14 +92,18 @@
       const pattern = patterns[currentPattern];
       const correct = pattern[step];
 
+      const resultDiv = document.getElementById("result");
+      const infoDiv = document.getElementById("patternInfo");
+
       if (userChoice === correct) {
-        document.getElementById("result").innerHTML = "✅ Right!";
+        resultDiv.innerHTML = "✅ Right!";
+        resultDiv.style.color = "lightgreen";
       } else {
-        document.getElementById("result").innerHTML = "❌ Wrong!";
+        resultDiv.innerHTML = "❌ Wrong!";
+        resultDiv.style.color = "red";
       }
 
-      document.getElementById("patternInfo").innerHTML =
-        `Pattern: ${currentPattern} | Step: ${step + 1}`;
+      infoDiv.innerHTML = `Step: ${step + 1}`;
 
       step++;
 
