@@ -1,88 +1,117 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Wingo Big-Small Game</title>
+  <title>91 Club Pattern Checker</title>
   <style>
     body {
-      background-color: #0f0; /* Green background */
       font-family: Arial, sans-serif;
       text-align: center;
       padding: 20px;
+      background: linear-gradient(to bottom, #FF9933 33%, #FFFFFF 34%, #FFFFFF 66%, #138808 67%);
+      min-height: 100vh;
+      margin: 0;
     }
-    h1 {
-      font-size: 28px;
-      color: #000;
+
+    h2 {
+      margin-top: 0;
+      padding-top: 20px;
+      color: #000080;
     }
-    #timer {
-      font-size: 48px;
-      margin: 20px;
-      color: #000;
-    }
-    #result {
-      font-size: 40px;
-      font-weight: bold;
-      color: #222;
-      margin: 20px;
-    }
+
     button {
-      font-size: 20px;
       padding: 10px 20px;
+      font-size: 18px;
       margin: 10px;
-      border-radius: 12px;
+      border-radius: 8px;
       border: none;
       cursor: pointer;
     }
-    .correct {
-      background-color: #4CAF50;
+
+    #result {
+      font-size: 20px;
+      margin-top: 20px;
+      font-weight: bold;
+      color: #000;
+    }
+
+    .right {
+      background: #4CAF50;
       color: white;
     }
+
     .wrong {
-      background-color: #f44336;
+      background: #f44336;
       color: white;
     }
   </style>
 </head>
 <body>
-  <h1>Wingo Big-Small 60s Game</h1>
-  <div id="timer">60</div>
-  <div id="result">Waiting...</div>
+  <h2>🇮🇳 91 Club Pattern Checker — Tiranga Style</h2>
 
-  <button class="correct" onclick="markResult('Sahi')">✅ Sahi</button>
-  <button class="wrong" onclick="markResult('Galat')">❌ Galat</button>
+  <div>
+    <button onclick="submitChoice('Big')">Big</button>
+    <button onclick="submitChoice('Small')">Small</button>
+  </div>
+
+  <div id="confirm" style="display:none;">
+    <p>✅ Result sahi tha ya galat?</p>
+    <button class="right" onclick="submitResult(true)">Right</button>
+    <button class="wrong" onclick="submitResult(false)">Wrong</button>
+  </div>
+
+  <div id="result"></div>
 
   <script>
-    let time = 60;
-    let timerInterval;
-    let result = "";
+    const userChoices = [];
+    const actualResults = [];
 
-    function startTimer() {
-      timerInterval = setInterval(() => {
-        time--;
-        document.getElementById("timer").innerText = time;
+    const patterns = {
+      1: Array(50).fill('Small'),
+      2: Array(50).fill('Big'),
+      3: Array.from({ length: 50 }, (_, i) => i % 2 === 0 ? 'Big' : 'Small'),
+      4: Array.from({ length: 50 }, (_, i) => Math.floor(i / 2) % 2 === 0 ? 'Big' : 'Small'),
+    };
 
-        if (time === 0) {
-          clearInterval(timerInterval);
-          generateResult();
-          time = 60;
-          setTimeout(startTimer, 1000); // restart timer after 1 sec
+    let currentChoice = '';
+
+    function submitChoice(choice) {
+      currentChoice = choice;
+      document.getElementById('confirm').style.display = 'block';
+    }
+
+    function submitResult(isRight) {
+      document.getElementById('confirm').style.display = 'none';
+      if (isRight) {
+        userChoices.push(currentChoice);
+        actualResults.push(currentChoice);
+      } else {
+        const flipped = currentChoice === 'Big' ? 'Small' : 'Big';
+        userChoices.push(currentChoice);
+        actualResults.push(flipped);
+      }
+      detectPattern();
+    }
+
+    function detectPattern() {
+      let matchCounts = {};
+      for (let [num, pattern] of Object.entries(patterns)) {
+        let match = 0;
+        for (let i = 0; i < actualResults.length; i++) {
+          if (actualResults[i] === pattern[i]) {
+            match++;
+          }
         }
-      }, 1000);
-    }
+        matchCounts[num] = match;
+      }
 
-    function generateResult() {
-      // Random result (or use your pattern logic here)
-      result = Math.random() > 0.5 ? "Big" : "Small";
-      document.getElementById("result").innerText = result;
-    }
+      let bestMatch = Object.entries(matchCounts).sort((a, b) => b[1] - a[1])[0];
 
-    function markResult(status) {
-      alert(`Aapne result ko "${status}" mark kiya!`);
+      document.getElementById('result').innerHTML = `
+        📊 Current Match:<br>
+        <strong>Pattern ${bestMatch[0]}</strong> is likely running<br>
+        ✅ Matched ${bestMatch[1]} of ${actualResults.length}
+      `;
     }
-
-    // Start everything
-    startTimer();
   </script>
 </body>
 </html>
