@@ -1,68 +1,109 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8" />
   <title>91 Club Pattern Game</title>
   <style>
     body {
-      background-image: url('https://i.imgur.com/Rl8HyZZ.jpg'); /* Virat Kohli wallpaper */
+      margin: 0;
+      padding: 0;
+      background-image: url('https://i.imgur.com/8gE9M3V.jpg'); /* Replace with your own image URL if needed */
       background-size: cover;
       background-position: center;
       font-family: Arial, sans-serif;
       color: white;
       text-align: center;
-      padding-top: 50px;
     }
+
+    .container {
+      background-color: rgba(0, 0, 0, 0.6);
+      padding: 30px;
+      margin: 50px auto;
+      width: 90%;
+      max-width: 400px;
+      border-radius: 20px;
+      box-shadow: 0 0 20px lime;
+    }
+
     button {
-      padding: 15px 25px;
-      font-size: 18px;
+      font-size: 20px;
+      padding: 15px 30px;
       margin: 10px;
-      border-radius: 10px;
       border: none;
+      border-radius: 15px;
       cursor: pointer;
+      transition: 0.3s;
     }
-    .result {
-      font-size: 22px;
-      margin-top: 30px;
-      font-weight: bold;
+
+    .big-btn {
+      background-color: green;
+      color: white;
+    }
+
+    .small-btn {
+      background-color: orange;
+      color: white;
+    }
+
+    .big-btn:hover,
+    .small-btn:hover {
+      opacity: 0.8;
+    }
+
+    #result {
+      font-size: 24px;
+      margin-top: 20px;
+    }
+
+    #patternInfo {
+      margin-top: 10px;
+      font-size: 18px;
+      color: #00ffcc;
     }
   </style>
 </head>
 <body>
-  <h1>91 Club Pattern Checker</h1>
-  <p>Choose Pattern:</p>
 
-  <button onclick="showPattern(1)">1 Pattern</button>
-  <button onclick="showPattern(2)">2 Pattern</button>
-  <button onclick="showPattern(3)">3 Pattern</button>
-  <button onclick="showPattern(4)">4 Pattern</button>
-
-  <div id="patternOutput" class="result"></div>
-
-  <br><br>
-  <button onclick="checkResult(true)" style="background-color: green;">Right</button>
-  <button onclick="checkResult(false)" style="background-color: red;">Wrong</button>
+  <div class="container">
+    <h2>🔥 91 Club Big Small Game</h2>
+    <p>Choose: Big or Small</p>
+    <button class="big-btn" onclick="checkResult('Big')">Big</button>
+    <button class="small-btn" onclick="checkResult('Small')">Small</button>
+    <div id="result"></div>
+    <div id="patternInfo"></div>
+  </div>
 
   <script>
     const patterns = {
-      1: Array(11).fill("Small"),
-      2: Array(11).fill("Big"),
-      3: Array.from({ length: 22 }, (_, i) => i % 2 === 0 ? "Big" : "Small"),
-      4: Array.from({ length: 16 }, (_, i) => (Math.floor(i / 2) % 2 === 0 ? "Big" : "Small")),
+      1: Array(100).fill("Small"),
+      2: Array(100).fill("Big"),
+      3: Array.from({length: 100}, (_, i) => i % 2 === 0 ? "Big" : "Small"),
+      4: Array.from({length: 100}, (_, i) => Math.floor(i/2) % 2 === 0 ? "Big" : "Small"),
     };
 
-    function showPattern(num) {
-      const pat = patterns[num];
-      document.getElementById("patternOutput").innerText = `Pattern ${num}: ${pat.join(", ")}`;
-    }
+    let currentPattern = Math.ceil(Math.random() * 4);
+    let step = 0;
 
-    function checkResult(isRight) {
-      const msg = isRight ? "Chakka!" : "Out!";
-      const utterance = new SpeechSynthesisUtterance(msg);
-      utterance.lang = "hi-IN";
-      speechSynthesis.speak(utterance);
-      alert(msg);
+    function checkResult(userChoice) {
+      const pattern = patterns[currentPattern];
+      const correct = pattern[step];
+
+      if (userChoice === correct) {
+        document.getElementById("result").innerHTML = "✅ Right!";
+      } else {
+        document.getElementById("result").innerHTML = "❌ Wrong!";
+      }
+
+      document.getElementById("patternInfo").innerHTML =
+        `Pattern: ${currentPattern} | Step: ${step + 1}`;
+
+      step++;
+
+      if (step >= pattern.length) {
+        step = 0;
+        currentPattern = Math.ceil(Math.random() * 4);
+      }
     }
   </script>
+
 </body>
 </html>
