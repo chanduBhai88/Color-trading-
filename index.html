@@ -2,100 +2,107 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>BIG-SMALL MOD PREDICTOR</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Color Trading Wingo Game</title>
   <style>
     body {
-      margin: 0;
       font-family: Arial, sans-serif;
       background: #111;
-      color: #eee;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-    }
-    .login-box, .predictor-box {
-      background: #222;
-      border: 2px solid #00ffcc;
-      border-radius: 12px;
-      padding: 20px;
-      width: 90%;
-      max-width: 350px;
+      color: white;
       text-align: center;
+      padding: 20px;
     }
-    input[type="text"], button {
-      padding: 10px;
-      width: 90%;
-      margin: 10px 0;
-      font-size: 1em;
+
+    h1 {
+      color: #00ffcc;
+    }
+
+    .color-buttons button {
+      padding: 15px 25px;
+      margin: 10px;
+      font-size: 18px;
       border: none;
-      border-radius: 5px;
-    }
-    button {
-      background: #00ffcc;
-      color: #000;
+      border-radius: 10px;
       cursor: pointer;
     }
-    .timer {
-      font-size: 2em;
-      margin-top: 20px;
+
+    .red { background: red; color: white; }
+    .green { background: green; color: white; }
+    .violet { background: violet; color: white; }
+
+    .result {
+      margin-top: 30px;
+      font-size: 24px;
     }
-    .prediction {
-      font-size: 1.5em;
-      color: #ffcc00;
-      margin-top: 15px;
+
+    .score {
+      margin-top: 10px;
+      font-size: 20px;
+      color: yellow;
+    }
+
+    .timer {
+      margin-top: 20px;
+      font-size: 18px;
+      color: #ccc;
     }
   </style>
 </head>
 <body>
-  <div class="login-box" id="loginBox">
-    <h2>Enter Access Key</h2>
-    <input type="text" id="accessKey" placeholder="Enter Login Key" />
-    <button onclick="checkLogin()">ENTER</button>
+
+  <h1>Color Trading Wingo (1-Minute Demo)</h1>
+
+  <div class="color-buttons">
+    <button class="red" onclick="makePrediction('Red')">Red</button>
+    <button class="green" onclick="makePrediction('Green')">Green</button>
+    <button class="violet" onclick="makePrediction('Violet')">Violet</button>
   </div>
 
-  <div class="predictor-box" id="predictorBox" style="display: none;">
-    <h2>BIG-SMALL Predictor</h2>
-    <div class="timer" id="countdown">00:59</div>
-    <div class="prediction" id="prediction">Next: --</div>
-  </div>
+  <div class="result" id="result">Make a prediction...</div>
+  <div class="score" id="score">Score: 0</div>
+  <div class="timer" id="timer">Next round in: 10s</div>
 
   <script>
-    const LOGIN_KEY = "SMR";
+    let colors = ['Red', 'Green', 'Violet'];
+    let userPrediction = null;
+    let score = 0;
+    let timeLeft = 10;
 
-    function checkLogin() {
-      const input = document.getElementById("accessKey").value.trim();
-      if (input === LOGIN_KEY) {
-        document.getElementById("loginBox").style.display = "none";
-        document.getElementById("predictorBox").style.display = "block";
-        startCountdown();
+    function makePrediction(color) {
+      userPrediction = color;
+      document.getElementById('result').textContent = `You predicted: ${color}`;
+    }
+
+    function pickRandomColor() {
+      return colors[Math.floor(Math.random() * colors.length)];
+    }
+
+    function startRound() {
+      const actualColor = pickRandomColor();
+      let message = `Actual color: ${actualColor}. `;
+
+      if (userPrediction === actualColor) {
+        score += 10;
+        message += "✅ You won!";
       } else {
-        alert("Invalid key!");
+        message += "❌ You lost!";
       }
+
+      document.getElementById('result').textContent = message;
+      document.getElementById('score').textContent = `Score: ${score}`;
+      userPrediction = null;
     }
 
-    function startCountdown() {
-      let seconds = 59;
-      const countdown = document.getElementById("countdown");
-      const predictionBox = document.getElementById("prediction");
-
-      setInterval(() => {
-        const now = new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" });
-        const time = new Date(now);
-        const secs = time.getSeconds();
-        const remaining = 59 - secs;
-        countdown.textContent = `00:${remaining < 10 ? "0" + remaining : remaining}`;
-
-        if (secs === 0) {
-          // Generate a new prediction every 59s
-          const options = ["BIG", "SMALL", "RED", "GREEN", "VIOLET"];
-          const next = options[Math.floor(Math.random() * options.length)];
-          predictionBox.textContent = "Next: " + next;
-        }
-      }, 1000);
-    }
+    // Timer countdown
+    setInterval(() => {
+      if (timeLeft > 0) {
+        timeLeft--;
+        document.getElementById('timer').textContent = `Next round in: ${timeLeft}s`;
+      } else {
+        startRound();
+        timeLeft = 10; // reset for next round (you can change to 60 for 1 minute)
+      }
+    }, 1000);
   </script>
+
 </body>
 </html>
