@@ -1,116 +1,67 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>91 Club Pattern Checker</title>
+  <meta charset="UTF-8" />
+  <title>91 Club Pattern Game</title>
   <style>
     body {
+      background-image: url('https://i.imgur.com/Rl8HyZZ.jpg'); /* Virat Kohli wallpaper */
+      background-size: cover;
+      background-position: center;
       font-family: Arial, sans-serif;
+      color: white;
       text-align: center;
-      padding: 20px;
-      background: linear-gradient(to bottom, #FF9933 33%, #FFFFFF 34%, #FFFFFF 66%, #138808 67%);
-      min-height: 100vh;
-      margin: 0;
+      padding-top: 50px;
     }
-
-    h2 {
-      margin-top: 0;
-      padding-top: 20px;
-      color: #000080;
-    }
-
     button {
-      padding: 10px 20px;
+      padding: 15px 25px;
       font-size: 18px;
       margin: 10px;
-      border-radius: 8px;
+      border-radius: 10px;
       border: none;
       cursor: pointer;
     }
-
-    #result {
-      font-size: 20px;
-      margin-top: 20px;
+    .result {
+      font-size: 22px;
+      margin-top: 30px;
       font-weight: bold;
-      color: #000;
-    }
-
-    .right {
-      background: #4CAF50;
-      color: white;
-    }
-
-    .wrong {
-      background: #f44336;
-      color: white;
     }
   </style>
 </head>
 <body>
-  <h2>🇮🇳 91 Club Pattern Checker — Tiranga Style</h2>
+  <h1>91 Club Pattern Checker</h1>
+  <p>Choose Pattern:</p>
 
-  <div>
-    <button onclick="submitChoice('Big')">Big</button>
-    <button onclick="submitChoice('Small')">Small</button>
-  </div>
+  <button onclick="showPattern(1)">1 Pattern</button>
+  <button onclick="showPattern(2)">2 Pattern</button>
+  <button onclick="showPattern(3)">3 Pattern</button>
+  <button onclick="showPattern(4)">4 Pattern</button>
 
-  <div id="confirm" style="display:none;">
-    <p>✅ Result sahi tha ya galat?</p>
-    <button class="right" onclick="submitResult(true)">Right</button>
-    <button class="wrong" onclick="submitResult(false)">Wrong</button>
-  </div>
+  <div id="patternOutput" class="result"></div>
 
-  <div id="result"></div>
+  <br><br>
+  <button onclick="checkResult(true)" style="background-color: green;">Right</button>
+  <button onclick="checkResult(false)" style="background-color: red;">Wrong</button>
 
   <script>
-    const userChoices = [];
-    const actualResults = [];
-
     const patterns = {
-      1: Array(50).fill('Small'),
-      2: Array(50).fill('Big'),
-      3: Array.from({ length: 50 }, (_, i) => i % 2 === 0 ? 'Big' : 'Small'),
-      4: Array.from({ length: 50 }, (_, i) => Math.floor(i / 2) % 2 === 0 ? 'Big' : 'Small'),
+      1: Array(11).fill("Small"),
+      2: Array(11).fill("Big"),
+      3: Array.from({ length: 22 }, (_, i) => i % 2 === 0 ? "Big" : "Small"),
+      4: Array.from({ length: 16 }, (_, i) => (Math.floor(i / 2) % 2 === 0 ? "Big" : "Small")),
     };
 
-    let currentChoice = '';
-
-    function submitChoice(choice) {
-      currentChoice = choice;
-      document.getElementById('confirm').style.display = 'block';
+    function showPattern(num) {
+      const pat = patterns[num];
+      document.getElementById("patternOutput").innerText = `Pattern ${num}: ${pat.join(", ")}`;
     }
 
-    function submitResult(isRight) {
-      document.getElementById('confirm').style.display = 'none';
-      if (isRight) {
-        userChoices.push(currentChoice);
-        actualResults.push(currentChoice);
-      } else {
-        const flipped = currentChoice === 'Big' ? 'Small' : 'Big';
-        userChoices.push(currentChoice);
-        actualResults.push(flipped);
-      }
-      detectPattern();
-    }
-
-    function detectPattern() {
-      let matchCounts = {};
-      for (let [num, pattern] of Object.entries(patterns)) {
-        let match = 0;
-        for (let i = 0; i < actualResults.length; i++) {
-          if (actualResults[i] === pattern[i]) {
-            match++;
-          }
-        }
-        matchCounts[num] = match;
-      }
-
-      let bestMatch = Object.entries(matchCounts).sort((a, b) => b[1] - a[1])[0];
-
-      document.getElementById('result').innerHTML = `
-        📊 Current Match:<br>
-        <strong>Pattern ${bestMatch[0]}</strong> is likely running<br>
-        ✅ Matched ${bestMatch[1]} of ${actualResults.length}
-      `;
+    function checkResult(isRight) {
+      const msg = isRight ? "Chakka!" : "Out!";
+      const utterance = new SpeechSynthesisUtterance(msg);
+      utterance.lang = "hi-IN";
+      speechSynthesis.speak(utterance);
+      alert(msg);
     }
   </script>
 </body>
