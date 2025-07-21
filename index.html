@@ -2,73 +2,104 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>91 Club Wingo Lottery Game</title>
+  <title>91 Club Big Small Wingo</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      font-family: 'Arial', sans-serif;
+      color: #fff;
       text-align: center;
-      background: #111;
-      color: white;
+      background: linear-gradient(-45deg, #ff0033, #3300ff, #00ffcc, #ffcc00);
+      background-size: 400% 400%;
+      animation: gradient 10s ease infinite;
     }
-    .timer {
-      font-size: 48px;
-      margin: 20px;
+
+    @keyframes gradient {
+      0% {background-position: 0% 50%;}
+      50% {background-position: 100% 50%;}
+      100% {background-position: 0% 50%;}
     }
-    .result {
+
+    .container {
+      margin-top: 80px;
+    }
+
+    h1 {
       font-size: 36px;
-      margin: 20px;
-      padding: 10px;
-      border-radius: 10px;
+      margin-bottom: 20px;
     }
-    .big { background-color: #28a745; }
-    .small { background-color: #dc3545; }
+
+    #timer {
+      font-size: 48px;
+      margin: 20px 0;
+    }
+
+    .btn {
+      font-size: 24px;
+      padding: 12px 30px;
+      margin: 10px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      background-color: #222;
+      color: white;
+      transition: 0.3s;
+    }
+
+    .btn:hover {
+      background-color: #555;
+    }
+
+    #result {
+      font-size: 32px;
+      margin-top: 20px;
+      font-weight: bold;
+    }
   </style>
 </head>
 <body>
+  <div class="container">
+    <h1>91 Club Big Small Wingo</h1>
+    <div id="timer">60</div>
 
-  <h1>🎯 91 Club Lottery - Wingo Big/Small 🎯</h1>
-  <div class="timer" id="timer">60</div>
-  <div class="result" id="result">Waiting...</div>
+    <button class="btn" onclick="choose('Big')">Big</button>
+    <button class="btn" onclick="choose('Small')">Small</button>
+
+    <div id="result"></div>
+  </div>
 
   <script>
     let timeLeft = 60;
-
-    function getResult() {
-      const resultBox = document.getElementById("result");
-      const num = Math.floor(Math.random() * 100); // 0 to 99
-      let result;
-
-      if (num >= 50) {
-        result = "BIG";
-        resultBox.className = "result big";
-      } else {
-        result = "SMALL";
-        resultBox.className = "result small";
-      }
-
-      resultBox.innerText = `Result: ${result} (${num})`;
-    }
+    let timerDisplay = document.getElementById("timer");
+    let resultDisplay = document.getElementById("result");
 
     function startTimer() {
-      const timerBox = document.getElementById("timer");
-
-      const countdown = setInterval(() => {
+      resultDisplay.innerHTML = "";
+      timeLeft = 60;
+      timerDisplay.innerHTML = timeLeft;
+      let timer = setInterval(() => {
         timeLeft--;
-        timerBox.innerText = timeLeft;
-
+        timerDisplay.innerHTML = timeLeft;
         if (timeLeft <= 0) {
-          clearInterval(countdown);
-          getResult();
-          setTimeout(() => {
-            timeLeft = 60;
-            startTimer(); // restart the timer automatically
-          }, 1000); // 1 sec delay before restart
+          clearInterval(timer);
+          showResult();
+          setTimeout(startTimer, 5000); // restart after 5 seconds
         }
       }, 1000);
     }
 
-    startTimer(); // Start when page loads
-  </script>
+    function showResult() {
+      let random = Math.floor(Math.random() * 1000); // 0 - 999
+      let resultType = random >= 500 ? "Big" : "Small";
+      resultDisplay.innerHTML = `Result: ${random} (${resultType})`;
+    }
 
+    function choose(choice) {
+      alert("You chose: " + choice);
+    }
+
+    startTimer();
+  </script>
 </body>
 </html>
