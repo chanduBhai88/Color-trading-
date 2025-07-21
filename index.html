@@ -1,78 +1,43 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Wingo Big-Small Game</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      background: #222;
-      color: white;
-      padding-top: 50px;
-    }
-    .game-box {
-      background: #333;
-      padding: 20px;
-      border-radius: 15px;
-      display: inline-block;
-      box-shadow: 0 0 10px #0f0;
-    }
-    button {
-      padding: 10px 20px;
-      font-size: 20px;
-      margin: 10px;
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
-    }
-    .big-btn { background: #1e90ff; color: white; }
-    .small-btn { background: #ff6347; color: white; }
-    .result {
-      font-size: 24px;
-      margin-top: 20px;
-      color: #00ff00;
-    }
-    .period {
-      font-size: 20px;
-      margin-bottom: 15px;
-      color: #ccc;
-    }
-  </style>
-</head>
-<body>
+<!-- Add Firebase CDN -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
-  <div class="game-box">
-    <div class="period">Period: <span id="periodNumber">100001</span></div>
-    <button class="big-btn" onclick="selectChoice('Big')">Big</button>
-    <button class="small-btn" onclick="selectChoice('Small')">Small</button>
+<script>
+  // 🔑 Replace with your Firebase config:
+  const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT.firebaseapp.com",
+    databaseURL: "https://YOUR_PROJECT.firebaseio.com",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_PROJECT.appspot.com",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
+  };
 
-    <div class="result" id="resultText">Select Big or Small</div>
-  </div>
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+  const database = firebase.database();
 
-  <script>
-    let period = 100001;
+  function fetchLatestResult() {
+    firebase.database().ref('results/latest').on('value', (snapshot) => {
+      const result = snapshot.val();
+      document.getElementById("prediction").innerText = result ? result : "No Data";
+    });
+  }
 
-    function selectChoice(userChoice) {
-      const result = Math.random() < 0.5 ? 'Small' : 'Big';
-      const resultText = document.getElementById('resultText');
-      if (userChoice === result) {
-        resultText.textContent = `You Win! Result was: ${result}`;
-      } else {
-        resultText.textContent = `You Lose! Result was: ${result}`;
-      }
+  fetchLatestResult(); // Call when page loads
+</script><input type="text" id="newResult" placeholder="Enter Big/Small">
+<button onclick="saveResult()">Save</button>
 
-      // Increase period number
-      period++;
-      document.getElementById('periodNumber').textContent = period;
-    }
-
-    // Optional: Auto-increment every 60 seconds
-    // setInterval(() => {
-    //   period++;
-    //   document.getElementById('periodNumber').textContent = period;
-    // },2025072110001201);
-  </script>
-
-</body>
-</html>
+<script>
+  function saveResult() {
+    const value = document.getElementById('newResult').value;
+    firebase.database().ref('results/latest').set(value);
+    alert("Result Saved: " + value);
+  }
+</script>{
+  "rules": {
+    ".read": true,
+    ".write": false
+  }
+}
