@@ -2,104 +2,73 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>91 Club Big Small Wingo</title>
+  <title>91 Club Game - Big Small</title>
   <style>
     body {
-      margin: 0;
-      padding: 0;
-      font-family: 'Arial', sans-serif;
+      background-color: #006400; /* Dark Green */
       color: #fff;
+      font-family: Arial, sans-serif;
       text-align: center;
-      background: linear-gradient(-45deg, #ff0033, #3300ff, #00ffcc, #ffcc00);
-      background-size: 400% 400%;
-      animation: gradient 10s ease infinite;
+      padding-top: 60px;
     }
-
-    @keyframes gradient {
-      0% {background-position: 0% 50%;}
-      50% {background-position: 100% 50%;}
-      100% {background-position: 0% 50%;}
-    }
-
     .container {
-      margin-top: 80px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      padding: 30px;
+      width: 300px;
+      margin: 0 auto;
     }
-
-    h1 {
-      font-size: 36px;
-      margin-bottom: 20px;
-    }
-
-    #timer {
-      font-size: 48px;
+    .period, .result, .timer {
+      font-size: 24px;
       margin: 20px 0;
     }
-
-    .btn {
-      font-size: 24px;
-      padding: 12px 30px;
-      margin: 10px;
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
-      background-color: #222;
-      color: white;
-      transition: 0.3s;
-    }
-
-    .btn:hover {
-      background-color: #555;
-    }
-
-    #result {
-      font-size: 32px;
-      margin-top: 20px;
+    .result {
       font-weight: bold;
+      font-size: 32px;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>91 Club Big Small Wingo</h1>
-    <div id="timer">60</div>
-
-    <button class="btn" onclick="choose('Big')">Big</button>
-    <button class="btn" onclick="choose('Small')">Small</button>
-
-    <div id="result"></div>
+    <div class="period" id="period">Period: 0001</div>
+    <div class="result" id="result">Result: Big</div>
+    <div class="timer" id="timer">Next in: 60s</div>
   </div>
 
   <script>
-    let timeLeft = 60;
-    let timerDisplay = document.getElementById("timer");
-    let resultDisplay = document.getElementById("result");
+    let periodNumber = 1;
 
-    function startTimer() {
-      resultDisplay.innerHTML = "";
-      timeLeft = 60;
-      timerDisplay.innerHTML = timeLeft;
-      let timer = setInterval(() => {
+    function getRandomResult() {
+      return Math.random() > 0.5 ? "Big" : "Small";
+    }
+
+    function updateGame() {
+      // Update period number
+      document.getElementById("period").innerText = "Period: " + String(periodNumber).padStart(4, '0');
+
+      // Generate and show result
+      const result = getRandomResult();
+      document.getElementById("result").innerText = "Result: " + result;
+
+      // Reset countdown
+      let timeLeft = 60;
+      const timerDisplay = document.getElementById("timer");
+      timerDisplay.innerText = `Next in: ${timeLeft}s`;
+
+      const countdown = setInterval(() => {
         timeLeft--;
-        timerDisplay.innerHTML = timeLeft;
+        timerDisplay.innerText = `Next in: ${timeLeft}s`;
+
         if (timeLeft <= 0) {
-          clearInterval(timer);
-          showResult();
-          setTimeout(startTimer, 5000); // restart after 5 seconds
+          clearInterval(countdown);
+          periodNumber++;
+          updateGame(); // Start next round
         }
       }, 1000);
     }
 
-    function showResult() {
-      let random = Math.floor(Math.random() * 1000); // 0 - 999
-      let resultType = random >= 500 ? "Big" : "Small";
-      resultDisplay.innerHTML = `Result: ${random} (${resultType})`;
-    }
-
-    function choose(choice) {
-      alert("You chose: " + choice);
-    }
-
-    startTimer();
+    // Start game first time
+    updateGame();
   </script>
 </body>
 </html>
