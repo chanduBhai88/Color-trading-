@@ -1,74 +1,57 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>91 Club Game - Big Small</title>
+  <meta charset="UTF-8" />
+  <title>91 Club Pattern Game</title>
   <style>
     body {
-      background-color: #006400; /* Dark Green */
-      color: #fff;
-      font-family: Arial, sans-serif;
       text-align: center;
-      padding-top: 60px;
-    }
-    .container {
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 20px;
+      font-family: Arial, sans-serif;
       padding: 30px;
-      width: 300px;
-      margin: 0 auto;
+      background: linear-gradient(to bottom right, red, white, green);
     }
-    .period, .result, .timer {
-      font-size: 24px;
-      margin: 20px 0;
+    h1 {
+      color: #222;
     }
-    .result {
+    #result {
+      font-size: 40px;
       font-weight: bold;
-      font-size: 32px;
+      margin-top: 30px;
+    }
+    button {
+      padding: 15px 30px;
+      font-size: 20px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      background-color: #333;
+      color: white;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <div class="period" id="period">Period: 0001</div>
-    <div class="result" id="result">Result: Big</div>
-    <div class="timer" id="timer">Next in: 60s</div>
-  </div>
+  <h1>91 Club Game Pattern Result</h1>
+  <button onclick="generateResult()">🎲 Click For Result</button>
+  <div id="result"></div>
 
   <script>
-    let periodNumber = 1;
-
-    function getRandomResult() {
-      return Math.random() > 0.5 ? "Big" : "Small";
+    const pattern1 = Array(20).fill("Big");
+    const pattern2 = Array(20).fill("Small");
+    const pattern3 = Array.from({ length: 20 }, (_, i) => (i % 2 === 0 ? "Small" : "Big"));
+    const pattern4 = [];
+    for (let i = 0; i < 10; i++) {
+      pattern4.push("Big", "Big", "Small", "Small");
     }
 
-    function updateGame() {
-      // Update period number
-      document.getElementById("period").innerText = "Period: " + String(periodNumber).padStart(4, '0');
+    const allPatterns = [pattern1, pattern2, pattern3, pattern4];
+    let count = 0;
 
-      // Generate and show result
-      const result = getRandomResult();
-      document.getElementById("result").innerText = "Result: " + result;
-
-      // Reset countdown
-      let timeLeft = 60;
-      const timerDisplay = document.getElementById("timer");
-      timerDisplay.innerText = `Next in: ${timeLeft}s`;
-
-      const countdown = setInterval(() => {
-        timeLeft--;
-        timerDisplay.innerText = `Next in: ${timeLeft}s`;
-
-        if (timeLeft <= 0) {
-          clearInterval(countdown);
-          periodNumber++;
-          updateGame(); // Start next round
-        }
-      }, 1000);
+    function generateResult() {
+      const pattern = allPatterns[count % allPatterns.length];
+      const result = pattern[Math.floor(Math.random() * pattern.length)];
+      document.getElementById("result").textContent = `Result: ${result}`;
+      count++;
     }
-
-    // Start game first time
-    updateGame();
   </script>
 </body>
 </html>
