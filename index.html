@@ -1,43 +1,58 @@
-<!-- Add Firebase CDN -->
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<!DOCTYPE html>
+<html>
+<head>
+  <title>55 Club - Big Small Predictor</title>
+  <style>
+    body { font-family: Arial; text-align: center; background: #222; color: #fff; }
+    .btn { padding: 10px 20px; margin: 10px; font-size: 18px; cursor: pointer; }
+    .big { background: green; }
+    .small { background: red; }
+    #result { font-size: 24px; margin-top: 20px; }
+  </style>
+</head>
+<body>
+  <h1>55 Club Wingo Game</h1>
+  <h2 id="timer">60</h2>
+  <button class="btn big" onclick="select('Big')">BIG</button>
+  <button class="btn small" onclick="select('Small')">SMALL</button>
+  <div id="result">Waiting...</div>
+  <hr />
+  <button onclick="contactService()">📞 Contact Service</button>
+</body>
 
 <script>
-  // 🔑 Replace with your Firebase config:
-  const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_PROJECT.firebaseapp.com",
-    databaseURL: "https://YOUR_PROJECT.firebaseio.com",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_PROJECT.appspot.com",
-    messagingSenderId: "YOUR_SENDER_ID",
-    appId: "YOUR_APP_ID"
-  };
+let time = 60;
+let selected = null;
 
-  // Initialize Firebase
-  firebase.initializeApp(firebaseConfig);
-  const database = firebase.database();
-
-  function fetchLatestResult() {
-    firebase.database().ref('results/latest').on('value', (snapshot) => {
-      const result = snapshot.val();
-      document.getElementById("prediction").innerText = result ? result : "No Data";
-    });
-  }
-
-  fetchLatestResult(); // Call when page loads
-</script><input type="text" id="newResult" placeholder="Enter Big/Small">
-<button onclick="saveResult()">Save</button>
-
-<script>
-  function saveResult() {
-    const value = document.getElementById('newResult').value;
-    firebase.database().ref('results/latest').set(value);
-    alert("Result Saved: " + value);
-  }
-</script>{
-  "rules": {
-    ".read": true,
-    ".write": false
+function countdown() {
+  document.getElementById("timer").innerText = time;
+  if (time === 0) {
+    showResult();
+    time = 60;
+  } else {
+    time--;
+    setTimeout(countdown, 1000);
   }
 }
+countdown();
+
+function select(choice) {
+  selected = choice;
+  document.getElementById("result").innerText = "You selected: " + choice;
+}
+
+function showResult() {
+  const outcome = Math.random() > 0.5 ? "Big" : "Small";
+  if (selected === outcome) {
+    document.getElementById("result").innerText = `✅ Win! Result: ${outcome}`;
+  } else {
+    document.getElementById("result").innerText = `❌ Lose! Result: ${outcome}`;
+  }
+  selected = null;
+}
+
+function contactService() {
+  alert("Contact WhatsApp: +91xxxxxxxxxx");
+}
+</script>
+</html>
