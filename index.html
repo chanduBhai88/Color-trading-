@@ -2,56 +2,87 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>91 Club Pattern Game</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Wingo Big-Small Game</title>
   <style>
     body {
-      text-align: center;
+      background-color: #0f0; /* Green background */
       font-family: Arial, sans-serif;
-      padding: 30px;
-      background: linear-gradient(to bottom right, red, white, green);
+      text-align: center;
+      padding: 20px;
     }
     h1 {
-      color: #222;
+      font-size: 28px;
+      color: #000;
+    }
+    #timer {
+      font-size: 48px;
+      margin: 20px;
+      color: #000;
     }
     #result {
       font-size: 40px;
       font-weight: bold;
-      margin-top: 30px;
+      color: #222;
+      margin: 20px;
     }
     button {
-      padding: 15px 30px;
       font-size: 20px;
+      padding: 10px 20px;
+      margin: 10px;
+      border-radius: 12px;
       border: none;
-      border-radius: 10px;
       cursor: pointer;
-      background-color: #333;
+    }
+    .correct {
+      background-color: #4CAF50;
+      color: white;
+    }
+    .wrong {
+      background-color: #f44336;
       color: white;
     }
   </style>
 </head>
 <body>
-  <h1>91 Club Game Pattern Result</h1>
-  <button onclick="generateResult()">🎲 Click For Result</button>
-  <div id="result"></div>
+  <h1>Wingo Big-Small 60s Game</h1>
+  <div id="timer">60</div>
+  <div id="result">Waiting...</div>
+
+  <button class="correct" onclick="markResult('Sahi')">✅ Sahi</button>
+  <button class="wrong" onclick="markResult('Galat')">❌ Galat</button>
 
   <script>
-    const pattern1 = Array(20).fill("Big");
-    const pattern2 = Array(20).fill("Small");
-    const pattern3 = Array.from({ length: 20 }, (_, i) => (i % 2 === 0 ? "Small" : "Big"));
-    const pattern4 = [];
-    for (let i = 0; i < 10; i++) {
-      pattern4.push("Big", "Big", "Small", "Small");
-    }
+    let time = 60;
+    let timerInterval;
+    let result = "";
 
-    const allPatterns = [pattern1, pattern2, pattern3, pattern4];
-    let count = 0;
+    function startTimer() {
+      timerInterval = setInterval(() => {
+        time--;
+        document.getElementById("timer").innerText = time;
+
+        if (time === 0) {
+          clearInterval(timerInterval);
+          generateResult();
+          time = 60;
+          setTimeout(startTimer, 1000); // restart timer after 1 sec
+        }
+      }, 1000);
+    }
 
     function generateResult() {
-      const pattern = allPatterns[count % allPatterns.length];
-      const result = pattern[Math.floor(Math.random() * pattern.length)];
-      document.getElementById("result").textContent = `Result: ${result}`;
-      count++;
+      // Random result (or use your pattern logic here)
+      result = Math.random() > 0.5 ? "Big" : "Small";
+      document.getElementById("result").innerText = result;
     }
+
+    function markResult(status) {
+      alert(`Aapne result ko "${status}" mark kiya!`);
+    }
+
+    // Start everything
+    startTimer();
   </script>
 </body>
 </html>
