@@ -6,22 +6,20 @@
     body {
       margin: 0;
       padding: 0;
-      background-color: orange;
-      background-size: cover;
-      background-position: center;
+      background: linear-gradient(to right, green, red);
       font-family: Arial, sans-serif;
       text-align: center;
       color: white;
     }
 
     .container {
-      background-color: rgba(0, 0, 0, 0.6);
+      background-color: rgba(0, 0, 0, 0.7);
       padding: 30px;
       margin: 60px auto;
       width: 90%;
       max-width: 400px;
       border-radius: 20px;
-      box-shadow: 0 0 20px #ffcc00;
+      box-shadow: 0 0 20px #00ff00;
     }
 
     h2 {
@@ -44,7 +42,7 @@
     }
 
     .small-btn {
-      background-color: #ff5722;
+      background-color: #dc3545;
       color: white;
     }
 
@@ -53,7 +51,7 @@
       opacity: 0.85;
     }
 
-    #result {
+    #result, #timer {
       font-size: 26px;
       margin-top: 20px;
       font-weight: bold;
@@ -69,10 +67,11 @@
 <body>
 
   <div class="container">
-    <h2>🔥 91 Club Big Small</h2>
-    <p>Click and Test Your Luck!</p>
-    <button class="big-btn" onclick="checkResult('Big')">Big</button>
-    <button class="small-btn" onclick="checkResult('Small')">Small</button>
+    <h2>🟢🔴 91 Club Big Small Wingo</h2>
+    <p>Choose: Big or Small</p>
+    <button class="big-btn" onclick="makeChoice('Big')">Big</button>
+    <button class="small-btn" onclick="makeChoice('Small')">Small</button>
+    <div id="timer">⏱️ 60</div>
     <div id="result"></div>
     <div id="patternInfo"></div>
   </div>
@@ -87,15 +86,40 @@
 
     let currentPattern = Math.ceil(Math.random() * 4);
     let step = 0;
+    let userChoice = null;
+    let countdown = 60;
+    let interval;
 
-    function checkResult(userChoice) {
+    function startTimer() {
+      document.getElementById("result").innerHTML = "";
+      document.getElementById("patternInfo").innerHTML = "";
+      document.getElementById("timer").innerHTML = "⏱️ 60";
+      countdown = 60;
+      interval = setInterval(() => {
+        countdown--;
+        document.getElementById("timer").innerHTML = "⏱️ " + countdown;
+        if (countdown <= 0) {
+          clearInterval(interval);
+          showResult();
+        }
+      }, 1000);
+    }
+
+    function makeChoice(choice) {
+      userChoice = choice;
+    }
+
+    function showResult() {
       const pattern = patterns[currentPattern];
-      const correct = pattern[step];
+      const correct = pattern[step] || "Big"; // fallback
 
       const resultDiv = document.getElementById("result");
       const infoDiv = document.getElementById("patternInfo");
 
-      if (userChoice === correct) {
+      if (!userChoice) {
+        resultDiv.innerHTML = "⚠️ No selection!";
+        resultDiv.style.color = "yellow";
+      } else if (userChoice === correct) {
         resultDiv.innerHTML = "✅ Right!";
         resultDiv.style.color = "lightgreen";
       } else {
@@ -103,15 +127,19 @@
         resultDiv.style.color = "red";
       }
 
-      infoDiv.innerHTML = `Step: ${step + 1}`;
-
+      infoDiv.innerHTML = `Pattern: ${currentPattern} | Step: ${step + 1} | Result: ${correct}`;
       step++;
+      userChoice = null;
 
       if (step >= pattern.length) {
         step = 0;
         currentPattern = Math.ceil(Math.random() * 4);
       }
+
+      setTimeout(startTimer, 3000); // next round in 3 seconds
     }
+
+    startTimer(); // Start game
   </script>
 
 </body>
