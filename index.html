@@ -1,33 +1,75 @@
-// Color Prediction Tool for 91 Club - Live Timer + Last 5 Results + Trend Graph
+https://91in02.com/[some_endpoint]<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Wingo 1-Minute Predictor</title>
+  <style>
+    body {
+      background: linear-gradient(to bottom right, #ffffff, #d2ffd2);
+      font-family: sans-serif;
+      text-align: center;
+      padding: 20px;
+    }
+    .countdown {
+      font-size: 48px;
+      font-weight: bold;
+      margin-top: 20px;
+    }
+    .result-box {
+      margin-top: 20px;
+      font-size: 24px;
+    }
+    .history {
+      margin-top: 20px;
+    }
+    .ball {
+      display: inline-block;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      line-height: 50px;
+      background-color: #4caf50;
+      color: white;
+      margin: 5px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>🔥 Wingo 1-Minute Auto Predictor 🔥</h1>  <div class="countdown" id="timer">60</div>  <div class="result-box" id="result">Waiting for next result...</div>  <div class="history" id="history">
+    <h3>Last 5 Results:</h3>
+    <div id="resultList"></div>
+  </div>  <script>
+    let timeLeft = 60;
+    let lastResults = [];
 
-import React, { useEffect, useState } from "react"; import { Card, CardContent } from "@/components/ui/card"; import { Button } from "@/components/ui/button"; import { LineChart, Line, XAxis, YAxis, Tooltip } from "recharts"; import { motion } from "framer-motion";
+    function getRandomResult() {
+      return Math.random() > 0.5 ? 'Big' : 'Small';
+    }
 
-const MOCK_RESULTS = ["Big", "Small", "Big", "Big", "Small"];
+    function updateTimer() {
+      document.getElementById('timer').textContent = timeLeft;
+      timeLeft--;
 
-export default function PredictionTool() { const [timer, setTimer] = useState(60); const [results, setResults] = useState(MOCK_RESULTS); const [period, setPeriod] = useState(11000); const [predicted, setPredicted] = useState("...");
+      if (timeLeft < 0) {
+        // Generate new result
+        const result = getRandomResult();
+        document.getElementById('result').textContent = 'Result: ' + result;
 
-// Countdown Timer useEffect(() => { const interval = setInterval(() => { setTimer((prev) => { if (prev === 1) { handlePrediction(); return 60; } return prev - 1; }); }, 1000); return () => clearInterval(interval); }, []);
+        // Update history
+        lastResults.unshift(result);
+        if (lastResults.length > 5) lastResults.pop();
 
-// Smart Prediction const handlePrediction = () => { const last = results.slice(-3); let countBig = last.filter((x) => x === "Big").length; let next = countBig >= 2 ? "Big" : "Small"; const newPeriod = period + 1;
+        const resultList = document.getElementById('resultList');
+        resultList.innerHTML = lastResults
+          .map((res) => `<div class="ball">${res}</div>`) 
+          .join('');
 
-setPredicted(next);
-setPeriod(newPeriod);
-setResults((prev) => [...prev.slice(-4), next]);
+        // Reset timer
+        timeLeft = 60;
+      }
+    }
 
-};
-
-const chartData = results.map((res, index) => ({ name: R${period - 4 + index}, value: res === "Big" ? 1 : 0, }));
-
-return ( <div className="min-h-screen bg-gradient-to-br from-white to-green-100 p-4"> <motion.h1 initial={{ opacity: 0, y: -30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="text-3xl font-bold text-center mb-4" > 🎯 91 Club Color Prediction Tool </motion.h1>
-
-<div className="grid md:grid-cols-3 gap-4">
-    <Card className="rounded-2xl shadow-lg">
-      <CardContent className="p-4">
-        <h2 className="text-xl font-semibold mb-2">🕒 Timer</h2>
-        <p className="text-3xl text-green-700 font-bold">{timer}s</p>
-      </CardContent>
-    </Card>
-
-    <Card className="rounded-2xl shadow-lg">
-      <CardContent className="p-4">
-
+    setInterval(updateTimer, 1000);
+  </script></body>
+</html>
