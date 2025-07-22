@@ -1,121 +1,51 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>MAHI BHAI PREDICTOR 🔥</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Wingo Live Result Tool</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     body {
-      background: linear-gradient(to right, white, #d4ffd4);
-      font-family: 'Segoe UI', sans-serif;
-      text-align: center;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(white, #d4fcd7);
+      margin: 0;
       padding: 20px;
     }
-    h1 {
-      color: green;
+    .card {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      padding: 20px;
+      margin-bottom: 20px;
     }
-    #timer {
-      font-size: 48px;
-      margin: 10px 0;
-      color: #ff4d00;
-    }
-    #prediction {
-      font-size: 32px;
+    .title {
+      font-size: 24px;
       font-weight: bold;
-      color: #0077ff;
+      margin-bottom: 10px;
     }
-    #results {
-      margin-top: 20px;
-      font-size: 18px;
-      color: #333;
+    .timer {
+      font-size: 32px;
+      color: #28a745;
+    }
+    .result-history {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
     }
     .result-box {
-      display: inline-block;
-      margin: 3px;
-      padding: 5px 10px;
-      border-radius: 6px;
-      background-color: #e0ffe0;
-    }
-    canvas {
-      margin-top: 20px;
+      padding: 8px 12px;
+      background-color: #f1f1f1;
+      border-radius: 8px;
     }
   </style>
 </head>
 <body>
-
-  <h1>MAHI BHAI PREDICTOR 🔥</h1>
-  <div id="timer">60</div>
-  <div id="prediction">Predicting...</div>
-  <div id="results"></div>
-  <canvas id="trend" width="300" height="100"></canvas>
-
-  <audio id="sound">
-    <source src="https://www.soundjay.com/buttons/beep-07.wav" type="audio/wav">
-  </audio>
-
-  <script>
-    let timeLeft = 60;
-    let results = [];
-    const timerDisplay = document.getElementById("timer");
-    const predictionDisplay = document.getElementById("prediction");
-    const resultsDisplay = document.getElementById("results");
-    const sound = document.getElementById("sound");
-    const trend = document.getElementById("trend");
-    const ctx = trend.getContext("2d");
-
-    function startTimer() {
-      const interval = setInterval(() => {
-        timeLeft--;
-        timerDisplay.textContent = timeLeft;
-
-        if (timeLeft <= 0) {
-          clearInterval(interval);
-          showResult();
-          timeLeft = 60;
-          startTimer();
-        }
-      }, 1000);
-    }
-
-    function showResult() {
-      const result = Math.random() > 0.5 ? "Big" : "Small";
-      results.unshift(result);
-      if (results.length > 10) results.pop();
-
-      updatePrediction();
-      updateResults();
-      updateGraph();
-      sound.play();
-    }
-
-    function updatePrediction() {
-      const bigCount = results.filter(r => r === "Big").length;
-      const smallCount = results.filter(r => r === "Small").length;
-
-      const prediction = bigCount > smallCount ? "Next: Small" : "Next: Big";
-      predictionDisplay.textContent = prediction;
-    }
-
-    function updateResults() {
-      resultsDisplay.innerHTML = results.map(r =>
-        `<span class="result-box">${r}</span>`
-      ).join("");
-    }
-
-    function updateGraph() {
-      ctx.clearRect(0, 0, trend.width, trend.height);
-      ctx.beginPath();
-      ctx.moveTo(0, 50);
-      results.slice().reverse().forEach((res, i) => {
-        const y = res === "Big" ? 30 : 70;
-        ctx.lineTo((i + 1) * 30, y);
-      });
-      ctx.strokeStyle = "#00aa00";
-      ctx.stroke();
-    }
-
-    // Initial Run
-    startTimer();
-  </script>
-
-</body>
-</html>
+  <div class="card">
+    <div class="title">Live Countdown Timer</div>
+    <div id="countdown" class="timer">60</div>
+  </div>  <div class="card">
+    <div class="title">Last 5 Results</div>
+    <div id="lastResults" class="result-history"></div>
+  </div>  <div class="card">
+    <div class="title">Live Trend Chart</div>
+    <canvas id="trendChart" height="100"></
