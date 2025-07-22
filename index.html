@@ -1,23 +1,6 @@
-let patternIndex91 = 0;
-const pattern91 = ["BIG", "SMALL", "BIG", "SMALL", "BIG", "SMALL"];function checkPlayerResult() {
-    const currentText = document.getElementById("textview1Player").textContent;
-    const selectedServer = document.getElementById("serverSpinner").value;
-
-    if (currentText !== previousPlayerText) {
-        let result;
-        if (selectedServer === "91 CLUB") {
-            result = pattern91[patternIndex91 % pattern91.length];
-            patternIndex91++;
-        } else {
-            result = Math.random() > 0.5 ? "BIG" : "SMALL";
-        }
-
-        document.getElementById("resultPlayer").textContent = `Result: ${result}`;
-        previousPlayerText = currentText;
-    } else {
-        alert("PLS WAIT FOR NEXT PERIOD");
-    }
-}if (document.getElementById('serverSpinner').value === '91 CLUB') {
-    alert("✅ 91 CLUB SERVICE ENABLED!");
-    document.body.style.background = "linear-gradient(90deg, #0F2027, #2C5364)";
-}
+1. Game name: 91 Club Wingo
+2. Logic: Big Small show with predicted number
+3. Buttons: Start, Stop, Reset – result auto aaye
+4. Timer: 60 second, auto reset
+5. UI: Tiranga theme
+6. Prediction: Pattern based prediction
