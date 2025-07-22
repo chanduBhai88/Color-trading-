@@ -1,75 +1,114 @@
-https://91in02.com/[some_endpoint]<!DOCTYPE html><html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Wingo 1-Minute Predictor</title>
-  <style>
-    body {
-      background: linear-gradient(to bottom right, #ffffff, #d2ffd2);
-      font-family: sans-serif;
-      text-align: center;
-      padding: 20px;
-    }
-    .countdown {
-      font-size: 48px;
-      font-weight: bold;
-      margin-top: 20px;
-    }
-    .result-box {
-      margin-top: 20px;
-      font-size: 24px;
-    }
-    .history {
-      margin-top: 20px;
-    }
-    .ball {
-      display: inline-block;
-      width: 50px;
-      height: 50px;
-      border-radius: 50%;
-      line-height: 50px;
-      background-color: #4caf50;
-      color: white;
-      margin: 5px;
-      font-weight: bold;
-    }
-  </style>
-</head>
-<body>
-  <h1>🔥 Wingo 1-Minute Auto Predictor 🔥</h1>  <div class="countdown" id="timer">60</div>  <div class="result-box" id="result">Waiting for next result...</div>  <div class="history" id="history">
-    <h3>Last 5 Results:</h3>
-    <div id="resultList"></div>
-  </div>  <script>
-    let timeLeft = 60;
-    let lastResults = [];
-
-    function getRandomResult() {
-      return Math.random() > 0.5 ? 'Big' : 'Small';
-    }
-
-    function updateTimer() {
-      document.getElementById('timer').textContent = timeLeft;
-      timeLeft--;
-
-      if (timeLeft < 0) {
-        // Generate new result
-        const result = getRandomResult();
-        document.getElementById('result').textContent = 'Result: ' + result;
-
-        // Update history
-        lastResults.unshift(result);
-        if (lastResults.length > 5) lastResults.pop();
-
-        const resultList = document.getElementById('resultList');
-        resultList.innerHTML = lastResults
-          .map((res) => `<div class="ball">${res}</div>`) 
-          .join('');
-
-        // Reset timer
-        timeLeft = 60;
-      }
-    }
-
-    setInterval(updateTimer, 1000);
-  </script></body>
-</html>
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    android:versionCode="1"
+    android:versionName="1.0"
+    android:compileSdkVersion="33"
+    android:compileSdkVersionCodename="13"
+    package="com.itachi.anxt.parnav"
+    platformBuildVersionCode="33"
+    platformBuildVersionName="13">
+    <uses-sdk
+        android:minSdkVersion="21"
+        android:targetSdkVersion="28"/>
+    <uses-permission
+        android:name="android.permission.INTERNET"/>
+    <uses-permission
+        android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <application
+        android:theme="@7F100008"
+        android:label="@7F0F001C"
+        android:icon="@7F070058"
+        android:name=".SketchApplication"
+        android:allowBackup="true"
+        android:usesCleartextTraffic="true">
+        <activity
+            android:name=".MainActivity"
+            android:screenOrientation="1"
+            android:configChanges="0x00000DA0"
+            android:hardwareAccelerated="true"
+            android:supportsPictureInPicture="true"/>
+        <activity
+            android:name=".SplActivity"
+            android:screenOrientation="1"
+            android:configChanges="0x00000DA0"
+            android:hardwareAccelerated="true"
+            android:supportsPictureInPicture="true"/>
+        <activity
+            android:theme="@7F10000A"
+            android:name=".LoginActivity"
+            android:screenOrientation="1"
+            android:configChanges="0x00000DA0"
+            android:hardwareAccelerated="true"
+            android:supportsPictureInPicture="true"/>
+        <activity
+            android:theme="@7F10000A"
+            android:name=".Httpserverv13Activity"
+            android:screenOrientation="1"
+            android:configChanges="0x00000DA0"
+            android:hardwareAccelerated="true"
+            android:supportsPictureInPicture="true">
+            <intent-filter>
+                <action
+                    android:name="android.intent.action.MAIN"/>
+                <category
+                    android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
+        <activity
+            android:theme="@7F10000A"
+            android:name=".DecodeActivity"
+            android:screenOrientation="1"
+            android:configChanges="0x00000DA0"
+            android:hardwareAccelerated="true"
+            android:supportsPictureInPicture="true"/>
+        <activity
+            android:theme="@7F10000A"
+            android:name=".ServerofworkActivity"
+            android:screenOrientation="1"
+            android:configChanges="0x00000DA0"
+            android:hardwareAccelerated="true"
+            android:supportsPictureInPicture="true"/>
+        <activity
+            android:theme="@7F10000A"
+            android:name=".ServersectionActivity"
+            android:screenOrientation="1"
+            android:configChanges="0x00000DA0"
+            android:hardwareAccelerated="true"
+            android:supportsPictureInPicture="true"/>
+        <activity
+            android:name=".DebugActivity"
+            android:screenOrientation="1"/>
+        <provider
+            android:name="androidx.startup.InitializationProvider"
+            android:exported="false"
+            android:authorities="com.itachi.anxt.parnav.androidx-startup">
+            <meta-data
+                android:name="androidx.lifecycle.ProcessLifecycleInitializer"
+                android:value="androidx.startup"/>
+            <meta-data
+                android:name="androidx.emoji2.text.EmojiCompatInitializer"
+                android:value="androidx.startup"/>
+        </provider>
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@7F090008"/>
+        <provider
+            android:name="com.google.firebase.provider.FirebaseInitProvider"
+            android:exported="false"
+            android:authorities="com.itachi.anxt.parnav.firebaseinitprovider"
+            android:initOrder="100"/>
+        <service
+            android:name="com.google.firebase.components.ComponentDiscoveryService"
+            android:exported="false">
+            <meta-data
+                android:name="com.google.firebase.components:com.google.firebase.auth.FirebaseAuthRegistrar"
+                android:value="com.google.firebase.components.ComponentRegistrar"/>
+            <meta-data
+                android:name="com.google.firebase.components:com.google.firebase.database.DatabaseRegistrar"
+                android:value="com.google.firebase.components.ComponentRegistrar"/>
+        </service>
+        <uses-library
+            android:name="org.apache.http.legacy"
+            android:required="false"/>
+    </application>
+</manifest>
