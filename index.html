@@ -1,35 +1,141 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>30 Second Auto Timer</title>
+  <title>Big Small Pattern Game with Countdown</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      text-align: center;
+      padding-top: 40px;
+      background: linear-gradient(to right, #e0eafc, #cfdef3);
+    }
+    h2 {
+      font-size: 28px;
+      color: #333;
+    }
+    #pattern {
+      font-size: 24px;
+      margin: 20px;
+      padding: 15px;
+      border-radius: 10px;
+      background-color: #fff;
+      display: inline-block;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    .pattern-item {
+      margin: 0 5px;
+      padding: 5px 10px;
+      border-radius: 5px;
+    }
+    .Big {
+      background-color: #4caf50;
+      color: white;
+    }
+    .Small {
+      background-color: #f44336;
+      color: white;
+    }
+    #time, #countdown {
+      margin-top: 10px;
+      color: gray;
+      font-size: 18px;
+    }
+    #buttons {
+      margin-top: 20px;
+    }
+    button {
+      font-size: 16px;
+      margin: 5px;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    .correct {
+      background-color: #4caf50;
+      color: white;
+    }
+    .wrong {
+      background-color: #f44336;
+      color: white;
+    }
+    #scoreboard {
+      margin-top: 20px;
+      font-size: 18px;
+    }
+  </style>
 </head>
-<body style="font-family: Arial; text-align: center; padding-top: 50px;">
-  <h2>⏲️ 30 Second Auto Timer</h2>
-  <p id="status">Next Action in 30 seconds...</p>
+<body>
+
+  <h2>🔁 Big/Small Pattern Game (Auto 30 sec)</h2>
+  <div id="pattern">Loading pattern...</div>
+  <div id="time"></div>
+  <div id="countdown">⏳ Next pattern in: <span id="timer">30</span> sec</div>
+
+  <div id="buttons">
+    <button class="correct" onclick="markResult(true)">✅ Correct</button>
+    <button class="wrong" onclick="markResult(false)">❌ Wrong</button>
+  </div>
+
+  <div id="scoreboard">
+    ✅ Correct: <span id="correct">0</span> |
+    ❌ Wrong: <span id="wrong">0</span>
+  </div>
 
   <script>
-    function doAction() {
-      const time = new Date().toLocaleTimeString();
-      document.getElementById("status").innerText = `🔁 Last Action Run at: ${time}`;
-      console.log("Action performed at", time);
+    const patterns = [
+      ["Small", "Small", "Small", "Small", "Small"],
+      ["Big", "Big", "Big", "Big", "Big"],
+      ["Big", "Small", "Big", "Small", "Big"],
+      ["Small", "Big", "Small", "Big", "Small"],
+      ["Big", "Big", "Small", "Small", "Big"],
+      ["Small", "Big", "Big", "Small", "Small"]
+    ];
 
-      // 👇 Yahan aap apna Big/Small game logic ya prediction daal sakte ho
-      // Example: predictBigSmall(), resetResult(), etc.
+    let index = 0;
+    let correctCount = 0;
+    let wrongCount = 0;
+    let countdown = 30;
+
+    function showPattern() {
+      const patternDiv = document.getElementById("pattern");
+      const timeDiv = document.getElementById("time");
+      const currentPattern = patterns[index % patterns.length];
+
+      patternDiv.innerHTML = currentPattern.map(item =>
+        `<span class="pattern-item ${item}">${item}</span>`
+      ).join("");
+
+      timeDiv.innerText = `⏰ Last Updated: ${new Date().toLocaleTimeString()}`;
+      index++;
+      countdown = 30;
     }
 
-    // Pehli baar turant run kare
-    doAction();
+    function markResult(isCorrect) {
+      if (isCorrect) {
+        correctCount++;
+        document.getElementById("correct").innerText = correctCount;
+      } else {
+        wrongCount++;
+        document.getElementById("wrong").innerText = wrongCount;
+      }
+    }
 
-    // Har 30 second baad run kare
-    setInterval(doAction, 30000); // 30000 ms = 30 sec
+    // Countdown Timer
+    setInterval(() => {
+      if (countdown > 0) {
+        countdown--;
+      } else {
+        showPattern();
+        countdown = 30;
+      }
+      document.getElementById("timer").innerText = countdown;
+    }, 1000);
+
+    // First pattern display
+    showPattern();
   </script>
-</body>
-</html>function doAction() {
-  const time = new Date().toLocaleTimeString();
-  document.getElementById("status").innerText = `🔁 Last Action Run at: ${time}`;
-  
-  let random = Math.floor(Math.random() * 100);
-  let result = random % 2 === 0 ? "Big" : "Small";
 
-  console.log(`Result: ${result} (${random})`);
-}
+</body>
+</html>
