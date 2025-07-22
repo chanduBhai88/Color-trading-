@@ -1,6 +1,79 @@
-1. Game name: 91 Club Wingo
-2. Logic: Big Small show with predicted number
-3. Buttons: Start, Stop, Reset – result auto aaye
-4. Timer: 60 second, auto reset
-5. UI: Tiranga theme
-6. Prediction: Pattern based prediction
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Wingo Big Small - 1 Minute</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background-color: #1a1a1a;
+      color: white;
+      padding: 20px;
+    }
+    #box {
+      font-size: 40px;
+      margin-top: 20px;
+    }
+    #result {
+      font-size: 32px;
+      font-weight: bold;
+      margin-top: 10px;
+    }
+    .big { color: limegreen; }
+    .small { color: orange; }
+  </style>
+</head>
+<body>
+
+  <h1>Wingo Big-Small Game (Auto 1 Minute)</h1>
+  <div id="number">Number: <span id="currentNumber">11000</span></div>
+  <div id="timer">Next in: <span id="countdown">60</span>s</div>
+  <div id="box">⏳ Waiting...</div>
+  <div id="result"></div>
+
+  <script>
+    let number = 11000;
+    let countdown = 60;
+
+    function generateResult(num) {
+      let lastDigit = num % 10;
+      if (lastDigit >= 5) {
+        return { label: "Big", class: "big" };
+      } else {
+        return { label: "Small", class: "small" };
+      }
+    }
+
+    function updateGame() {
+      // Update number
+      document.getElementById("currentNumber").textContent = number;
+
+      // Predict and show result
+      const result = generateResult(number);
+      document.getElementById("box").textContent = result.label;
+      document.getElementById("box").className = result.class;
+      document.getElementById("result").textContent = `Result for ${number} is ${result.label}`;
+      document.getElementById("result").className = result.class;
+
+      // Prepare for next
+      number--;
+      if (number < 10999) number = 11000; // Reset after 10999
+    }
+
+    // Timer countdown
+    setInterval(() => {
+      countdown--;
+      document.getElementById("countdown").textContent = countdown;
+
+      if (countdown <= 0) {
+        updateGame();
+        countdown = 60;
+      }
+    }, 1000);
+
+    // First show
+    updateGame();
+  </script>
+</body>
+</html>
