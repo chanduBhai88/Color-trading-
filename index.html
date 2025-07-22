@@ -1,51 +1,33 @@
-<!DOCTYPE html><html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Wingo Live Result Tool</title>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: linear-gradient(white, #d4fcd7);
-      margin: 0;
-      padding: 20px;
-    }
-    .card {
-      background: #fff;
-      border-radius: 16px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-      padding: 20px;
-      margin-bottom: 20px;
-    }
-    .title {
-      font-size: 24px;
-      font-weight: bold;
-      margin-bottom: 10px;
-    }
-    .timer {
-      font-size: 32px;
-      color: #28a745;
-    }
-    .result-history {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-    .result-box {
-      padding: 8px 12px;
-      background-color: #f1f1f1;
-      border-radius: 8px;
-    }
-  </style>
-</head>
-<body>
-  <div class="card">
-    <div class="title">Live Countdown Timer</div>
-    <div id="countdown" class="timer">60</div>
-  </div>  <div class="card">
-    <div class="title">Last 5 Results</div>
-    <div id="lastResults" class="result-history"></div>
-  </div>  <div class="card">
-    <div class="title">Live Trend Chart</div>
-    <canvas id="trendChart" height="100"></
+// Color Prediction Tool for 91 Club - Live Timer + Last 5 Results + Trend Graph
+
+import React, { useEffect, useState } from "react"; import { Card, CardContent } from "@/components/ui/card"; import { Button } from "@/components/ui/button"; import { LineChart, Line, XAxis, YAxis, Tooltip } from "recharts"; import { motion } from "framer-motion";
+
+const MOCK_RESULTS = ["Big", "Small", "Big", "Big", "Small"];
+
+export default function PredictionTool() { const [timer, setTimer] = useState(60); const [results, setResults] = useState(MOCK_RESULTS); const [period, setPeriod] = useState(11000); const [predicted, setPredicted] = useState("...");
+
+// Countdown Timer useEffect(() => { const interval = setInterval(() => { setTimer((prev) => { if (prev === 1) { handlePrediction(); return 60; } return prev - 1; }); }, 1000); return () => clearInterval(interval); }, []);
+
+// Smart Prediction const handlePrediction = () => { const last = results.slice(-3); let countBig = last.filter((x) => x === "Big").length; let next = countBig >= 2 ? "Big" : "Small"; const newPeriod = period + 1;
+
+setPredicted(next);
+setPeriod(newPeriod);
+setResults((prev) => [...prev.slice(-4), next]);
+
+};
+
+const chartData = results.map((res, index) => ({ name: R${period - 4 + index}, value: res === "Big" ? 1 : 0, }));
+
+return ( <div className="min-h-screen bg-gradient-to-br from-white to-green-100 p-4"> <motion.h1 initial={{ opacity: 0, y: -30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="text-3xl font-bold text-center mb-4" > 🎯 91 Club Color Prediction Tool </motion.h1>
+
+<div className="grid md:grid-cols-3 gap-4">
+    <Card className="rounded-2xl shadow-lg">
+      <CardContent className="p-4">
+        <h2 className="text-xl font-semibold mb-2">🕒 Timer</h2>
+        <p className="text-3xl text-green-700 font-bold">{timer}s</p>
+      </CardContent>
+    </Card>
+
+    <Card className="rounded-2xl shadow-lg">
+      <CardContent className="p-4">
+
