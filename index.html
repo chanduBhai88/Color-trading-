@@ -1,79 +1,278 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Wingo Big Small - 1 Minute</title>
+  <meta charset="UTF-8">
+  <title>Wingo 1-Minute Big Small Auto Result</title>
   <style>
     body {
       font-family: Arial, sans-serif;
+      background: #1c1c1c;
+      color: #fff;
       text-align: center;
-      background-color: #1a1a1a;
-      color: white;
+      padding-top: 50px;
+    }
+    .result-box {
+      font-size: 30px;
+      margin: 20px auto;
       padding: 20px;
+      border-radius: 12px;
+      background: #2c2c2c;
+      width: 300px;
+      box-shadow: 0 0 10px #00ffcc;
     }
-    #box {
-      font-size: 40px;
-      margin-top: 20px;
-    }
-    #result {
-      font-size: 32px;
-      font-weight: bold;
-      margin-top: 10px;
-    }
-    .big { color: limegreen; }
-    .small { color: orange; }
+    .big { color: #00ff00; }
+    .small { color: #ff0000; }
   </style>
 </head>
 <body>
 
-  <h1>Wingo Big-Small Game (Auto 1 Minute)</h1>
-  <div id="number">Number: <span id="currentNumber">11000</span></div>
-  <div id="timer">Next in: <span id="countdown">60</span>s</div>
-  <div id="box">⏳ Waiting...</div>
-  <div id="result"></div>
+  <h1>Wingo 1-Minute Predictor</h1>
+  <div class="result-box" id="resultBox">
+    Loading...
+  </div>
 
   <script>
-    let number = 11000;
+    function getRandomResult() {
+      const number = Math.floor(Math.random() * 100); // 0–99
+      const type = number >= 50 ? "Big" : "Small";
+      const cssClass = number >= 50 ? "big" : "small";
+      const result = `<span class="${cssClass}">${type}</span> - Number: ${number}`;
+      document.getElementById("resultBox").innerHTML = result;
+    }
+
+    // Initial load
+    getRandomResult();
+
+    // Auto update every 60 seconds
+    setInterval(getRandomResult, 60000);
+  </script>
+
+</body>
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Wingo Big/Small Predictor</title>
+  <style>
+    body {
+      background-color: #111;
+      color: white;
+      font-family: 'Segoe UI', sans-serif;
+      text-align: center;
+      padding: 20px;
+    }
+
+    h1 {
+      color: #00ffff;
+    }
+
+    .result-box {
+      margin: 20px auto;
+      padding: 20px;
+      border-radius: 15px;
+      width: 300px;
+      font-size: 26px;
+      background: #222;
+      box-shadow: 0 0 12px #00ffcc;
+    }
+
+    .big {
+      color: #00ff00;
+    }
+
+    .small {
+      color: #ff4444;
+    }
+
+    .history {
+      margin-top: 30px;
+    }
+
+    .history h2 {
+      margin-bottom: 10px;
+      font-size: 20px;
+      color: #ffaa00;
+    }
+
+    .history-item {
+      font-size: 18px;
+      margin: 5px;
+    }
+
+    #timer {
+      font-size: 22px;
+      color: #00ffcc;
+      margin-bottom: 15px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Wingo 1-Minute Predictor</h1>
+  <div id="timer">Next Result in: 60s</div>
+  <div class="result-box" id="resultBox">
+    Loading result...
+  </div>
+
+  <div class="history" id="history">
+    <h2>Last 5 Results</h2>
+    <!-- History will show here -->
+  </div>
+
+  <script>
+    let historyData = [];
     let countdown = 60;
 
-    function generateResult(num) {
-      let lastDigit = num % 10;
-      if (lastDigit >= 5) {
-        return { label: "Big", class: "big" };
-      } else {
-        return { label: "Small", class: "small" };
+    function generateResult() {
+      const number = Math.floor(Math.random() * 100); // 0 to 99
+      const type = number >= 50 ? "Big" : "Small";
+      const cssClass = type.toLowerCase();
+
+      const resultText = `<span class="${cssClass}">${type}</span> - Number: ${number}`;
+      document.getElementById("resultBox").innerHTML = resultText;
+
+      // Add to history
+      historyData.unshift(`${type} - ${number}`);
+      if (historyData.length > 5) {
+        historyData.pop();
       }
+
+      // Show history
+      const historyHTML = historyData.map(item => `<div class="history-item">${item}</div>`).join("");
+      document.getElementById("history").innerHTML = `<h2>Last 5 Results</h2>${historyHTML}`;
     }
 
-    function updateGame() {
-      // Update number
-      document.getElementById("currentNumber").textContent = number;
+    function startCountdown() {
+      setInterval(() => {
+        countdown--;
+        document.getElementById("timer").innerText = `Next Result in: ${countdown}s`;
 
-      // Predict and show result
-      const result = generateResult(number);
-      document.getElementById("box").textContent = result.label;
-      document.getElementById("box").className = result.class;
-      document.getElementById("result").textContent = `Result for ${number} is ${result.label}`;
-      document.getElementById("result").className = result.class;
-
-      // Prepare for next
-      number--;
-      if (number < 10999) number = 11000; // Reset after 10999
+        if (countdown === 0) {
+          generateResult();
+          countdown = 60;
+        }
+      }, 1000);
     }
 
-    // Timer countdown
-    setInterval(() => {
-      countdown--;
-      document.getElementById("countdown").textContent = countdown;
-
-      if (countdown <= 0) {
-        updateGame();
-        countdown = 60;
-      }
-    }, 1000);
-
-    // First show
-    updateGame();
+    // Initial run
+    generateResult();
+    startCountdown();
   </script>
+
 </body>
-</html>
+</html>let historyData = [];historyData.unshift(`${type} - ${number}`);
+if (historyData.length > 5) {
+  historyData.pop(); // Purane result hatao
+}let historyData = JSON.parse(localStorage.getItem("wingoHistory")) || [];
+
+function saveHistory() {
+  localStorage.setItem("wingoHistory", JSON.stringify(historyData));
+}// Add to history
+historyData.unshift(`${type} - ${number}`);
+if (historyData.length > 5) {
+  historyData.pop();
+}
+saveHistory(); // Save to localStorage
+
+// Show history
+const historyHTML = historyData.map(item => `<div class="history-item">${item}</div>`).join("");
+document.getElementById("history").innerHTML = `<h2>Last 5 Results</h2>${historyHTML}`;<button onclick="clearHistory()">Clear History</button>function clearHistory() {
+  historyData = [];
+  saveHistory();
+  document.getElementById("history").innerHTML = "<h2>Last 5 Results</h2>No history.";
+}<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Wingo Predictor with Sound</title>
+  <style>
+    body {
+      background-color: #111;
+      color: white;
+      font-family: 'Segoe UI', sans-serif;
+      text-align: center;
+      padding: 20px;
+    }
+    h1 { color: #00ffff; }
+    .result-box {
+      margin: 20px auto;
+      padding: 20px;
+      border-radius: 15px;
+      width: 300px;
+      font-size: 26px;
+      background: #222;
+      box-shadow: 0 0 12px #00ffcc;
+    }
+    .big { color: #00ff00; }
+    .small { color: #ff4444; }
+    .history { margin-top: 30px; }
+    .history h2 { font-size: 20px; color: #ffaa00; }
+    .history-item { font-size: 18px; margin: 5px; }
+    #timer { font-size: 22px; color: #00ffcc; margin-bottom: 15px; }
+  </style>
+</head>
+<body>
+
+  <h1>Wingo 1-Minute Predictor</h1>
+  <div id="timer">Next Result in: 60s</div>
+  <div class="result-box" id="resultBox">
+    Loading result...
+  </div>
+
+  <div class="history" id="history">
+    <h2>Last 5 Results</h2>
+  </div>
+
+  <!-- 🔊 Sound files -->
+  <audio id="bigSound" src="big.mp3" preload="auto"></audio>
+  <audio id="smallSound" src="small.mp3" preload="auto"></audio>
+
+  <script>
+    let historyData = JSON.parse(localStorage.getItem("wingoHistory")) || [];
+    let countdown = 60;
+
+    function saveHistory() {
+      localStorage.setItem("wingoHistory", JSON.stringify(historyData));
+    }
+
+    function generateResult() {
+      const number = Math.floor(Math.random() * 100);
+      const type = number >= 50 ? "Big" : "Small";
+      const cssClass = type.toLowerCase();
+
+      // Sound play
+      if (type === "Big") {
+        document.getElementById("bigSound").play();
+      } else {
+        document.getElementById("smallSound").play();
+      }
+
+      const resultText = `<span class="${cssClass}">${type}</span> - Number: ${number}`;
+      document.getElementById("resultBox").innerHTML = resultText;
+
+      historyData.unshift(`${type} - ${number}`);
+      if (historyData.length > 5) historyData.pop();
+      saveHistory();
+
+      const historyHTML = historyData.map(item => `<div class="history-item">${item}</div>`).join("");
+      document.getElementById("history").innerHTML = `<h2>Last 5 Results</h2>${historyHTML}`;
+    }
+
+    function startCountdown() {
+      setInterval(() => {
+        countdown--;
+        document.getElementById("timer").innerText = `Next Result in: ${countdown}s`;
+        if (countdown === 0) {
+          generateResult();
+          countdown = 60;
+        }
+      }, 1000);
+    }
+
+    // First run
+    generateResult();
+    startCountdown();
+  </script>
+
+</body>
+</html><audio id="bigSound" src="https://www.soundjay.com/buttons/sounds/button-4.mp3" preload="auto"></audio>
