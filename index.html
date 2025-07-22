@@ -1,125 +1,197 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Big Small Pattern Game with Countdown</title>
+  <title>Big Small Color Trading Demo</title>
   <style>
     body {
-      font-family: 'Arial', sans-serif;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to right, #fdfbfb, #ebedee);
       text-align: center;
       padding-top: 40px;
-      background: linear-gradient(to right, #e0eafc, #cfdef3);
     }
     h2 {
       font-size: 28px;
-      color: #333;
+      color: #2e2e2e;
     }
-    #pattern {
-      font-size: 24px;
-      margin: 20px;
-      padding: 15px;
-      border-radius: 10px;
-      background-color: #fff;
+    .box {
+      background: white;
       display: inline-block;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      margin-top: 20px;
     }
-    .pattern-item {
-      margin: 0 5px;
-      padding: 5px 10px;
-      border-radius: 5px;
+    #result {
+      font-size: 32px;
+      margin: 10px 0;
     }
     .Big {
-      background-color: #4caf50;
       color: white;
+      background-color: #4caf50;
+      padding: 10px 20px;
+      border-radius: 10px;
     }
     .Small {
-      background-color: #f44336;
       color: white;
-    }
-    #time, #countdown {
-      margin-top: 10px;
-      color: gray;
-      font-size: 18px;
-    }
-    #buttons {
-      margin-top: 20px;
-    }
-    button {
-      font-size: 16px;
-      margin: 5px;
+      background-color: #f44336;
       padding: 10px 20px;
-      border: none;
       border-radius: 10px;
-      cursor: pointer;
-      transition: 0.3s;
     }
-    .correct {
-      background-color: #4caf50;
-      color: white;
+    #number {
+      font-size: 24px;
+      color: #444;
     }
-    .wrong {
-      background-color: #f44336;
-      color: white;
-    }
-    #scoreboard {
-      margin-top: 20px;
-      font-size: 18px;
+    #timer {
+      font-size: 20px;
+      color: #555;
+      margin-top: 15px;
     }
   </style>
 </head>
 <body>
 
-  <h2>🔁 Big/Small Pattern Game (Auto 30 sec)</h2>
-  <div id="pattern">Loading pattern...</div>
-  <div id="time"></div>
-  <div id="countdown">⏳ Next pattern in: <span id="timer">30</span> sec</div>
-
-  <div id="buttons">
-    <button class="correct" onclick="markResult(true)">✅ Correct</button>
-    <button class="wrong" onclick="markResult(false)">❌ Wrong</button>
-  </div>
-
-  <div id="scoreboard">
-    ✅ Correct: <span id="correct">0</span> |
-    ❌ Wrong: <span id="wrong">0</span>
+  <h2>🎯 Big / Small - Wingo 1 Minute Auto Show</h2>
+  <div class="box">
+    <div id="result">Loading...</div>
+    <div id="number">Number: --</div>
+    <div id="timer">⏳ Next result in: <span id="countdown">60</span> sec</div>
   </div>
 
   <script>
-    const patterns = [
-      ["Small", "Small", "Small", "Small", "Small"],
-      ["Big", "Big", "Big", "Big", "Big"],
-      ["Big", "Small", "Big", "Small", "Big"],
-      ["Small", "Big", "Small", "Big", "Small"],
-      ["Big", "Big", "Small", "Small", "Big"],
-      ["Small", "Big", "Big", "Small", "Small"]
-    ];
+    let countdown = 60;
 
-    let index = 0;
-    let correctCount = 0;
-    let wrongCount = 0;
-    let countdown = 30;
+    function generateResult() {
+      const randomNum = Math.floor(Math.random() * 100); // 0-99
+      const resultType = randomNum >= 50 ? "Big" : "Small";
 
-    function showPattern() {
-      const patternDiv = document.getElementById("pattern");
-      const timeDiv = document.getElementById("time");
-      const currentPattern = patterns[index % patterns.length];
-
-      patternDiv.innerHTML = currentPattern.map(item =>
-        `<span class="pattern-item ${item}">${item}</span>`
-      ).join("");
-
-      timeDiv.innerText = `⏰ Last Updated: ${new Date().toLocaleTimeString()}`;
-      index++;
-      countdown = 30;
+      document.getElementById("result").innerHTML = `<span class="${resultType}">${resultType}</span>`;
+      document.getElementById("number").innerText = `Number: ${randomNum}`;
+      countdown = 60;
     }
 
-    function markResult(isCorrect) {
-      if (isCorrect) {
-        correctCount++;
-        document.getElementById("correct").innerText = correctCount;
+    // Countdown Timer every second
+    setInterval(() => {
+      if (countdown > 0) {
+        countdown--;
       } else {
-        wrongCount++;
-        document.getElementById("wrong").innerText = wrongCount;
+        generateResult(); // New result every 60 sec
+        countdown = 60;
       }
+      document.getElementById("countdown").innerText = countdown;
+    }, 1000);
+
+    // First time run
+    generateResult();
+  </script>
+
+</body>
+</html><!DOCTYPE html>
+<html>
+<head>
+  <title>Big Small Color Trading - Wingo Demo</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to right, #e0eafc, #cfdef3);
+      text-align: center;
+      padding-top: 40px;
+    }
+    h2 {
+      font-size: 28px;
+      color: #2e2e2e;
+    }
+    .box {
+      background: white;
+      display: inline-block;
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      margin-top: 20px;
+    }
+    #result {
+      font-size: 32px;
+      margin: 10px 0;
+    }
+    .Big {
+      color: white;
+      background-color: #4caf50;
+      padding: 10px 20px;
+      border-radius: 10px;
+    }
+    .Small {
+      color: white;
+      background-color: #f44336;
+      padding: 10px 20px;
+      border-radius: 10px;
+    }
+    #number {
+      font-size: 24px;
+      color: #444;
+    }
+    #timer {
+      font-size: 20px;
+      color: #555;
+      margin-top: 15px;
+    }
+    #history {
+      margin-top: 30px;
+    }
+    .history-item {
+      display: inline-block;
+      margin: 5px;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+    .BigH {
+      background-color: #c8e6c9;
+      color: #2e7d32;
+    }
+    .SmallH {
+      background-color: #ffcdd2;
+      color: #b71c1c;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>🎯 Big / Small - Wingo 1 Minute Demo</h2>
+  <div class="box">
+    <div id="result">Loading...</div>
+    <div id="number">Number: --</div>
+    <div id="timer">⏳ Next result in: <span id="countdown">60</span> sec</div>
+  </div>
+
+  <div id="history">
+    <h3>🕓 Last 5 Results:</h3>
+    <div id="historyList"></div>
+  </div>
+
+  <script>
+    let countdown = 60;
+    let resultHistory = [];
+
+    function generateResult() {
+      const randomNum = Math.floor(Math.random() * 100); // 0–99
+      const resultType = randomNum >= 50 ? "Big" : "Small";
+
+      document.getElementById("result").innerHTML = `<span class="${resultType}">${resultType}</span>`;
+      document.getElementById("number").innerText = `Number: ${randomNum}`;
+
+      // Save to history
+      resultHistory.unshift({ type: resultType, number: randomNum });
+      if (resultHistory.length > 5) resultHistory.pop();
+      updateHistory();
+
+      countdown = 60;
+    }
+
+    function updateHistory() {
+      const historyDiv = document.getElementById("historyList");
+      historyDiv.innerHTML = resultHistory.map(item => {
+        const cls = item.type === "Big" ? "BigH" : "SmallH";
+        return `<span class="history-item ${cls}">${item.type} (${item.number})</span>`;
+      }).join("");
     }
 
     // Countdown Timer
@@ -127,14 +199,167 @@
       if (countdown > 0) {
         countdown--;
       } else {
-        showPattern();
-        countdown = 30;
+        generateResult(); // New result every 60 sec
+        countdown = 60;
       }
-      document.getElementById("timer").innerText = countdown;
+      document.getElementById("countdown").innerText = countdown;
     }, 1000);
 
-    // First pattern display
-    showPattern();
+    // First result
+    generateResult();
+  </script>
+
+</body>
+</html><!DOCTYPE html>
+<html>
+<head>
+  <title>Wingo Big Small Predictor</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to right, #ffffff, #c8facc); /* white to green */
+      text-align: center;
+      padding-top: 40px;
+    }
+    h2 {
+      font-size: 28px;
+      color: #1b5e20;
+    }
+    .box {
+      background: #ffffff;
+      display: inline-block;
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      margin-top: 20px;
+    }
+    #result {
+      font-size: 32px;
+      margin: 10px 0;
+    }
+    .Big {
+      color: white;
+      background-color: #4caf50;
+      padding: 10px 20px;
+      border-radius: 10px;
+    }
+    .Small {
+      color: white;
+      background-color: #f44336;
+      padding: 10px 20px;
+      border-radius: 10px;
+    }
+    #number {
+      font-size: 24px;
+      color: #444;
+    }
+    #timer {
+      font-size: 20px;
+      color: #2e7d32;
+      margin-top: 15px;
+    }
+    #history {
+      margin-top: 30px;
+    }
+    .history-item {
+      display: inline-block;
+      margin: 5px;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+    .BigH {
+      background-color: #c8e6c9;
+      color: #2e7d32;
+    }
+    .SmallH {
+      background-color: #ffcdd2;
+      color: #b71c1c;
+    }
+    #prediction {
+      font-size: 20px;
+      color: #1b5e20;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>🎯 Big / Small - Smart Predictor Wingo</h2>
+  <div class="box">
+    <div id="result">Loading...</div>
+    <div id="number">Number: --</div>
+    <div id="timer">⏳ Next result in: <span id="countdown">60</span> sec</div>
+    <div id="prediction">🤖 Prediction: --</div>
+  </div>
+
+  <div id="history">
+    <h3>🕓 Last 5 Results:</h3>
+    <div id="historyList"></div>
+  </div>
+
+  <script>
+    let countdown = 60;
+    let resultHistory = [];
+
+    function generateResult() {
+      const randomNum = Math.floor(Math.random() * 100); // 0–99
+      const resultType = randomNum >= 50 ? "Big" : "Small";
+
+      // Show result
+      document.getElementById("result").innerHTML = `<span class="${resultType}">${resultType}</span>`;
+      document.getElementById("number").innerText = `Number: ${randomNum}`;
+
+      // Save to history
+      resultHistory.unshift({ type: resultType, number: randomNum });
+      if (resultHistory.length > 5) resultHistory.pop();
+      updateHistory();
+
+      // Update prediction
+      updatePrediction();
+
+      countdown = 60;
+    }
+
+    function updateHistory() {
+      const historyDiv = document.getElementById("historyList");
+      historyDiv.innerHTML = resultHistory.map(item => {
+        const cls = item.type === "Big" ? "BigH" : "SmallH";
+        return `<span class="history-item ${cls}">${item.type} (${item.number})</span>`;
+      }).join("");
+    }
+
+    function updatePrediction() {
+      if (resultHistory.length < 3) {
+        document.getElementById("prediction").innerText = `🤖 Prediction: Wait for data...`;
+        return;
+      }
+
+      // Count Big/Small in last 3 results
+      const last3 = resultHistory.slice(0, 3);
+      let bigCount = 0;
+      let smallCount = 0;
+      last3.forEach(item => {
+        item.type === "Big" ? bigCount++ : smallCount++;
+      });
+
+      const prediction = bigCount > smallCount ? "Big" : "Small";
+      document.getElementById("prediction").innerHTML = `🤖 Prediction: <b>${prediction}</b>`;
+    }
+
+    // Countdown Timer
+    setInterval(() => {
+      if (countdown > 0) {
+        countdown--;
+      } else {
+        generateResult(); // Every 60 sec
+        countdown = 60;
+      }
+      document.getElementById("countdown").innerText = countdown;
+    }, 1000);
+
+    // Start first result
+    generateResult();
   </script>
 
 </body>
