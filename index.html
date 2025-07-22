@@ -1,93 +1,23 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Wingo Color Trading Game</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #202124;
-      color: #fff;
-      text-align: center;
-      padding: 50px;
-    }
-    .box {
-      background: #333;
-      padding: 20px;
-      border-radius: 10px;
-      display: inline-block;
-    }
-    input, button {
-      padding: 10px;
-      margin: 10px;
-      font-size: 16px;
-    }
-    .result {
-      font-size: 30px;
-      margin-top: 20px;
-    }
-    .timer {
-      font-size: 24px;
-      color: #0f0;
-    }
-  </style>
-</head>
-<body>
-  <div class="box">
-    <h2>🎯 Wingo Color Trading 1 Minute Game 🎯</h2>
+let patternIndex91 = 0;
+const pattern91 = ["BIG", "SMALL", "BIG", "SMALL", "BIG", "SMALL"];function checkPlayerResult() {
+    const currentText = document.getElementById("textview1Player").textContent;
+    const selectedServer = document.getElementById("serverSpinner").value;
 
-    <input type="number" id="startNumber" placeholder="Enter Predicted Number" />
-    <button onclick="resetGame()">Reset Game</button>
-
-    <div class="timer" id="timerDisplay">60</div>
-    <div class="result" id="result">Result: --</div>
-    <div id="currentNumber">Current Number: --</div>
-  </div>
-
-  <script>
-    let timer = 60;
-    let interval;
-    let current = 11000;
-
-    function resetGame() {
-      const input = document.getElementById('startNumber').value;
-      if (!input || isNaN(input)) {
-        alert("Predicted number daaliye (11000 se 10999 ke beech)");
-        return;
-      }
-
-      current = parseInt(input);
-      if (current < 10999 || current > 11000) {
-        alert("Sirf 11000 se 10999 tak valid range hai!");
-        return;
-      }
-
-      clearInterval(interval);
-      startTimer();
-    }
-
-    function startTimer() {
-      timer = 60;
-      document.getElementById('timerDisplay').innerText = timer;
-      interval = setInterval(() => {
-        timer--;
-        document.getElementById('timerDisplay').innerText = timer;
-
-        // Auto result show
-        const resultType = Math.random() > 0.5 ? "BIG" : "SMALL";
-        document.getElementById('result').innerText = "Result: " + resultType;
-
-        // Show current predicted number
-        document.getElementById('currentNumber').innerText = "Current Number: " + current;
-
-        current--;
-
-        if (timer <= 0 || current < 10999) {
-          clearInterval(interval);
-          document.getElementById('timerDisplay').innerText = "Time Over";
+    if (currentText !== previousPlayerText) {
+        let result;
+        if (selectedServer === "91 CLUB") {
+            result = pattern91[patternIndex91 % pattern91.length];
+            patternIndex91++;
+        } else {
+            result = Math.random() > 0.5 ? "BIG" : "SMALL";
         }
-      }, 1000);
+
+        document.getElementById("resultPlayer").textContent = `Result: ${result}`;
+        previousPlayerText = currentText;
+    } else {
+        alert("PLS WAIT FOR NEXT PERIOD");
     }
-  </script>
-</body>
-</html>
+}if (document.getElementById('serverSpinner').value === '91 CLUB') {
+    alert("✅ 91 CLUB SERVICE ENABLED!");
+    document.body.style.background = "linear-gradient(90deg, #0F2027, #2C5364)";
+}
