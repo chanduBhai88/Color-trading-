@@ -1,0 +1,76 @@
+<!DOCTYPE html><html>
+<head>
+  <title>Wingo Big/Small Tool</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(white, lightgreen);
+      text-align: center;
+      padding: 30px;
+    }
+    #timer {
+      font-size: 48px;
+      margin: 20px 0;
+      color: darkgreen;
+    }
+    button {
+      padding: 12px 24px;
+      margin: 10px;
+      font-size: 18px;
+      border-radius: 10px;
+      border: none;
+      background-color: #4CAF50;
+      color: white;
+    }
+    #result {
+      font-size: 36px;
+      font-weight: bold;
+      margin-top: 20px;
+    }
+    #history {
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>  <h1>🔥 Wingo Big/Small Auto Result 🔥</h1>  <div id="timer">60</div><button onclick="manualPredict()">Manual Predict</button> <button onclick="resetTimer()">Reset Timer</button>
+
+  <div id="result">Result: --</div>
+  <div id="history">Last Results: <span id="lastResults">--</span></div><audio id="beep" src="https://www.soundjay.com/button/beep-07.wav" preload="auto"></audio>
+
+  <script>
+    let countdown = 60;
+    let timerInterval;
+    let resultHistory = [];
+
+    function startTimer() {
+      timerInterval = setInterval(() => {
+        countdown--;
+        document.getElementById("timer").textContent = countdown;
+
+        if (countdown <= 0) {
+          clearInterval(timerInterval);
+          showResult();
+          document.getElementById("beep").play();
+          setTimeout(resetTimer, 2000); // auto reset after 2 seconds
+        }
+      }, 1000);
+    }
+
+    function resetTimer() {
+      clearInterval(timerInterval);
+      countdown = 60;
+      document.getElementById("timer").textContent = countdown;
+      document.getElementById("result").textContent = "Result: --";
+      startTimer();
+    }
+
+    function manualPredict() {
+      showResult();
+      document.getElementById("beep").play();
+      setTimeout(resetTimer, 2000);
+    }
+
+    function showResult() {
+      const random = Math.random();
+      const result = random > 0.5 ? "BIG" : "SMALL";
+      document.getElementById("result
