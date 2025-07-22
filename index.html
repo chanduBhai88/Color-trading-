@@ -1,153 +1,126 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Wingo Big Small Predictor</title>
+  <meta charset="UTF-8" />
+  <title>Wingo 1-Minute Predictor</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background: linear-gradient(to right, #ffffff, #c8facc); /* white to green */
+      font-family: sans-serif;
+      background: white;
+      color: #333;
       text-align: center;
-      padding-top: 40px;
     }
-    h2 {
-      font-size: 28px;
-      color: #1b5e20;
+    .timer {
+      font-size: 2rem;
+      margin: 10px;
+      color: green;
     }
-    .box {
-      background: #ffffff;
-      display: inline-block;
-      padding: 20px;
-      border-radius: 15px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-      margin-top: 20px;
+    .result-box {
+      margin: 10px;
     }
-    #result {
-      font-size: 32px;
-      margin: 10px 0;
+    .prediction {
+      font-size: 1.5rem;
+      color: #007bff;
     }
-    .Big {
-      color: white;
-      background-color: #4caf50;
-      padding: 10px 20px;
-      border-radius: 10px;
+    .big { color: red; }
+    .small { color: blue; }
+    .chart-container {
+      width: 90%;
+      margin: auto;
     }
-    .Small {
-      color: white;
-      background-color: #f44336;
-      padding: 10px 20px;
-      border-radius: 10px;
-    }
-    #number {
-      font-size: 24px;
-      color: #444;
-    }
-    #timer {
-      font-size: 20px;
-      color: #2e7d32;
-      margin-top: 15px;
-    }
-    #history {
-      margin-top: 30px;
-    }
-    .history-item {
-      display: inline-block;
-      margin: 5px;
-      padding: 8px 12px;
-      border-radius: 8px;
-      font-size: 16px;
-    }
-    .BigH {
-      background-color: #c8e6c9;
-      color: #2e7d32;
-    }
-    .SmallH {
-      background-color: #ffcdd2;
-      color: #b71c1c;
-    }
-    #prediction {
-      font-size: 20px;
-      color: #1b5e20;
-      margin-top: 20px;
+    .period-box {
+      margin-top: 10px;
+      font-size: 1.2rem;
+      color: #555;
     }
   </style>
 </head>
 <body>
 
-  <h2>🎯 Big / Small - Smart Predictor Wingo</h2>
-  <div class="box">
-    <div id="result">Loading...</div>
-    <div id="number">Number: --</div>
-    <div id="timer">⏳ Next result in: <span id="countdown">60</span> sec</div>
-    <div id="prediction">🤖 Prediction: --</div>
+  <h1>🎯 Wingo 1-Minute Big/Small Predictor</h1>
+
+  <div class="timer" id="countdown">60</div>
+
+  <div class="result-box">
+    <h3>Last 5 Results:</h3>
+    <div id="lastResults">--</div>
   </div>
 
-  <div id="history">
-    <h3>🕓 Last 5 Results:</h3>
-    <div id="historyList"></div>
+  <div class="prediction">
+    🔮 Prediction: <span id="predictionText">--</span>
+  </div>
+
+  <div class="period-box">
+    📅 Period Number: <span id="periodNumber">--</span><br>
+    🧮 Calculation: <span id="calcResult">--</span>
+  </div>
+
+  <div class="chart-container">
+    <canvas id="resultChart"></canvas>
   </div>
 
   <script>
-    let countdown = 60;
-    let resultHistory = [];
+    let timer = 60;
+    let lastResults = [];
+    let currentPeriod = 10990;
 
-    function generateResult() {
-      const randomNum = Math.floor(Math.random() * 100); // 0–99
-      const resultType = randomNum >= 50 ? "Big" : "Small";
+    const countdownEl = document.getElementById("countdown");
+    const predictionEl = document.getElementById("predictionText");
+    const lastResultsEl = document.getElementById("lastResults");
+    const periodEl = document.getElementById("periodNumber");
+    const calcEl = document.getElementById("calcResult");
 
-      // Show result
-      document.getElementById("result").innerHTML = `<span class="${resultType}">${resultType}</span>`;
-      document.getElementById("number").innerText = `Number: ${randomNum}`;
-
-      // Save to history
-      resultHistory.unshift({ type: resultType, number: randomNum });
-      if (resultHistory.length > 5) resultHistory.pop();
-      updateHistory();
-
-      // Update prediction
-      updatePrediction();
-
-      countdown = 60;
-    }
-
-    function updateHistory() {
-      const historyDiv = document.getElementById("historyList");
-      historyDiv.innerHTML = resultHistory.map(item => {
-        const cls = item.type === "Big" ? "BigH" : "SmallH";
-        return `<span class="history-item ${cls}">${item.type} (${item.number})</span>`;
-      }).join("");
-    }
-
-    function updatePrediction() {
-      if (resultHistory.length < 3) {
-        document.getElementById("prediction").innerText = `🤖 Prediction: Wait for data...`;
-        return;
+    const ctx = document.getElementById('resultChart').getContext('2d');
+    const chart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: [],
+        datasets: [{
+          label: 'Big/Small Trend',
+          data: [],
+          backgroundColor: []
+        }]
       }
+    });
 
-      // Count Big/Small in last 3 results
-      const last3 = resultHistory.slice(0, 3);
-      let bigCount = 0;
-      let smallCount = 0;
-      last3.forEach(item => {
-        item.type === "Big" ? bigCount++ : smallCount++;
-      });
-
-      const prediction = bigCount > smallCount ? "Big" : "Small";
-      document.getElementById("prediction").innerHTML = `🤖 Prediction: <b>${prediction}</b>`;
+    function calculateBigSmall(periodNumber) {
+      return periodNumber % 2 === 0 ? "Small" : "Big";
     }
 
-    // Countdown Timer
-    setInterval(() => {
-      if (countdown > 0) {
-        countdown--;
-      } else {
-        generateResult(); // Every 60 sec
-        countdown = 60;
-      }
-      document.getElementById("countdown").innerText = countdown;
-    }, 1000);
+    function updateResults() {
+      currentPeriod++;
+      const result = calculateBigSmall(currentPeriod);
+      lastResults.unshift(result);
+      if (lastResults.length > 5) lastResults.pop();
 
-    // Start first result
-    generateResult();
+      // Update UI
+      lastResultsEl.innerHTML = lastResults.map(r => `<span class="${r.toLowerCase()}">${r}</span>`).join(" | ");
+      periodEl.textContent = currentPeriod;
+      calcEl.innerHTML = `(${currentPeriod} % 2 = ${currentPeriod % 2}) → <span class="${result.toLowerCase()}">${result}</span>`;
+      predictionEl.innerHTML = `<span class="${result.toLowerCase()}">${result}</span>`;
+
+      // Update chart
+      chart.data.labels = lastResults.map((_, i) => `#${5 - i}`);
+      chart.data.datasets[0].data = lastResults.map(r => r === "Big" ? 1 : 0);
+      chart.data.datasets[0].backgroundColor = lastResults.map(r => r === "Big" ? "red" : "blue");
+      chart.update();
+    }
+
+    function startTimer() {
+      setInterval(() => {
+        timer--;
+        if (timer <= 0) {
+          timer = 60;
+          updateResults();
+        }
+        countdownEl.textContent = timer;
+      }, 1000);
+    }
+
+    // Start app
+    updateResults();
+    startTimer();
   </script>
 
 </body>
