@@ -1,3 +1,71 @@
-https://91clubapi.com/getResult?period=XXXXX
-https://91clubapi.com/getCurrentPeriodhttps://91clubapi.com/getPeriodHistory
-https://91clubapi.com/getTrendData
+<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Wingo Result & Trend Tool</title>
+  <style>
+    body { font-family: Arial; background: #e7f9f2; color: #222; text-align: center; padding: 20px; }
+    h1 { color: green; }
+    #timer { font-size: 2rem; margin: 10px; }
+    .result-box, .history-box { background: white; border-radius: 12px; padding: 20px; margin: 20px auto; width: 90%; max-width: 400px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+    canvas { max-width: 100%; height: 200px; }
+  </style>
+</head>
+<body>
+  <h1>🎯 Wingo Live Result & Prediction</h1>
+  <div id="timer">Next round in: 60s</div>
+  <div class="result-box">
+    <h2>Live Result</h2>
+    <div id="liveResult">Loading...</div>
+    <div id="prediction"></div>
+  </div>
+  <div class="history-box">
+    <h3>Last 5 Results</h3>
+    <ul id="history"></ul>
+  </div>
+  <canvas id="trendChart"></canvas>  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>  <script>
+    let countdown = 60;
+    let history = [];
+
+    function startTimer() {
+      setInterval(() => {
+        countdown--;
+        document.getElementById("timer").innerText = `Next round in: ${countdown}s`;
+        if (countdown <= 0) {
+          countdown = 60;
+          fetchLiveResult();
+        }
+      }, 1000);
+    }
+
+    async function fetchLiveResult() {
+      // Fake API response (replace with real API endpoint)
+      const result = Math.floor(Math.random() * 10); // simulate result 0-9
+      const type = result >= 5 ? "Big" : "Small";
+
+      document.getElementById("liveResult").innerHTML = `Number: <b>${result}</b> (${type})`;
+      history.unshift({ number: result, type });
+      history = history.slice(0, 5);
+
+      updateHistory();
+      showPrediction();
+      updateChart();
+    }
+
+    function updateHistory() {
+      const list = document.getElementById("history");
+      list.innerHTML = history.map(h => `<li>${h.number} (${h.type})</li>`).join("");
+    }
+
+    function showPrediction() {
+      const bigs = history.filter(h => h.type === "Big").length;
+      const smalls = history.length - bigs;
+      const pred = bigs > smalls ? "Likely: Big" : bigs < smalls ? "Likely: Small" : "Equal chance";
+      document.getElementById("prediction").innerHTML = `<br><b>Prediction:</b> ${pred}`;
+    }
+
+    function updateChart() {
+      const ctx = document.getElementById('trendChart').getContext('2d');
+      if (window.trendChart) window.trendChart.destroy();
+
+      window.trend
