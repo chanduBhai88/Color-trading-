@@ -1,26 +1,111 @@
-// Dark Mode Prediction Tool UI with API Fetch (No Auto Timer)
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>🔥 पंकज AI Predictor - Auto Live Mode</title>
+  <style>
+    body {
+      background: #000;
+      color: #fff;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 30px;
+    }
 
-import React, { useState, useEffect } from "react"; import { Card, CardContent } from "@/components/ui/card"; import { Button } from "@/components/ui/button"; import { Input } from "@/components/ui/input"; import axios from "axios";
+    .box {
+      background: #111;
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 0 25px #0ff;
+      max-width: 450px;
+      margin: auto;
+    }
 
-const PredictionTool = () => { const [results, setResults] = useState([]); const [prediction, setPrediction] = useState(""); const [apiData, setApiData] = useState(null);
+    input, button {
+      padding: 12px;
+      border-radius: 10px;
+      margin: 10px;
+      width: 80%;
+      border: none;
+      font-size: 16px;
+    }
 
-// Mock API URL - replace with live one const apiUrl = "https://your-api-endpoint.com/latest-result";
+    #result {
+      margin-top: 20px;
+      font-size: 20px;
+      font-weight: bold;
+      line-height: 1.5;
+    }
 
-const fetchResult = async () => { try { const res = await axios.get(apiUrl); const newResult = res.data?.result || "?"; setApiData(res.data); setResults((prev) => [newResult, ...prev.slice(0, 4)]); } catch (err) { console.error("API error:", err); } };
+    .live {
+      color: yellow;
+    }
+  </style>
+</head>
+<body>
 
-const handleReset = () => { setPrediction(""); fetchResult(); };
+  <div class="box">
+    <h2>🧠 पंकज AI Predictor (Auto + API)</h2>
+    <p>Last Period: <span id="livePeriod">⏳ Loading...</span></p>
+    <div id="result">Prediction will appear here every 60 seconds...</div>
+  </div>
 
-return ( <div className="min-h-screen bg-zinc-900 text-white p-4"> <h1 className="text-2xl font-bold text-center mb-4">Prediction Tool</h1>
+  <script>
+    const API_URL = "https://api.example.com/latest"; // 🔁 YOUR API HERE
 
-<div className="flex justify-center gap-4 mb-4">
-    <Button
-      className="bg-green-600 hover:bg-green-700"
-      onClick={() => setPrediction("BIG")}
-    >
-      BIG
-    </Button>
-    <Button
-      className="bg-red-600 hover:bg-red-700"
-      onClick={() => setPrediction("SMALL")}
-    >
+    function fetchLivePeriodAndPredict() {
+      fetch(API_URL)
+        .then(res => res.json())
+        .then(data => {
+          const period = data?.period || "000000";  // Use correct path based on API
+          document.getElementById("livePeriod").innerText = period;
+          runPrediction(period);
+        })
+        .catch(err => {
+          document.getElementById("livePeriod").innerText = "⚠️ API Error";
+          document.getElementById("result").innerHTML = `<span style='color:red'>Failed to load API result</span>`;
+        });
+    }
 
+    function runPrediction(period) {
+      const resultBox = document.getElementById("result");
+
+      if (!/^\d{6,}$/.test(period)) {
+        resultBox.innerHTML = "<span style='color:red'>Invalid period number from API</span>";
+        return;
+      }
+
+      const last = parseInt(period.slice(-1));
+      const last2 = parseInt(period.slice(-2));
+      const last3 = parseInt(period.slice(-3));
+      const digits = period.split('').map(Number);
+
+      let score = 0;
+
+      if (last % 2 === 0) score++;
+      if (last > 5) score++;
+      if (last2 % 3 === 0) score++;
+      if (last2 % 10 > 4) score++;
+      if (last3 % 7 < 4) score++;
+      if (last3 % 2 === 1) score++;
+
+      const sum = digits.reduce((a, b) => a + b, 0);
+      if (sum % 5 === 0) score++;
+      if (sum > 25) score++;
+
+      const prediction = score >= 5 ? "BIG" : "SMALL";
+      const confidence = Math.min(95 + score, 100);
+
+      resultBox.innerHTML = `
+        🕒 Auto Prediction: <span class='live'>${prediction}</span><br>
+        🔐 Confidence: ${confidence}%<br>
+        📊 Smart Score: ${score}/8
+      `;
+    }
+
+    fetchLivePeriodAndPredict(); // Initial call
+    setInterval(fetchLivePeriodAndPredict, 60000); // Every 60 seconds
+  </script>
+
+</body>
+</html>
