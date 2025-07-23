@@ -47,7 +47,7 @@
   <div class="box">
     <h2>🧠 पंकज AI Predictor (Auto + API)</h2>
     <p>Last Period: <span id="livePeriod">⏳ Loading...</span></p>
-    <div id="result">Prediction will appear here every 60 seconds...</div>
+    <div id="result">Prediction will appear here every 60seconds...</div>
   </div>
 
   <script>
@@ -63,7 +63,7 @@
         })
         .catch(err => {
           document.getElementById("livePeriod").innerText = "⚠️ API Error";
-          document.getElementById("result").innerHTML = `<span style='color:red'>Failed to load API result</span>`;
+          document.getElementById("result").innerHTML = `<span style='color:red'>API result</span>`;
         });
     }
 
