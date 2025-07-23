@@ -2,10 +2,10 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>🔥 पंकज AI Predictor - Auto Live Mode</title>
+  <title>पंकज AI Predictor - Wingo 1 Minute</title>
   <style>
     body {
-      background: #000;
+      background: #111;
       color: #fff;
       font-family: Arial, sans-serif;
       text-align: center;
@@ -13,11 +13,11 @@
     }
 
     .box {
-      background: #111;
+      background: #222;
       padding: 30px;
       border-radius: 20px;
-      box-shadow: 0 0 25px #0ff;
-      max-width: 450px;
+      box-shadow: 0 0 20px #ff0;
+      max-width: 400px;
       margin: auto;
     }
 
@@ -32,79 +32,75 @@
 
     #result {
       margin-top: 20px;
-      font-size: 20px;
+      font-size: 22px;
       font-weight: bold;
-      line-height: 1.5;
+      color: #0f0;
     }
 
-    .live {
-      color: yellow;
+    ::selection {
+      background: none;
     }
   </style>
 </head>
-<body>
+<body oncontextmenu="return false" onkeydown="return protectKeys(event)">
 
   <div class="box">
-    <h2>🧠 पंकज AI Predictor (Auto + API)</h2>
-    <p>Last Period: <span id="livePeriod">⏳ Loading...</span></p>
-    <div id="result">Prediction will appear here every 60seconds...</div>
+    <h2>🧠 CHANDU AI Predictor (2-3 Level)</h2>
+    <p>Enter Period Number:</p>
+    <input type="number" id="periodInput" placeholder="Ex: 123456" maxlength="6" />
+    <br>
+    <button onclick="predict()">🔮 Predict</button>
+    <div id="result">Result will appear here...</div>
   </div>
 
   <script>
-    const API_URL = "https://api.example.com/latest"; // 🔁 YOUR API HERE
-
-    function fetchLivePeriodAndPredict() {
-      fetch(API_URL)
-        .then(res => res.json())
-        .then(data => {
-          const period = data?.period || "000000";  // Use correct path based on API
-          document.getElementById("livePeriod").innerText = period;
-          runPrediction(period);
-        })
-        .catch(err => {
-          document.getElementById("livePeriod").innerText ="result start"
-          document.getElementById("result").innerHTML = `<span style='color:red'"result</span>`;
-        });
+    function protectKeys(e) {
+      if (e.ctrlKey && (e.key === 'u' || e.key === 'U' || e.key === 's' || e.key === 'S')) return false;
+      if (e.keyCode === 123) return false; // F12
     }
 
-    function runPrediction(period) {
+    (function trapConsole() {
+      const trap = function() {
+        setInterval(() => {
+          const before = performance.now();
+          debugger;
+          const after = performance.now();
+          if (after - before > 100) window.location.href = "about:blank";
+        }, 2000);
+      };
+      try {
+        trap();
+      } catch(e) {}
+    })();
+
+    function predict() {
+      const period = document.getElementById("periodInput").value.trim();
       const resultBox = document.getElementById("result");
 
-      if (!/^\d{6,}$/.test(period)) {
-        resultBox.innerHTML = "<span style='color:red'>Invalid period number from API</span>";
+      if (!/^\d{6}$/.test(period)) {
+        resultBox.textContent = "❌ Please enter a valid 6-digit period number";
+        resultBox.style.color = "#f00";
         return;
       }
 
-      const last = parseInt(period.slice(-1));
-      const last2 = parseInt(period.slice(-2));
-      const last3 = parseInt(period.slice(-3));
-      const digits = period.split('').map(Number);
-
+      const last = +period.slice(-1);
+      const last2 = +period.slice(-2);
+      const last3 = +period.slice(-3);
       let score = 0;
 
       if (last % 2 === 0) score++;
-      if (last > 5) score++;
+      if (last > 4) score++;
       if (last2 % 3 === 0) score++;
-      if (last2 % 10 > 4) score++;
-      if (last3 % 7 < 4) score++;
-      if (last3 % 2 === 1) score++;
+      if ((last2 % 10) > 5) score++;
+      if ((last3 % 7) < 4) score++;
+      if ((last3 % 2 === 1)) score++;
 
-      const sum = digits.reduce((a, b) => a + b, 0);
-      if (sum % 5 === 0) score++;
-      if (sum > 25) score++;
+      let prediction = score >= 4 ? "BIG" : "SMALL";
+      let confidence = 88 + (score * 2);
 
-      const prediction = score >= 5 ? "BIG" : "SMALL";
-      const confidence = Math.min(95 + score, 100);
-
-      resultBox.innerHTML = `
-        🕒 Auto Prediction: <span class='live'>${prediction}</span><br>
-        🔐 Confidence: ${confidence}%<br>
-        📊 Smart Score: ${score}/8
-      `;
+      resultBox.innerHTML = `✅ Prediction: <span style="color:yellow">${prediction}</span><br>🔐 Confidence: ${confidence}%`;
+      resultBox.style.color = "#0f0";
     }
-
-    fetchLivePeriodAndPredict(); // Initial call
-    setInterval(fetchLivePeriodAndPredict, 60000); // Every 60 seconds
   </script>
 
 </body>
