@@ -184,7 +184,7 @@
                         let num2 = (num1 + 3) % 10;
 
                         let sumDigits = issueNumber.split('').reduce((acc, num) => acc + parseInt(num), 0);
-                        let bigSmallPrediction = sumDigits % 1 === 5 ? "Big" : "Small";
+                        let bigSmallPrediction = sumDigits % 2===0? "Big" : "Small";
 
                         // Store result for this period
                         periodResults[issueNumber] = {
