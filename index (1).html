@@ -1,216 +1,105 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dark Fire Login</title>
-
-    <!-- Import Stylish Font -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600&display=swap" rel="stylesheet">
-
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            background-color: #0a0a0a;
-            color: white;
-            font-family: 'Poppins', sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            text-align: center;
-            padding: 10px;
-        }
-
-        .container {
-            width: 90%;
-            max-width: 350px;
-            padding: 20px;
-            background: rgba(20, 20, 20, 0.9);
-            border-radius: 10px;
-            box-shadow: 0 0 15px red;
-        }
-
-        h1 {
-            font-size: 24px;
-            color: red;
-            font-weight: bold;
-            text-shadow: 0 0 10px red, 0 0 20px red;
-        }
-
-        input {
-            width: 100%;
-            padding: 10px;
-            margin: 10px 0;
-            border: 2px solid red;
-            border-radius: 5px;
-            background: black;
-            color: white;
-            text-align: center;
-            font-size: 16px;
-            box-shadow: 0 0 10px red;
-        }
-
-        button {
-            width: 100%;
-            padding: 10px;
-            border: none;
-            border-radius: 5px;
-            background: red;
-            color: white;
-            font-size: 18px;
-            cursor: pointer;
-            box-shadow: 0 0 10px red;
-            transition: 0.3s;
-        }
-
-        button:hover {
-            background: darkred;
-            box-shadow: 0 0 20px red;
-        }
-
-        .error {
-            color: red;
-            margin-top: 10px;
-            display: none;
-        }
-
-        /* Hide prediction system initially */
-        #prediction-page {
-            display: none;
-        }
-
-        .box {
-            display: inline-block;
-            padding: 8px 12px;
-            font-size: 18px;
-            font-weight: bold;
-            margin: 5px;
-            border-radius: 5px;
-            border: 2px solid red;
-            text-shadow: 0 0 10px red;
-        }
-
-        .period-box { color: yellow; }
-        .big { color: lightblue; }
-        .small { color: orange; }
-        .number-box { color: green; }
-
-        .predict-btn {
-            padding: 10px 15px;
-            font-size: 14px;
-            background: white;
-            color: black;
-            font-weight: bold;
-            border: none;
-            cursor: pointer;
-            margin-top: 15px;
-            border-radius: 5px;
-            transition: all 0.3s ease-in-out;
-        }
-
-        .predict-btn:hover {
-            background: lightgray;
-            transform: scale(1.05);
-        }
-
-        #live-result {
-            font-size: 14px;
-            font-weight: bold;
-            color: white;
-            margin-top: 10px;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Khatarnak Wingo Predictor</title>
+  <style>
+    body {
+      background: #111;
+      color: #fff;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      text-align: center;
+      padding: 20px;
+    }
+    h1 {
+      color: #0f0;
+      margin-bottom: 10px;
+    }
+    .box {
+      background: #222;
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 0 10px #0f0;
+      max-width: 400px;
+      margin: auto;
+    }
+    .result {
+      margin-top: 10px;
+      font-size: 1.2em;
+    }
+    .trend {
+      margin-top: 20px;
+    }
+    .btn {
+      background: #0f0;
+      color: #000;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      margin-top: 15px;
+    }
+    .fullscreen-btn {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      background: #0ff;
+    }
+    @media (max-width: 600px) {
+      body {
+        padding: 10px;
+      }
+    }
+  </style>
 </head>
 <body>
-
-    <!-- LOGIN PAGE -->
-    <div id="login-box" class="container">
-        <h1>Enter Passcode</h1>
-        <input type="password" id="password" placeholder="Enter Key">
-        <button onclick="checkLogin()">Unlock</button>
-        <p class="error" id="error-message">Wrong Key! Try Again.</p>
+  <h1>⚡ Khatarnak Wingo 1 Min Predictor ⚡</h1>  <div class="box">
+    <div>Next Prediction in: <span id="timer">60</span>s</div>
+    <div class="result">
+      <strong>Predicted:</strong> <span id="prediction">Calculating...</span>
     </div>
-
-    <!-- PREDICTION SYSTEM (HIDDEN INITIALLY) -->
-    <div id="prediction-page" class="container">
-        <h1>🔥 乂ᴅᴀʀᴋ乡ғɪʀᴇ Prediction 🔥</h1>
-        <p id="result" class="result">PERIOD: <span class="box period-box">--</span></p>
-        <p id="signal" class="signal">SIGNAL: <span class="box">--</span></p>
-        <p id="prediction" class="prediction">PREDICTED NUMBERS: <span class="box number-box">--/--</span></p>
-        <p id="live-result">LIVE UPDATING...</p>
-        <button class="predict-btn" onclick="fetchPrediction()">Predict</button>
+    <div class="result">
+      <strong>Last Result:</strong> <span id="lastResult">Waiting...</span>
     </div>
+    <button class="btn" onclick="manualReset()">🔁 Reset</button>
+  </div>  <div class="trend">
+    <h3>📈 Last 5 Results:</h3>
+    <div id="history">Loading...</div>
+  </div><button class="btn fullscreen-btn" onclick="toggleFullscreen()">⛶ Fullscreen</button>
 
-    <script>
-        function checkLogin() {
-            var pass = document.getElementById("password").value;
-            if (pass === "AARISHOWNER") {
-                document.getElementById("login-box").style.display = "none"; // Hide login
-                document.getElementById("prediction-page").style.display = "block"; // Show prediction system
-                fetchPrediction(); // Load prediction data
-            } else {
-                document.getElementById("error-message").style.display = "block";
-            }
-        }
+  <script>
+    let timer = 60;
+    let interval = setInterval(() => {
+      timer--;
+      document.getElementById('timer').innerText = timer;
+      if (timer === 0) {
+        timer = 60;
+        getPrediction();
+      }
+    }, 1000);
 
-        const API_URL = 'https://api.bdg88zf.com/api/webapi/GetGameIssue';
-        const REQUEST_DATA = {
-            typeId: 1,
-            language: 0,
-            random: "e7fe6c090da2495ab8290dac551ef1ed",
-            signature: "1F390E2B2D8A55D693E57FD905AE73A7",
-            timestamp: 1723726679
-        };
+    let history = [];
 
-        let periodResults = {}; // Store results for each period
+    function getPrediction() {
+      // Dummy API Data (replace with real API later)
+      const number = Math.floor(Math.random() * 10);
+      const color = number % 2 === 0 ? 'Green' : 'Red';
+      const violetChance = Math.random() < 0.1;
+      const finalColor = violetChance ? 'Violet' : color;
 
-        function fetchPrediction() {
-            fetch(API_URL, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json;charset=UTF-8"
-                },
-                body: JSON.stringify(REQUEST_DATA)
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data && data.data) {
-                    let issueNumber = data.data.issueNumber || "Unknown";
+      const size = number >= 5 ? 'Big' : 'Small';
 
-                    // Check if result already exists for this period
-                    if (!periodResults[issueNumber]) {
-                        let num1 = Math.floor(Math.random() * 10);
-                        let num2 = (num1 + 3) % 10;
+      const resultText = `${finalColor} - ${size} (${number})`;
+      document.getElementById('lastResult').innerText = resultText;
+      document.getElementById('prediction').innerText = predictNext();
 
-                        let sumDigits = issueNumber.split('').reduce((acc, num) => acc + parseInt(num), 0);
-                        let bigSmallPrediction = sumDigits % 2===0? "Big" : "Small";
+      history.unshift(resultText);
+      if (history.length > 5) history.pop();
+      document.getElementById('history').innerHTML = history.map(h => `<div>${h}</div>`).join('');
+    }
 
-                        // Store result for this period
-                        periodResults[issueNumber] = {
-                            bigSmallPrediction,
-                            predictedNumbers: `${num1}/${num2}`
-                        };
-                    }
+    function predictNext() {
+      if (history.length < 3) return 'Waiting for data...';
 
-                    let { bigSmallPrediction, predictedNumbers } = periodResults[issueNumber];
-
-                    document.getElementById("result").innerHTML = `PERIOD: <span class="box period-box">${issueNumber}</span>`;
-                    document.getElementById("signal").innerHTML = `SIGNAL: <span class="box ${bigSmallPrediction.toLowerCase()}">${bigSmallPrediction}</span>`;
-                    document.getElementById("prediction").innerHTML = `PREDICTED NUMBERS: <span class="box number-box">${predictedNumbers}</span>`;
-                    document.getElementById("live-result").innerHTML = "✅ LIVE DATA UPDATED!";
-                } else {
-                    document.getElementById("live-result").innerHTML = "⚠️ ERROR!";
-                }
-            })
-            .catch(error => {
-                document.getElementById("live-result").innerHTML = "⚠️ ERROR!";
-                console.error("API Fetch Error:", error);
-            });
-        }
-
-        setInterval(fetchPrediction, 10000);
-    </script>
-
-</body>
-    </html>
+      const lastNum = parseInt(history[0].match(/(\d)/)[1]);
+      if (lastNum >= 
