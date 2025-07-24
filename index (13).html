@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Prediction</title>
+  <style>
+    body {
+      background: #000;
+      color: #0f0;
+      font-family: monospace;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      flex-direction: column;
+    }
+
+    #randomWord {
+      font-size: 32px;
+      font-weight: bold;
+      padding: 20px;
+      background-color: #111;
+      border: 2px solid #0f0;
+      border-radius: 10px;
+      margin-bottom: 20px;
+    }
+
+    #timer {
+      font-size: 24px;
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+  <div id="randomWord">Loading...</div>
+  <div id="timer">00:00</div>
+
+  <script>
+    let lastMinute = -1;
+
+    function startTimer() {
+      setInterval(() => {
+        const now = new Date();
+        const minutes = now.getMinutes();
+        const seconds = now.getSeconds();
+
+        // Show timer
+        document.getElementById('timer').textContent =
+          String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
+
+        // Change every new minute
+        if (seconds === 0 && lastMinute !== minutes) {
+          const colors = ['Red', 'Green', 'Violet'];
+          const randomColor = colors[Math.floor(Math.random() * colors.length)];
+          const randomNumber = Math.floor(Math.random() * 10); // 0–9
+          document.getElementById('randomWord').textContent = `${randomColor} - ${randomNumber}`;
+          lastMinute = minutes;
+        }
+      }, 1000);
+    }
+
+    startTimer();
+  </script>
+</body>
+</html>
