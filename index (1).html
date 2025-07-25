@@ -1,105 +1,70 @@
-<!DOCTYPE html><html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Khatarnak Wingo Predictor</title>
-  <style>
-    body {
-      background: #111;
-      color: #fff;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      text-align: center;
-      padding: 20px;
-    }
-    h1 {
-      color: #0f0;
-      margin-bottom: 10px;
-    }
-    .box {
-      background: #222;
-      padding: 20px;
-      border-radius: 15px;
-      box-shadow: 0 0 10px #0f0;
-      max-width: 400px;
-      margin: auto;
-    }
-    .result {
-      margin-top: 10px;
-      font-size: 1.2em;
-    }
-    .trend {
-      margin-top: 20px;
-    }
-    .btn {
-      background: #0f0;
-      color: #000;
-      padding: 10px 20px;
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
-      margin-top: 15px;
-    }
-    .fullscreen-btn {
-      position: fixed;
-      top: 10px;
-      right: 10px;
-      background: #0ff;
-    }
-    @media (max-width: 600px) {
-      body {
-        padding: 10px;
-      }
-    }
-  </style>
-</head>
-<body>
-  <h1>⚡ Khatarnak Wingo 1 Min Predictor ⚡</h1>  <div class="box">
-    <div>Next Prediction in: <span id="timer">60</span>s</div>
-    <div class="result">
-      <strong>Predicted:</strong> <span id="prediction">Calculating...</span>
-    </div>
-    <div class="result">
-      <strong>Last Result:</strong> <span id="lastResult">Waiting...</span>
-    </div>
-    <button class="btn" onclick="manualReset()">🔁 Reset</button>
-  </div>  <div class="trend">
-    <h3>📈 Last 5 Results:</h3>
-    <div id="history">Loading...</div>
-  </div><button class="btn fullscreen-btn" onclick="toggleFullscreen()">⛶ Fullscreen</button>
+<script>
+  let countdown = 60;
+  let countdownInterval;
+  let history = [];
 
-  <script>
-    let timer = 60;
-    let interval = setInterval(() => {
-      timer--;
-      document.getElementById('timer').innerText = timer;
-      if (timer === 0) {
-        timer = 60;
-        getPrediction();
+  function startTimer() {
+    countdownInterval = setInterval(() => {
+      countdown--;
+      document.getElementById("countdown").innerText = countdown;
+
+      if (countdown <= 0) {
+        clearInterval(countdownInterval);
+        generatePrediction();
+        countdown = 60;
+        startTimer();
       }
     }, 1000);
+  }
 
-    let history = [];
+  function generatePrediction() {
+    const outcomes = ["Red", "Green", "Violet"];
+    const randomIndex = Math.floor(Math.random() * outcomes.length);
+    const result = outcomes[randomIndex];
 
-    function getPrediction() {
-      // Dummy API Data (replace with real API later)
-      const number = Math.floor(Math.random() * 10);
-      const color = number % 2 === 0 ? 'Green' : 'Red';
-      const violetChance = Math.random() < 0.1;
-      const finalColor = violetChance ? 'Violet' : color;
+    document.getElementById("lastResult").innerText = result;
+    document.getElementById("prediction").innerText = outcomes[(randomIndex + 1) % outcomes.length];
 
-      const size = number >= 5 ? 'Big' : 'Small';
+    // Update History
+    history.unshift(result);
+    if (history.length > 5) history.pop();
+    document.getElementById("history").innerText = history.join(", ");
+  }
 
-      const resultText = `${finalColor} - ${size} (${number})`;
-      document.getElementById('lastResult').innerText = resultText;
-      document.getElementById('prediction').innerText = predictNext();
+  function resetHistory() {
+    history = [];
+    document.getElementById("history").innerText = "---";
+    document.getElementById("lastResult").innerText = "Loading...";
+    document.getElementById("prediction").innerText = "Calculating...";
+    countdown = 60;
+  }
 
-      history.unshift(resultText);
-      if (history.length > 5) history.pop();
-      document.getElementById('history').innerHTML = history.map(h => `<div>${h}</div>`).join('');
-    }
+  function toggleMode() {
+    document.body.classList.toggle("light-mode");
+  }
 
-    function predictNext() {
-      if (history.length < 3) return 'Waiting for data...';
+  // Start everything when page loads
+  window.onload = () => {
+    startTimer();
+  };
+</script><style>
+  .light-mode {
+    background: #fff;
+    color: #000;
+  }
 
-      const lastNum = parseInt(history[0].match(/(\d)/)[1]);
-      if (lastNum >= 
+  .light-mode .panel {
+    background: #eee;
+    box-shadow: 0 0 20px #aaa;
+  }
+
+  .light-mode button {
+    background: #000;
+    color: #0f0;
+  }
+
+  .light-mode .mode-toggle {
+    background: #000;
+    color: #0f0;
+  }
+</style>
