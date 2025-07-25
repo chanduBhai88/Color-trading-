@@ -1,4 +1,110 @@
-<script>
+<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Khatarnak Predictor Pro</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Orbitron', sans-serif;
+      background: #111;
+      color: #0f0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    .panel {
+      width: 100%;
+      max-width: 480px;
+      background: #222;
+      padding: 20px;
+      border-radius: 20px;
+      box-shadow: 0 0 20px #0f0;
+    }
+    .title {
+      text-align: center;
+      font-size: 28px;
+      margin-bottom: 20px;
+    }
+    .result, .prediction {
+      font-size: 20px;
+      text-align: center;
+      margin: 10px 0;
+    }
+    .timer {
+      font-size: 16px;
+      text-align: center;
+      margin-bottom: 15px;
+    }
+    .history {
+      background: #111;
+      padding: 10px;
+      border-radius: 10px;
+      max-height: 150px;
+      overflow-y: auto;
+      margin-top: 10px;
+      font-size: 14px;
+    }
+    button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-weight: bold;
+      background: #0f0;
+      color: #000;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="panel">
+    <div class="title">Khatarnak Predictor</div>
+    <div class="timer" id="timer">Next round in: 60s</div>
+    <div class="prediction" id="prediction">Prediction: ...</div>
+    <div class="result" id="result">Result: ...</div>
+    <div class="history" id="history"></div>
+    <button onclick="resetGame()">Reset</button>
+  </div>  <script>
+    let counter = 60;
+    let interval;
+    const predictionEl = document.getElementById("prediction");
+    const resultEl = document.getElementById("result");
+    const timerEl = document.getElementById("timer");
+    const historyEl = document.getElementById("history");
+    const history = [];
+
+    const colors = ["Red", "Green", "Violet"];
+    const numbers = [0,1,2,3,4,5,6,7,8,9];
+
+    function generatePrediction() {
+      const color = colors[Math.floor(Math.random() * colors.length)];
+      const number = numbers[Math.floor(Math.random() * numbers.length)];
+      const size = number >= 5 ? "Big" : "Small";
+      const coin = Math.random() < 0.5 ? "Heads" : "Tails";
+
+      return {
+        color,
+        number,
+        size,
+        coin
+      };
+    }
+
+    function updatePrediction(pred) {
+      predictionEl.innerText = Prediction: Color: ${pred.color}, Size: ${pred.size}, Number: ${pred.number}, Coin: ${pred.coin};
+    }
+
+    function updateResult(pred) {
+      resultEl.innerText = Result: Color: ${pred.color}, Size: ${pred.size}, Number: ${pred.number}, Coin: ${pred.coin};
+      history.unshift(✅ ${new Date().toLocaleTimeString()} → ${resultEl.innerText});
+      if (history.length > 5) history.pop();
+      history<script>
   let counter = 60;
   let interval;
   const predictionEl = document.getElementById("prediction");
