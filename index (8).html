@@ -1,7 +1,8 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>VIP Predictor</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
   <style>
@@ -47,44 +48,80 @@
       flex-direction: column;
       gap: 10px;
     }
-    #history, #trend {
-      max-height: 150px;
-      overflow-y: auto;
-      border: 1px solid #0f0;
-      padding: 5px;
-    }
-    #timer {
-      font-size: 2em;
-      text-shadow: 0 0 10px #f00;
-    }
-    #fullscreenBtn {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-    }
   </style>
 </head>
 <body>
-  <canvas id="matrix"></canvas>  <div id="loginPage">
+  <canvas id="matrix"></canvas>
+
+  <div id="loginPage">
     <h2>ENTER PAID KEY</h2>
     <input id="keyInput" placeholder="Enter Access Key" />
     <button onclick="checkKey()">Submit</button>
-    <button onclick="buyKey()">Buy Key</button><script>
-  function checkKey() {
-    const key = document.getElementById("keyInput").value.trim();
+    <button onclick="buyKey()">Buy Key</button>
+  </div>
 
-    // Dummy key check – aap apna logic yahan daal sakte ho
-    if (key === "123456") {
-      alert("Access Granted!");
-      document.getElementById("loginPage").style.display = "none";
-      document.getElementById("mainPanel").style.display = "flex";
-    } else {
-      alert("Invalid Key!");
+  <div id="mainPanel">
+    <h1>Access Granted</h1>
+    <p>Welcome to the VIP Panel</p>
+  </div>
+
+  <script>
+    function checkKey() {
+      const key = document.getElementById("keyInput").value.trim();
+      if (key === "123456") {
+        alert("Access Granted!");
+        document.getElementById("loginPage").style.display = "none";
+        document.getElementById("mainPanel").style.display = "flex";
+      } else {
+        alert("Invalid Key!");
+      }
     }
-  }
 
-  function buyKey() {
-    // Telegram link ya payment page ka redirect
-    window.location.href = "https://t.me/YourTelegramUsername"; // ← Replace with your actual Telegram
-  }
-</script>
+    function buyKey() {
+      // Change to your actual Telegram username
+      window.location.href = "https://t.me/YourTelegramUsername";
+    }
+  </script>
+
+  <script>
+    // Matrix Background Animation
+    const canvas = document.getElementById('matrix');
+    const ctx = canvas.getContext('2d');
+
+    canvas.height = window.innerHeight;
+    canvas.width = window.innerWidth;
+
+    const letters = '01';
+    const fontSize = 16;
+    const columns = canvas.width / fontSize;
+
+    const drops = Array.from({ length: columns }, () => 1);
+
+    function draw() {
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.fillStyle = '#0f0';
+      ctx.font = fontSize + 'px monospace';
+
+      for (let i = 0; i < drops.length; i++) {
+        const text = letters[Math.floor(Math.random() * letters.length)];
+        ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+          drops[i] = 0;
+        }
+        drops[i]++;
+      }
+    }
+
+    setInterval(draw, 33);
+
+    // Resize canvas on window resize
+    window.addEventListener('resize', () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    });
+  </script>
+</body>
+</html>
