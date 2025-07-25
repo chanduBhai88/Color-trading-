@@ -188,4 +188,38 @@ Number: 🔢 6
 Last 5 Results:
 🟥 RED - 🔢 3  
 🟩 GREEN - 🔢 6  
-...
+...function startPrediction() {
+  const code = document.getElementById("codeInput").value;
+  const result = document.getElementById("resultText");
+  const timerText = document.getElementById("timerText");
+  const historyBox = document.getElementById("historyBox");
+
+  if (code !== validCode) {
+    result.innerHTML = "❌ Access Denied!";
+    return;
+  }
+
+  result.innerHTML = "✅ Access Granted!";
+  timerText.innerHTML = "Next prediction in: 60s";
+
+  generatePrediction();
+
+  clearInterval(interval);
+  let secondsLeft = 60;
+
+  interval = setInterval(() => {
+    secondsLeft--;
+    timerText.innerHTML = `Next prediction in: ${secondsLeft}s`;
+
+    if (secondsLeft <= 0) {
+      secondsLeft = 60;
+      generatePrediction();
+    }
+  }, 1000);
+}function resetPrediction() {
+  clearInterval(interval);
+  document.getElementById("resultText").innerHTML = "";
+  document.getElementById("timerText").innerHTML = "Next prediction in: 60s";
+  document.getElementById("historyBox").innerHTML = "<strong>Last 5 Results:</strong>";
+  history = [];
+}
