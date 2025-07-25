@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Prediction - CHANDU</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: black;
+      font-family: 'Courier New', monospace;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      flex-direction: column;
+      color: #0f0;
+    }
+
+    .glow-box {
+      background-color: #000;
+      border: 2px solid #0f0;
+      box-shadow: 0 0 20px #0f0;
+      padding: 30px;
+      border-radius: 10px;
+      text-align: center;
+    }
+
+    .glow-box h2 {
+      font-size: 28px;
+      margin-bottom: 20px;
+      color: #0f0;
+      text-shadow: 0 0 10px #0f0;
+    }
+
+    input[type="text"] {
+      background: #111;
+      color: #0f0;
+      border: 2px solid #0f0;
+      border-radius: 5px;
+      padding: 10px 20px;
+      font-size: 16px;
+      width: 250px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .btn {
+      background: transparent;
+      color: #0f0;
+      border: 2px solid #0f0;
+      padding: 10px 20px;
+      margin: 10px;
+      font-size: 16px;
+      border-radius: 5px;
+      cursor: pointer;
+      text-shadow: 0 0 10px #0f0;
+      box-shadow: 0 0 10px #0f0;
+    }
+
+    .btn:hover {
+      background: #0f0;
+      color: #000;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="glow-box">
+    <h2>ENTER PAID KEY</h2>
+    <input type="text" id="accessKey" placeholder="Enter Access Key" />
+    <br />
+    <button class="btn" onclick="submitKey()">Submit</button>
+    <button class="btn" onclick="buyKey()">Buy Key</button>
+  </div>
+
+  <script>
+    function submitKey() {
+      const key = document.getElementById('accessKey').value;
+      alert("Entered Key: " + key); // Replace this with your own key validation
+    }
+
+    function buyKey() {
+      window.open("https://t.me/yourTelegramUsername", "_blank"); // Replace with your Telegram link
+    }
+  </script>
+
+</body>
+</html>
