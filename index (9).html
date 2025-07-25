@@ -132,4 +132,73 @@
   }
 </script>
 </body>
-</html>
+</html><!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ultimate Predictor Panel</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.3.0/chart.min.css"/>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron&display=swap');
+    :root {
+      --bg: #000; --fg: #0f0; --btnbg: #0f0; --btnfg: #000;
+    }
+    body.light {
+      --bg: #fff; --fg: #000; --btnbg: #000; --btnfg: #fff;
+    }
+    body {
+      background: var(--bg);
+      color: var(--fg);
+      font-family: 'Orbitron', sans-serif;
+      overflow-x: hidden;
+      margin: 0; padding: 0;
+      text-align: center;
+    }
+    canvas { display: block; }
+    #chartCanvas { width:100%; max-width:400px; margin:20px auto; }
+    button { margin:5px; padding:10px 20px; cursor:pointer; background:var(--btnbg); color:var(--btnfg); border:none; border-radius:8px; }
+    .container { padding:30px; border:2px solid var(--fg); margin:10vh auto; width:90%; max-width:400px; background:rgba(0,0,0,0.6); border-radius:15px; }
+    .result, .timer, .history { margin-top:20px; font-size:18px; }
+    #modeBtn, #fullscreenBtn { position:fixed; top:10px; padding:8px 12px; }
+    #modeBtn { right:10px; }
+    #fullscreenBtn { left:10px; }
+    .color-box { display:inline-block; width:20px; height:20px; border:1px solid #fff; margin-right:5px; vertical-align:middle; }
+    @media(max-width: 600px) {
+      .container { margin-top: 5vh; padding:20px; }
+    }
+  </style>
+</head>
+<body>
+  <button id="modeBtn">🌙/🔆 Mode</button>
+  <button id="fullscreenBtn" onclick="document.documentElement.requestFullscreen()">⛶ Fullscreen</button>
+  <canvas id="matrix-canvas"></canvas>
+  <div class="container">
+    <h2>Ultimate Predictor</h2>
+    <input type="text" id="codeInput" placeholder="Enter Access Code" />
+    <button onclick="startPrediction()">Start</button>
+    <button onclick="resetPrediction()">Reset</button>
+    <div class="result" id="resultText"></div>
+    <div class="timer" id="timerText">Next prediction in: 60s</div>
+    <div class="history" id="historyBox"><strong>Last 5:</strong></div>
+    <canvas id="chartCanvas"></canvas>
+  </div><script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.3.0/chart.min.js"></script><script>
+  // Matrix Animation
+  const canvas = document.getElementById('matrix-canvas');
+  const ctx = canvas.getContext('2d');
+  function resizeCanvas(){ canvas.height = innerHeight; canvas.width = innerWidth; }
+  window.addEventListener('resize', resizeCanvas); resizeCanvas();
+  const letters = '01'.split(''), fontSize = 14;
+  const drops = Array(Math.floor(canvas.width/fontSize)).fill(1);
+  function draw() {
+    ctx.fillStyle = 'rgba(0,0,0,0.05)';
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+    ctx.fillStyle = '#0f0'; ctx.font = fontSize+'px monospace';
+    drops.forEach((y,x)=> {
+      const text=letters[Math.floor(Math.random()*letters.length)];
+      ctx.fillText(text,x*fontSize,y*fontSize);
+      drops[x]= y*fontSize>canvas.height && Math.random()>0.975 ? 0 : y+1;
+    });
+  }
+  setInterval(draw,33);
+
+  const validCodeAPI='https://your-backend.com/
