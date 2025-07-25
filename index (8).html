@@ -69,4 +69,22 @@
     <h2>ENTER PAID KEY</h2>
     <input id="keyInput" placeholder="Enter Access Key" />
     <button onclick="checkKey()">Submit</button>
-    <button onclick="buyKey()">Buy Key</button>
+    <button onclick="buyKey()">Buy Key</button><script>
+  function checkKey() {
+    const key = document.getElementById("keyInput").value.trim();
+
+    // Dummy key check – aap apna logic yahan daal sakte ho
+    if (key === "123456") {
+      alert("Access Granted!");
+      document.getElementById("loginPage").style.display = "none";
+      document.getElementById("mainPanel").style.display = "flex";
+    } else {
+      alert("Invalid Key!");
+    }
+  }
+
+  function buyKey() {
+    // Telegram link ya payment page ka redirect
+    window.location.href = "https://t.me/YourTelegramUsername"; // ← Replace with your actual Telegram
+  }
+</script>
