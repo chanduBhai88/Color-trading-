@@ -1,0 +1,70 @@
+<script>
+  let countdown = 60;
+  let countdownInterval;
+  let history = [];
+
+  function startTimer() {
+    countdownInterval = setInterval(() => {
+      countdown--;
+      document.getElementById("countdown").innerText = countdown;
+
+      if (countdown <= 0) {
+        clearInterval(countdownInterval);
+        generatePrediction();
+        countdown = 60;
+        startTimer();
+      }
+    }, 1000);
+  }
+
+  function generatePrediction() {
+    const outcomes = ["Red", "Green", "Violet"];
+    const randomIndex = Math.floor(Math.random() * outcomes.length);
+    const result = outcomes[randomIndex];
+
+    document.getElementById("lastResult").innerText = result;
+    document.getElementById("prediction").innerText = outcomes[(randomIndex + 1) % outcomes.length];
+
+    // Update History
+    history.unshift(result);
+    if (history.length > 5) history.pop();
+    document.getElementById("history").innerText = history.join(", ");
+  }
+
+  function resetHistory() {
+    history = [];
+    document.getElementById("history").innerText = "---";
+    document.getElementById("lastResult").innerText = "Loading...";
+    document.getElementById("prediction").innerText = "Calculating...";
+    countdown = 60;
+  }
+
+  function toggleMode() {
+    document.body.classList.toggle("light-mode");
+  }
+
+  // Start everything when page loads
+  window.onload = () => {
+    startTimer();
+  };
+</script><style>
+  .light-mode {
+    background: #fff;
+    color: #000;
+  }
+
+  .light-mode .panel {
+    background: #eee;
+    box-shadow: 0 0 20px #aaa;
+  }
+
+  .light-mode button {
+    background: #000;
+    color: #0f0;
+  }
+
+  .light-mode .mode-toggle {
+    background: #000;
+    color: #0f0;
+  }
+</style>
