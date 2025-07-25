@@ -1,104 +1,47 @@
-<!DOCTYPE html>
-<html lang="en">
+window.location.href = "prediction.html";<!DOCTYPE html>
+<html>
 <head>
   <meta charset="UTF-8">
-  <title>Prediction - CHANDU</title>
+  <title>Prediction</title>
   <style>
     body {
-      margin: 0;
-      padding: 0;
-      background: black;
-      font-family: 'Courier New', monospace;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      flex-direction: column;
+      background: #000;
       color: #0f0;
-    }
-
-    .glow-box {
-      background-color: #000;
-      border: 2px solid #0f0;
-      box-shadow: 0 0 20px #0f0;
+      text-align: center;
+      font-family: monospace;
       padding: 30px;
+    }
+    #randomWord {
+      font-size: 32px;
+      padding: 20px;
+      border: 2px solid #0f0;
       border-radius: 10px;
-      text-align: center;
-    }
-
-    .glow-box h2 {
-      font-size: 28px;
       margin-bottom: 20px;
-      color: #0f0;
-      text-shadow: 0 0 10px #0f0;
-    }
-
-    input[type="text"] {
-      background: #111;
-      color: #0f0;
-      border: 2px solid #0f0;
-      border-radius: 5px;
-      padding: 10px 20px;
-      font-size: 16px;
-      width: 250px;
-      margin-bottom: 20px;
-      text-align: center;
-    }
-
-    .btn {
-      background: transparent;
-      color: #0f0;
-      border: 2px solid #0f0;
-      padding: 10px 20px;
-      margin: 10px;
-      font-size: 16px;
-      border-radius: 5px;
-      cursor: pointer;
-      text-shadow: 0 0 10px #0f0;
-      box-shadow: 0 0 10px #0f0;
-    }
-
-    .btn:hover {
-      background: #0f0;
-      color: #000;
-      font-weight: bold;
     }
   </style>
 </head>
 <body>
-
-  <div class="glow-box">
-    <h2>ENTER PAID KEY</h2>
-    <input type="text" id="accessKey" placeholder="Enter Access Key" />
-    <br />
-    <button class="btn" onclick="submitKey()">Submit</button>
-    <button class="btn" onclick="buyKey()">Buy Key</button>
-  </div>
+  <h1>Prediction Panel</h1>
+  <div id="randomWord">Loading...</div>
+  <div id="timer">00:00</div>
 
   <script>
-    function submitKey() {
-      const key = document.getElementById('accessKey').value;
-      alert("Entered Key: " + key); // Replace this with your own key validation
-    }
+    let lastMinute = -1;
+    setInterval(() => {
+      const now = new Date();
+      const minutes = now.getMinutes();
+      const seconds = now.getSeconds();
 
-    function buyKey() {
-      window.open("https://t.me/yourTelegramUsername", "_blank"); // Replace with your Telegram link
-    }
+      document.getElementById('timer').textContent =
+        String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
+
+      if (seconds === 0 && lastMinute !== minutes) {
+        const randomNumber = Math.floor(Math.random() * 10);
+        const result = randomNumber >= 5 ? 'Big' : 'Small';
+        document.getElementById('randomWord').textContent = result;
+        lastMinute = minutes;
+      }
+    }, 1000);
   </script>
-
 </body>
-</html><script>
-  function submitKey() {
-    const key = document.getElementById('accessKey').value;
-    if (key === "CHANDU") {
-      // Agar sahi key hai toh next page open karo
-      window.location.href = "prediction.html"; // Apna prediction page yahan daalo
-    } else {
-      alert("Invalid Key. Please buy a valid key.");
-    }
-  }
-
-  function buyKey() {
-    window.open("https://t.me/yourTelegramUsername", "_blank");
-  }
-</script>
+</html>
