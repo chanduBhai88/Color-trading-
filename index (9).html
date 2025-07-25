@@ -1,4 +1,161 @@
-🔮 Prediction:
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Smart Matrix Predictor</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron&display=swap');
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Orbitron', sans-serif;
+      background: black;
+      color: #0f0;
+      overflow: hidden;
+    }
+    #matrix-canvas {
+      position: fixed;
+      top: 0; left: 0;
+      z-index: -1;
+    }
+    .container {
+      text-align: center;
+      padding: 30px 20px;
+      border: 2px solid lime;
+      margin: 10vh auto;
+      width: 90%;
+      max-width: 400px;
+      background: rgba(0, 0, 0, 0.7);
+      border-radius: 15px;
+    }
+    h2 { color: red; margin-bottom: 15px; }
+    input {
+      padding: 10px;
+      width: 100%;
+      font-size: 18px;
+      text-align: center;
+      margin-bottom: 10px;
+    }
+    button {
+      padding: 10px 25px;
+      font-size: 16px;
+      background: blue;
+      color: white;
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
+      margin: 5px;
+    }
+    .result, .timer, .history {
+      margin-top: 20px;
+      font-size: 18px;
+    }
+    .history div {
+      margin: 3px 0;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="matrix-canvas"></canvas>
+
+  <div class="container">
+    <h2>Smart Matrix Predictor</h2>
+    <input type="text" id="codeInput" placeholder="Enter Access Code" />
+    <button onclick="startPrediction()">Start</button>
+    <button onclick="resetPrediction()">Reset</button>
+    <div class="result" id="resultText"></div>
+    <div class="timer" id="timerText">Next prediction in: 60s</div>
+    <div class="history" id="historyBox"><strong>Last 5 Results:</strong></div>
+  </div>
+
+  <script>
+    // Matrix Animation
+    const canvas = document.getElementById("matrix-canvas");
+    const ctx = canvas.getContext("2d");
+    canvas.height = window.innerHeight;
+    canvas.width = window.innerWidth;
+    let letters = "01".split("");
+    let fontSize = 14;
+    let columns = canvas.width / fontSize;
+    let drops = Array(Math.floor(columns)).fill(1);
+    function drawMatrix() {
+      ctx.fillStyle = "rgba(0,0,0,0.05)";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = "#0f0";
+      ctx.font = fontSize + "px monospace";
+      drops.forEach((y, x) => {
+        const text = letters[Math.floor(Math.random() * letters.length)];
+        ctx.fillText(text, x * fontSize, y * fontSize);
+        drops[x] = y * fontSize > canvas.height && Math.random() > 0.975 ? 0 : y + 1;
+      });
+    }
+    setInterval(drawMatrix, 33);
+
+    // Predictor
+    const validCode = "VIP123";
+    const predictionOptions = ["🟥 RED", "🟩 GREEN", "🟦 BLUE"];
+    let history = [];
+    let timer = 60;
+    let interval;
+
+    function startPrediction() {
+      const code = document.getElementById("codeInput").value;
+      const result = document.getElementById("resultText");
+      const timerText = document.getElementById("timerText");
+      const historyBox = document.getElementById("historyBox");
+
+      if (code !== validCode) {
+        result.innerHTML = "❌ Access Denied!";
+        return;
+      }
+
+      result.innerHTML = "✅ Access Granted!";
+      generatePrediction();
+      clearInterval(interval);
+      interval = setInterval(() => {
+        timer--;
+        timerText.innerHTML = `Next prediction in: ${timer}s`;
+        if (timer <= 0) {
+          timer = 60;
+          generatePrediction();
+        }
+      }, 1000);
+
+      function generatePrediction() {
+        const next = smartPredict();
+        result.innerHTML = `🔮 Prediction: ${next}`;
+        history.unshift(next);
+        history = history.slice(0, 5);
+        historyBox.innerHTML = `<strong>Last 5 Results:</strong>` + history.map(p => `<div>${p}</div>`).join("");
+      }
+
+      function smartPredict() {
+        if (history.length >= 2) {
+          const [last, second] = history;
+          if (last === second) {
+            // If last 2 are same, pick something different
+            return predictionOptions.find(p => p !== last);
+          } else if (history.length >= 3 && history[0] === history[2]) {
+            // RED → GREEN → RED = likely GREEN
+            return history[1];
+          }
+        }
+        // Default random fallback
+        return predictionOptions[Math.floor(Math.random() * predictionOptions.length)];
+      }
+    }
+
+    function resetPrediction() {
+      clearInterval(interval);
+      document.getElementById("resultText").innerHTML = "";
+      document.getElementById("timerText").innerHTML = "Next prediction in: 60s";
+      document.getElementById("historyBox").innerHTML = "<strong>Last 5 Results:</strong>";
+      history = [];
+      timer = 60;
+    }
+  </script>
+</body>
+</html>🔮 Prediction:
 Color: 🟥 RED  
 Number: 🔢 7function generatePrediction() {
   const nextColor = smartPredict();
