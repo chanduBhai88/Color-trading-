@@ -1,21 +1,16 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>VIP Mod Panel</title>
+  <title>VIP Predictor</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
   <style>
     body {
+      margin: 0;
       background: #000;
       color: #0f0;
       font-family: 'Orbitron', sans-serif;
-      margin: 0;
       overflow: hidden;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
     }
     canvas {
       position: fixed;
@@ -23,187 +18,55 @@
       left: 0;
       z-index: -1;
     }
-    h1 {
-      position: absolute;
-      top: 20px;
-      font-size: 1.2em;
-      background: none;
-      border: 2px solid #00ff00;
-      color: #00ff00;
-      cursor: pointer;
-      border-radius: 5px;
-      text-shadow: 0 0 5px #00ff00;
-      box-shadow: 0 0 10px #00ff00;
-      transition: all 0.3s;
+    #loginPage, #mainPanel {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+    h2, h3, h1 {
+      text-shadow: 0 0 10px #0f0;
+    }
+    input, button {
+      margin: 10px;
       padding: 10px;
+      background: #000;
+      border: 2px solid #0f0;
+      color: #0f0;
+      font-family: 'Orbitron', sans-serif;
+      border-radius: 5px;
+      text-align: center;
     }
-    h1:hover {
-      background: #00ff00;
+    button:hover {
+      background: #0f0;
       color: #000;
-      box-shadow: 0 0 20px #00ff00;
     }
-    #timerBox {
+    #mainPanel {
       display: none;
-      position: fixed;
-      background: rgba(0, 0, 0, 0.9);
-      padding: 20px;
-      border: 2px solid #00ff00;
-      border-radius: 15px;
-      box-shadow: 0 0 20px #00ff00, 0 0 40px rgba(0, 255, 0, 0.5);
-      cursor: move;
-      user-select: none;
+      flex-direction: column;
+      gap: 10px;
     }
-    #randomWord {
-      font-size: 2.2em;
-      color: #ff0000;
-      text-shadow: 0 0 10px #ff0000;
-      margin-top: 15px;
-      animation: pulse 1s infinite;
+    #history, #trend {
+      max-height: 150px;
+      overflow-y: auto;
+      border: 1px solid #0f0;
+      padding: 5px;
     }
-    @keyframes pulse {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.1); }
+    #timer {
+      font-size: 2em;
+      text-shadow: 0 0 10px #f00;
     }
-    #closeButton {
+    #fullscreenBtn {
       position: absolute;
       top: 10px;
       right: 10px;
-      background: none;
-      border: none;
-      color: #ff0000;
-      font-size: 1.2em;
-      cursor: pointer;
-      text-shadow: 0 0 5px #ff0000;
-      transition: transform 0.2s;
-    }
-    #closeButton:hover {
-      transform: scale(1.2);
-    }
-    #keyInput {
-      padding: 10px;
-      font-size: 1em;
-      background: rgba(0, 0, 0, 0.8);
-      border: 2px solid #00ff00;
-      color: #00ff00;
-      border-radius: 5px;
-      width: 200px;
-      text-align: center;
-      font-family: 'Orbitron', sans-serif;
-      margin-bottom: 15px;
-      text-shadow: 0 0 5px #00ff00;
-    }
-    #keyInput:focus {
-      outline: none;
-      box-shadow: 0 0 15px #00ff00;
-    }
-    #errorMessage {
-      color: #ff0000;
-      font-size: 1em;
-      text-shadow: 0 0 5px #ff0000;
-      margin-top: 10px;
-      display: none;
-    }
-    button {
-      font-size: 1em;
-      background: none;
-      border: 2px solid #00ff00;
-      color: #00ff00;
-      cursor: pointer;
-      border-radius: 5px;
-      padding: 10px;
-      margin: 10px;
-      font-family: 'Orbitron', sans-serif;
-      text-shadow: 0 0 5px #00ff00;
-      transition: all 0.3s;
-    }
-    button:hover {
-      background: #00ff00;
-      color: #000;
-      box-shadow: 0 0 20px #00ff00;
     }
   </style>
 </head>
 <body>
-  <canvas id="matrix"></canvas>
-
-  <div id="loginPage">
+  <canvas id="matrix"></canvas>  <div id="loginPage">
     <h2>ENTER PAID KEY</h2>
-    <input type="text" id="keyInput" placeholder="Enter Access Key" />
+    <input id="keyInput" placeholder="Enter Access Key" />
     <button onclick="checkKey()">Submit</button>
     <button onclick="buyKey()">Buy Key</button>
-    <div id="errorMessage">Please enter correct key</div>
-  </div>
-
-  <h1 style="display: none;">SERVER RUNNING</h1>
-  <button style="display: none;" onclick="toggleTimerBox()">Start Hack</button>
-
-  <div id="timerBox">
-    <button id="closeButton" onclick="toggleTimerBox()">X</button>
-    <h3>VIP PANEL</h3>
-    <div id="period1m"></div>
-    <div id="timer1m"></div>
-    <div id="randomWord"></div>
-  </div>
-
-  <script>
-    // Matrix background
-    const canvas = document.getElementById('matrix');
-    const ctx = canvas.getContext('2d');
-    canvas.height = window.innerHeight;
-    canvas.width = window.innerWidth;
-    const chars = '0101HACKVIPCYPHER';
-    const fontSize = 14;
-    const columns = canvas.width / fontSize;
-    const drops = Array(Math.floor(columns)).fill(1);
-
-    function drawMatrix() {
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      ctx.fillStyle = '#00ff00';
-      ctx.font = fontSize + 'px monospace';
-
-      drops.forEach((y, i) => {
-        const text = chars.charAt(Math.floor(Math.random() * chars.length));
-        ctx.fillText(text, i * fontSize, y * fontSize);
-        if (y * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
-        drops[i]++;
-      });
-    }
-    setInterval(drawMatrix, 33);
-
-    // Key check logic
-    function checkKey() {
-      const input = document.getElementById('keyInput').value.trim();
-      const error = document.getElementById('errorMessage');
-      if (input === "0101HACKVIPCYPHER") {
-        document.getElementById('loginPage').style.display = 'none';
-        document.querySelector('h1').style.display = 'block';
-        document.querySelector('button[onclick="toggleTimerBox()"]').style.display = 'inline-block';
-      } else {
-        error.style.display = 'block';
-      }
-    }
-
-    // Buy key redirect
-    function buyKey() {
-      window.location.href = 'https://t.me/+xVHt9WSvAsw4YzY1';
-    }
-
-    // Toggle VIP panel
-    function toggleTimerBox() {
-      const box = document.getElementById('timerBox');
-      if (box.style.display === 'none' || box.style.display === '') {
-        box.style.display = 'block';
-        const ww = window.innerWidth;
-        const wh = window.innerHeight;
-        const bw = box.offsetWidth;
-        const bh = box.offsetHeight;
-        box.style.left = (ww - bw) / 2 + 'px';
-        box.style.top = (wh - bh) / 2 + 'px';
-      } else {
-        box.style.display = 'none';
-      }
-    }
-  </script>
-</body>
-</html>
