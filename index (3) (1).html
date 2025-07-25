@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -70,7 +71,9 @@
     <div class="result" id="result">Result: ...</div>
     <div class="history" id="history"></div>
     <button onclick="resetGame()">Reset</button>
-  </div>  <script>
+  </div>
+
+  <script>
     let counter = 60;
     let interval;
     const predictionEl = document.getElementById("prediction");
@@ -88,83 +91,47 @@
       const size = number >= 5 ? "Big" : "Small";
       const coin = Math.random() < 0.5 ? "Heads" : "Tails";
 
-      return {
-        color,
-        number,
-        size,
-        coin
-      };
+      return { color, number, size, coin };
     }
 
     function updatePrediction(pred) {
-      predictionEl.innerText = Prediction: Color: ${pred.color}, Size: ${pred.size}, Number: ${pred.number}, Coin: ${pred.coin};
+      predictionEl.innerText = `Prediction: Color: ${pred.color}, Size: ${pred.size}, Number: ${pred.number}, Coin: ${pred.coin}`;
     }
 
     function updateResult(pred) {
-      resultEl.innerText = Result: Color: ${pred.color}, Size: ${pred.size}, Number: ${pred.number}, Coin: ${pred.coin};
-      history.unshift(✅ ${new Date().toLocaleTimeString()} → ${resultEl.innerText});
+      resultEl.innerText = `Result: Color: ${pred.color}, Size: ${pred.size}, Number: ${pred.number}, Coin: ${pred.coin}`;
+      history.unshift(`✅ ${new Date().toLocaleTimeString()} → ${resultEl.innerText}`);
       if (history.length > 5) history.pop();
-      history<script>
-  let counter = 60;
-  let interval;
-  const predictionEl = document.getElementById("prediction");
-  const resultEl = document.getElementById("result");
-  const timerEl = document.getElementById("timer");
-  const historyEl = document.getElementById("history");
-  const history = [];
+      historyEl.innerHTML = history.join("<br>");
+    }
 
-  const colors = ["Red", "Green", "Violet"];
-  const numbers = [0,1,2,3,4,5,6,7,8,9];
+    function startTimer() {
+      interval = setInterval(() => {
+        counter--;
+        timerEl.innerText = `Next round in: ${counter}s`;
 
-  function generatePrediction() {
-    const color = colors[Math.floor(Math.random() * colors.length)];
-    const number = numbers[Math.floor(Math.random() * numbers.length)];
-    const size = number >= 5 ? "Big" : "Small";
-    const coin = Math.random() < 0.5 ? "Heads" : "Tails";
+        if (counter === 0) {
+          const pred = generatePrediction();
+          updatePrediction(pred);
+          updateResult(pred);
+          counter = 60;
+        }
+      }, 1000);
+    }
 
-    return {
-      color,
-      number,
-      size,
-      coin
-    };
-  }
+    function resetGame() {
+      clearInterval(interval);
+      counter = 60;
+      timerEl.innerText = `Next round in: 60s`;
+      predictionEl.innerText = "Prediction: ...";
+      resultEl.innerText = "Result: ...";
+      history.length = 0;
+      historyEl.innerHTML = "";
+      startTimer();
+    }
 
-  function updatePrediction(pred) {
-    predictionEl.innerText = `Prediction: Color: ${pred.color}, Size: ${pred.size}, Number: ${pred.number}, Coin: ${pred.coin}`;
-  }
-
-  function updateResult(pred) {
-    resultEl.innerText = `Result: Color: ${pred.color}, Size: ${pred.size}, Number: ${pred.number}, Coin: ${pred.coin}`;
-    history.unshift(`✅ ${new Date().toLocaleTimeString()} → ${resultEl.innerText}`);
-    if (history.length > 5) history.pop();
-    historyEl.innerHTML = history.join("<br>");
-  }
-
-  function startTimer() {
-    interval = setInterval(() => {
-      counter--;
-      timerEl.innerText = `Next round in: ${counter}s`;
-
-      if (counter === 0) {
-        const pred = generatePrediction();
-        updatePrediction(pred);
-        updateResult(pred);
-        counter = 60;
-      }
-    }, 1000);
-  }
-
-  function resetGame() {
-    clearInterval(interval);
-    counter = 60;
-    timerEl.innerText = `Next round in: 60s`;
-    predictionEl.innerText = "Prediction: ...";
-    resultEl.innerText = "Result: ...";
-    historyEl.innerHTML = "";
-    startTimer();
-  }
-
-  // Start timer when page loads
-  window.onload = startTimer;
-</script>
+    // Start when page loads
+    window.onload = startTimer;
+  </script>
+</body>
+</html>
