@@ -1,47 +1,138 @@
-window.location.href = "prediction.html";<!DOCTYPE html>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Prediction</title>
+  <meta charset="UTF-8" />
+  <title>CHANDU Key Access</title>
   <style>
     body {
+      margin: 0;
+      padding: 0;
       background: #000;
+      font-family: 'Courier New', monospace;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
       color: #0f0;
-      text-align: center;
-      font-family: monospace;
-      padding: 30px;
     }
+
+    .box {
+      border: 2px solid #0f0;
+      padding: 30px;
+      border-radius: 10px;
+      text-align: center;
+      box-shadow: 0 0 20px #0f0;
+    }
+
+    h2 {
+      font-size: 28px;
+      margin-bottom: 20px;
+      text-shadow: 0 0 10px #0f0;
+    }
+
+    input {
+      background: #111;
+      border: 2px solid #0f0;
+      color: #0f0;
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 5px;
+      width: 250px;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .btn {
+      display: inline-block;
+      margin: 10px;
+      padding: 10px 20px;
+      border: 2px solid #0f0;
+      color: #0f0;
+      background: transparent;
+      font-size: 16px;
+      border-radius: 5px;
+      cursor: pointer;
+      text-shadow: 0 0 10px #0f0;
+      box-shadow: 0 0 10px #0f0;
+    }
+
+    .btn:hover {
+      background: #0f0;
+      color: #000;
+      font-weight: bold;
+    }
+
+    #predictionSection {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+    }
+
     #randomWord {
       font-size: 32px;
+      font-weight: bold;
       padding: 20px;
+      background-color: #111;
       border: 2px solid #0f0;
       border-radius: 10px;
-      margin-bottom: 20px;
+      margin: 20px 0;
+    }
+
+    #timer {
+      font-size: 24px;
     }
   </style>
 </head>
 <body>
-  <h1>Prediction Panel</h1>
-  <div id="randomWord">Loading...</div>
-  <div id="timer">00:00</div>
+
+  <div id="keyBox" class="box">
+    <h2>ENTER PAID KEY</h2>
+    <input type="text" id="accessKey" placeholder="Enter Access Key" />
+    <br />
+    <button class="btn" onclick="submitKey()">Submit</button>
+    <button class="btn" onclick="buyKey()">Buy Key</button>
+  </div>
+
+  <div id="predictionSection">
+    <h2>WELCOME TO PREDICTION PANEL</h2>
+    <div id="randomWord">Loading...</div>
+    <div id="timer">00:00</div>
+  </div>
 
   <script>
-    let lastMinute = -1;
-    setInterval(() => {
-      const now = new Date();
-      const minutes = now.getMinutes();
-      const seconds = now.getSeconds();
-
-      document.getElementById('timer').textContent =
-        String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
-
-      if (seconds === 0 && lastMinute !== minutes) {
-        const randomNumber = Math.floor(Math.random() * 10);
-        const result = randomNumber >= 5 ? 'Big' : 'Small';
-        document.getElementById('randomWord').textContent = result;
-        lastMinute = minutes;
+    function submitKey() {
+      const key = document.getElementById('accessKey').value.trim();
+      if (key === "CHANDU") {
+        document.getElementById('keyBox').style.display = 'none';
+        document.getElementById('predictionSection').style.display = 'flex';
+        startPrediction();
+      } else {
+        alert("❌ Invalid Key");
       }
-    }, 1000);
+    }
+
+    function buyKey() {
+      window.open("https://t.me/yourTelegramUsername", "_blank");
+    }
+
+    function startPrediction() {
+      let lastMinute = -1;
+      setInterval(() => {
+        const now = new Date();
+        const minutes = now.getMinutes();
+        const seconds = now.getSeconds();
+
+        document.getElementById('timer').textContent =
+          String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
+
+        if (seconds === 0 && lastMinute !== minutes) {
+          const randomNumber = Math.floor(Math.random() * 10);
+          const result = randomNumber >= 5 ? 'Big' : 'Small';
+          document.getElementById('randomWord').textContent = result;
+          lastMinute = minutes;
+        }
+      }, 1000);
+    }
   </script>
 </body>
 </html>
