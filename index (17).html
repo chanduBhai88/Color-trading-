@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Prediction</title>
+  <style>
+    body {
+      background: #000;
+      color: #0f0;
+      font-family: monospace;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      flex-direction: column;
+    }
+
+    #randomWord {
+      font-size: 32px;
+      font-weight: bold;
+      padding: 20px;
+      background-color: #111;
+      border: 2px solid #0f0;
+      border-radius: 10px;
+      margin-bottom: 20px;
+    }
+
+    #timer {
+      font-size: 24px;
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+  <div id="randomWord">Loading...</div>
+  <div id="timer">00:00</div>
+
+  <script>
+    let lastMinute = -1;
+
+    function smartPrediction(minute) {
+      // Smart pattern logic based on minute
+      const colorPattern = ['Red', 'Green', 'Violet'];
+      const color = colorPattern[minute % colorPattern.length];
+
+      // Smart number prediction: alternating 0–9 in reverse
+      const number = (9 - (minute % 10));
+
+      return `${color} - ${number}`;
+    }
+
+    function startTimer() {
+      setInterval(() => {
+        const now = new Date();
+        const minutes = now.getMinutes();
+        const seconds = now.getSeconds();
+
+        // Show timer
+        document.getElementById('timer').textContent =
+          String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
+
+        // Predict only on new minute
+        if (seconds === 0 && lastMinute !== minutes) {
+          const prediction = smartPrediction(minutes);
+          document.getElementById('randomWord').textContent = prediction;
+          lastMinute = minutes;
+        }
+      }, 1000);
+    }
+
+    startTimer();
+  </script>
+</body>
+</html>
