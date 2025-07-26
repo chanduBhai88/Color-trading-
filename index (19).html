@@ -1,68 +1,65 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>91 Club Pattern Game</title>
+  <meta charset="UTF-8">
+  <title>Color Match: Impossible Win</title>
   <style>
-    body {
-      background-image: url('https://i.imgur.com/Rl8HyZZ.jpg'); /* Virat Kohli wallpaper */
-      background-size: cover;
-      background-position: center;
-      font-family: Arial, sans-serif;
-      color: white;
-      text-align: center;
-      padding-top: 50px;
-    }
-    button {
-      padding: 15px 25px;
-      font-size: 18px;
-      margin: 10px;
-      border-radius: 10px;
-      border: none;
-      cursor: pointer;
-    }
-    .result {
-      font-size: 22px;
-      margin-top: 30px;
-      font-weight: bold;
-    }
+    body { font-family: Arial; text-align: center; margin-top: 40px; }
+    #targetColor, #guessColor { width: 100px; height: 100px; margin: 20px auto; }
+    .slider { width: 300px; }
+    #result { font-weight: bold; margin-top: 20px; }
   </style>
 </head>
 <body>
-  <h1>91 Club Pattern Checker</h1>
-  <p>Choose Pattern:</p>
 
-  <button onclick="showPattern(1)">1 Pattern</button>
-  <button onclick="showPattern(2)">2 Pattern</button>
-  <button onclick="showPattern(3)">3 Pattern</button>
-  <button onclick="showPattern(4)">4 Pattern</button>
+<h1>🎯 Color Match: Impossible Win</h1>
 
-  <div id="patternOutput" class="result"></div>
+<p>Try to match the hidden color using RGB sliders:</p>
 
-  <br><br>
-  <button onclick="checkResult(true)" style="background-color: green;">Right</button>
-  <button onclick="checkResult(false)" style="background-color: red;">Wrong</button>
+<div id="targetColor" style="background-color: rgb(0,0,0);"></div>
 
-  <script>
-    const patterns = {
-      1: Array(11).fill("Small"),
-      2: Array(11).fill("Big"),
-      3: Array.from({ length: 22 }, (_, i) => i % 2 === 0 ? "Big" : "Small"),
-      4: Array.from({ length: 16 }, (_, i) => (Math.floor(i / 2) % 2 === 0 ? "Big" : "Small")),
-    };
+<div>
+  <label>Red: <input class="slider" type="range" min="0" max="255" id="red"></label><br>
+  <label>Green: <input class="slider" type="range" min="0" max="255" id="green"></label><br>
+  <label>Blue: <input class="slider" type="range" min="0" max="255" id="blue"></label><br>
+</div>
 
-    function showPattern(num) {
-      const pat = patterns[num];
-      document.getElementById("patternOutput").innerText = `Pattern ${num}: ${pat.join(", ")}`;
+<button onclick="checkMatch()">Check Match</button>
+
+<div id="guessColor"></div>
+<div id="result"></div>
+
+<script>
+  let target = {
+    r: Math.floor(Math.random()*256),
+    g: Math.floor(Math.random()*256),
+    b: Math.floor(Math.random()*256)
+  };
+
+  function checkMatch() {
+    const r = parseInt(document.getElementById('red').value);
+    const g = parseInt(document.getElementById('green').value);
+    const b = parseInt(document.getElementById('blue').value);
+
+    const guess = { r, g, b };
+    document.getElementById('guessColor').style.backgroundColor = `rgb(${r},${g},${b})`;
+
+    const diff = Math.abs(target.r - r) + Math.abs(target.g - g) + Math.abs(target.b - b);
+
+    if (diff < 15) {
+      document.getElementById('result').innerText = "🎉 You won! But the color shifts again...";
+    } else {
+      document.getElementById('result').innerText = `Nope! You're off by ${diff} points.`;
     }
 
-    function checkResult(isRight) {
-      const msg = isRight ? "Chakka!" : "Out!";
-      const utterance = new SpeechSynthesisUtterance(msg);
-      utterance.lang = "hi-IN";
-      speechSynthesis.speak(utterance);
-      alert(msg);
-    }
-  </script>
+    // Make it impossible to win by subtly changing the target color
+    target.r = (target.r + Math.floor(Math.random()*5)) % 256;
+    target.g = (target.g + Math.floor(Math.random()*5)) % 256;
+    target.b = (target.b + Math.floor(Math.random()*5)) % 256;
+
+    document.getElementById('targetColor').style.backgroundColor = `rgb(${target.r},${target.g},${target.b})`;
+  }
+</script>
+
 </body>
 </html>
