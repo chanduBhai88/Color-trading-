@@ -1,70 +1,78 @@
-<script>
-  let countdown = 60;
-  let countdownInterval;
-  let history = [];
-
-  function startTimer() {
-    countdownInterval = setInterval(() => {
-      countdown--;
-      document.getElementById("countdown").innerText = countdown;
-
-      if (countdown <= 0) {
-        clearInterval(countdownInterval);
-        generatePrediction();
-        countdown = 60;
-        startTimer();
-      }
-    }, 1000);
-  }
-
-  function generatePrediction() {
-    const outcomes = ["Red", "Green", "Violet"];
-    const randomIndex = Math.floor(Math.random() * outcomes.length);
-    const result = outcomes[randomIndex];
-
-    document.getElementById("lastResult").innerText = result;
-    document.getElementById("prediction").innerText = outcomes[(randomIndex + 1) % outcomes.length];
-
-    // Update History
-    history.unshift(result);
-    if (history.length > 5) history.pop();
-    document.getElementById("history").innerText = history.join(", ");
-  }
-
-  function resetHistory() {
-    history = [];
-    document.getElementById("history").innerText = "---";
-    document.getElementById("lastResult").innerText = "Loading...";
-    document.getElementById("prediction").innerText = "Calculating...";
-    countdown = 60;
-  }
-
-  function toggleMode() {
-    document.body.classList.toggle("light-mode");
-  }
-
-  // Start everything when page loads
-  window.onload = () => {
-    startTimer();
-  };
-</script><style>
-  .light-mode {
-    background: #fff;
-    color: #000;
-  }
-
-  .light-mode .panel {
-    background: #eee;
-    box-shadow: 0 0 20px #aaa;
-  }
-
-  .light-mode button {
-    background: #000;
-    color: #0f0;
-  }
-
-  .light-mode .mode-toggle {
-    background: #000;
-    color: #0f0;
-  }
-</style>
+<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Khatarnak Predictor v5.0</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Orbitron', sans-serif;
+      background: #000;
+      color: #0f0;
+      overflow-x: hidden;
+    }
+    .tabs {
+      display: flex;
+      justify-content: center;
+      background: #111;
+    }
+    .tab {
+      padding: 1rem 2rem;
+      cursor: pointer;
+      color: #aaa;
+      border-bottom: 3px solid transparent;
+    }
+    .tab.active {
+      color: #0f0;
+      border-color: #0f0;
+    }
+    .panel {
+      display: none;
+      padding: 2rem;
+      animation: fade 0.5s ease-in-out;
+    }
+    .panel.active {
+      display: block;
+    }
+    @keyframes fade {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    .result-box {
+      font-size: 3rem;
+      text-align: center;
+      margin-top: 2rem;
+    }
+    .predict-btn {
+      display: block;
+      margin: 1rem auto;
+      padding: 1rem 2rem;
+      font-size: 1.5rem;
+      background: #0f0;
+      color: #000;
+      border: none;
+      cursor: pointer;
+      border-radius: 10px;
+    }
+    .predict-btn:hover {
+      background: #0c0;
+    }
+  </style>
+</head>
+<body>
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('color')">Color</div>
+    <div class="tab" onclick="switchTab('number')">Number</div>
+  </div>  <div id="color" class="panel active">
+    <h2>Color Prediction</h2>
+    <button class="predict-btn" onclick="predictColor()">Predict Color</button>
+    <div class="result-box" id="color-result">...</div>
+  </div>  <div id="number" class="panel">
+    <h2>Number Prediction</h2>
+    <button class="predict-btn" onclick="predictNumber()">Predict Number</button>
+    <div class="result-box" id="number-result">...</div>
+  </div>  <script>
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+      document.querySelectorAll('.panel').forEach(panel =>
