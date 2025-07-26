@@ -1,50 +1,68 @@
-<script>
-  // 🔄 Tab switch logic
-  function switchTab(tabId) {
-    document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
-    document.querySelectorAll('.panel').forEach(panel => panel.classList.remove('active'));
-
-    document.querySelector(`.tab[onclick="switchTab('${tabId}')"]`).classList.add('active');
-    document.getElementById(tabId).classList.add('active');
-  }
-
-  // 🌐 Color Prediction from Server
-  async function predictColor() {
-    const resultBox = document.getElementById('color-result');
-    resultBox.innerText = '⏳ Fetching...';
-
-    try {
-      const response = await fetch('https://your-api.com/predict/color'); // 🔁 Replace with your real API URL
-      const data = await response.json();
-
-      if (data && data.color) {
-        resultBox.innerText = `🎨 ${data.color.toUpperCase()}`;
-      } else {
-        resultBox.innerText = '❌ Invalid response';
-      }
-    } catch (error) {
-      resultBox.innerText = '🚫 Server Error';
-      console.error('Color API Error:', error);
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>91 Club Pattern Game</title>
+  <style>
+    body {
+      background-image: url('https://i.imgur.com/Rl8HyZZ.jpg'); /* Virat Kohli wallpaper */
+      background-size: cover;
+      background-position: center;
+      font-family: Arial, sans-serif;
+      color: white;
+      text-align: center;
+      padding-top: 50px;
     }
-  }
-
-  // 🌐 Number Prediction from Server
-  async function predictNumber() {
-    const resultBox = document.getElementById('number-result');
-    resultBox.innerText = '⏳ Fetching...';
-
-    try {
-      const response = await fetch('https://your-api.com/predict/number'); // 🔁 Replace with your real API URL
-      const data = await response.json();
-
-      if (data && typeof data.number === 'number') {
-        resultBox.innerText = `🎯 ${data.number}`;
-      } else {
-        resultBox.innerText = '❌ Invalid response';
-      }
-    } catch (error) {
-      resultBox.innerText = '🚫 Server Error';
-      console.error('Number API Error:', error);
+    button {
+      padding: 15px 25px;
+      font-size: 18px;
+      margin: 10px;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
     }
-  }
-</script>
+    .result {
+      font-size: 22px;
+      margin-top: 30px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>91 Club Pattern Checker</h1>
+  <p>Choose Pattern:</p>
+
+  <button onclick="showPattern(1)">1 Pattern</button>
+  <button onclick="showPattern(2)">2 Pattern</button>
+  <button onclick="showPattern(3)">3 Pattern</button>
+  <button onclick="showPattern(4)">4 Pattern</button>
+
+  <div id="patternOutput" class="result"></div>
+
+  <br><br>
+  <button onclick="checkResult(true)" style="background-color: green;">Right</button>
+  <button onclick="checkResult(false)" style="background-color: red;">Wrong</button>
+
+  <script>
+    const patterns = {
+      1: Array(11).fill("Small"),
+      2: Array(11).fill("Big"),
+      3: Array.from({ length: 22 }, (_, i) => i % 2 === 0 ? "Big" : "Small"),
+      4: Array.from({ length: 16 }, (_, i) => (Math.floor(i / 2) % 2 === 0 ? "Big" : "Small")),
+    };
+
+    function showPattern(num) {
+      const pat = patterns[num];
+      document.getElementById("patternOutput").innerText = `Pattern ${num}: ${pat.join(", ")}`;
+    }
+
+    function checkResult(isRight) {
+      const msg = isRight ? "Chakka!" : "Out!";
+      const utterance = new SpeechSynthesisUtterance(msg);
+      utterance.lang = "hi-IN";
+      speechSynthesis.speak(utterance);
+      alert(msg);
+    }
+  </script>
+</body>
+</html>
