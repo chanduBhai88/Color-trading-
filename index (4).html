@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -45,6 +46,36 @@
 </head>
 <body>
   <h1>Khatarnak Predictor v4.0</h1>
-  <button id="predict-btn">Predict Now</button>  <div id="result" class="box"></div>
+  <button id="predict-btn">Predict Now</button>
+  <div id="result" class="box"></div>
   <div id="logic" class="box"></div>
   <div id="history" class="box"></div>
+
+  <script>
+    const resultBox = document.getElementById("result");
+    const logicBox = document.getElementById("logic");
+    const historyBox = document.getElementById("history");
+
+    let history = [];
+
+    function predict() {
+      const colors = ["Red", "Green", "Violet"];
+      const sizes = ["Big", "Small"];
+      const number = Math.floor(Math.random() * 10);
+
+      const color = colors[number % 3]; // based on number
+      const size = number >= 5 ? "Big" : "Small";
+
+      const prediction = `Color: ${color}, Size: ${size}, Number: ${number}`;
+      resultBox.innerHTML = `<strong>${prediction}</strong>`;
+      logicBox.innerHTML = `Logic: Color = number % 3, Size = number >= 5 ? Big : Small`;
+
+      history.unshift(prediction);
+      if (history.length > 5) history.pop();
+      historyBox.innerHTML = `<strong>Last 5:</strong><br>${history.join('<br>')}`;
+    }
+
+    document.getElementById("predict-btn").addEventListener("click", predict);
+  </script>
+</body>
+</html>
