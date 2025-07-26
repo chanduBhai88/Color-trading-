@@ -1,64 +1,60 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <title>Color Match: Impossible Win</title>
+  <title>Wingo Color Predictor Game</title>
   <style>
-    body { font-family: Arial; text-align: center; margin-top: 40px; }
-    #targetColor, #guessColor { width: 100px; height: 100px; margin: 20px auto; }
-    .slider { width: 300px; }
-    #result { font-weight: bold; margin-top: 20px; }
+    body { font-family: Arial; text-align: center; padding: 40px; }
+    button { padding: 10px 20px; margin: 10px; font-size: 16px; }
+    #timer { font-size: 24px; margin-top: 20px; }
+    #result { font-size: 22px; margin-top: 30px; font-weight: bold; }
   </style>
 </head>
 <body>
 
-<h1>🎯 Color Match: Impossible Win</h1>
+<h1>🎯 Wingo Color Predictor</h1>
+<p>Select your color prediction for the next round:</p>
 
-<p>Try to match the hidden color using RGB sliders:</p>
+<button onclick="makePrediction('Green')">Green</button>
+<button onclick="makePrediction('Red')">Red</button>
+<button onclick="makePrediction('Violet')">Violet</button>
 
-<div id="targetColor" style="background-color: rgb(0,0,0);"></div>
-
-<div>
-  <label>Red: <input class="slider" type="range" min="0" max="255" id="red"></label><br>
-  <label>Green: <input class="slider" type="range" min="0" max="255" id="green"></label><br>
-  <label>Blue: <input class="slider" type="range" min="0" max="255" id="blue"></label><br>
-</div>
-
-<button onclick="checkMatch()">Check Match</button>
-
-<div id="guessColor"></div>
+<div id="timer">Time left: 60s</div>
 <div id="result"></div>
 
 <script>
-  let target = {
-    r: Math.floor(Math.random()*256),
-    g: Math.floor(Math.random()*256),
-    b: Math.floor(Math.random()*256)
-  };
+let userPrediction = null;
+let timeLeft = 60;
 
-  function checkMatch() {
-    const r = parseInt(document.getElementById('red').value);
-    const g = parseInt(document.getElementById('green').value);
-    const b = parseInt(document.getElementById('blue').value);
+function makePrediction(color) {
+  userPrediction = color;
+  document.getElementById('result').innerText = `You predicted: ${color}`;
+}
 
-    const guess = { r, g, b };
-    document.getElementById('guessColor').style.backgroundColor = `rgb(${r},${g},${b})`;
+function generateResult() {
+  const number = Math.floor(Math.random() * 10);
+  let outcome = number % 2 === 0 ? 'Green' : 'Red';
+  if (number === 0 || number === 5) outcome = 'Violet';
 
-    const diff = Math.abs(target.r - r) + Math.abs(target.g - g) + Math.abs(target.b - b);
-
-    if (diff < 15) {
-      document.getElementById('result').innerText = "🎉 You won! But the color shifts again...";
-    } else {
-      document.getElementById('result').innerText = `Nope! You're off by ${diff} points.`;
-    }
-
-    // Make it impossible to win by subtly changing the target color
-    target.r = (target.r + Math.floor(Math.random()*5)) % 256;
-    target.g = (target.g + Math.floor(Math.random()*5)) % 256;
-    target.b = (target.b + Math.floor(Math.random()*5)) % 256;
-
-    document.getElementById('targetColor').style.backgroundColor = `rgb(${target.r},${target.g},${target.b})`;
+  let resultText = `Number: ${number} → ${outcome}`;
+  if (userPrediction === outcome) {
+    resultText += "\n✅ You guessed it right!";
+  } else {
+    resultText += "\n❌ Wrong prediction.";
   }
+
+  document.getElementById('result').innerText = resultText;
+  userPrediction = null;
+  timeLeft = 60;
+}
+
+setInterval(() => {
+  timeLeft--;
+  document.getElementById('timer').innerText = `Time left: ${timeLeft}s`;
+
+  if (timeLeft <= 0) {
+    generateResult();
+  }
+}, 1000);
 </script>
 
 </body>
