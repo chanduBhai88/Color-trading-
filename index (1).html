@@ -75,4 +75,23 @@
   </div>  <script>
     function switchTab(tabId) {
       document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
-      document.querySelectorAll('.panel').forEach(panel =>
+      document.querySelectorAll('.panel').forEach(panel =><script>
+  function switchTab(tabId) {
+    document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(panel => panel.classList.remove('active'));
+
+    document.querySelector(`.tab[onclick="switchTab('${tabId}')"]`).classList.add('active');
+    document.getElementById(tabId).classList.add('active');
+  }
+
+  function predictColor() {
+    const colors = ['🔴 Red', '🟢 Green', '🟣 Violet'];
+    const randomIndex = Math.floor(Math.random() * colors.length);
+    document.getElementById('color-result').innerText = colors[randomIndex];
+  }
+
+  function predictNumber() {
+    const randomNumber = Math.floor(Math.random() * 10); // 0 to 9
+    document.getElementById('number-result').innerText = `🎯 ${randomNumber}`;
+  }
+</script>
