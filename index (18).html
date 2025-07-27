@@ -1,200 +1,80 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Khatarnak Number Predictor v6.0</title>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+  <title>Prediction</title>
   <style>
     body {
-      margin: 0;
-      background: black;
+      background: #000;
       color: #0f0;
-      font-family: 'Orbitron', monospace;
+      font-family: monospace;
       display: flex;
-      flex-direction: column;
-      align-items: center;
       justify-content: center;
+      align-items: center;
       height: 100vh;
-      overflow: hidden;
+      flex-direction: column;
     }
-    h1 {
-      font-size: 2rem;
-      text-shadow: 0 0 10px lime;
-      margin-bottom: 10px;
-    }
-    #timer {
-      font-size: 1.5rem;
-      color: cyan;
-    }
-    #prediction {
-      font-size: 5rem;
-      margin: 20px 0;
-      color: yellow;
-      text-shadow: 0 0 20px red;
-    }
-    #history {
-      font-size: 1.2rem;
-      margin-bottom: 10px;
-    }
-    #trendGraph {
-      display: flex;
-      gap: 5px;
+
+    #randomWord {
+      font-size: 32px;
+      font-weight: bold;
+      padding: 20px;
+      background-color: #111;
+      border: 2px solid #0f0;
+      border-radius: 10px;
       margin-bottom: 20px;
     }
-    .bar {
-      width: 20px;
-      height: 30px;
-      background: lime;
-      box-shadow: 0 0 10px lime;
-    }
-    .controls {
-      display: flex;
-      gap: 10px;
-      margin-top: 20px;
-    }
-    button {
-      background: #111;
-      color: #0f0;
-      border: 1px solid #0f0;
-      padding: 10px;
-      border-radius: 10px;
-      font-family: Orbitron;
-      cursor: pointer;
-      box-shadow: 0 0 5px #0f0;
-    }
-    button:hover {
-      background: #0f0;
-      color: #000;
-    }
-    .light-mode {
-      background: #fff;
-      color: #000;
-    }
-    .light-mode #prediction {
-      color: red;
-      text-shadow: 0 0 10px orange;
-    }
-    .light-mode .bar {
-      background: #00f;
-      box-shadow: 0 0 5px #00f;
+
+    #timer {
+      font-size: 24px;
+      color: #fff;
     }
   </style>
 </head>
 <body>
-  <h1>Khatarnak Number Predictor v6.0</h1>
-  <div id="timer">Next prediction in: <span id="countdown">60</span>s</div>
-  <div id="prediction">0</div>
-  <div id="history">Last 5 Results: <span id="results">-</span></div>
-  <div id="trendGraph"></div>
-  <div class="controls">
-    <button onclick="resetTool()">🔄 Reset</button>
-    <button onclick="toggleMode()">🌗 Mode</button>
-    <button onclick="playWinSound()">🔊 Test Sound</button>
-  </div>
-
-  <audio id="winSound" src="https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg"></audio>
+  <div id="randomWord">Loading...</div>
+  <div id="timer">00:00</div>
 
   <script>
-    let results = [];
-    let countdown = 60;
-    let interval;
+    let lastMinute = -1;
 
-    function predictNumber() {
-      // Smart dummy logic: most frequent last 3 numbers
-      const freq = {};
-      results.forEach(num => freq[num] = (freq[num] || 0) + 1);
-      const sorted = Object.entries(freq).sort((a, b) => b[1] - a[1]);
-      let pred = Math.floor(Math.random() * 10);
-      if (sorted.length) pred = parseInt(sorted[0][0]);
+    function smartPrediction(minute) {
+      // Big/Small prediction
+      const type = (minute % 2 === 0) ? 'Big' : 'Small';
 
-      document.getElementById("prediction").textContent = pred;
-      results.push(pred);
-      if (results.length > 5) results.shift();
+      // Number prediction based on type
+      let number;
+      if (type === 'Big') {
+        const bigNumbers = [5, 6, 7, 8, 9];
+        number = bigNumbers[minute % bigNumbers.length];
+      } else {
+        const smallNumbers = [0, 1, 2, 3, 4];
+        number = smallNumbers[minute % smallNumbers.length];
+      }
 
-      document.getElementById("results").textContent = results.join(", ");
-      updateTrendGraph();
-
-      playWinSound();
-    }
-
-    function updateTrendGraph() {
-      const trendGraph = document.getElementById("trendGraph");
-      trendGraph.innerHTML = "";
-      results.forEach(val => {
-        const bar = document.createElement("div");
-        bar.className = "bar";
-        bar.style.height = (10 + val * 4) + "px";
-        trendGraph.appendChild(bar);
-      });
-    }
-
-    function playWinSound() {
-      document.getElementById("winSound").play();
+      return `${type} - ${number}`;
     }
 
     function startTimer() {
-      interval = setInterval(() => {
-        countdown--;
-        document.getElementById("countdown").textContent = countdown;
-        if (countdown === 0) {
-          predictNumber();
-          countdown = 60;
+      setInterval(() => {
+        const now = new Date();
+        const minutes = now.getMinutes();
+        const seconds = now.getSeconds();
+
+        // Show timer
+        document.getElementById('timer').textContent =
+          String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
+
+        // Predict only on new minute
+        if (seconds === 0 && lastMinute !== minutes) {
+          const prediction = smartPrediction(minutes);
+          document.getElementById('randomWord').textContent = prediction;
+          lastMinute = minutes;
         }
       }, 1000);
     }
 
-    function resetTool() {
-      results = [];
-      countdown = 60;
-      clearInterval(interval);
-      document.getElementById("results").textContent = "-";
-      document.getElementById("trendGraph").innerHTML = "";
-      document.getElementById("prediction").textContent = "0";
-      startTimer();
-    }
-
-    function toggleMode() {
-      document.body.classList.toggle("light-mode");
-    }
-
-    // Start on load
-    window.onload = () => {
-      predictNumber();
-      startTimer();
-    };
+    startTimer();
   </script>
 </body>
-</html><div id="prediction">0</div>
-<div id="category">Category: -</div>#category {
-  font-size: 2rem;
-  color: orange;
-  margin-bottom: 10px;
-  text-shadow: 0 0 10px orange;
-}
-.light-mode #category {
-  color: blue;
-  text-shadow: 0 0 5px blue;
-}function predictNumber() {
-  const freq = {};
-  results.forEach(num => freq[num] = (freq[num] || 0) + 1);
-  const sorted = Object.entries(freq).sort((a, b) => b[1] - a[1]);
-  let pred = Math.floor(Math.random() * 10);
-  if (sorted.length) pred = parseInt(sorted[0][0]);
-
-  document.getElementById("prediction").textContent = pred;
-
-  // 🔥 Big/Small Logic
-  const category = pred >= 5 ? "BIG 🔺" : "SMALL 🔻";
-  document.getElementById("category").textContent = `Category: ${category}`;
-
-  results.push(pred);
-  if (results.length > 5) results.shift();
-
-  document.getElementById("results").textContent = results.join(", ");
-  updateTrendGraph();
-
-  playWinSound();
-}Prediction: 8
-Category: BIG 🔺
-Last 5 Results: 3, 7, 8, 2, 5
+</html>
