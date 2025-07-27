@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Khatarnak Predictor v7.1</title>
+  <title>Khatarnak Predictor v7.2</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     body {
@@ -80,7 +80,7 @@
       data: {
         labels: [],
         datasets: [{
-          label: 'Prediction Number',
+          label: 'Prediction Numbers',
           data: [],
           backgroundColor: '#0f0'
         }]
@@ -94,13 +94,15 @@
       }
     });
 
-    function updateChart(label, number) {
-      if (chart.data.labels.length >= 10) {
-        chart.data.labels.shift();
-        chart.data.datasets[0].data.shift();
-      }
-      chart.data.labels.push(label);
-      chart.data.datasets[0].data.push(number);
+    function updateChart(label, numbers) {
+      numbers.forEach((num, index) => {
+        if (chart.data.labels.length >= 20) {
+          chart.data.labels.shift();
+          chart.data.datasets[0].data.shift();
+        }
+        chart.data.labels.push(`${label}-${index + 1}`);
+        chart.data.datasets[0].data.push(num);
+      });
       chart.update();
     }
 
@@ -126,17 +128,28 @@
       }
     }
 
+    function getTwoRandomNumbers(type) {
+      const pool = type === "Big" ? [5, 6, 7, 8, 9] : [0, 1, 2, 3, 4];
+      const shuffled = pool.sort(() => 0.5 - Math.random());
+      return shuffled.slice(0, 2);
+    }
+
     function getSmartPrediction() {
       if (history.length < 3) {
-        return { result: "Big", number: 9 };
+        return {
+          result: "Big",
+          numbers: getTwoRandomNumbers("Big")
+        };
       }
+
       const last3 = history.slice(-3);
       const bigCount = last3.filter(x => x.result === "Big").length;
       const result = bigCount >= 2 ? "Small" : "Big";
-      const number = result === "Big"
-        ? [5,6,7,8,9][Math.floor(Math.random()*5)]
-        : [0,1,2,3,4][Math.floor(Math.random()*5)];
-      return { result, number };
+
+      return {
+        result,
+        numbers: getTwoRandomNumbers(result)
+      };
     }
 
     function startTimer() {
@@ -155,10 +168,10 @@
           }
 
           const prediction = getSmartPrediction();
-          const text = `🧠 Predicted: ${prediction.result} - ${prediction.number}`;
+          const text = `🧠 Predicted: ${prediction.result} - ${prediction.numbers.join(', ')}`;
           document.getElementById('randomWord').textContent = text;
 
-          updateChart(prediction.result, prediction.number);
+          updateChart(prediction.result, prediction.numbers);
           updateTable();
           lastMinute = minutes;
         }
@@ -168,14 +181,4 @@
     startTimer();
   </script>
 </body>
-</html>function updateChart(label, numbers) {
-  numbers.forEach((num, index) => {
-    if (chart.data.labels.length >= 20) {
-      chart.data.labels.shift();
-      chart.data.datasets[0].data.shift();
-    }
-    chart.data.labels.push(`${label}-${index + 1}`);
-    chart.data.datasets[0].data.push(num);
-  });
-  chart.update();
-}updateChart(prediction.result, prediction.numbers);
+</html>
