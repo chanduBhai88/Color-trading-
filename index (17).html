@@ -2,67 +2,164 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Prediction</title>
+  <title>Khatarnak Predictor v7.1</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     body {
       background: #000;
       color: #0f0;
       font-family: monospace;
       display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
       flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 20px;
     }
 
     #randomWord {
-      font-size: 32px;
-      font-weight: bold;
-      padding: 20px;
-      background-color: #111;
+      font-size: 28px;
+      padding: 10px 20px;
+      margin: 10px;
       border: 2px solid #0f0;
       border-radius: 10px;
-      margin-bottom: 20px;
     }
 
     #timer {
-      font-size: 24px;
-      color: #fff;
+      font-size: 20px;
+      margin-bottom: 20px;
+    }
+
+    canvas {
+      background: #111;
+      border: 1px solid #0f0;
+      border-radius: 10px;
+      margin-top: 10px;
+    }
+
+    table {
+      width: 300px;
+      border-collapse: collapse;
+      margin-top: 20px;
+      background: #111;
+      border: 1px solid #0f0;
+      border-radius: 10px;
+    }
+
+    th, td {
+      border: 1px solid #0f0;
+      padding: 5px 10px;
+      text-align: center;
+      color: #0f0;
+    }
+
+    th {
+      background-color: #070;
     }
   </style>
 </head>
 <body>
   <div id="randomWord">Loading...</div>
   <div id="timer">00:00</div>
+  <canvas id="myChart" width="300" height="200"></canvas>
+
+  <table id="resultTable">
+    <thead>
+      <tr><th>#</th><th>Result</th><th>Number</th></tr>
+    </thead>
+    <tbody></tbody>
+  </table>
 
   <script>
+    const API_URL = "https://draw.ar-lottery01.com/api/getResult";
     let lastMinute = -1;
+    let history = [];
 
-    function smartPrediction(minute) {
-      // Smart pattern logic based on minute
-      const colorPattern = ['Red', 'Green', 'Violet'];
-      const color = colorPattern[minute % colorPattern.length];
+    const ctx = document.getElementById('myChart').getContext('2d');
+    const chart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: [],
+        datasets: [{
+          label: 'Prediction Number',
+          data: [],
+          backgroundColor: '#0f0'
+        }]
+      },
+      options: {
+        scales: {
+          y: { beginAtZero: true, ticks: { color: '#0f0' } },
+          x: { ticks: { color: '#0f0' } }
+        },
+        plugins: { legend: { labels: { color: '#0f0' } } }
+      }
+    });
 
-      // Smart number prediction: alternating 0–9 in reverse
-      const number = (9 - (minute % 10));
+    function updateChart(label, number) {
+      if (chart.data.labels.length >= 10) {
+        chart.data.labels.shift();
+        chart.data.datasets[0].data.shift();
+      }
+      chart.data.labels.push(label);
+      chart.data.datasets[0].data.push(number);
+      chart.update();
+    }
 
-      return `${color} - ${number}`;
+    function updateTable() {
+      const tbody = document.querySelector("#resultTable tbody");
+      tbody.innerHTML = "";
+      history.slice().reverse().forEach((entry, index) => {
+        const row = document.createElement("tr");
+        row.innerHTML = `<td>${history.length - index}</td><td>${entry.result}</td><td>${entry.number}</td>`;
+        tbody.appendChild(row);
+      });
+    }
+
+    async function fetchResultFromServer() {
+      try {
+        const response = await fetch(API_URL);
+        const data = await response.json();
+        const number = parseInt(data.number);
+        const result = number >= 5 ? "Big" : "Small";
+        return { result, number };
+      } catch (e) {
+        return null;
+      }
+    }
+
+    function getSmartPrediction() {
+      if (history.length < 3) {
+        return { result: "Big", number: 9 };
+      }
+      const last3 = history.slice(-3);
+      const bigCount = last3.filter(x => x.result === "Big").length;
+      const result = bigCount >= 2 ? "Small" : "Big";
+      const number = result === "Big"
+        ? [5,6,7,8,9][Math.floor(Math.random()*5)]
+        : [0,1,2,3,4][Math.floor(Math.random()*5)];
+      return { result, number };
     }
 
     function startTimer() {
-      setInterval(() => {
+      setInterval(async () => {
         const now = new Date();
         const minutes = now.getMinutes();
         const seconds = now.getSeconds();
-
-        // Show timer
         document.getElementById('timer').textContent =
           String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
 
-        // Predict only on new minute
         if (seconds === 0 && lastMinute !== minutes) {
-          const prediction = smartPrediction(minutes);
-          document.getElementById('randomWord').textContent = prediction;
+          const realData = await fetchResultFromServer();
+          if (realData) {
+            history.push(realData);
+            if (history.length > 20) history.shift();
+          }
+
+          const prediction = getSmartPrediction();
+          const text = `🧠 Predicted: ${prediction.result} - ${prediction.number}`;
+          document.getElementById('randomWord').textContent = text;
+
+          updateChart(prediction.result, prediction.number);
+          updateTable();
           lastMinute = minutes;
         }
       }, 1000);
