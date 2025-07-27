@@ -1,61 +1,193 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Wingo Color Predictor Game</title>
+  <meta charset="UTF-8">
+  <title>Khatarnak Predictor v7.1</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
-    body { font-family: Arial; text-align: center; padding: 40px; }
-    button { padding: 10px 20px; margin: 10px; font-size: 16px; }
-    #timer { font-size: 24px; margin-top: 20px; }
-    #result { font-size: 22px; margin-top: 30px; font-weight: bold; }
+    body {
+      background: #000;
+      color: #0f0;
+      font-family: monospace;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 20px;
+    }
+
+    #randomWord {
+      font-size: 28px;
+      padding: 10px 20px;
+      margin: 10px;
+      border: 2px solid #0f0;
+      border-radius: 10px;
+    }
+
+    #timer {
+      font-size: 20px;
+      margin-bottom: 20px;
+    }
+
+    canvas {
+      background: #111;
+      border: 1px solid #0f0;
+      border-radius: 10px;
+      margin-top: 10px;
+    }
+
+    table {
+      width: 300px;
+      border-collapse: collapse;
+      margin-top: 20px;
+      background: #111;
+      border: 1px solid #0f0;
+      border-radius: 10px;
+    }
+
+    th, td {
+      border: 1px solid #0f0;
+      padding: 5px 10px;
+      text-align: center;
+      color: #0f0;
+    }
+
+    th {
+      background-color: #070;
+    }
   </style>
 </head>
 <body>
+  <div id="randomWord">Loading...</div>
+  <div id="timer">00:00</div>
+  <canvas id="myChart" width="300" height="200"></canvas>
 
-<h1>🎯 Wingo Color Predictor</h1>
-<p>Select your color prediction for the next round:</p>
+  <table id="resultTable">
+    <thead>
+      <tr><th>#</th><th>Result</th><th>Number</th></tr>
+    </thead>
+    <tbody></tbody>
+  </table>
 
-<button onclick="makePrediction('Green')">Green</button>
-<button onclick="makePrediction('Red')">Red</button>
-<button onclick="makePrediction('Violet')">Violet</button>
+  <script>
+    const API_URL = "https://draw.ar-lottery01.com/api/getResult";
+    let lastMinute = -1;
+    let history = [];
 
-<div id="timer">Time left: 60s</div>
-<div id="result"></div>
+    const ctx = document.getElementById('myChart').getContext('2d');
+    const chart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: [],
+        datasets: [{
+          label: 'Prediction Number',
+          data: [],
+          backgroundColor: '#0f0'
+        }]
+      },
+      options: {
+        scales: {
+          y: { beginAtZero: true, ticks: { color: '#0f0' } },
+          x: { ticks: { color: '#0f0' } }
+        },
+        plugins: { legend: { labels: { color: '#0f0' } } }
+      }
+    });
 
-<script>
-let userPrediction = null;
-let timeLeft = 60;
+    function updateChart(label, number) {
+      if (chart.data.labels.length >= 10) {
+        chart.data.labels.shift();
+        chart.data.datasets[0].data.shift();
+      }
+      chart.data.labels.push(label);
+      chart.data.datasets[0].data.push(number);
+      chart.update();
+    }
 
-function makePrediction(color) {
-  userPrediction = color;
-  document.getElementById('result').innerText = `You predicted: ${color}`;
-}
+    function updateTable() {
+      const tbody = document.querySelector("#resultTable tbody");
+      tbody.innerHTML = "";
+      history.slice().reverse().forEach((entry, index) => {
+        const row = document.createElement("tr");
+        row.innerHTML = `<td>${history.length - index}</td><td>${entry.result}</td><td>${entry.number}</td>`;
+        tbody.appendChild(row);
+      });
+    }
 
-function generateResult() {
-  const number = Math.floor(Math.random() * 10);
-  let outcome = number % 2 === 0 ? 'Green' : 'Red';
-  if (number === 0 || number === 5) outcome = 'Violet';
+    async function fetchResultFromServer() {
+      try {
+        const response = await fetch(API_URL);
+        const data = await response.json();
+        const number = parseInt(data.number);
+        const result = number >= 5 ? "Big" : "Small";
+        return { result, number };
+      } catch (e) {
+        return null;
+      }
+    }
 
-  let resultText = `Number: ${number} → ${outcome}`;
-  if (userPrediction === outcome) {
-    resultText += "\n✅ You guessed it right!";
-  } else {
-    resultText += "\n❌ Wrong prediction.";
-  }
+    function getSmartPrediction() {
+      if (history.length < 3) {
+        return { result: "Big", number: 9 };
+      }
+      const last3 = history.slice(-3);
+      const bigCount = last3.filter(x => x.result === "Big").length;
+      const result = bigCount >= 2 ? "Small" : "Big";
+      const number = result === "Big"
+        ? [5,6,7,8,9][Math.floor(Math.random()*5)]
+        : [0,1,2,3,4][Math.floor(Math.random()*5)];
+      return { result, number };
+    }
 
-  document.getElementById('result').innerText = resultText;
-  userPrediction = null;
-  timeLeft = 60;
-}
+    function startTimer() {
+      setInterval(async () => {
+        const now = new Date();
+        const minutes = now.getMinutes();
+        const seconds = now.getSeconds();
+        document.getElementById('timer').textContent =
+          String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
 
-setInterval(() => {
-  timeLeft--;
-  document.getElementById('timer').innerText = `Time left: ${timeLeft}s`;
+        if (seconds === 0 && lastMinute !== minutes) {
+          const realData = await fetchResultFromServer();
+          if (realData) {
+            history.push(realData);
+            if (history.length > 20) history.shift();
+          }
 
-  if (timeLeft <= 0) {
-    generateResult();
-  }
-}, 1000);
-</script>
+          const prediction = getSmartPrediction();
+          const text = `🧠 Predicted: ${prediction.result} - ${prediction.number}`;
+          document.getElementById('randomWord').textContent = text;
 
+          updateChart(prediction.result, prediction.number);
+          updateTable();
+          lastMinute = minutes;
+        }
+      }, 1000);
+    }
+
+    startTimer();
+  </script>
 </body>
-</html>
+</html>function getSmartPrediction() {
+  if (history.length < 3) {
+    return {
+      result: "Big",
+      numbers: getTwoRandomNumbers("Big")
+    };
+  }
+
+  const last3 = history.slice(-3);
+  const bigCount = last3.filter(x => x.result === "Big").length;
+  const result = bigCount >= 2 ? "Small" : "Big";
+
+  return {
+    result,
+    numbers: getTwoRandomNumbers(result)
+  };
+}
+
+function getTwoRandomNumbers(type) {
+  const pool = type === "Big" ? [5, 6, 7, 8, 9] : [0, 1, 2, 3, 4];
+  const shuffled = pool.sort(() => 0.5 - Math.random());
+  return shuffled.slice(0, 2);
+}const text = `🧠 Predicted: ${prediction.result} - ${prediction.number}`;const text = `🧠 Predicted: ${prediction.result} - ${prediction.numbers.join(', ')}`;updateChart(prediction.result, prediction.numbers[0]);
