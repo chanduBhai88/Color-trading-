@@ -1,80 +1,108 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Prediction</title>
+  <title>Khatarnak Predictor v6.0</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     body {
       background: #000;
       color: #0f0;
       font-family: monospace;
       display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
       flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
     }
-
     #randomWord {
-      font-size: 32px;
-      font-weight: bold;
-      padding: 20px;
-      background-color: #111;
+      font-size: 28px;
+      padding: 10px 20px;
+      margin: 10px;
       border: 2px solid #0f0;
       border-radius: 10px;
+    }
+    #timer {
+      font-size: 20px;
       margin-bottom: 20px;
     }
-
-    #timer {
-      font-size: 24px;
-      color: #fff;
+    canvas {
+      background: #111;
+      border: 1px solid #0f0;
+      border-radius: 10px;
+      margin-top: 10px;
     }
   </style>
 </head>
 <body>
   <div id="randomWord">Loading...</div>
   <div id="timer">00:00</div>
-
-  <script>
+  <canvas id="myChart" width="300" height="200"></canvas>  <script>
+    const API_URL = "https://draw.ar-lottery01.com/api/getResult"; // TODO: Replace with real path if known
     let lastMinute = -1;
+    let history = [];
 
-    function smartPrediction(minute) {
-      // Big/Small prediction
-      const type = (minute % 2 === 0) ? 'Big' : 'Small';
-
-      // Number prediction based on type
-      let number;
-      if (type === 'Big') {
-        const bigNumbers = [5, 6, 7, 8, 9];
-        number = bigNumbers[minute % bigNumbers.length];
-      } else {
-        const smallNumbers = [0, 1, 2, 3, 4];
-        number = smallNumbers[minute % smallNumbers.length];
+    const ctx = document.getElementById('myChart').getContext('2d');
+    const chart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: [],
+        datasets: [{
+          label: 'Prediction Number',
+          data: [],
+          backgroundColor: '#0f0'
+        }]
+      },
+      options: {
+        scales: {
+          y: { beginAtZero: true, ticks: { color: '#0f0' } },
+          x: { ticks: { color: '#0f0' } }
+        },
+        plugins: { legend: { labels: { color: '#0f0' } } }
       }
+    });
 
-      return `${type} - ${number}`;
+    function updateChart(prediction, number) {
+      if (chart.data.labels.length >= 10) {
+        chart.data.labels.shift();
+        chart.data.datasets[0].data.shift();
+      }
+      chart.data.labels.push(prediction);
+      chart.data.datasets[0].data.push(number);
+      chart.update();
+    }
+
+    async function fetchResultFromServer() {
+      try {
+        const response = await fetch(API_URL);
+        const data = await response.json();
+        return { result: data.result, number: data.number };
+      } catch (e) {
+        // fallback dummy logic if API fails
+        const type = Math.random() > 0.5 ? 'Big' : 'Small';
+        const number = type === 'Big' ? [5,6,7,8,9][Math.floor(Math.random()*5)] : [0,1,2,3,4][Math.floor(Math.random()*5)];
+        return { result: type, number };
+      }
     }
 
     function startTimer() {
-      setInterval(() => {
+      setInterval(async () => {
         const now = new Date();
         const minutes = now.getMinutes();
         const seconds = now.getSeconds();
-
-        // Show timer
         document.getElementById('timer').textContent =
           String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
 
-        // Predict only on new minute
         if (seconds === 0 && lastMinute !== minutes) {
-          const prediction = smartPrediction(minutes);
+          const data = await fetchResultFromServer();
+          const prediction = `${data.result} - ${data.number}`;
           document.getElementById('randomWord').textContent = prediction;
+
+          updateChart(data.result, data.number);
           lastMinute = minutes;
         }
       }, 1000);
     }
 
     startTimer();
-  </script>
-</body>
+  </script></body>
 </html>
