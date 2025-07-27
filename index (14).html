@@ -2,17 +2,17 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Prediction</title>
+  <title>Smart Big/Small Predictor</title>
   <style>
     body {
       background: #000;
       color: #0f0;
       font-family: monospace;
       display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
       flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
     }
 
     #randomWord {
@@ -28,29 +28,49 @@
 
     #timer {
       font-size: 24px;
-      color: #fff;
+      margin-bottom: 20px;
+    }
+
+    #history {
+      font-size: 16px;
+      color: #0f0;
+      text-align: center;
+      max-width: 300px;
+      border-top: 1px solid #0f0;
+      padding-top: 10px;
     }
   </style>
 </head>
 <body>
   <div id="randomWord">Loading...</div>
   <div id="timer">00:00</div>
+  <div id="history">History:<br/></div>
 
   <script>
     let lastMinute = -1;
+    const history = [];
 
-    function smartPrediction(minute) {
-      // Big/Small alternating logic
-      const type = (minute % 2 === 0) ? 'Big' : 'Small';
+    function smartPrediction() {
+      // Basic smart logic: reverse if last 2 same
+      let type;
+      if (history.length >= 2 && history[0].startsWith(history[1].split(' - ')[0])) {
+        type = history[0].startsWith('Big') ? 'Small' : 'Big';
+      } else {
+        type = Math.random() > 0.5 ? 'Big' : 'Small';
+      }
 
-      // Number based on type
-      const bigNumbers = [5, 6, 7, 8, 9];
-      const smallNumbers = [0, 1, 2, 3, 4];
       const number = type === 'Big'
-        ? bigNumbers[minute % bigNumbers.length]
-        : smallNumbers[minute % smallNumbers.length];
+        ? [5, 6, 7, 8, 9][Math.floor(Math.random() * 5)]
+        : [0, 1, 2, 3, 4][Math.floor(Math.random() * 5)];
 
       return `${type} - ${number}`;
+    }
+
+    function updateHistory(prediction) {
+      history.unshift(prediction);
+      if (history.length > 5) history.pop(); // only last 5
+
+      document.getElementById('history').innerHTML = 'History:<br>' + history.map(p => `• ${p}`).join('<br>');
     }
 
     function startTimer() {
@@ -63,10 +83,11 @@
         document.getElementById('timer').textContent =
           String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
 
-        // Update prediction every new minute
+        // Predict on new minute
         if (seconds === 0 && lastMinute !== minutes) {
-          const prediction = smartPrediction(minutes);
+          const prediction = smartPrediction();
           document.getElementById('randomWord').textContent = prediction;
+          updateHistory(prediction);
           lastMinute = minutes;
         }
       }, 1000);
