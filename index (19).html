@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <title>Khatarnak Predictor v7.3</title>
@@ -12,56 +13,76 @@
       flex-direction: column;
       align-items: center;
       padding: 20px;
-    }#prediction {
-  font-size: 24px;
-  padding: 10px 20px;
-  border: 2px solid #0f0;
-  border-radius: 10px;
-  margin-bottom: 10px;
-}
+    }
 
-#timer {
-  font-size: 22px;
-  margin-bottom: 20px;
-}
+    #prediction {
+      font-size: 24px;
+      padding: 10px 20px;
+      border: 2px solid #0f0;
+      border-radius: 10px;
+      margin-bottom: 10px;
+    }
 
-canvas {
-  background: #111;
-  border: 1px solid #0f0;
-  border-radius: 10px;
-  margin-bottom: 20px;
-}
+    #timer {
+      font-size: 22px;
+      margin-bottom: 20px;
+    }
 
-table {
-  width: 320px;
-  background: #111;
-  border-collapse: collapse;
-}
+    canvas {
+      background: #111;
+      border: 1px solid #0f0;
+      border-radius: 10px;
+      margin-bottom: 20px;
+    }
 
-th, td {
-  border: 1px solid #0f0;
-  padding: 6px 8px;
-  text-align: center;
-}
+    table {
+      width: 320px;
+      background: #111;
+      border-collapse: collapse;
+    }
 
-th {
-  background: #070;
-}
+    th, td {
+      border: 1px solid #0f0;
+      padding: 6px 8px;
+      text-align: center;
+    }
 
+    th {
+      background: #070;
+    }
   </style>
 </head>
 <body>
+
   <div id="prediction">Prediction Loading...</div>
   <div id="timer">00:00</div>
+
   <canvas id="myChart" width="320" height="180"></canvas>
+
   <table id="resultTable">
     <thead>
       <tr><th>#</th><th>Result</th><th>Number</th></tr>
     </thead>
     <tbody></tbody>
-  </table>  <script>
-    const API_URL = "https://draw.ar-lottery01.com/api/getResult";
-    const chart = new Chart(document.getElementById('myChart').getContext('2d'), {
+  </table>
+
+  <script>
+    // ✅ TIMER START: Stylish Version
+    let seconds = 0;
+    const timerElement = document.getElementById("timer");
+
+    function updateTimer() {
+      const mins = String(Math.floor(seconds / 60)).padStart(2, '0');
+      const secs = String(seconds % 60).padStart(2, '0');
+      timerElement.textContent = `${mins}:${secs}`;
+      seconds++;
+    }
+
+    setInterval(updateTimer, 1000);
+
+    // ✅ CHART INITIALIZATION
+    const ctx = document.getElementById('myChart').getContext('2d');
+    const chart = new Chart(ctx, {
       type: 'bar',
       data: {
         labels: [],
@@ -76,4 +97,15 @@ th {
           y: { beginAtZero: true, ticks: { color: '#0f0' } },
           x: { ticks: { color: '#0f0' } }
         },
-        plugins: { legend: { labels: { color: '#0f0' } }
+        plugins: {
+          legend: { labels: { color: '#0f0' } }
+        }
+      }
+    });
+
+    // ⚠️ (Optional) You can add data fetching from API below:
+    // const API_URL = "https://draw.ar-lottery01.com/api/getResult";
+  </script>
+
+</body>
+</html>
