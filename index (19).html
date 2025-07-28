@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Color Trading Game</title>
+    <title>Color Trading Game with Timer</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -22,12 +22,16 @@
             font-size: 20px;
             font-weight: bold;
         }
+        #timer {
+            font-size: 24px;
+            color: red;
+        }
     </style>
 </head>
 <body>
 
 <h1>Color Trading: Big Small Game</h1>
-<p>Choose a color and your bet: </p>
+<p>Choose a color and your bet:</p>
 
 <select id="colorSelect">
     <option value="Red">Red</option>
@@ -39,9 +43,29 @@
 <button class="button" onclick="play('Small')">Small</button>
 
 <div class="result" id="result"></div>
+<div id="timer">60</div>
 
 <script>
+let timeLeft = 60;
+let gameActive = true;
+
+function startTimer() {
+    const timerDiv = document.getElementById('timer');
+    const timerInterval = setInterval(() => {
+        if (timeLeft <= 0 || !gameActive) {
+            clearInterval(timerInterval);
+            document.getElementById('result').innerHTML += "<br>Time's up! Game Over!";
+            gameActive = false;
+        } else {
+            timerDiv.innerHTML = timeLeft;
+            timeLeft--;
+        }
+    }, 1000);
+}
+
 function play(bet) {
+    if (!gameActive) return; // Prevent play if time is up
+
     const randomNumber = Math.floor(Math.random() * 10); // Generates a number between 0 and 9
     const selectedColor = document.getElementById('colorSelect').value;
     const resultDiv = document.getElementById('result');
@@ -57,6 +81,10 @@ function play(bet) {
 
     resultDiv.innerHTML = outcome;
 }
+
+window.onload = function() {
+    startTimer(); // Start the timer when the game loads
+};
 </script>
 
 </body>
