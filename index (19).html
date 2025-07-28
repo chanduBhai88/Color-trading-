@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Khatarnak Predictor v7.3</title>
+  <title>Khatarnak Predictor v7.4</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     body {
@@ -67,20 +67,7 @@
   </table>
 
   <script>
-    // Smart Timer Code (from your second version)
-    function startTimer() {
-      setInterval(() => {
-        const now = new Date();
-        const minutes = now.getMinutes();
-        const seconds = now.getSeconds();
-        document.getElementById('timer').textContent =
-          String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
-      }, 1000);
-    }
-
-    startTimer();
-
-    // Chart Initialization
+    // Chart Setup
     const ctx = document.getElementById('myChart').getContext('2d');
     const chart = new Chart(ctx, {
       type: 'bar',
@@ -102,39 +89,60 @@
         }
       }
     });
-  </script>function getSmartPrediction() {
-  const result = Math.random() > 0.5 ? "Big" : "Small";
-  const number = result === "Big"
-    ? [5,6,7,8,9][Math.floor(Math.random()*5)]
-    : [0,1,2,3,4][Math.floor(Math.random()*5)];
-  return { result, number };
-}function updateChart(label, number) {
-  if (chart.data.labels.length >= 10) {
-    chart.data.labels.shift();
-    chart.data.datasets[0].data.shift();
-  }
-  chart.data.labels.push(label);
-  chart.data.datasets[0].data.push(number);
-  chart.update();
-}let lastSecond = -1;
-setInterval(() => {
-  const now = new Date();
-  const minutes = now.getMinutes();
-  const seconds = now.getSeconds();
 
-  document.getElementById('timer').textContent =
-    String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
+    let history = [];
 
-  // TEMPORARY: Update every 10 seconds for testing
-  if (seconds % 10 === 0 && lastSecond !== seconds) {
-    const prediction = getSmartPrediction();
-    const text = `🧠 Predicted: ${prediction.result} - ${prediction.number}`;
-    document.getElementById('prediction').textContent = text;
+    function getSmartPrediction() {
+      const result = Math.random() > 0.5 ? "Big" : "Small";
+      const number = result === "Big"
+        ? [5,6,7,8,9][Math.floor(Math.random()*5)]
+        : [0,1,2,3,4][Math.floor(Math.random()*5)];
+      return { result, number };
+    }
 
-    updateChart(prediction.result, prediction.number);
-    lastSecond = seconds;
-  }
-}, 1000);
+    function updateChart(label, number) {
+      if (chart.data.labels.length >= 10) {
+        chart.data.labels.shift();
+        chart.data.datasets[0].data.shift();
+      }
+      chart.data.labels.push(label);
+      chart.data.datasets[0].data.push(number);
+      chart.update();
+    }
+
+    function updateTable() {
+      const tbody = document.querySelector("#resultTable tbody");
+      tbody.innerHTML = "";
+      history.slice().reverse().forEach((entry, index) => {
+        const row = document.createElement("tr");
+        row.innerHTML = `<td>${history.length - index}</td><td>${entry.result}</td><td>${entry.number}</td>`;
+        tbody.appendChild(row);
+      });
+    }
+
+    // ✅ Stylish Timer + Prediction Logic
+    let lastSecond = -1;
+    setInterval(() => {
+      const now = new Date();
+      const minutes = now.getMinutes();
+      const seconds = now.getSeconds();
+
+      // Update Timer
+      document.getElementById('timer').textContent =
+        String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
+
+      // Prediction every 15 seconds (for testing/demo)
+      if (seconds % 15 === 0 && lastSecond !== seconds) {
+        const prediction = getSmartPrediction();
+        document.getElementById('prediction').textContent = `🧠 Predicted: ${prediction.result} - ${prediction.number}`;
+        history.push(prediction);
+        if (history.length > 20) history.shift();
+        updateChart(prediction.result, prediction.number);
+        updateTable();
+        lastSecond = seconds;
+      }
+    }, 1000);
+  </script>
 
 </body>
 </html>
