@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Khatarnak Predictor v7.2</title>
+  <title>Khatarnak Predictor v8.0</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     body {
@@ -22,11 +22,19 @@
       margin: 10px;
       border: 2px solid #0f0;
       border-radius: 10px;
+      animation: glow 1s infinite alternate;
     }
 
     #timer {
-      font-size: 20px;
+      font-size: 22px;
       margin-bottom: 20px;
+      font-weight: bold;
+      color: #0f0;
+    }
+
+    @keyframes glow {
+      from { box-shadow: 0 0 10px #0f0; }
+      to   { box-shadow: 0 0 20px #0f0; }
     }
 
     canvas {
@@ -58,7 +66,7 @@
   </style>
 </head>
 <body>
-  <div id="randomWord">Loading...</div>
+  <div id="randomWord">Loading Prediction...</div>
   <div id="timer">00:00</div>
   <canvas id="myChart" width="300" height="200"></canvas>
 
@@ -142,23 +150,30 @@
         };
       }
 
-      const last3 = history.slice(-3);
-      const results = last3.map(x => x.result);
+      const lastResults = history.map(x => x.result);
+      const last5 = lastResults.slice(-5);
+      const last3 = lastResults.slice(-3);
+      const last1 = lastResults[history.length - 1];
+      const allSame5 = last5.every(r => r === last5[0]);
 
-      const bigCount = results.filter(r => r === "Big").length;
-      const smallCount = results.filter(r => r === "Small").length;
+      if (last5.length === 5 && allSame5) {
+        return {
+          result: last5[0],
+          numbers: getTwoRandomNumbers(last5[0])
+        };
+      }
 
-      // If equal pattern, alternate from last result
+      const bigCount = last3.filter(r => r === "Big").length;
+      const smallCount = last3.filter(r => r === "Small").length;
+
       if (bigCount === smallCount) {
-        const lastResult = results[2];
-        const result = lastResult === "Big" ? "Small" : "Big";
+        const result = last1 === "Big" ? "Small" : "Big";
         return {
           result,
           numbers: getTwoRandomNumbers(result)
         };
       }
 
-      // Predict less frequent one
       const result = bigCount > smallCount ? "Small" : "Big";
       return {
         result,
@@ -185,10 +200,9 @@
           const text = `🧠 Predicted: ${prediction.result} - ${prediction.numbers.join(', ')}`;
           document.getElementById('randomWord').textContent = text;
 
-          console.log("REAL:", realData, "PREDICTION:", prediction);
-
           updateChart(prediction.result, prediction.numbers);
           updateTable();
+
           lastMinute = minutes;
         }
       }, 1000);
@@ -196,44 +210,5 @@
 
     startTimer();
   </script>
-</body>const result = bigCount >= 2 ? "Small" : "Big";function getSmartPrediction() {
-  if (history.length < 3) {
-    return {
-      result: "Big",
-      numbers: getTwoRandomNumbers("Big")
-    };
-  }
-
-  const lastResults = history.map(x => x.result);
-  const last = lastResults.slice(-5); // check last 5
-  const lastOne = last[last.length - 1];
-
-  const allSame = last.every(r => r === lastOne);
-
-  // Agar 4 ya 5 baar same result aaya to wahi predict karo (trend follow)
-  if (last.length >= 4 && allSame) {
-    return {
-      result: lastOne,
-      numbers: getTwoRandomNumbers(lastOne)
-    };
-  }
-
-  // Trend ke alawa alternate logic
-  const bigCount = lastResults.slice(-3).filter(r => r === "Big").length;
-  const smallCount = 3 - bigCount;
-
-  if (bigCount === smallCount) {
-    const result = lastResults[lastResults.length - 1] === "Big" ? "Small" : "Big";
-    return {
-      result,
-      numbers: getTwoRandomNumbers(result)
-    };
-  }
-
-  const result = bigCount > smallCount ? "Small" : "Big";
-  return {
-    result,
-    numbers: getTwoRandomNumbers(result)
-  };
-}🧠 Predicted: Small - 1, 2🧠 Predicted: Big - 8, 6
+</body>
 </html>
