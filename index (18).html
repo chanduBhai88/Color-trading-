@@ -1,7 +1,8 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Khatarnak Predictor v6.0</title>
+  <title>Khatarnak Predictor v6.1</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     body {
@@ -11,9 +12,11 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
-      height: 100vh;
+      justify-content: start;
+      padding-top: 30px;
+      min-height: 100vh;
     }
+
     #randomWord {
       font-size: 28px;
       padding: 10px 20px;
@@ -21,23 +24,54 @@
       border: 2px solid #0f0;
       border-radius: 10px;
     }
+
     #timer {
       font-size: 20px;
       margin-bottom: 20px;
     }
+
     canvas {
       background: #111;
       border: 1px solid #0f0;
       border-radius: 10px;
       margin-top: 10px;
     }
+
+    #historyTable {
+      margin-top: 20px;
+      border-collapse: collapse;
+      width: 90%;
+      max-width: 400px;
+    }
+
+    #historyTable th, #historyTable td {
+      border: 1px solid #0f0;
+      padding: 5px;
+      text-align: center;
+    }
+
+    .big { color: #0ff; }
+    .small { color: #ff0; }
   </style>
 </head>
 <body>
   <div id="randomWord">Loading...</div>
   <div id="timer">00:00</div>
-  <canvas id="myChart" width="300" height="200"></canvas>  <script>
-    const API_URL = "https://draw.ar-lottery01.com/api/getResult"; // TODO: Replace with real path if known
+  <canvas id="myChart" width="300" height="200"></canvas>
+
+  <!-- 🔁 Table for Last 5 Results -->
+  <table id="historyTable">
+    <thead>
+      <tr><th>Time</th><th>Result</th></tr>
+    </thead>
+    <tbody id="historyBody"></tbody>
+  </table>
+
+  <!-- 🔊 Audio element for alert -->
+  <audio id="alertSound" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" preload="auto"></audio>
+
+  <script>
+    const API_URL = "https://draw.ar-lottery01.com/api/getResult"; // Your server API
     let lastMinute = -1;
     let history = [];
 
@@ -71,17 +105,37 @@
       chart.update();
     }
 
+    function updateHistoryTable(time, result, number) {
+      const historyBody = document.getElementById('historyBody');
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${time}</td>
+        <td class="${result.toLowerCase()}">${result} - ${number}</td>
+      `;
+      historyBody.prepend(row);
+
+      // Only keep last 5 rows
+      while (historyBody.children.length > 5) {
+        historyBody.removeChild(historyBody.lastChild);
+      }
+    }
+
     async function fetchResultFromServer() {
       try {
         const response = await fetch(API_URL);
         const data = await response.json();
         return { result: data.result, number: data.number };
       } catch (e) {
-        // fallback dummy logic if API fails
         const type = Math.random() > 0.5 ? 'Big' : 'Small';
         const number = type === 'Big' ? [5,6,7,8,9][Math.floor(Math.random()*5)] : [0,1,2,3,4][Math.floor(Math.random()*5)];
         return { result: type, number };
       }
+    }
+
+    function playAlert() {
+      const alertSound = document.getElementById('alertSound');
+      alertSound.currentTime = 0;
+      alertSound.play();
     }
 
     function startTimer() {
@@ -89,20 +143,22 @@
         const now = new Date();
         const minutes = now.getMinutes();
         const seconds = now.getSeconds();
-        document.getElementById('timer').textContent =
-          String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
+        const timeStr = String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
+        document.getElementById('timer').textContent = timeStr;
 
         if (seconds === 0 && lastMinute !== minutes) {
           const data = await fetchResultFromServer();
           const prediction = `${data.result} - ${data.number}`;
           document.getElementById('randomWord').textContent = prediction;
-
           updateChart(data.result, data.number);
+          updateHistoryTable(timeStr, data.result, data.number);
+          playAlert();
           lastMinute = minutes;
         }
       }, 1000);
     }
 
     startTimer();
-  </script></body>
+  </script>
+</body>
 </html>
