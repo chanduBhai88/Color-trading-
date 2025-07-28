@@ -16,7 +16,7 @@
 </head>
 <body>
   <h1>Wingo 1 Minute Prediction Game</h1>
-  <div id="timer">Timer: 60</div>
+  <div id="timer">00:00</div>
   <div id="balance">Balance: ₹1000</div>
   <div id="bets">
     <button class="bet-btn big" onclick="placeBet('Big')">Big (5-9)</button>
@@ -40,26 +40,14 @@
   <div id="results"></div>
   <script>
     let balance = 1000;
-    let timer = 60;
-    let countdown;
     let currentBets = [];
     let roundActive = true;
+    let lastMinute = -1;
 
-    function startRound() {
-      timer = 60;
+    function resetRound() {
       roundActive = true;
       currentBets = [];
-      document.getElementById('timer').innerText = "Timer: 60";
       document.getElementById('results').innerHTML = "";
-      countdown = setInterval(() => {
-        timer--;
-        document.getElementById('timer').innerText = "Timer: " + timer;
-        if (timer <= 0) {
-          clearInterval(countdown);
-          roundActive = false;
-          showResult();
-        }
-      }, 1000);
     }
 
     function placeBet(type) {
@@ -107,10 +95,33 @@
         winText += `<div>No wins this round!</div>`;
       }
       document.getElementById('balance').innerText = "Balance: ₹" + balance;
-      document.getElementById('results').innerHTML = winText + `<br><button onclick="startRound()">Next Round</button>`;
+      document.getElementById('results').innerHTML = winText;
     }
 
-    startRound();
+    // Timer code from your first HTML
+    function startTimer() {
+      setInterval(() => {
+        const now = new Date();
+        const minutes = now.getMinutes();
+        const seconds = now.getSeconds();
+        document.getElementById('timer').textContent =
+          String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
+
+        // New round starts every time seconds reach 0 and minute changes
+        if (seconds === 0 && lastMinute !== minutes) {
+          roundActive = false;
+          showResult();
+          setTimeout(() => {
+            resetRound();
+            roundActive = true;
+          }, 1000); // Wait 1 second before allowing bets again
+          lastMinute = minutes;
+        }
+      }, 1000);
+    }
+
+    startTimer();
+    resetRound();
   </script>
 </body>
 </html>
