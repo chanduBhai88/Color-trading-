@@ -10,14 +10,16 @@
     .number { background:#3498db; }
     #timer { font-size:24px; margin:10px; }
     #balance { font-size:22px; margin:15px; }
-    #results { margin-top:20px; font-size:20px; }
+    #results, #resultsHistory { margin-top:20px; font-size:20px; }
     #bets { margin:15px 0; }
+    #resultsHistory div { margin:2px 0; font-size:18px; color:#ccc; }
   </style>
 </head>
 <body>
   <h1>Wingo 1 Minute Prediction Game</h1>
   <div id="timer">00:00</div>
   <div id="balance">Balance: ₹1000</div>
+
   <div id="bets">
     <button class="bet-btn big" onclick="placeBet('Big')">Big (5-9)</button>
     <button class="bet-btn small" onclick="placeBet('Small')">Small (0-4)</button>
@@ -34,15 +36,21 @@
     <button class="bet-btn number" onclick="placeBet('8')">8</button>
     <button class="bet-btn number" onclick="placeBet('9')">9</button>
   </div>
+
   <div>
     Bet Amount: <input type="number" id="betAmount" value="100" min="10" max="1000" style="width:80px;">
   </div>
+
   <div id="results"></div>
+  <h3>Last 10 Results:</h3>
+  <div id="resultsHistory"></div>
+
   <script>
     let balance = 1000;
     let currentBets = [];
     let roundActive = true;
     let lastMinute = -1;
+    let resultsList = [];
 
     function resetRound() {
       roundActive = true;
@@ -71,11 +79,15 @@
     }
 
     function showResult() {
-      // Random number 0-9
       let resultNum = Math.floor(Math.random() * 10);
       let resultType = resultNum >= 5 ? "Big" : "Small";
       let winText = `<div>Result: <b>${resultNum}</b> (${resultType})</div>`;
-      // Check bets
+
+      // Save to results list
+      resultsList.unshift(`${resultNum} (${resultType})`);
+      if (resultsList.length > 10) resultsList.pop();
+      updateHistory();
+
       let winAmt = 0;
       currentBets.forEach(bet => {
         if (bet.type === resultType) {
@@ -91,14 +103,20 @@
           winText += `<div>You won on <b>${bet.type}</b>! +₹${prize}</div>`;
         }
       });
+
       if (winAmt === 0) {
         winText += `<div>No wins this round!</div>`;
       }
+
       document.getElementById('balance').innerText = "Balance: ₹" + balance;
       document.getElementById('results').innerHTML = winText;
     }
 
-    // Timer code from your first HTML
+    function updateHistory() {
+      const historyDiv = document.getElementById('resultsHistory');
+      historyDiv.innerHTML = resultsList.map(item => `<div>${item}</div>`).join('');
+    }
+
     function startTimer() {
       setInterval(() => {
         const now = new Date();
@@ -107,14 +125,13 @@
         document.getElementById('timer').textContent =
           String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
 
-        // New round starts every time seconds reach 0 and minute changes
         if (seconds === 0 && lastMinute !== minutes) {
           roundActive = false;
           showResult();
           setTimeout(() => {
             resetRound();
             roundActive = true;
-          }, 1000); // Wait 1 second before allowing bets again
+          }, 1000);
           lastMinute = minutes;
         }
       }, 1000);
