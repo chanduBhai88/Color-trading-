@@ -196,5 +196,44 @@
 
     startTimer();
   </script>
-</body>
+</body>const result = bigCount >= 2 ? "Small" : "Big";function getSmartPrediction() {
+  if (history.length < 3) {
+    return {
+      result: "Big",
+      numbers: getTwoRandomNumbers("Big")
+    };
+  }
+
+  const lastResults = history.map(x => x.result);
+  const last = lastResults.slice(-5); // check last 5
+  const lastOne = last[last.length - 1];
+
+  const allSame = last.every(r => r === lastOne);
+
+  // Agar 4 ya 5 baar same result aaya to wahi predict karo (trend follow)
+  if (last.length >= 4 && allSame) {
+    return {
+      result: lastOne,
+      numbers: getTwoRandomNumbers(lastOne)
+    };
+  }
+
+  // Trend ke alawa alternate logic
+  const bigCount = lastResults.slice(-3).filter(r => r === "Big").length;
+  const smallCount = 3 - bigCount;
+
+  if (bigCount === smallCount) {
+    const result = lastResults[lastResults.length - 1] === "Big" ? "Small" : "Big";
+    return {
+      result,
+      numbers: getTwoRandomNumbers(result)
+    };
+  }
+
+  const result = bigCount > smallCount ? "Small" : "Big";
+  return {
+    result,
+    numbers: getTwoRandomNumbers(result)
+  };
+}🧠 Predicted: Small - 1, 2🧠 Predicted: Big - 8, 6
 </html>
