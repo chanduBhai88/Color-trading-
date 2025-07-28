@@ -94,7 +94,6 @@
 
       document.getElementById('results').innerHTML = winText;
       suggestNext();
-      saveState();
     }
 
     function resetRound() {
@@ -102,7 +101,6 @@
       currentBets = [];
       document.getElementById('results').innerHTML = "";
       suggestNext();
-      saveState();
     }
 
     function updateHistory() {
@@ -163,25 +161,11 @@
             roundActive = true;
           }, 1000);
           lastMinute = minutes;
-          saveState(); // store last round
         }
       }, 1000);
     }
 
-    function saveState() {
-      localStorage.setItem("resultsList", JSON.stringify(resultsList));
-      localStorage.setItem("lastMinute", lastMinute);
-    }
-
-    function loadState() {
-      const savedResults = localStorage.getItem("resultsList");
-      const savedMinute = localStorage.getItem("lastMinute");
-      if (savedResults) resultsList = JSON.parse(savedResults);
-      if (savedMinute) lastMinute = parseInt(savedMinute);
-    }
-
     // Initialize
-    loadState();
     updateHistory();
     suggestNext();
     startTimer();
