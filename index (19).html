@@ -143,9 +143,23 @@
       }
 
       const last3 = history.slice(-3);
-      const bigCount = last3.filter(x => x.result === "Big").length;
-      const result = bigCount >= 2 ? "Small" : "Big";
+      const results = last3.map(x => x.result);
 
+      const bigCount = results.filter(r => r === "Big").length;
+      const smallCount = results.filter(r => r === "Small").length;
+
+      // If equal pattern, alternate from last result
+      if (bigCount === smallCount) {
+        const lastResult = results[2];
+        const result = lastResult === "Big" ? "Small" : "Big";
+        return {
+          result,
+          numbers: getTwoRandomNumbers(result)
+        };
+      }
+
+      // Predict less frequent one
+      const result = bigCount > smallCount ? "Small" : "Big";
       return {
         result,
         numbers: getTwoRandomNumbers(result)
@@ -170,6 +184,8 @@
           const prediction = getSmartPrediction();
           const text = `🧠 Predicted: ${prediction.result} - ${prediction.numbers.join(', ')}`;
           document.getElementById('randomWord').textContent = text;
+
+          console.log("REAL:", realData, "PREDICTION:", prediction);
 
           updateChart(prediction.result, prediction.numbers);
           updateTable();
