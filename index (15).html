@@ -1,55 +1,141 @@
-<!DOCTYPE html><html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Khatarnak Prediction Tool</title>
-  <style>
-    body {
-      margin: 0;
-      font-family: 'Orbitron', sans-serif;
-      background: #111;
-      color: #0f0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 20px;
+<script>
+  let balance = 1000;
+  let currentBets = [];
+  let roundActive = true;
+  let lastMinute = -1;
+  let resultsList = [];
+
+  function resetRound() {
+    roundActive = true;
+    currentBets = [];
+    document.getElementById('results').innerHTML = "";
+    suggestNext();
+  }
+
+  function placeBet(type) {
+    if (!roundActive) {
+      alert("Wait for next round!");
+      return;
     }
-    .panel {
-      background: #222;
-      border-radius: 20px;
-      padding: 20px;
-      box-shadow: 0 0 20px #0f0;
-      width: 100%;
-      max-width: 500px;
+    let amount = parseInt(document.getElementById('betAmount').value);
+    if (isNaN(amount) || amount < 10 || amount > 1000) {
+      alert("Bet amount must be between 10 and 1000");
+      return;
     }
-    .title {
-      text-align: center;
-      font-size: 24px;
-      margin-bottom: 20px;
+    if (balance < amount) {
+      alert("Not enough balance!");
+      return;
     }
-    .section {
-      margin-bottom: 20px;
+    balance -= amount;
+    currentBets.push({type, amount});
+    document.getElementById('balance').innerText = "Balance: ₹" + balance;
+    document.getElementById('results').innerHTML += `<div>Bet placed: <b>${type}</b> ₹${amount}</div>`;
+  }
+
+  function showResult() {
+    let resultNum = Math.floor(Math.random() * 10);
+    let resultType = resultNum >= 5 ? "Big" : "Small";
+    let winText = `<div>Result: <b>${resultNum}</b> (${resultType})</div>`;
+
+    resultsList.unshift(resultType);
+    if (resultsList.length > 10) resultsList.pop();
+    updateHistory();
+
+    let winAmt = 0;
+    currentBets.forEach(bet => {
+      if (bet.type === resultType) {
+        let prize = bet.amount * 2;
+        balance += prize;
+        winAmt += prize;
+        winText += `<div>You won on <b>${bet.type}</b>! +₹${prize}</div>`;
+      }
+      if (bet.type === String(resultNum)) {
+        let prize = bet.amount * 9;
+        balance += prize;
+        winAmt += prize;
+        winText += `<div>You won on <b>${bet.type}</b>! +₹${prize}</div>`;
+      }
+    });
+
+    if (winAmt === 0) {
+      winText += `<div>No wins this round!</div>`;
     }
-    .section span {
-      font-weight: bold;
-      font-size: 20px;
+
+    document.getElementById('balance').innerText = "Balance: ₹" + balance;
+    document.getElementById('results').innerHTML = winText;
+
+    suggestNext(); // update prediction
+  }
+
+  function updateHistory() {
+    const historyDiv = document.getElementById('resultsHistory');
+    historyDiv.innerHTML = resultsList.map((item, index) => `<div>${index + 1}. ${item}</div>`).join('');
+  }
+
+  function suggestNext() {
+    const predDiv = document.getElementById('prediction');
+    let suggestion = "";
+    let r = resultsList;
+
+    if (r.length < 3) {
+      suggestion = "Waiting for more data...";
+    } else {
+      let last = r[0], second = r[1], third = r[2];
+
+      if (last === second && second === third) {
+        suggestion = last === "Big" ? "Small" : "Big";
+      } else if (last === second) {
+        suggestion = last === "Big" ? "Small" : "Big";
+      } else if (last !== second && second !== third && last !== third) {
+        suggestion = "Big"; // fallback default
+      } else {
+        suggestion = last === "Big" ? "Small" : "Big";
+      }
     }
-    .timer {
-      text-align: center;
-      font-size: 18px;
-      margin: 10px 0;
+
+    predDiv.innerHTML = `🔥 <b>Smart Prediction:</b> ${suggestion}`;
+    highlightPrediction(suggestion);
+  }
+
+  function highlightPrediction(type) {
+    document.querySelectorAll('.bet-btn.big, .bet-btn.small').forEach(btn => {
+      btn.style.boxShadow = "none";
+    });
+
+    if (type === "Big") {
+      document.querySelector('.bet-btn.big').style.boxShadow = "0 0 20px 4px #e67e22";
+    } else if (type === "Small") {
+      document.querySelector('.bet-btn.small').style.boxShadow = "0 0 20px 4px #2ecc71";
     }
-    button {
-      padding: 10px 20px;
-      border: none;
-      border-radius: 12px;
-      font-weight: bold;
-      background: #0f0;
-      color: #000;
-      cursor: pointer;
-    }
-    .mode-toggle {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      background: #
+  }
+
+  function startTimer() {
+    setInterval(() => {
+      const now = new Date();
+      const minutes = now.getMinutes();
+      const seconds = now.getSeconds();
+      document.getElementById('timer').textContent =
+        String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
+
+      if (seconds === 0 && lastMinute !== minutes) {
+        roundActive = false;
+        showResult();
+        setTimeout(() => {
+          resetRound();
+          roundActive = true;
+        }, 1000);
+        lastMinute = minutes;
+      }
+    }, 1000);
+  }
+
+  // Add prediction display element
+  const predBox = document.createElement("div");
+  predBox.id = "prediction";
+  predBox.style.margin = "20px";
+  predBox.style.fontSize = "22px";
+  document.body.insertBefore(predBox, document.getElementById("bets"));
+
+  startTimer();
+  resetRound();
+</script>
