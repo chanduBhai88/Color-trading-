@@ -1,153 +1,56 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Khatarnak Predictor v7.4</title>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <style>
-    body {
-      background: #000;
-      color: #0f0;
-      font-family: monospace;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 20px;
-    }
+Here's a complete **Color + Number Trading Tool** (like 91 Club) in Python with GUI using `tkinter`:  
 
-    #prediction {
-      font-size: 24px;
-      padding: 10px 20px;
-      border: 2px solid #0f0;
-      border-radius: 10px;
-      margin-bottom: 10px;
-    }
+```python
+import tkinter as tk
+from tkinter import messagebox
+import random
 
-    #timer {
-      font-size: 22px;
-      margin-bottom: 20px;
-    }
+# Game Logic
+colors = ["Red", "Green", "Violet"]
+numbers = list(range(0, 10))
 
-    canvas {
-      background: #111;
-      border: 1px solid #0f0;
-      border-radius: 10px;
-      margin-bottom: 20px;
-    }
+def generate_result():
+    color = random.choice(colors)
+    number = random.choice(numbers)
+    size = "Big" if number >=5 else "Small"
+    
+    result_label.config(text=f"Result: {color} + {number} ({size})")
+    
+    # Special Win Condition (Customize Rules Here)
+    if color == "Violet" and number == 7:
+        messagebox.showinfo("Winner!", "JACKPOT! 💎")
 
-    table {
-      width: 320px;
-      background: #111;
-      border-collapse: collapse;
-    }
+# GUI Setup
+root = tk.Tk()
+root.title("91 Club Style Trading Tool")
+root.geometry("300x200")
 
-    th, td {
-      border: 1px solid #0f0;
-      padding: 6px 8px;
-      text-align: center;
-    }
+# Labels
+title_label = tk.Label(root, text="Color + Number Trading", font=("Arial", 16))
+title_label.pack(pady=10)
 
-    th {
-      background: #070;
-    }
-  </style>
-</head>
-<body>
+result_label = tk.Label(root, text="Press Generate to Start", font=("Arial", 12))
+result_label.pack(pady=20)
 
-  <div id="prediction">Prediction Loading...</div>
-  <div id="timer">00:00</div>
+# Buttons
+generate_btn = tk.Button(root, text="Generate", command=generate_result, bg="#4CAF50", fg="white")
+generate_btn.pack(pady=10)
 
-  <canvas id="myChart" width="320" height="180"></canvas>
+root.mainloop()
+```
 
-  <table id="resultTable">
-    <thead>
-      <tr><th>#</th><th>Result</th><th>Number</th></tr>
-    </thead>
-    <tbody></tbody>
-  </table>
+### Features:
+1. **3 Colors** (Red, Green, Violet)  
+2. **Numbers 0-9** with **Big/Small** (5-9=Big, 0-4=Small)  
+3. **Custom Win Conditions** (e.g., Violet + 7 = Jackpot)  
+4. Simple GUI with **Tkinter**  
 
-  <script>
-    // Chart Setup
-    const ctx = document.getElementById('myChart').getContext('2d');
-    const chart = new Chart(ctx, {
-      type: 'bar',
-      data: {
-        labels: [],
-        datasets: [{
-          label: 'Predicted Number',
-          data: [],
-          backgroundColor: '#0f0'
-        }]
-      },
-      options: {
-        scales: {
-          y: { beginAtZero: true, ticks: { color: '#0f0' } },
-          x: { ticks: { color: '#0f0' } }
-        },
-        plugins: {
-          legend: { labels: { color: '#0f0' } }
-        }
-      }
-    });
+### How to Run:
+1. Copy this code into a file (e.g., `color_trading.py`).  
+2. Install Python (if not installed).  
+3. Run: `python color_trading.py`.  
 
-    let history = [];
-
-    function getSmartPrediction() {
-      const result = Math.random() > 0.5 ? "Big" : "Small";
-      const number = result === "Big"
-        ? [5,6,7,8,9][Math.floor(Math.random()*5)]
-        : [0,1,2,3,4][Math.floor(Math.random()*5)];
-      return { result, number };
-    }
-
-    function updateChart(label, number) {
-      if (chart.data.labels.length >= 10) {
-        chart.data.labels.shift();
-        chart.data.datasets[0].data.shift();
-      }
-      chart.data.labels.push(label);
-      chart.data.datasets[0].data.push(number);
-      chart.update();
-    }
-
-    function updateTable() {
-      const tbody = document.querySelector("#resultTable tbody");
-      tbody.innerHTML = "";
-      history.slice().reverse().forEach((entry, index) => {
-        const row = document.createElement("tr");
-        row.innerHTML = `<td>${history.length - index}</td><td>${entry.result}</td><td>${entry.number}</td>`;
-        tbody.appendChild(row);
-      });
-    }
-
-    // ✅ Stylish Timer + Prediction Logic (Every 60 seconds)
-    let lastSecond = -1;
-    setInterval(() => {
-      const now = new Date();
-      const minutes = now.getMinutes();
-      const seconds = now.getSeconds();
-
-      // Update Timer
-      document.getElementById('timer').textContent =
-        String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
-
-      // Prediction every 60 seconds (when seconds === 0)
-      if (seconds === 0 && lastSecond !== seconds) {
-        const prediction = getSmartPrediction();
-        document.getElementById('prediction').textContent = `🧠 Predicted: ${prediction.result} - ${prediction.number}`;
-        history.push(prediction);
-        if (history.length > 20) history.shift();
-        updateChart(prediction.result, prediction.number);
-        updateTable();
-        lastSecond = seconds;
-      }
-
-      // Reset lastSecond if not zero
-      if (seconds !== 0) {
-        lastSecond = -1;
-      }
-    }, 1000);
-  </script>
-
-</body>
-</html>
+Want more features? Ask for:  
+- Betting system 💰  
+- Sound effects 🔊  
+- Multiplayer (online) 🌐  
