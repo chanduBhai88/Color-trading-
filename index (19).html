@@ -1,91 +1,116 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Color Trading Game with Timer</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            margin-top: 50px;
-        }
-        .button {
-            padding: 10px 20px;
-            margin: 5px;
-            border: none;
-            cursor: pointer;
-            border-radius: 5px;
-        }
-        .result {
-            margin-top: 20px;
-            font-size: 20px;
-            font-weight: bold;
-        }
-        #timer {
-            font-size: 24px;
-            color: red;
-        }
-    </style>
+  <title>Wingo Style 1 Minute Game</title>
+  <style>
+    body { background:#222; color:#fff; font-family:Arial; text-align:center; }
+    .bet-btn { padding:10px 20px; margin:5px; font-size:18px; cursor:pointer; border:none; border-radius:5px; }
+    .big { background:#e67e22; }
+    .small { background:#2ecc71; }
+    .number { background:#3498db; }
+    #timer { font-size:24px; margin:10px; }
+    #balance { font-size:22px; margin:15px; }
+    #results { margin-top:20px; font-size:20px; }
+    #bets { margin:15px 0; }
+  </style>
 </head>
 <body>
+  <h1>Wingo 1 Minute Prediction Game</h1>
+  <div id="timer">Timer: 60</div>
+  <div id="balance">Balance: ₹1000</div>
+  <div id="bets">
+    <button class="bet-btn big" onclick="placeBet('Big')">Big (5-9)</button>
+    <button class="bet-btn small" onclick="placeBet('Small')">Small (0-4)</button>
+    <br>
+    <span>Number Prediction:</span><br>
+    <button class="bet-btn number" onclick="placeBet('0')">0</button>
+    <button class="bet-btn number" onclick="placeBet('1')">1</button>
+    <button class="bet-btn number" onclick="placeBet('2')">2</button>
+    <button class="bet-btn number" onclick="placeBet('3')">3</button>
+    <button class="bet-btn number" onclick="placeBet('4')">4</button>
+    <button class="bet-btn number" onclick="placeBet('5')">5</button>
+    <button class="bet-btn number" onclick="placeBet('6')">6</button>
+    <button class="bet-btn number" onclick="placeBet('7')">7</button>
+    <button class="bet-btn number" onclick="placeBet('8')">8</button>
+    <button class="bet-btn number" onclick="placeBet('9')">9</button>
+  </div>
+  <div>
+    Bet Amount: <input type="number" id="betAmount" value="100" min="10" max="1000" style="width:80px;">
+  </div>
+  <div id="results"></div>
+  <script>
+    let balance = 1000;
+    let timer = 60;
+    let countdown;
+    let currentBets = [];
+    let roundActive = true;
 
-<h1>Color Trading: Big Small Game</h1>
-<p>Choose a color and your bet:</p>
-
-<select id="colorSelect">
-    <option value="Red">Red</option>
-    <option value="Green">Green</option>
-    <option value="Violet">Violet</option>
-</select>
-
-<button class="button" onclick="play('Big')">Big</button>
-<button class="button" onclick="play('Small')">Small</button>
-
-<div class="result" id="result"></div>
-<div id="timer">60</div>
-
-<script>
-let timeLeft = 60;
-let gameActive = true;
-
-function startTimer() {
-    const timerDiv = document.getElementById('timer');
-    const timerInterval = setInterval(() => {
-        if (timeLeft <= 0 || !gameActive) {
-            clearInterval(timerInterval);
-            document.getElementById('result').innerHTML += "<br>Time's up! Game Over!";
-            gameActive = false;
-        } else {
-            timerDiv.innerHTML = timeLeft;
-            timeLeft--;
+    function startRound() {
+      timer = 60;
+      roundActive = true;
+      currentBets = [];
+      document.getElementById('timer').innerText = "Timer: 60";
+      document.getElementById('results').innerHTML = "";
+      countdown = setInterval(() => {
+        timer--;
+        document.getElementById('timer').innerText = "Timer: " + timer;
+        if (timer <= 0) {
+          clearInterval(countdown);
+          roundActive = false;
+          showResult();
         }
-    }, 1000);
-}
-
-function play(bet) {
-    if (!gameActive) return; // Prevent play if time is up
-
-    const randomNumber = Math.floor(Math.random() * 10); // Generates a number between 0 and 9
-    const selectedColor = document.getElementById('colorSelect').value;
-    const resultDiv = document.getElementById('result');
-
-    let outcome = "";
-    outcome += `Random Number: ${randomNumber} <br>`;
-
-    if ((randomNumber >= 5 && bet === 'Big') || (randomNumber < 5 && bet === 'Small')) {
-        outcome += "Congratulations! You win!";
-    } else {
-        outcome += "Sorry! You lose. Try again!";
+      }, 1000);
     }
 
-    resultDiv.innerHTML = outcome;
-}
+    function placeBet(type) {
+      if (!roundActive) {
+        alert("Wait for next round!");
+        return;
+      }
+      let amount = parseInt(document.getElementById('betAmount').value);
+      if (isNaN(amount) || amount < 10 || amount > 1000) {
+        alert("Bet amount must be between 10 and 1000");
+        return;
+      }
+      if (balance < amount) {
+        alert("Not enough balance!");
+        return;
+      }
+      balance -= amount;
+      currentBets.push({type, amount});
+      document.getElementById('balance').innerText = "Balance: ₹" + balance;
+      document.getElementById('results').innerHTML += `<div>Bet placed: <b>${type}</b> ₹${amount}</div>`;
+    }
 
-window.onload = function() {
-    startTimer(); // Start the timer when the game loads
-};
-</script>
+    function showResult() {
+      // Random number 0-9
+      let resultNum = Math.floor(Math.random() * 10);
+      let resultType = resultNum >= 5 ? "Big" : "Small";
+      let winText = `<div>Result: <b>${resultNum}</b> (${resultType})</div>`;
+      // Check bets
+      let winAmt = 0;
+      currentBets.forEach(bet => {
+        if (bet.type === resultType) {
+          let prize = bet.amount * 2;
+          balance += prize;
+          winAmt += prize;
+          winText += `<div>You won on <b>${bet.type}</b>! +₹${prize}</div>`;
+        }
+        if (bet.type === String(resultNum)) {
+          let prize = bet.amount * 9;
+          balance += prize;
+          winAmt += prize;
+          winText += `<div>You won on <b>${bet.type}</b>! +₹${prize}</div>`;
+        }
+      });
+      if (winAmt === 0) {
+        winText += `<div>No wins this round!</div>`;
+      }
+      document.getElementById('balance').innerText = "Balance: ₹" + balance;
+      document.getElementById('results').innerHTML = winText + `<br><button onclick="startRound()">Next Round</button>`;
+    }
 
+    startRound();
+  </script>
 </body>
 </html>
