@@ -1,103 +1,124 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Raja Game Big/Small Tracker</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RajaGame Predictor</title>
   <style>
     body {
       margin: 0;
-      font-family: 'Segoe UI', sans-serif;
+      font-family: Arial, sans-serif;
       background: url('https://images.unsplash.com/photo-1604382351680-699d8ad42937?auto=format&fit=crop&w=1470&q=80') no-repeat center center fixed;
       background-size: cover;
       color: #fff;
     }
+
     .container {
       background: rgba(0, 0, 0, 0.7);
-      max-width: 600px;
-      margin: 40px auto;
+      max-width: 500px;
+      margin: 50px auto;
       padding: 20px;
       border-radius: 16px;
       box-shadow: 0 0 20px rgba(255,255,255,0.2);
     }
-    h1 {
+
+    h2 {
       text-align: center;
-      margin-bottom: 20px;
     }
-    .history {
+
+    .inputs {
       display: flex;
       flex-wrap: wrap;
-      gap: 8px;
-      justify-content: center;
-      margin-bottom: 20px;
+      justify-content: space-between;
+      gap: 10px;
+      margin: 20px 0;
     }
-    .history div {
-      padding: 8px 12px;
-      border-radius: 20px;
-      background: #1e90ff;
-      font-weight: bold;
-      transition: 0.3s;
-    }
-    .history div.big {
-      background-color: #28a745;
-    }
-    .history div.small {
-      background-color: #dc3545;
-    }
-    .prediction {
-      text-align: center;
-      font-size: 1.5rem;
+
+    .inputs input {
+      width: 22%;
       padding: 10px;
-      background: rgba(255,255,255,0.1);
-      border-radius: 10px;
+      font-size: 1rem;
+      border-radius: 6px;
+      border: none;
+      text-align: center;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      font-size: 1rem;
+      background-color: #28a745;
+      border: none;
+      border-radius: 8px;
+      color: white;
+      cursor: pointer;
+    }
+
+    .result {
+      margin-top: 20px;
+      text-align: center;
       font-weight: bold;
+      font-size: 1.2rem;
+      color: red;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>Raja Game Tracker</h1>
-    <div class="history" id="history"></div>
-    <div class="prediction" id="prediction">Loading...</div>
+    <h2>🎯 RajaGame Predictor</h2>
+    <div class="inputs">
+      <input type="number" id="n1" />
+      <input type="number" id="n2" />
+      <input type="number" id="n3" />
+      <input type="number" id="n4" />
+      <input type="number" id="n5" />
+      <input type="number" id="n6" />
+      <input type="number" id="n7" />
+      <input type="number" id="n8" />
+    </div>
+    <button onclick="predict()">Predict</button>
+    <div class="result" id="result">Enter 8 previous numbers.</div>
   </div>
 
   <script>
-    const data = [
+    const gameHistory = [
       "Small", "Small", "Small", "Big", "Small", "Small", "Big", "Big", "Big", "Big",
       "Big", "Small", "Small", "Big", "Big", "Big", "Big", "Small", "Small", "Big",
       "Big", "Small", "Small", "Big", "Small", "Small", "Big", "Small", "Big", "Small",
-      "Small", "Small", "Big", "Big", "Small", "Big", "Small", "Big", "Big", "Big"
+      "Big", "Small", "Small", "Small", "Big", "Big", "Small", "Big", "Small", "Big"
     ];
 
-    const historyEl = document.getElementById("history");
-    const predictionEl = document.getElementById("prediction");
-
-    // Show full history
-    data.slice().reverse().forEach(item => {
-      const div = document.createElement("div");
-      div.className = item.toLowerCase();
-      div.innerText = item;
-      historyEl.appendChild(div);
-    });
-
-    // Basic prediction logic: last 3 pattern repeat
-    function predictNext(data) {
-      if (data.length < 3) return "Not enough data";
-      const last3 = data.slice(-3).join("-");
-      const matchIndex = data.slice(0, -3).join("-").indexOf(last3);
-      if (matchIndex !== -1 && data[matchIndex + 3]) {
-        return data[matchIndex + 3];
-      } else {
-        // fallback logic
-        const countBig = data.filter(x => x === "Big").length;
-        const countSmall = data.length - countBig;
-        return countBig > countSmall ? "Small" : "Big";
-      }
+    function toBigSmall(num) {
+      return parseInt(num) >= 5 ? "Big" : "Small";
     }
 
-    const next = predictNext(data);
-    predictionEl.innerText = `Next Prediction: ${next}`;
-    predictionEl.style.color = next === "Big" ? "#28a745" : "#dc3545";
+    function predict() {
+      const nums = [];
+      for (let i = 1; i <= 8; i++) {
+        const val = document.getElementById("n" + i).value;
+        if (val === "") {
+          document.getElementById("result").innerText = "❌ Please enter all 8 numbers.";
+          return;
+        }
+        nums.push(toBigSmall(val));
+      }
+
+      const pattern = nums.join("-");
+      let found = false;
+
+      for (let i = 0; i < gameHistory.length - 8; i++) {
+        const slice = gameHistory.slice(i, i + 8).join("-");
+        if (slice === pattern) {
+          document.getElementById("result").innerText = "✅ Next: " + gameHistory[i + 8];
+          found = true;
+          break;
+        }
+      }
+
+      if (!found) {
+        document.getElementById("result").innerText = "❌ Pattern not found in history.";
+      }
+    }
   </script>
 </body>
 </html>
