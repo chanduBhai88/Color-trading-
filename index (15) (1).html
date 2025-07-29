@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>RajaGame Big/Small Tracker</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: url('https://images.unsplash.com/photo-1604382351680-699d8ad42937?auto=format&fit=crop&w=1470&q=80') no-repeat center center fixed;
+      background-size: cover;
+      color: #fff;
+    }
+
+    .container {
+      background: rgba(0, 0, 0, 0.85);
+      max-width: 600px;
+      margin: 50px auto;
+      padding: 20px;
+      border-radius: 16px;
+      box-shadow: 0 0 20px rgba(255,255,255,0.2);
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .inputs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+
+    select {
+      padding: 10px;
+      font-size: 1rem;
+      border-radius: 8px;
+      border: none;
+      width: 100px;
+      text-align: center;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      font-size: 1rem;
+      background-color: #28a745;
+      border: none;
+      border-radius: 10px;
+      color: white;
+      cursor: pointer;
+    }
+
+    .result {
+      margin-top: 20px;
+      text-align: center;
+      font-weight: bold;
+      font-size: 1.3rem;
+      color: #ff4d4d;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>🎯 RajaGame Predictor</h2>
+    <div class="inputs" id="input-container"></div>
+    <button onclick="predict()">🔮 Predict Next</button>
+    <div class="result" id="result">Enter 6 previous results.</div>
+  </div>
+
+  <script>
+    const history = [
+      "Small", "Small", "Small", "Small", "Big", "Small", "Small", "Small", "Big", "Small",
+      "Small", "Small", "Big", "Small", "Small", "Small", "Small", "Small", "Small", "Big",
+      "Big", "Big", "Big", "Big", "Big", "Big", "Big", "Big", "Big", "Big",
+      "Small", "Small", "Big", "Small", "Small", "Small", "Small", "Small", "Small", "Small",
+      "Big", "Small", "Small", "Small", "Big", "Big", "Big", "Big", "Small", "Small",
+      "Big", "Small", "Small", "Big", "Small", "Big", "Small", "Small", "Small", "Big",
+      "Big", "Big", "Small", "Small", "Small", "Small", "Big", "Big", "Big", "Big",
+      "Big", "Big", "Big"
+    ];
+
+    const container = document.getElementById("input-container");
+    const inputLength = 6;
+
+    // Create dropdowns
+    for (let i = 0; i < inputLength; i++) {
+      const select = document.createElement("select");
+      const opt1 = document.createElement("option");
+      opt1.value = "";
+      opt1.text = "--";
+      const opt2 = document.createElement("option");
+      opt2.value = "Big";
+      opt2.text = "Big";
+      const opt3 = document.createElement("option");
+      opt3.value = "Small";
+      opt3.text = "Small";
+      select.appendChild(opt1);
+      select.appendChild(opt2);
+      select.appendChild(opt3);
+      select.id = "s" + i;
+      container.appendChild(select);
+    }
+
+    function predict() {
+      const pattern = [];
+      for (let i = 0; i < inputLength; i++) {
+        const val = document.getElementById("s" + i).value;
+        if (val !== "Big" && val !== "Small") {
+          document.getElementById("result").innerText = "❌ Please select all 6 inputs.";
+          return;
+        }
+        pattern.push(val);
+      }
+
+      const strPattern = pattern.join("-");
+      let found = false;
+
+      for (let i = 0; i <= history.length - (inputLength + 1); i++) {
+        const current = history.slice(i, i + inputLength).join("-");
+        if (current === strPattern) {
+          document.getElementById("result").innerText = `✅ Next: ${history[i + inputLength]}`;
+          found = true;
+          break;
+        }
+      }
+
+      if (!found) {
+        document.getElementById("result").innerText = "❌ Pattern not found in history.";
+      }
+    }
+  </script>
+</body>
+</html>
