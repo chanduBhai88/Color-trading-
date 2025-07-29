@@ -69,11 +69,11 @@
     <h2>🎯 RajaGame Predictor</h2>
     <div class="inputs" id="input-container"></div>
     <button onclick="predict()">🔮 Predict Next</button>
-    <div class="result" id="result">Enter 8 previous results.</div>
+    <div class="result" id="result">Enter 6 previous results.</div>
   </div>
 
   <script>
-    // Sample history from all images
+    // Sample game history
     const history = [
       "Small", "Small", "Small", "Big", "Small", "Small", "Big", "Big", "Big", "Big",
       "Big", "Small", "Small", "Big", "Big", "Big", "Big", "Small", "Small", "Big",
@@ -81,9 +81,10 @@
       "Big", "Small", "Small", "Small", "Big", "Big", "Small", "Big", "Small", "Big"
     ];
 
-    // Create 8 dropdowns dynamically
+    // Create 6 dropdowns
     const container = document.getElementById("input-container");
-    for (let i = 0; i < 8; i++) {
+    const inputLength = 6;
+    for (let i = 0; i < inputLength; i++) {
       const select = document.createElement("select");
       const opt1 = document.createElement("option");
       opt1.value = "";
@@ -103,10 +104,10 @@
 
     function predict() {
       const pattern = [];
-      for (let i = 0; i < 8; i++) {
+      for (let i = 0; i < inputLength; i++) {
         const val = document.getElementById("s" + i).value;
         if (val !== "Big" && val !== "Small") {
-          document.getElementById("result").innerText = "❌ Please select all 8 inputs.";
+          document.getElementById("result").innerText = "❌ Please select all 6 inputs.";
           return;
         }
         pattern.push(val);
@@ -115,10 +116,10 @@
       const strPattern = pattern.join("-");
       let found = false;
 
-      for (let i = 0; i <= history.length - 9; i++) {
-        const current = history.slice(i, i + 8).join("-");
+      for (let i = 0; i <= history.length - (inputLength + 1); i++) {
+        const current = history.slice(i, i + inputLength).join("-");
         if (current === strPattern) {
-          document.getElementById("result").innerText = `✅ Next: ${history[i + 8]}`;
+          document.getElementById("result").innerText = `✅ Next: ${history[i + inputLength]}`;
           found = true;
           break;
         }
