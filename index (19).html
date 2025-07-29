@@ -2,174 +2,216 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Smart Predictor</title>
+  <title>Khatarnak Predictor v6.3</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
-    body {
-      background: #111;
-      color: #fff;
-      font-family: Arial, sans-serif;
-      text-align: center;
+    :root {
+      --bg-color: #000;
+      --text-color: #0f0;
+      --border-color: #0f0;
+      --chart-bg: #111;
     }
-    .bet-btn {
+    body.light {
+      --bg-color: #fff;
+      --text-color: #000;
+      --border-color: #000;
+      --chart-bg: #eee;
+    }
+    body {
+      background: var(--bg-color);
+      color: var(--text-color);
+      font-family: monospace;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding-top: 30px;
+      min-height: 100vh;
+      transition: 0.3s ease;
+    }
+    #randomWord {
+      font-size: 28px;
       padding: 10px 20px;
       margin: 10px;
-      font-size: 20px;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      transition: 0.3s;
-    }
-    .big { background: #e67e22; }
-    .small { background: #2ecc71; }
-    #results, #resultsHistory {
-      margin-top: 20px;
+      border: 2px solid var(--border-color);
+      border-radius: 10px;
     }
     #timer {
-      font-size: 28px;
-      margin: 20px 0;
+      font-size: 20px;
+      margin-bottom: 20px;
+    }
+    canvas {
+      background: var(--chart-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      margin-top: 10px;
+    }
+    #historyTable {
+      margin-top: 20px;
+      border-collapse: collapse;
+      width: 90%;
+      max-width: 400px;
+    }
+    #historyTable th, #historyTable td {
+      border: 1px solid var(--border-color);
+      padding: 5px;
+      text-align: center;
+    }
+    .big { color: #0ff; }
+    .small { color: #ff0; }
+    #modeToggle {
+      margin: 15px;
+      padding: 6px 12px;
+      font-size: 16px;
+      border: none;
+      background: var(--border-color);
+      color: var(--bg-color);
+      border-radius: 8px;
+      cursor: pointer;
     }
   </style>
 </head>
 <body>
-
-  <h1>🧠 Smart Predictor Game</h1>
+  <button id="modeToggle">Switch to Light Mode</button>
+  <div id="randomWord">Loading...</div>
   <div id="timer">00:00</div>
+  <canvas id="myChart" width="300" height="200"></canvas>
 
-  <div id="prediction" style="font-size: 22px; margin-bottom: 20px;">Loading...</div>
+  <table id="historyTable">
+    <thead>
+      <tr><th>Time</th><th>Result</th></tr>
+    </thead>
+    <tbody id="historyBody"></tbody>
+  </table>
 
-  <div id="bets">
-    <button class="bet-btn big" onclick="placeBet('Big')">Bet Big</button>
-    <button class="bet-btn small" onclick="placeBet('Small')">Bet Small</button>
-    <button class="bet-btn" onclick="placeBet('0')">Number 0</button>
-    <button class="bet-btn" onclick="placeBet('1')">Number 1</button>
-    <button class="bet-btn" onclick="placeBet('2')">Number 2</button>
-    <button class="bet-btn" onclick="placeBet('3')">Number 3</button>
-    <button class="bet-btn" onclick="placeBet('4')">Number 4</button>
-    <button class="bet-btn" onclick="placeBet('5')">Number 5</button>
-    <button class="bet-btn" onclick="placeBet('6')">Number 6</button>
-    <button class="bet-btn" onclick="placeBet('7')">Number 7</button>
-    <button class="bet-btn" onclick="placeBet('8')">Number 8</button>
-    <button class="bet-btn" onclick="placeBet('9')">Number 9</button>
-  </div>
-
-  <div id="results"></div>
-  <h3>🕓 Last 10 Results:</h3>
-  <div id="resultsHistory"></div>
+  <audio id="alertSound" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" preload="auto"></audio>
 
   <script>
-    let currentBets = [];
-    let roundActive = true;
+    const API_URL = "https://draw.ar-lottery01.com/api/getResult";
     let lastMinute = -1;
-    let resultsList = [];
+    let history = [];
+    let lastPrediction = "";
 
-    function placeBet(type) {
-      if (!roundActive) {
-        alert("Wait for next round!");
-        return;
+    const ctx = document.getElementById('myChart').getContext('2d');
+    const chart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: [],
+        datasets: [{
+          label: 'Prediction Number',
+          data: [],
+          backgroundColor: '#0f0'
+        }]
+      },
+      options: {
+        scales: {
+          y: { beginAtZero: true, ticks: { color: getComputedStyle(document.body).getPropertyValue('--text-color') } },
+          x: { ticks: { color: getComputedStyle(document.body).getPropertyValue('--text-color') } }
+        },
+        plugins: { legend: { labels: { color: getComputedStyle(document.body).getPropertyValue('--text-color') } } }
       }
-      currentBets.push({ type });
-      document.getElementById('results').innerHTML += `<div>Bet placed: <b>${type}</b></div>`;
-    }
+    });
 
-    function showResult() {
-      let resultNum = Math.floor(Math.random() * 10);
-      let resultType = resultNum >= 5 ? "Big" : "Small";
-      let winText = `<div>Result: <b>${resultNum}</b> (${resultType})</div>`;
-
-      resultsList.unshift(resultType);
-      if (resultsList.length > 10) resultsList.pop();
-      updateHistory();
-
-      let winHappened = false;
-      currentBets.forEach(bet => {
-        if (bet.type === resultType || bet.type === String(resultNum)) {
-          winText += `<div>You won on <b>${bet.type}</b>!</div>`;
-          winHappened = true;
-        }
-      });
-
-      if (!winHappened) {
-        winText += `<div>No wins this round!</div>`;
+    function updateChart(prediction, number) {
+      if (chart.data.labels.length >= 10) {
+        chart.data.labels.shift();
+        chart.data.datasets[0].data.shift();
       }
-
-      document.getElementById('results').innerHTML = winText;
-      suggestNext();
+      chart.data.labels.push(prediction);
+      chart.data.datasets[0].data.push(number);
+      chart.update();
     }
 
-    function resetRound() {
-      roundActive = true;
-      currentBets = [];
-      document.getElementById('results').innerHTML = "";
-      suggestNext();
+    function updateHistoryTable(time, result, number) {
+      const historyBody = document.getElementById('historyBody');
+      const row = document.createElement('tr');
+      row.innerHTML = `<td>${time}</td><td class="${result.toLowerCase()}">${result} - ${number}</td>`;
+      historyBody.prepend(row);
+      while (historyBody.children.length > 5) {
+        historyBody.removeChild(historyBody.lastChild);
+      }
     }
 
-    function updateHistory() {
-      const historyDiv = document.getElementById('resultsHistory');
-      historyDiv.innerHTML = resultsList.map((item, index) => `<div>${index + 1}. ${item}</div>`).join('');
+    async function fetchResultFromServer() {
+      try {
+        const response = await fetch(API_URL);
+        const data = await response.json();
+        return { result: data.result, number: data.number };
+      } catch (e) {
+        return null;
+      }
     }
 
-    function suggestNext() {
-      const predDiv = document.getElementById('prediction');
-      let r = resultsList;
-      let suggestion = "";
+    function smartPredict(historyList) {
+      let result = "Big";
+      let number = 7;
 
-      if (r.length < 3) {
-        suggestion = "Waiting for more data...";
-      } else {
-        let [last, second, third] = [r[0], r[1], r[2]];
+      if (historyList.length >= 4) {
+        const last4 = historyList.slice(-4);
+        const bigs = last4.filter(h => h.result === "Big").length;
+        const smalls = last4.filter(h => h.result === "Small").length;
 
-        if (last === second && second === third) {
-          suggestion = last === "Big" ? "Small" : "Big";
-        } else if (last === second) {
-          suggestion = last === "Big" ? "Small" : "Big";
-        } else if (last !== second && second !== third && last !== third) {
-          suggestion = "Big";
+        if (bigs >= 3) {
+          result = "Small";
+        } else if (smalls >= 3) {
+          result = "Big";
         } else {
-          suggestion = last === "Big" ? "Small" : "Big";
+          const last = historyList[historyList.length - 1];
+          result = last.result === "Big" ? "Small" : "Big";
         }
+      } else {
+        result = Math.random() > 0.5 ? "Big" : "Small";
       }
 
-      predDiv.innerHTML = `🔥 <b>Smart Prediction:</b> ${suggestion}`;
-      highlightPrediction(suggestion);
+      number = result === "Big"
+        ? [5,6,7,8,9][Math.floor(Math.random()*5)]
+        : [0,1,2,3,4][Math.floor(Math.random()*5)];
+
+      const current = `${result}-${number}`;
+      if (current === lastPrediction) {
+        const altNums = result === "Big"
+          ? [5,6,7,8,9].filter(n => n !== number)
+          : [0,1,2,3,4].filter(n => n !== number);
+        number = altNums[Math.floor(Math.random() * altNums.length)];
+      }
+
+      lastPrediction = `${result}-${number}`;
+      return { result, number };
     }
 
-    function highlightPrediction(type) {
-      document.querySelectorAll('.bet-btn.big, .bet-btn.small').forEach(btn => {
-        btn.style.boxShadow = "none";
-      });
-
-      if (type === "Big") {
-        document.querySelector('.bet-btn.big').style.boxShadow = "0 0 20px 4px #e67e22";
-      } else if (type === "Small") {
-        document.querySelector('.bet-btn.small').style.boxShadow = "0 0 20px 4px #2ecc71";
-      }
+    function playAlert() {
+      const alertSound = document.getElementById('alertSound');
+      alertSound.currentTime = 0;
+      alertSound.play();
     }
 
     function startTimer() {
-      setInterval(() => {
+      setInterval(async () => {
         const now = new Date();
         const minutes = now.getMinutes();
         const seconds = now.getSeconds();
-        document.getElementById('timer').textContent =
-          String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
+        const timeStr = String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
+        document.getElementById('timer').textContent = timeStr;
 
         if (seconds === 0 && lastMinute !== minutes) {
-          roundActive = false;
-          showResult();
-          setTimeout(() => {
-            resetRound();
-            roundActive = true;
-          }, 1000);
+          let data = await fetchResultFromServer();
+          if (data) history.push(data);
+          const prediction = smartPredict(history);
+          document.getElementById('randomWord').textContent = `${prediction.result} - ${prediction.number}`;
+          updateChart(prediction.result, prediction.number);
+          updateHistoryTable(timeStr, prediction.result, prediction.number);
+          playAlert();
           lastMinute = minutes;
         }
       }, 1000);
     }
 
-    // Initialize
-    updateHistory();
-    suggestNext();
+    document.getElementById('modeToggle').addEventListener('click', () => {
+      document.body.classList.toggle('light');
+      const isLight = document.body.classList.contains('light');
+      document.getElementById('modeToggle').textContent = isLight ? 'Switch to Dark Mode' : 'Switch to Light Mode';
+    });
+
     startTimer();
   </script>
-
 </body>
 </html>
