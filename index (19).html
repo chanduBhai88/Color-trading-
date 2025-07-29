@@ -2,216 +2,113 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Khatarnak Predictor v6.3</title>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <title>IN999 Pattern Match Predictor v6.6</title>
   <style>
-    :root {
-      --bg-color: #000;
-      --text-color: #0f0;
-      --border-color: #0f0;
-      --chart-bg: #111;
-    }
-    body.light {
-      --bg-color: #fff;
-      --text-color: #000;
-      --border-color: #000;
-      --chart-bg: #eee;
-    }
     body {
-      background: var(--bg-color);
-      color: var(--text-color);
-      font-family: monospace;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding-top: 30px;
-      min-height: 100vh;
-      transition: 0.3s ease;
-    }
-    #randomWord {
-      font-size: 28px;
-      padding: 10px 20px;
-      margin: 10px;
-      border: 2px solid var(--border-color);
-      border-radius: 10px;
-    }
-    #timer {
-      font-size: 20px;
-      margin-bottom: 20px;
-    }
-    canvas {
-      background: var(--chart-bg);
-      border: 1px solid var(--border-color);
-      border-radius: 10px;
-      margin-top: 10px;
-    }
-    #historyTable {
-      margin-top: 20px;
-      border-collapse: collapse;
-      width: 90%;
-      max-width: 400px;
-    }
-    #historyTable th, #historyTable td {
-      border: 1px solid var(--border-color);
-      padding: 5px;
+      background: #000;
+      color: #0f0;
+      font-family: 'Courier New', monospace;
       text-align: center;
+      padding: 20px;
     }
-    .big { color: #0ff; }
-    .small { color: #ff0; }
-    #modeToggle {
-      margin: 15px;
-      padding: 6px 12px;
-      font-size: 16px;
+    h1 {
+      color: #00ffcc;
+    }
+    input[type="number"] {
+      width: 40px;
+      font-size: 20px;
+      margin: 5px;
+      text-align: center;
+      background: #111;
+      color: #0f0;
+      border: 1px solid #0f0;
+      border-radius: 5px;
+    }
+    button {
+      margin-top: 15px;
+      padding: 10px 20px;
+      font-size: 18px;
+      background: #0f0;
+      color: #000;
       border: none;
-      background: var(--border-color);
-      color: var(--bg-color);
       border-radius: 8px;
       cursor: pointer;
+    }
+    #result {
+      margin-top: 20px;
+      font-size: 24px;
+      color: #fff;
     }
   </style>
 </head>
 <body>
-  <button id="modeToggle">Switch to Light Mode</button>
-  <div id="randomWord">Loading...</div>
-  <div id="timer">00:00</div>
-  <canvas id="myChart" width="300" height="200"></canvas>
+  <h1>🔮 IN999 Pattern Match Predictor v6.6</h1>
+  <p>Enter last 9 results (0–9):</p>
+  <div id="inputs"></div>
+  <button onclick="predictNext()">Predict Next</button>
 
-  <table id="historyTable">
-    <thead>
-      <tr><th>Time</th><th>Result</th></tr>
-    </thead>
-    <tbody id="historyBody"></tbody>
-  </table>
-
-  <audio id="alertSound" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" preload="auto"></audio>
+  <div id="result"></div>
 
   <script>
-    const API_URL = "https://draw.ar-lottery01.com/api/getResult";
-    let lastMinute = -1;
-    let history = [];
-    let lastPrediction = "";
-
-    const ctx = document.getElementById('myChart').getContext('2d');
-    const chart = new Chart(ctx, {
-      type: 'bar',
-      data: {
-        labels: [],
-        datasets: [{
-          label: 'Prediction Number',
-          data: [],
-          backgroundColor: '#0f0'
-        }]
-      },
-      options: {
-        scales: {
-          y: { beginAtZero: true, ticks: { color: getComputedStyle(document.body).getPropertyValue('--text-color') } },
-          x: { ticks: { color: getComputedStyle(document.body).getPropertyValue('--text-color') } }
-        },
-        plugins: { legend: { labels: { color: getComputedStyle(document.body).getPropertyValue('--text-color') } } }
-      }
-    });
-
-    function updateChart(prediction, number) {
-      if (chart.data.labels.length >= 10) {
-        chart.data.labels.shift();
-        chart.data.datasets[0].data.shift();
-      }
-      chart.data.labels.push(prediction);
-      chart.data.datasets[0].data.push(number);
-      chart.update();
+    const inputsDiv = document.getElementById('inputs');
+    for (let i = 0; i < 9; i++) {
+      const input = document.createElement('input');
+      input.type = 'number';
+      input.min = 0;
+      input.max = 9;
+      input.id = 'n' + i;
+      inputsDiv.appendChild(input);
     }
 
-    function updateHistoryTable(time, result, number) {
-      const historyBody = document.getElementById('historyBody');
-      const row = document.createElement('tr');
-      row.innerHTML = `<td>${time}</td><td class="${result.toLowerCase()}">${result} - ${number}</td>`;
-      historyBody.prepend(row);
-      while (historyBody.children.length > 5) {
-        historyBody.removeChild(historyBody.lastChild);
-      }
+    // Example Pattern Database (you can expand this later)
+    const patternDatabase = [
+      { pattern: [4,8,8,1,3,0,9,4,1], next: 6 },
+      { pattern: [1,3,4,5,8,0,2,3,1], next: 9 },
+      { pattern: [7,2,1,4,0,6,3,5,9], next: 8 }
+    ];
+
+    function getColor(num) {
+      if (num === 0 || num === 5) return 'Violet';
+      if ([2, 4, 6, 8].includes(num)) return 'Red';
+      if ([1, 3, 7, 9].includes(num)) return 'Green';
+      return 'Unknown';
     }
 
-    async function fetchResultFromServer() {
-      try {
-        const response = await fetch(API_URL);
-        const data = await response.json();
-        return { result: data.result, number: data.number };
-      } catch (e) {
-        return null;
-      }
+    function getSize(num) {
+      if (num <= 4) return 'Small';
+      return 'Big';
     }
 
-    function smartPredict(historyList) {
-      let result = "Big";
-      let number = 7;
-
-      if (historyList.length >= 4) {
-        const last4 = historyList.slice(-4);
-        const bigs = last4.filter(h => h.result === "Big").length;
-        const smalls = last4.filter(h => h.result === "Small").length;
-
-        if (bigs >= 3) {
-          result = "Small";
-        } else if (smalls >= 3) {
-          result = "Big";
-        } else {
-          const last = historyList[historyList.length - 1];
-          result = last.result === "Big" ? "Small" : "Big";
+    function predictNext() {
+      const pattern = [];
+      for (let i = 0; i < 9; i++) {
+        const val = parseInt(document.getElementById('n' + i).value);
+        if (isNaN(val) || val < 0 || val > 9) {
+          document.getElementById('result').innerHTML = "❌ Please enter all 9 valid numbers (0–9)";
+          return;
         }
+        pattern.push(val);
+      }
+
+      // Search for pattern match
+      const match = patternDatabase.find(p =>
+        JSON.stringify(p.pattern) === JSON.stringify(pattern)
+      );
+
+      if (match) {
+        const num = match.next;
+        const color = getColor(num);
+        const size = getSize(num);
+        document.getElementById('result').innerHTML = `
+          ✅ Match Found!<br>
+          🔢 Next Number: <b>${num}</b><br>
+          🔴 Size: <b>${size}</b><br>
+          🎨 Color: <b>${color}</b>
+        `;
       } else {
-        result = Math.random() > 0.5 ? "Big" : "Small";
+        document.getElementById('result').innerHTML = "⚠️ Pattern not found in database.";
       }
-
-      number = result === "Big"
-        ? [5,6,7,8,9][Math.floor(Math.random()*5)]
-        : [0,1,2,3,4][Math.floor(Math.random()*5)];
-
-      const current = `${result}-${number}`;
-      if (current === lastPrediction) {
-        const altNums = result === "Big"
-          ? [5,6,7,8,9].filter(n => n !== number)
-          : [0,1,2,3,4].filter(n => n !== number);
-        number = altNums[Math.floor(Math.random() * altNums.length)];
-      }
-
-      lastPrediction = `${result}-${number}`;
-      return { result, number };
     }
-
-    function playAlert() {
-      const alertSound = document.getElementById('alertSound');
-      alertSound.currentTime = 0;
-      alertSound.play();
-    }
-
-    function startTimer() {
-      setInterval(async () => {
-        const now = new Date();
-        const minutes = now.getMinutes();
-        const seconds = now.getSeconds();
-        const timeStr = String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
-        document.getElementById('timer').textContent = timeStr;
-
-        if (seconds === 0 && lastMinute !== minutes) {
-          let data = await fetchResultFromServer();
-          if (data) history.push(data);
-          const prediction = smartPredict(history);
-          document.getElementById('randomWord').textContent = `${prediction.result} - ${prediction.number}`;
-          updateChart(prediction.result, prediction.number);
-          updateHistoryTable(timeStr, prediction.result, prediction.number);
-          playAlert();
-          lastMinute = minutes;
-        }
-      }, 1000);
-    }
-
-    document.getElementById('modeToggle').addEventListener('click', () => {
-      document.body.classList.toggle('light');
-      const isLight = document.body.classList.contains('light');
-      document.getElementById('modeToggle').textContent = isLight ? 'Switch to Dark Mode' : 'Switch to Light Mode';
-    });
-
-    startTimer();
   </script>
 </body>
 </html>
