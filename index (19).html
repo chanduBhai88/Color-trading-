@@ -2,160 +2,102 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>RajaGame Predictor - Big/Small</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Raja Game Big/Small Tracker</title>
   <style>
     body {
-      font-family: Arial;
-      background: #f4f4f4;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
       margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: url('https://images.unsplash.com/photo-1604382351680-699d8ad42937?auto=format&fit=crop&w=1470&q=80') no-repeat center center fixed;
+      background-size: cover;
+      color: #fff;
     }
-
     .container {
+      background: rgba(0, 0, 0, 0.7);
+      max-width: 600px;
+      margin: 40px auto;
+      padding: 20px;
+      border-radius: 16px;
+      box-shadow: 0 0 20px rgba(255,255,255,0.2);
+    }
+    h1 {
       text-align: center;
-      background: white;
-      padding: 30px;
-      border-radius: 10px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
     }
-
-    select {
-      width: 80px;
-      padding: 5px;
-      margin: 5px;
-      font-size: 16px;
+    .history {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+      margin-bottom: 20px;
     }
-
-    button {
-      padding: 10px 20px;
-      font-size: 16px;
-      margin-top: 10px;
-      cursor: pointer;
-    }
-
-    #result {
-      margin-top: 20px;
+    .history div {
+      padding: 8px 12px;
+      border-radius: 20px;
+      background: #1e90ff;
       font-weight: bold;
-      font-size: 18px;
+      transition: 0.3s;
     }
-
-    #pattern-matches {
-      margin-top: 10px;
-      font-size: 14px;
+    .history div.big {
+      background-color: #28a745;
+    }
+    .history div.small {
+      background-color: #dc3545;
+    }
+    .prediction {
+      text-align: center;
+      font-size: 1.5rem;
+      padding: 10px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 10px;
+      font-weight: bold;
     }
   </style>
 </head>
 <body>
-
-<div class="container">
-  <h2>🎯 RajaGame Predictor (Big/Small)</h2>
-  <p>Enter 5 previous results:</p>
-
-  <div>
-    <select id="num1">
-      <option value="">Select</option>
-      <option value="Big">Big</option>
-      <option value="Small">Small</option>
-    </select>
-    <select id="num2">
-      <option value="">Select</option>
-      <option value="Big">Big</option>
-      <option value="Small">Small</option>
-    </select>
-    <select id="num3">
-      <option value="">Select</option>
-      <option value="Big">Big</option>
-      <option value="Small">Small</option>
-    </select>
-    <select id="num4">
-      <option value="">Select</option>
-      <option value="Big">Big</option>
-      <option value="Small">Small</option>
-    </select>
-    <select id="num5">
-      <option value="">Select</option>
-      <option value="Big">Big</option>
-      <option value="Small">Small</option>
-    </select>
+  <div class="container">
+    <h1>Raja Game Tracker</h1>
+    <div class="history" id="history"></div>
+    <div class="prediction" id="prediction">Loading...</div>
   </div>
 
-  <button onclick="predict()">Predict</button>
-
-  <div id="result"></div>
-  <div id="pattern-matches"></div>
-
-  <!-- 🔊 Simple sound effect -->
-  <audio id="result-sound">
-    <source src="https://www.soundjay.com/button/sounds/button-3.mp3" type="audio/mpeg">
-  </audio>
-</div>
-
-<script>
-  const gameHistory = [
-    7, 4, 2, 5, 8, 5, 1, 5, 4, 2,
-    0, 1, 1, 1, 2, 4, 5, 9, 1, 8,
-    3, 1, 8, 9, 6, 2, 6, 6, 5, 1,
-    0, 1, 1, 1, 2, 2, 4, 9, 5, 8,
-    5, 7, 7, 4, 1, 4, 8, 5, 1, 5,
-    5, 7, 8, 3, 6, 4, 2, 9, 8, 6,
-    3, 7, 5, 4
-  ];
-
-  const historyBigSmall = gameHistory.map(n => n <= 4 ? "Small" : "Big");
-
-  function predict() {
-    const inputs = [
-      document.getElementById("num1").value,
-      document.getElementById("num2").value,
-      document.getElementById("num3").value,
-      document.getElementById("num4").value,
-      document.getElementById("num5").value
+  <script>
+    const data = [
+      "Small", "Small", "Small", "Big", "Small", "Small", "Big", "Big", "Big", "Big",
+      "Big", "Small", "Small", "Big", "Big", "Big", "Big", "Small", "Small", "Big",
+      "Big", "Small", "Small", "Big", "Small", "Small", "Big", "Small", "Big", "Small",
+      "Small", "Small", "Big", "Big", "Small", "Big", "Small", "Big", "Big", "Big"
     ];
 
-    const resultDiv = document.getElementById("result");
-    const patternDiv = document.getElementById("pattern-matches");
-    const audio = document.getElementById("result-sound");
+    const historyEl = document.getElementById("history");
+    const predictionEl = document.getElementById("prediction");
 
-    resultDiv.innerText = "";
-    patternDiv.innerText = "";
+    // Show full history
+    data.slice().reverse().forEach(item => {
+      const div = document.createElement("div");
+      div.className = item.toLowerCase();
+      div.innerText = item;
+      historyEl.appendChild(div);
+    });
 
-    // 🔊 Play sound
-    audio.play();
-
-    if (inputs.includes("")) {
-      resultDiv.innerText = "❌ Please select all 5 results.";
-      return;
-    }
-
-    let matches = [];
-    for (let i = 0; i <= historyBigSmall.length - 6; i++) {
-      const segment = historyBigSmall.slice(i, i + 5);
-      if (JSON.stringify(segment) === JSON.stringify(inputs)) {
-        matches.push(historyBigSmall[i + 5]);
+    // Basic prediction logic: last 3 pattern repeat
+    function predictNext(data) {
+      if (data.length < 3) return "Not enough data";
+      const last3 = data.slice(-3).join("-");
+      const matchIndex = data.slice(0, -3).join("-").indexOf(last3);
+      if (matchIndex !== -1 && data[matchIndex + 3]) {
+        return data[matchIndex + 3];
+      } else {
+        // fallback logic
+        const countBig = data.filter(x => x === "Big").length;
+        const countSmall = data.length - countBig;
+        return countBig > countSmall ? "Small" : "Big";
       }
     }
 
-    if (matches.length > 0) {
-      let bigCount = matches.filter(x => x === "Big").length;
-      let smallCount = matches.filter(x => x === "Small").length;
-
-      resultDiv.innerText = `✅ ${matches.length} match(es) found! Predicted next: ${
-        bigCount > smallCount ? "Big" : smallCount > bigCount ? "Small" : "Equal chance"
-      }`;
-
-      patternDiv.innerHTML = `
-        🔍 Pattern: [${inputs.join(", ")}]<br>
-        ➕ Big: ${bigCount}, Small: ${smallCount}<br>
-        📊 Next values seen: ${matches.join(", ")}
-      `;
-    } else {
-      resultDiv.innerText = "❌ Pattern not found in history.";
-    }
-  }
-</script>
-
+    const next = predictNext(data);
+    predictionEl.innerText = `Next Prediction: ${next}`;
+    predictionEl.style.color = next === "Big" ? "#28a745" : "#dc3545";
+  </script>
 </body>
 </html>
