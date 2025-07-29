@@ -14,7 +14,7 @@
     }
 
     .container {
-      background: rgba(0, 0, 0, 0.75);
+      background: rgba(0, 0, 0, 0.85);
       max-width: 600px;
       margin: 50px auto;
       padding: 20px;
@@ -73,32 +73,22 @@
   </div>
 
   <script>
-    // Game history including latest screenshot
     const history = [
       // Latest screenshot (top to bottom)
-      "Small", "Small", "Big", "Big", "Small", "Small", "Small", "Big", "Small", "Big",
+      "Big", "Big", "Small", "Small", "Big", "Small", "Small", "Big", "Big", "Small",
 
-      // Previous screenshots
+      // Older entries
       "Small", "Small", "Small", "Big", "Small", "Small", "Big", "Big", "Big", "Big",
       "Big", "Small", "Small", "Big", "Small", "Small", "Big", "Small", "Big", "Small",
       "Big", "Small", "Small", "Small", "Big", "Big", "Small", "Big", "Small", "Big",
       "Big", "Small", "Small", "Big", "Small", "Small", "Big", "Big", "Big", "Big",
       "Big", "Small", "Small", "Big", "Small", "Small", "Big", "Small", "Big", "Small"
-    ];const history = [
-  // Latest screenshot (top to bottom)
-  "Big", "Big", "Small", "Small", "Big", "Small", "Small", "Big", "Big", "Small",
+    ];
 
-  // Older entries
-  "Small", "Small", "Small", "Big", "Small", "Small", "Big", "Big", "Big", "Big",
-  "Big", "Small", "Small", "Big", "Small", "Small", "Big", "Small", "Big", "Small",
-  "Big", "Small", "Small", "Small", "Big", "Big", "Small", "Big", "Small", "Big",
-  "Big", "Small", "Small", "Big", "Small", "Small", "Big", "Big", "Big", "Big",
-  "Big", "Small", "Small", "Big", "Small", "Small", "Big", "Small", "Big", "Small"
-];
-
-    // Create 6 dropdowns
     const container = document.getElementById("input-container");
     const inputLength = 6;
+
+    // Create dropdowns
     for (let i = 0; i < inputLength; i++) {
       const select = document.createElement("select");
       const opt1 = document.createElement("option");
