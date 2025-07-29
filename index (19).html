@@ -1,16 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>RajaGame Predictor</title>
+  <meta charset="UTF-8" />
+  <title>RajaGame Predictor - Big/Small Version</title>
   <style>
     body {
       font-family: Arial;
       padding: 20px;
       background: #f4f4f4;
     }
-    input {
-      width: 40px;
+    select {
+      width: 80px;
       padding: 5px;
       margin-right: 5px;
       font-size: 16px;
@@ -28,14 +28,35 @@
 </head>
 <body>
 
-  <h2>🎯 RajaGame Predictor</h2>
-  <p>Enter 5 previous numbers:</p>
+  <h2>🎯 RajaGame Predictor (Big/Small)</h2>
+  <p>Enter 5 previous results (Big or Small):</p>
 
-  <input type="number" id="num1" min="0" max="9">
-  <input type="number" id="num2" min="0" max="9">
-  <input type="number" id="num3" min="0" max="9">
-  <input type="number" id="num4" min="0" max="9">
-  <input type="number" id="num5" min="0" max="9">
+  <select id="num1">
+    <option value="">Select</option>
+    <option value="Big">Big</option>
+    <option value="Small">Small</option>
+  </select>
+  <select id="num2">
+    <option value="">Select</option>
+    <option value="Big">Big</option>
+    <option value="Small">Small</option>
+  </select>
+  <select id="num3">
+    <option value="">Select</option>
+    <option value="Big">Big</option>
+    <option value="Small">Small</option>
+  </select>
+  <select id="num4">
+    <option value="">Select</option>
+    <option value="Big">Big</option>
+    <option value="Small">Small</option>
+  </select>
+  <select id="num5">
+    <option value="">Select</option>
+    <option value="Big">Big</option>
+    <option value="Small">Small</option>
+  </select>
+
   <button onclick="predict()">Predict</button>
 
   <div id="result"></div>
@@ -51,6 +72,9 @@
       3, 7, 5, 4
     ];
 
+    // Convert each number in gameHistory to "Big" or "Small"
+    const historyBigSmall = gameHistory.map(n => n <= 4 ? "Small" : "Big");
+
     function predict() {
       const inputs = [
         document.getElementById("num1").value,
@@ -62,19 +86,16 @@
 
       const resultDiv = document.getElementById("result");
 
-      // Check for empty fields
       if (inputs.includes("")) {
-        resultDiv.innerText = "❌ Please enter all 5 numbers.";
+        resultDiv.innerText = "❌ Please select all 5 results.";
         return;
       }
 
-      const userInput = inputs.map(Number);
-
-      // Search for pattern
-      for (let i = 0; i <= gameHistory.length - 6; i++) {
-        const segment = gameHistory.slice(i, i + 5);
-        if (JSON.stringify(segment) === JSON.stringify(userInput)) {
-          const next = gameHistory[i + 5];
+      // Search for matching sequence in historyBigSmall
+      for (let i = 0; i <= historyBigSmall.length - 6; i++) {
+        const segment = historyBigSmall.slice(i, i + 5);
+        if (JSON.stringify(segment) === JSON.stringify(inputs)) {
+          const next = historyBigSmall[i + 5];
           resultDiv.innerText = `✅ Match found! Predicted next result: ${next}`;
           return;
         }
