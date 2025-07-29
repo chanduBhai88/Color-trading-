@@ -3,135 +3,102 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>RajaGame Big/Small Tracker</title>
+  <title>RajaGame Predictor</title>
   <style>
     body {
       margin: 0;
       font-family: 'Segoe UI', sans-serif;
-      background: url('https://images.unsplash.com/photo-1604382351680-699d8ad42937?auto=format&fit=crop&w=1470&q=80') no-repeat center center fixed;
-      background-size: cover;
-      color: #fff;
+      background-color: white;
+      color: black;
     }
 
     .container {
-      background: rgba(0, 0, 0, 0.85);
-      max-width: 600px;
+      background: #1c1c1c;
+      max-width: 400px;
       margin: 50px auto;
       padding: 20px;
-      border-radius: 16px;
-      box-shadow: 0 0 20px rgba(255,255,255,0.2);
-    }
-
-    h2 {
+      border-radius: 20px;
       text-align: center;
-      margin-bottom: 20px;
-    }
-
-    .inputs {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      justify-content: center;
-      margin-bottom: 20px;
+      color: white;
     }
 
     select {
+      margin: 5px;
       padding: 10px;
       font-size: 1rem;
       border-radius: 8px;
-      border: none;
-      width: 100px;
-      text-align: center;
     }
 
     button {
+      margin-top: 10px;
+      padding: 10px;
       width: 100%;
-      padding: 12px;
-      font-size: 1rem;
-      background-color: #28a745;
+      background-color: green;
+      color: white;
+      font-size: 1.1rem;
       border: none;
       border-radius: 10px;
-      color: white;
-      cursor: pointer;
     }
 
     .result {
-      margin-top: 20px;
-      text-align: center;
+      margin-top: 15px;
+      font-size: 1.2rem;
       font-weight: bold;
-      font-size: 1.3rem;
-      color: #ff4d4d;
     }
   </style>
 </head>
 <body>
   <div class="container">
     <h2>🎯 RajaGame Predictor</h2>
-    <div class="inputs" id="input-container"></div>
+
+    <div>
+      <select id="s0"><option>Big</option><option>Small</option></select>
+      <select id="s1"><option>Big</option><option>Small</option></select>
+      <select id="s2"><option>Big</option><option>Small</option></select><br/>
+      <select id="s3"><option>Big</option><option>Small</option></select>
+      <select id="s4"><option>Big</option><option>Small</option></select>
+      <select id="s5"><option>Big</option><option>Small</option></select><br/>
+      <select id="s6"><option>Big</option><option>Small</option></select>
+    </div>
+
     <button onclick="predict()">🔮 Predict Next</button>
-    <div class="result" id="result">Enter 6 previous results.</div>
+    <div class="result" id="result">❌ Pattern not found in history.</div>
+
+    <!-- Sound file -->
+    <audio id="sound">
+      <source src="https://www.soundjay.com/buttons/sounds/button-16.mp3" type="audio/mpeg">
+    </audio>
   </div>
 
   <script>
     const history = [
-      "Small", "Small", "Small", "Small", "Big", "Small", "Small", "Small", "Big", "Small",
-      "Small", "Small", "Big", "Small", "Small", "Small", "Small", "Small", "Small", "Big",
-      "Big", "Big", "Big", "Big", "Big", "Big", "Big", "Big", "Big", "Big",
-      "Small", "Small", "Big", "Small", "Small", "Small", "Small", "Small", "Small", "Small",
-      "Big", "Small", "Small", "Small", "Big", "Big", "Big", "Big", "Small", "Small",
-      "Big", "Small", "Small", "Big", "Small", "Big", "Small", "Small", "Small", "Big",
-      "Big", "Big", "Small", "Small", "Small", "Small", "Big", "Big", "Big", "Big",
-      "Big", "Big", "Big"
+      "Small", "Big", "Big", "Small", "Small", "Big", "Big",
+      "Big", "Small", "Big", "Big", "Small", "Big", "Big"
     ];
 
-    const container = document.getElementById("input-container");
-    const inputLength = 6;
-
-    // Create dropdowns
-    for (let i = 0; i < inputLength; i++) {
-      const select = document.createElement("select");
-      const opt1 = document.createElement("option");
-      opt1.value = "";
-      opt1.text = "--";
-      const opt2 = document.createElement("option");
-      opt2.value = "Big";
-      opt2.text = "Big";
-      const opt3 = document.createElement("option");
-      opt3.value = "Small";
-      opt3.text = "Small";
-      select.appendChild(opt1);
-      select.appendChild(opt2);
-      select.appendChild(opt3);
-      select.id = "s" + i;
-      container.appendChild(select);
-    }
-
     function predict() {
+      const sound = document.getElementById("sound");
+      sound.play(); // Play sound when button is clicked
+
       const pattern = [];
-      for (let i = 0; i < inputLength; i++) {
+      for (let i = 0; i < 7; i++) {
         const val = document.getElementById("s" + i).value;
-        if (val !== "Big" && val !== "Small") {
-          document.getElementById("result").innerText = "❌ Please select all 6 inputs.";
-          return;
-        }
         pattern.push(val);
       }
 
       const strPattern = pattern.join("-");
       let found = false;
 
-      for (let i = 0; i <= history.length - (inputLength + 1); i++) {
-        const current = history.slice(i, i + inputLength).join("-");
+      for (let i = 0; i <= history.length - 8; i++) {
+        const current = history.slice(i, i + 7).join("-");
         if (current === strPattern) {
-          document.getElementById("result").innerText = `✅ Next: ${history[i + inputLength]}`;
+          document.getElementById("result").innerText = `✅ Next: ${history[i + 7]}`;
           found = true;
-          break;
+          return;
         }
       }
 
-      if (!found) {
-        document.getElementById("result").innerText = "❌ Pattern not found in history.";
-      }
+      document.getElementById("result").innerText = "❌ Pattern not found in history.";
     }
   </script>
 </body>
