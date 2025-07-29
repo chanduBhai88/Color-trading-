@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Khatarnak Predictor v6.1</title>
+  <title>Khatarnak Predictor v6.4</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     body {
@@ -12,11 +12,9 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: start;
       padding-top: 30px;
       min-height: 100vh;
     }
-
     #randomWord {
       font-size: 28px;
       padding: 10px 20px;
@@ -24,32 +22,27 @@
       border: 2px solid #0f0;
       border-radius: 10px;
     }
-
     #timer {
       font-size: 20px;
       margin-bottom: 20px;
     }
-
     canvas {
       background: #111;
       border: 1px solid #0f0;
       border-radius: 10px;
       margin-top: 10px;
     }
-
     #historyTable {
       margin-top: 20px;
       border-collapse: collapse;
       width: 90%;
       max-width: 400px;
     }
-
     #historyTable th, #historyTable td {
       border: 1px solid #0f0;
       padding: 5px;
       text-align: center;
     }
-
     .big { color: #0ff; }
     .small { color: #ff0; }
   </style>
@@ -59,21 +52,24 @@
   <div id="timer">00:00</div>
   <canvas id="myChart" width="300" height="200"></canvas>
 
-  <!-- 🔁 Table for Last 5 Results -->
   <table id="historyTable">
     <thead>
-      <tr><th>Time</th><th>Result</th></tr>
+      <tr><th>Time</th><th>Prediction</th></tr>
     </thead>
     <tbody id="historyBody"></tbody>
   </table>
 
-  <!-- 🔊 Audio element for alert -->
   <audio id="alertSound" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" preload="auto"></audio>
 
   <script>
-    const API_URL = "https://draw.ar-lottery01.com/api/getResult"; // Your server API
+    // ✅ Placeholder for Future API Integration
+    const API_URL = "https://your-api-url.com"; // Replace later
     let lastMinute = -1;
     let history = [];
+    let lastPrediction = "";
+
+    const bigNumbers = [5,6,7,8,9];
+    const smallNumbers = [0,1,2,3,4];
 
     const ctx = document.getElementById('myChart').getContext('2d');
     const chart = new Chart(ctx, {
@@ -81,7 +77,7 @@
       data: {
         labels: [],
         datasets: [{
-          label: 'Prediction Number',
+          label: 'Predicted Number',
           data: [],
           backgroundColor: '#0f0'
         }]
@@ -105,31 +101,48 @@
       chart.update();
     }
 
-    function updateHistoryTable(time, result, number) {
+    function updateHistoryTable(time, result, numberList) {
       const historyBody = document.getElementById('historyBody');
       const row = document.createElement('tr');
-      row.innerHTML = `
-        <td>${time}</td>
-        <td class="${result.toLowerCase()}">${result} - ${number}</td>
-      `;
+      const typeClass = result.toLowerCase();
+      row.innerHTML = `<td>${time}</td><td class="${typeClass}">${result} → [${numberList.join(', ')}]</td>`;
       historyBody.prepend(row);
-
-      // Only keep last 5 rows
       while (historyBody.children.length > 5) {
         historyBody.removeChild(historyBody.lastChild);
       }
     }
 
-    async function fetchResultFromServer() {
-      try {
-        const response = await fetch(API_URL);
-        const data = await response.json();
-        return { result: data.result, number: data.number };
-      } catch (e) {
-        const type = Math.random() > 0.5 ? 'Big' : 'Small';
-        const number = type === 'Big' ? [5,6,7,8,9][Math.floor(Math.random()*5)] : [0,1,2,3,4][Math.floor(Math.random()*5)];
-        return { result: type, number };
+    function smartPredict(historyList) {
+      let result = "Big";
+      let candidates = bigNumbers;
+
+      if (historyList.length >= 4) {
+        const last4 = historyList.slice(-4);
+        const bigs = last4.filter(h => h.result === "Big").length;
+        const smalls = last4.filter(h => h.result === "Small").length;
+
+        if (bigs >= 3) {
+          result = "Small";
+          candidates = smallNumbers;
+        } else if (smalls >= 3) {
+          result = "Big";
+          candidates = bigNumbers;
+        } else {
+          const last = historyList[historyList.length - 1];
+          result = last.result === "Big" ? "Small" : "Big";
+          candidates = result === "Big" ? bigNumbers : smallNumbers;
+        }
+      } else {
+        result = Math.random() > 0.5 ? "Big" : "Small";
+        candidates = result === "Big" ? bigNumbers : smallNumbers;
       }
+
+      // Pick 2 different numbers from candidates
+      const shuffled = candidates.sort(() => 0.5 - Math.random());
+      const pick = shuffled.slice(0, 2);
+
+      lastPrediction = { result, pick };
+      return { result, pick };
     }
 
     function playAlert() {
@@ -147,12 +160,20 @@
         document.getElementById('timer').textContent = timeStr;
 
         if (seconds === 0 && lastMinute !== minutes) {
-          const data = await fetchResultFromServer();
-          const prediction = `${data.result} - ${data.number}`;
-          document.getElementById('randomWord').textContent = prediction;
-          updateChart(data.result, data.number);
-          updateHistoryTable(timeStr, data.result, data.number);
+          // 🔁 In future: replace with live fetch from API
+          // Example:
+          // const data = await fetch(API_URL).then(res => res.json());
+          // history.push({ result: data.result, number: data.number });
+
+          const prediction = smartPredict(history);
+          document.getElementById('randomWord').textContent =
+            `${prediction.result} → [${prediction.pick.join(', ')}]`;
+
+          updateChart(prediction.result, prediction.pick[0]);
+          updateHistoryTable(timeStr, prediction.result, prediction.pick);
           playAlert();
+
+          history.push({ result: prediction.result }); // Store for logic
           lastMinute = minutes;
         }
       }, 1000);
