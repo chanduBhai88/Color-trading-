@@ -1,219 +1,131 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Smart Big/Small Predictor</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>RajaGame Big/Small Predictor with Number Tracking</title>
   <style>
     body {
-      background: #111;
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: url('https://images.unsplash.com/photo-1604382351680-699d8ad42937?auto=format&fit=crop&w=1470&q=80') no-repeat center center fixed;
+      background-size: cover;
       color: #fff;
-      font-family: Arial, sans-serif;
-      text-align: center;
+    }
+
+    .container {
+      background: rgba(0, 0, 0, 0.85);
+      max-width: 600px;
+      margin: 50px auto;
       padding: 20px;
+      border-radius: 16px;
+      box-shadow: 0 0 20px rgba(255,255,255,0.2);
     }
-    .bet-btn {
-      padding: 10px 20px;
-      margin: 10px;
-      font-size: 20px;
+
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .inputs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+
+    select {
+      padding: 10px;
+      font-size: 1rem;
+      border-radius: 8px;
       border: none;
-      border-radius: 5px;
+      width: 100px;
+      text-align: center;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      font-size: 1rem;
+      background-color: #28a745;
+      border: none;
+      border-radius: 10px;
+      color: white;
       cursor: pointer;
-      transition: 0.3s;
     }
-    .big {
-      background-color: #e67e22;
-      color: #fff;
-    }
-    .small {
-      background-color: #2ecc71;
-      color: #fff;
-    }
-    #results, #resultsHistory {
+
+    .result {
       margin-top: 20px;
-      font-size: 18px;
-    }
-    #balance {
-      margin-top: 10px;
-      font-size: 22px;
+      text-align: center;
       font-weight: bold;
-    }
-    #timer {
-      font-size: 24px;
-      margin-top: 10px;
-      font-weight: bold;
-      color: #00ffff;
-    }
-    #prediction {
-      font-size: 22px;
-      margin: 15px 0;
-      color: #ffd700;
+      font-size: 1.3rem;
+      color: #ff4d4d;
     }
   </style>
 </head>
 <body>
-
-  <h1>🔥 Wingo Smart Predictor 🔥</h1>
-
-  <div id="timer">00:00</div>
-  <div id="balance">Balance: ₹1000</div>
-
-  <div style="margin: 20px;">
-    <input type="number" id="betAmount" placeholder="Enter Bet Amount (10-1000)" style="padding: 10px; font-size: 16px;">
-    <br>
-    <button class="bet-btn big" onclick="placeBet('Big')">Bet on Big (5-9)</button>
-    <button class="bet-btn small" onclick="placeBet('Small')">Bet on Small (0-4)</button>
+  <div class="container">
+    <h2>🎯 RajaGame Predictor</h2>
+    <div class="inputs" id="input-container"></div>
+    <button onclick="predict()">🔮 Predict Next</button>
+    <div class="result" id="result">Enter 6 previous results.</div>
   </div>
 
-  <div id="bets"></div>
-
-  <div id="results"></div>
-
-  <h3>🔁 Last 10 Results</h3>
-  <div id="resultsHistory"></div>
-
-  <!-- Paste your JavaScript here -->
   <script>
-    let balance = 1000;
-    let currentBets = [];
-    let roundActive = true;
-    let lastMinute = -1;
-    let resultsList = [];
+    const container = document.getElementById("input-container");
+    const inputLength = 6;
 
-    function resetRound() {
-      roundActive = true;
-      currentBets = [];
-      document.getElementById('results').innerHTML = "";
-      suggestNext();
-    }
+    // Create input rows
+    for (let i = 0; i < inputLength; i++) {
+      const bigSmallSelect = document.createElement("select");
+      const numberSelect = document.createElement("select");
 
-    function placeBet(type) {
-      if (!roundActive) {
-        alert("Wait for next round!");
-        return;
-      }
-      let amount = parseInt(document.getElementById('betAmount').value);
-      if (isNaN(amount) || amount < 10 || amount > 1000) {
-        alert("Bet amount must be between 10 and 1000");
-        return;
-      }
-      if (balance < amount) {
-        alert("Not enough balance!");
-        return;
-      }
-      balance -= amount;
-      currentBets.push({type, amount});
-      document.getElementById('balance').innerText = "Balance: ₹" + balance;
-      document.getElementById('results').innerHTML += `<div>Bet placed: <b>${type}</b> ₹${amount}</div>`;
-    }
-
-    function showResult() {
-      let resultNum = Math.floor(Math.random() * 10);
-      let resultType = resultNum >= 5 ? "Big" : "Small";
-      let winText = `<div>Result: <b>${resultNum}</b> (${resultType})</div>`;
-
-      resultsList.unshift(resultType);
-      if (resultsList.length > 10) resultsList.pop();
-      updateHistory();
-
-      let winAmt = 0;
-      currentBets.forEach(bet => {
-        if (bet.type === resultType) {
-          let prize = bet.amount * 2;
-          balance += prize;
-          winAmt += prize;
-          winText += `<div>You won on <b>${bet.type}</b>! +₹${prize}</div>`;
-        }
-        if (bet.type === String(resultNum)) {
-          let prize = bet.amount * 9;
-          balance += prize;
-          winAmt += prize;
-          winText += `<div>You won on <b>${bet.type}</b>! +₹${prize}</div>`;
-        }
+      // Big/Small Options
+      ["--", "Big", "Small"].forEach(val => {
+        const opt = document.createElement("option");
+        opt.value = val === "--" ? "" : val;
+        opt.textContent = val;
+        bigSmallSelect.appendChild(opt);
       });
 
-      if (winAmt === 0) {
-        winText += `<div>No wins this round!</div>`;
+      // Number Options (1 to 8)
+      const defaultOpt = document.createElement("option");
+      defaultOpt.value = "";
+      defaultOpt.textContent = "--";
+      numberSelect.appendChild(defaultOpt);
+      for (let n = 1; n <= 8; n++) {
+        const opt = document.createElement("option");
+        opt.value = n;
+        opt.textContent = n;
+        numberSelect.appendChild(opt);
       }
 
-      document.getElementById('balance').innerText = "Balance: ₹" + balance;
-      document.getElementById('results').innerHTML = winText;
-
-      suggestNext();
+      container.appendChild(bigSmallSelect);
+      container.appendChild(numberSelect);
     }
 
-    function updateHistory() {
-      const historyDiv = document.getElementById('resultsHistory');
-      historyDiv.innerHTML = resultsList.map((item, index) => `<div>${index + 1}. ${item}</div>`).join('');
-    }
+    function predict() {
+      const selects = container.querySelectorAll("select");
+      let inputData = [];
 
-    function suggestNext() {
-      const predDiv = document.getElementById('prediction');
-      let suggestion = "";
-      let r = resultsList;
-
-      if (r.length < 3) {
-        suggestion = "Waiting for more data...";
-      } else {
-        let last = r[0], second = r[1], third = r[2];
-
-        if (last === second && second === third) {
-          suggestion = last === "Big" ? "Small" : "Big";
-        } else if (last === second) {
-          suggestion = last === "Big" ? "Small" : "Big";
-        } else if (last !== second && second !== third && last !== third) {
-          suggestion = "Big";
-        } else {
-          suggestion = last === "Big" ? "Small" : "Big";
+      for (let i = 0; i < selects.length; i += 2) {
+        const bigSmall = selects[i].value;
+        const number = parseInt(selects[i + 1].value);
+        if (!bigSmall || isNaN(number)) {
+          document.getElementById("result").textContent = "Please complete all 6 inputs.";
+          return;
         }
+        inputData.push({ bigSmall, number });
       }
 
-      predDiv.innerHTML = `🔥 <b>Smart Prediction:</b> ${suggestion}`;
-      highlightPrediction(suggestion);
+      // Simple prediction: count how many Big vs Small
+      const bigCount = inputData.filter(item => item.bigSmall === "Big").length;
+      const smallCount = inputData.filter(item => item.bigSmall === "Small").length;
+
+      const predicted = bigCount > smallCount ? "Small" : "Big";
+      document.getElementById("result").textContent = `Predicted Next: ${predicted}`;
     }
-
-    function highlightPrediction(type) {
-      document.querySelectorAll('.bet-btn.big, .bet-btn.small').forEach(btn => {
-        btn.style.boxShadow = "none";
-      });
-
-      if (type === "Big") {
-        document.querySelector('.bet-btn.big').style.boxShadow = "0 0 20px 4px #e67e22";
-      } else if (type === "Small") {
-        document.querySelector('.bet-btn.small').style.boxShadow = "0 0 20px 4px #2ecc71";
-      }
-    }
-
-    function startTimer() {
-      setInterval(() => {
-        const now = new Date();
-        const minutes = now.getMinutes();
-        const seconds = now.getSeconds();
-        document.getElementById('timer').textContent =
-          String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
-
-        if (seconds === 0 && lastMinute !== minutes) {
-          roundActive = false;
-          showResult();
-          setTimeout(() => {
-            resetRound();
-            roundActive = true;
-          }, 1000);
-          lastMinute = minutes;
-        }
-      }, 1000);
-    }
-
-    // Create prediction box inside JavaScript if not defined
-    if (!document.getElementById("prediction")) {
-      const predBox = document.createElement("div");
-      predBox.id = "prediction";
-      predBox.style.margin = "20px";
-      predBox.style.fontSize = "22px";
-      document.body.insertBefore(predBox, document.getElementById("bets"));
-    }
-
-    startTimer();
-    resetRound();
   </script>
 </body>
 </html>
