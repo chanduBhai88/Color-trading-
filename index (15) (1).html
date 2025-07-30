@@ -1,105 +1,61 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>RajaGame Predictor</title>
+  <meta charset="UTF-8">
+  <title>Big/Small Pattern Tracker</title>
   <style>
     body {
-      margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background-color: white;
-      color: black;
-    }
-
-    .container {
-      background: #1c1c1c;
-      max-width: 400px;
-      margin: 50px auto;
-      padding: 20px;
-      border-radius: 20px;
+      background: url('your-background.jpg') no-repeat center center fixed;
+      background-size: cover;
+      font-family: Arial, sans-serif;
+      color: white;
       text-align: center;
-      color: white;
+      padding: 20px;
     }
-
-    select {
-      margin: 5px;
+    .pattern-box {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(50px, 1fr));
+      gap: 8px;
+      max-width: 600px;
+      margin: auto;
+    }
+    .cell {
       padding: 10px;
-      font-size: 1rem;
       border-radius: 8px;
-    }
-
-    button {
-      margin-top: 10px;
-      padding: 10px;
-      width: 100%;
-      background-color: green;
-      color: white;
-      font-size: 1.1rem;
-      border: none;
-      border-radius: 10px;
-    }
-
-    .result {
-      margin-top: 15px;
-      font-size: 1.2rem;
       font-weight: bold;
+    }
+    .Big {
+      background-color: #4caf50; /* Green */
+    }
+    .Small {
+      background-color: #f44336; /* Red */
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h2>🎯 RajaGame Predictor</h2>
-
-    <div>
-      <select id="s0"><option>Big</option><option>Small</option></select>
-      <select id="s1"><option>Big</option><option>Small</option></select>
-      <select id="s2"><option>Big</option><option>Small</option></select><br/>
-      <select id="s3"><option>Big</option><option>Small</option></select>
-      <select id="s4"><option>Big</option><option>Small</option></select>
-      <select id="s5"><option>Big</option><option>Small</option></select><br/>
-      <select id="s6"><option>Big</option><option>Small</option></select>
-    </div>
-
-    <button onclick="predict()">🔮 Predict Next</button>
-    <div class="result" id="result">❌ Pattern not found in history.</div>
-
-    <!-- Sound file -->
-    <audio id="sound">
-      <source src="https://www.soundjay.com/buttons/sounds/button-16.mp3" type="audio/mpeg">
-    </audio>
-  </div>
+  <h1>Big/Small Pattern Tracker</h1>
+  <div class="pattern-box" id="patternBox"></div>
 
   <script>
-    const history = [
-      "Small", "Big", "Big", "Small", "Small", "Big", "Big",
-      "Big", "Small", "Big", "Big", "Small", "Big", "Big"
+    const bigSmallHistory = [
+      "Big", "Small", "Big", "Big", "Small", "Small", "Big", "Big", "Small", "Big",
+      "Big", "Small", "Small", "Big", "Big", "Small", "Big", "Big", "Small", "Small",
+      "Small", "Big", "Small", "Big", "Small", "Big", "Small", "Small", "Big", "Big",
+      "Small", "Small", "Big", "Big", "Big", "Big", "Small", "Small", "Big", "Small",
+      "Big", "Big", "Big", "Small", "Big", "Big", "Small", "Big", "Small", "Big",
+      "Big", "Small", "Small", "Big", "Small", "Big", "Small", "Small", "Small", "Big",
+      "Big", "Big", "Small", "Big",
+      "Small", "Small", "Small", "Big", "Big", "Small", "Small", "Big", "Small", "Small",
+      "Big", "Small", "Big", "Small", "Small", "Small", "Big"
     ];
 
-    function predict() {
-      const sound = document.getElementById("sound");
-      sound.play(); // Play sound when button is clicked
-
-      const pattern = [];
-      for (let i = 0; i < 7; i++) {
-        const val = document.getElementById("s" + i).value;
-        pattern.push(val);
-      }
-
-      const strPattern = pattern.join("-");
-      let found = false;
-
-      for (let i = 0; i <= history.length - 8; i++) {
-        const current = history.slice(i, i + 7).join("-");
-        if (current === strPattern) {
-          document.getElementById("result").innerText = `✅ Next: ${history[i + 7]}`;
-          found = true;
-          return;
-        }
-      }
-
-      document.getElementById("result").innerText = "❌ Pattern not found in history.";
-    }
+    const box = document.getElementById("patternBox");
+    bigSmallHistory.forEach(item => {
+      const div = document.createElement("div");
+      div.className = `cell ${item}`;
+      div.textContent = item;
+      box.appendChild(div);
+    });
   </script>
 </body>
 </html>
