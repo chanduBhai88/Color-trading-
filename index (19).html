@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>🎯 RajaGame Predictor</title>
+  <title>❤️ RajaGame Predictor (Big/Small)</title>
   <style>
     body {
       margin: 0;
       font-family: 'Segoe UI', sans-serif;
-      background: url('https://images.unsplash.com/photo-1604382351680-699d8ad42937?auto=format&fit=crop&w=1470&q=80') no-repeat center center fixed;
+      background: url('https://images.unsplash.com/photo-1589998059171-988d887df646?auto=format&fit=crop&w=1470&q=80') no-repeat center center fixed;
       background-size: cover;
       color: #fff;
     }
@@ -18,8 +18,8 @@
       max-width: 500px;
       margin: 50px auto;
       padding: 20px;
-      border-radius: 16px;
-      box-shadow: 0 0 20px rgba(255,255,255,0.2);
+      border-radius: 20px;
+      box-shadow: 0 0 25px rgba(255,0,100,0.5);
       text-align: center;
     }
 
@@ -48,7 +48,7 @@
       width: 100%;
       padding: 12px;
       font-size: 1rem;
-      background-color: #28a745;
+      background-color: #ff4081;
       border: none;
       border-radius: 10px;
       color: white;
@@ -77,26 +77,57 @@
         text-shadow: 0 0 5px #ff4d4d;
       }
       to {
-        color: #00ffd5;
-        text-shadow: 0 0 10px #00ffd5;
+        color: #ffeb3b;
+        text-shadow: 0 0 10px #ffeb3b;
       }
+    }
+
+    .memory {
+      margin-top: 25px;
+      text-align: left;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 15px;
+      border-radius: 12px;
+    }
+
+    .memory h4 {
+      margin: 0 0 10px;
+      font-size: 1rem;
+      color: #ffc0cb;
+    }
+
+    .memory ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .memory li {
+      margin-bottom: 4px;
+      color: #fff;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h2>🎯 RajaGame Predictor</h2>
+    <h2>❤️ RajaGame Predictor</h2>
     <div class="inputs" id="input-container"></div>
     <button onclick="predict()">🔮 Predict Next</button>
-    <div class="result" id="result">Enter 6 Big/Small values.</div>
+    <div class="result" id="result">Enter last 6 Big/Small results.</div>
+
+    <!-- 🧠 Memory of last 5 predictions -->
+    <div class="memory" id="memory-box">
+      <h4>🧠 Last 5 Predictions:</h4>
+      <ul id="memory-list"></ul>
+    </div>
   </div>
 
   <!-- 🔊 Sound Effects -->
-  <audio id="successSound" src="https://cdn.pixabay.com/audio/2022/03/15/audio_6cda4e6d14.mp3"></audio>
+  <audio id="successSound" src="https://cdn.pixabay.com/audio/2023/03/25/audio_c6191129df.mp3"></audio>
   <audio id="errorSound" src="https://cdn.pixabay.com/audio/2022/03/15/audio_37f6e33a1f.mp3"></audio>
 
   <script>
     const history = [
+      // Original + extracted Big/Small results
       "Small", "Big", "Big", "Small", "Big", "Big", "Big", "Small", "Big", "Small",
       "Small", "Big", "Small", "Small", "Big", "Big", "Big", "Small", "Big", "Big",
       "Small", "Big", "Big", "Big", "Small", "Small", "Big", "Big", "Small", "Small",
@@ -105,14 +136,20 @@
       "Small", "Big", "Big", "Big", "Big", "Small", "Small", "Big", "Small", "Small",
       "Small", "Big", "Big", "Small", "Big", "Small", "Big", "Big", "Big", "Big",
       "Small", "Big", "Big", "Small", "Big", "Small", "Big", "Big", "Big", "Small",
-      "Big", "Big", "Big", "Small", "Big", "Small", "Big", "Big", "Small", "Big"
+      "Big", "Big", "Big", "Small", "Big", "Small", "Big", "Big", "Small", "Big",
+      "Big", "Small", "Small", "Small", "Small", "Small", "Small", "Small", "Small", "Small",
+      "Small", "Small", "Small", "Big", "Small", "Big", "Small", "Big", "Small", "Big",
+      "Small", "Small"
     ];
 
     const container = document.getElementById("input-container");
     const resultBox = document.getElementById("result");
+    const memoryList = document.getElementById("memory-list");
+    const memory = [];
+
     const inputLength = 6;
 
-    // Create input selects
+    // Create dropdowns
     for (let i = 0; i < inputLength; i++) {
       const select = document.createElement("select");
       ["--", "Big", "Small"].forEach(val => {
@@ -144,6 +181,13 @@
       }
     }
 
+    function updateMemory(entry) {
+      memory.unshift(entry);
+      if (memory.length > 5) memory.pop();
+
+      memoryList.innerHTML = memory.map(item => `<li>${item}</li>`).join('');
+    }
+
     function predict() {
       const pattern = [];
       for (let i = 0; i < inputLength; i++) {
@@ -163,18 +207,19 @@
         if (current === strPattern) {
           const next = history[i + inputLength];
           showResult(`✅ Matched! Predicted Next: <b>${next}</b>`, true);
-          found = true;
+          updateMemory(`✅ ${strPattern} ➜ <b>${next}</b>`);
           return;
         }
       }
 
-      // Fallback logic if pattern not found
       const bigCount = pattern.filter(p => p === "Big").length;
       const smallCount = pattern.filter(p => p === "Small").length;
       const fallback = bigCount > smallCount ? "Small" : "Big";
 
-      showResult(`⚠️ Pattern not found. Fallback Prediction: <b>${fallback}</b><br>
-      <img src="https://via.placeholder.com/500x200?text=Fallback+Prediction" alt="No Match" style="margin-top:10px; max-width:100%; border-radius:12px;">`, false);
+      showResult(`⚠️ Pattern not found. Fallback: <b>${fallback}</b><br>
+        <img src="https://via.placeholder.com/500x200/ffb6c1/000000?text=Heart+Fallback" alt="No Match" style="margin-top:10px; max-width:100%; border-radius:12px;">`, false);
+
+      updateMemory(`⚠️ ${strPattern} ➜ <b>${fallback}</b> (fallback)`);
     }
   </script>
 </body>
