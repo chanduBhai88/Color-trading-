@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Big Small Pattern Tracker with OCR</title>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@2.1.1/dist/tesseract.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f9;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .input-section {
+            margin-bottom: 20px;
+        }
+        .input-section button {
+            padding: 10px 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .input-section button:disabled {
+            background-color: #ddd;
+            cursor: not-allowed;
+        }
+        .result-section {
+            margin-top: 20px;
+        }
+        .result-section ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        .result-section ul li {
+            background-color: #f0f0f0;
+            margin: 5px 0;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .status {
+            font-size: 18px;
+            margin-top: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Big Small Pattern Tracker with OCR</h2>
+
+    <!-- Upload Image Section -->
+    <div class="input-section">
+        <input type="file" id="imageUpload" accept="image/*">
+        <button id="extractBtn" onclick="extractTextFromImage()" disabled>Extract Text</button>
+    </div>
+
+    <!-- Enter Big/Small Sequence -->
+    <div class="input-section">
+        <label for="inputValue">Enter Big/Small (e.g., Big or Small):</label>
+        <input type="text" id="inputValue" placeholder="Type 'Big' or 'Small'">
+        <button id="submitBtn" onclick="addToHistory()" disabled>Add</button>
+    </div>
+
+    <div class="result-section">
+        <h3>Game History (Last 6 Digits)</h3>
+        <ul id="historyList"></ul>
+        <div class="status" id="statusMessage">Please add at least 6 results.</div>
+    </div>
+</div>
+
+<script>
+    let results = [];
+    let extractedData = [];
+
+    // Function to enable the Add button based on input
+    document.getElementById('inputValue').addEventListener('input', function() {
+        const value = this.value.toLowerCase().trim();
+        const button = document.getElementById('submitBtn');
+        if (value === 'big' || value === 'small') {
+            button.disabled = false;
+        } else {
+            button.disabled = true;
+        }
+    });
+
+    // Function to extract text from image using Tesseract.js (OCR)
+    function extractTextFromImage() {
+        const image = document.getElementById('imageUpload').files[0];
+        if (!image) {
+            alert("Please upload an image.");
+            return;
+        }
+
+        Tesseract.recognize(
+            image,
+            'eng', 
+            {
+                logger: (m) => console.log(m),
+            }
+        ).then(({ data: { text } }) => {
+            extractedData = text.split("\n").filter(line => line.trim().toLowerCase() === 'big' || line.trim().toLowerCase() === 'small');
+            console.log(extractedData);
+            alert("Text extracted from image successfully!");
+            document.getElementById('extractBtn').disabled = true; // Disable after extraction
+        });
+    }
+
+    // Function to add Big/Small to history
+    function addToHistory() {
+        const inputValue = document.getElementById('inputValue').value.toLowerCase().trim();
+        results.push(inputValue);
+        displayHistory();
+        checkStatus();
+        document.getElementById('inputValue').value = '';  // Clear input field
+        document.getElementById('submitBtn').disabled = true;  // Disable button after click
+    }
+
+    // Displaying the history of results
+    function displayHistory() {
+        const historyList = document.getElementById('historyList');
+        historyList.innerHTML = '';
+        for (let i = Math.max(0, results.length - 6); i < results.length; i++) {
+            const li = document.createElement('li');
+            li.textContent = `Period ${i + 1}: ${results[i]}`;
+            historyList.appendChild(li);
+        }
+    }
+
+    // Check the status after 6 inputs
+    function checkStatus() {
+        const statusMessage = document.getElementById('statusMessage');
+        if (results.length < 6) {
+            statusMessage.textContent = 'Please add at least 6 results.';
+        } else {
+            statusMessage.textContent = 'You can now check the 6-digit sequence.';
+        }
+    }
+</script>
+
+</body>
+</html>
