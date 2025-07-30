@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>RajaGame Predictor - 3 Number & 3 Big/Small</title>
+  <title>RajaGame Predictor (With Animation & Sound)</title>
   <style>
     body {
       margin: 0;
@@ -57,8 +57,28 @@
     .result {
       margin-top: 20px;
       font-weight: bold;
-      font-size: 1.3rem;
+      font-size: 1.5rem;
       color: #ff4d4d;
+      opacity: 0;
+      transform: scale(0.9);
+      transition: all 0.5s ease-in-out;
+    }
+
+    .result.show {
+      opacity: 1;
+      transform: scale(1.2);
+      animation: pulse 1s infinite alternate;
+    }
+
+    @keyframes pulse {
+      from {
+        color: #ff4d4d;
+        text-shadow: 0 0 5px #ff4d4d;
+      }
+      to {
+        color: #00ffd5;
+        text-shadow: 0 0 10px #00ffd5;
+      }
     }
   </style>
 </head>
@@ -67,13 +87,18 @@
     <h2>🎯 RajaGame Predictor</h2>
     <div class="inputs" id="input-container"></div>
     <button onclick="predict()">🔮 Predict Next</button>
-    <div class="result" id="result">Enter 3 numbers & 3 big/small values.</div>
+    <div class="result" id="result">Enter 3 numbers & 3 Big/Small values.</div>
   </div>
+
+  <!-- Sound -->
+  <audio id="sound" src="https://cdn.pixabay.com/download/audio/2022/10/30/audio_02840b3f79.mp3?filename=success-1-6297.mp3" preload="auto"></audio>
 
   <script>
     const container = document.getElementById("input-container");
+    const resultBox = document.getElementById("result");
+    const sound = document.getElementById("sound");
 
-    // Add 3 number inputs
+    // Add 3 number inputs (0 to 9)
     for (let i = 0; i < 3; i++) {
       const numberSelect = document.createElement("select");
       const defaultOpt = document.createElement("option");
@@ -81,7 +106,7 @@
       defaultOpt.textContent = "--";
       numberSelect.appendChild(defaultOpt);
 
-      for (let n = 1; n <= 8; n++) {
+      for (let n = 0; n <= 9; n++) {
         const opt = document.createElement("option");
         opt.value = n;
         opt.textContent = n;
@@ -114,7 +139,7 @@
       for (let i = 0; i < 3; i++) {
         const val = parseInt(selects[i].value);
         if (isNaN(val)) {
-          document.getElementById("result").textContent = "Please select all 3 numbers.";
+          showResult("Please select all 3 numbers.", false);
           return;
         }
         numbers.push(val);
@@ -124,7 +149,7 @@
       for (let i = 3; i < 6; i++) {
         const val = selects[i].value;
         if (!val) {
-          document.getElementById("result").textContent = "Please select all 3 Big/Small values.";
+          showResult("Please select all 3 Big/Small values.", false);
           return;
         }
         types.push(val);
@@ -134,7 +159,18 @@
       const smallCount = types.filter(t => t === "Small").length;
 
       const predicted = bigCount > smallCount ? "Small" : "Big";
-      document.getElementById("result").textContent = `Predicted Next: ${predicted}`;
+      showResult(`Predicted Next: ${predicted}`, true);
+    }
+
+    function showResult(msg, success) {
+      resultBox.textContent = msg;
+      if (success) {
+        resultBox.classList.add("show");
+        sound.currentTime = 0;
+        sound.play();
+      } else {
+        resultBox.classList.remove("show");
+      }
     }
   </script>
 </body>
