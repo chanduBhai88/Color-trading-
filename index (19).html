@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>RajaGame Big/Small Tracker</title>
+  <title>🎯 RajaGame Predictor</title>
   <style>
     body {
       margin: 0;
@@ -15,15 +15,15 @@
 
     .container {
       background: rgba(0, 0, 0, 0.75);
-      max-width: 600px;
+      max-width: 500px;
       margin: 50px auto;
       padding: 20px;
       border-radius: 16px;
       box-shadow: 0 0 20px rgba(255,255,255,0.2);
+      text-align: center;
     }
 
     h2 {
-      text-align: center;
       margin-bottom: 20px;
     }
 
@@ -57,10 +57,29 @@
 
     .result {
       margin-top: 20px;
-      text-align: center;
       font-weight: bold;
-      font-size: 1.3rem;
+      font-size: 1.5rem;
       color: #ff4d4d;
+      opacity: 0;
+      transform: scale(0.9);
+      transition: all 0.5s ease-in-out;
+    }
+
+    .result.show {
+      opacity: 1;
+      transform: scale(1.2);
+      animation: pulse 1s infinite alternate;
+    }
+
+    @keyframes pulse {
+      from {
+        color: #ff4d4d;
+        text-shadow: 0 0 5px #ff4d4d;
+      }
+      to {
+        color: #00ffd5;
+        text-shadow: 0 0 10px #00ffd5;
+      }
     }
   </style>
 </head>
@@ -69,10 +88,10 @@
     <h2>🎯 RajaGame Predictor</h2>
     <div class="inputs" id="input-container"></div>
     <button onclick="predict()">🔮 Predict Next</button>
-    <div class="result" id="result">Enter 6 previous results.</div>
+    <div class="result" id="result">Enter 6 Big/Small values.</div>
   </div>
 
-  <!-- ✅ Sound Effects -->
+  <!-- 🔊 Sound Effects -->
   <audio id="successSound" src="https://cdn.pixabay.com/audio/2022/03/15/audio_6cda4e6d14.mp3"></audio>
   <audio id="errorSound" src="https://cdn.pixabay.com/audio/2022/03/15/audio_37f6e33a1f.mp3"></audio>
 
@@ -89,23 +108,19 @@
       "Big", "Big", "Big", "Small", "Big", "Small", "Big", "Big", "Small", "Big"
     ];
 
-    // Create 6 dropdowns
     const container = document.getElementById("input-container");
+    const resultBox = document.getElementById("result");
     const inputLength = 6;
+
+    // Create input selects
     for (let i = 0; i < inputLength; i++) {
       const select = document.createElement("select");
-      const opt1 = document.createElement("option");
-      opt1.value = "";
-      opt1.text = "--";
-      const opt2 = document.createElement("option");
-      opt2.value = "Big";
-      opt2.text = "Big";
-      const opt3 = document.createElement("option");
-      opt3.value = "Small";
-      opt3.text = "Small";
-      select.appendChild(opt1);
-      select.appendChild(opt2);
-      select.appendChild(opt3);
+      ["--", "Big", "Small"].forEach(val => {
+        const opt = document.createElement("option");
+        opt.value = val === "--" ? "" : val;
+        opt.textContent = val;
+        select.appendChild(opt);
+      });
       select.id = "s" + i;
       container.appendChild(select);
     }
@@ -118,13 +133,23 @@
       }
     }
 
+    function showResult(msg, success) {
+      resultBox.innerHTML = msg;
+      if (success) {
+        resultBox.classList.add("show");
+        playSound("successSound");
+      } else {
+        resultBox.classList.remove("show");
+        playSound("errorSound");
+      }
+    }
+
     function predict() {
       const pattern = [];
       for (let i = 0; i < inputLength; i++) {
         const val = document.getElementById("s" + i).value;
-        if (val !== "Big" && val !== "Small") {
-          document.getElementById("result").innerText = "❌ Please select all 6 inputs.";
-          playSound("errorSound");
+        if (!val) {
+          showResult("❌ Please select all 6 inputs.", false);
           return;
         }
         pattern.push(val);
@@ -136,20 +161,20 @@
       for (let i = 0; i <= history.length - (inputLength + 1); i++) {
         const current = history.slice(i, i + inputLength).join("-");
         if (current === strPattern) {
-          document.getElementById("result").innerText = `✅ Next: ${history[i + inputLength]}`;
-          playSound("successSound");
+          const next = history[i + inputLength];
+          showResult(`✅ Matched! Predicted Next: <b>${next}</b>`, true);
           found = true;
-          break;
+          return;
         }
       }
 
-      if (!found) {
-        document.getElementById("result").innerHTML = `
-          ❌ Pattern not found in history.<br>
-          <img src="https://via.placeholder.com/500x200?text=No+Match+Found" alt="Not Found" style="margin-top:10px; max-width:100%; border-radius:12px;">
-        `;
-        playSound("errorSound");
-      }
+      // Fallback logic if pattern not found
+      const bigCount = pattern.filter(p => p === "Big").length;
+      const smallCount = pattern.filter(p => p === "Small").length;
+      const fallback = bigCount > smallCount ? "Small" : "Big";
+
+      showResult(`⚠️ Pattern not found. Fallback Prediction: <b>${fallback}</b><br>
+      <img src="https://via.placeholder.com/500x200?text=Fallback+Prediction" alt="No Match" style="margin-top:10px; max-width:100%; border-radius:12px;">`, false);
     }
   </script>
 </body>
