@@ -72,13 +72,21 @@
     <div class="result" id="result">Enter 6 previous results.</div>
   </div>
 
+  <!-- ✅ Sound Effects -->
+  <audio id="successSound" src="https://cdn.pixabay.com/audio/2022/03/15/audio_6cda4e6d14.mp3"></audio>
+  <audio id="errorSound" src="https://cdn.pixabay.com/audio/2022/03/15/audio_37f6e33a1f.mp3"></audio>
+
   <script>
-    // Sample game history
     const history = [
-      "Small", "Small", "Small", "Big", "Small", "Small", "Big", "Big", "Big", "Big",
-      "Big", "Small", "Small", "Big", "Big", "Big", "Big", "Small", "Small", "Big",
-      "Big", "Small", "Small", "Big", "Small", "Small", "Big", "Small", "Big", "Small",
-      "Big", "Small", "Small", "Small", "Big", "Big", "Small", "Big", "Small", "Big"
+      "Small", "Big", "Big", "Small", "Big", "Big", "Big", "Small", "Big", "Small",
+      "Small", "Big", "Small", "Small", "Big", "Big", "Big", "Small", "Big", "Big",
+      "Small", "Big", "Big", "Big", "Small", "Small", "Big", "Big", "Small", "Small",
+      "Small", "Small", "Big", "Big", "Big", "Big", "Big", "Big", "Small", "Big",
+      "Small", "Small", "Big", "Small", "Small", "Small", "Big", "Big", "Big", "Big",
+      "Small", "Big", "Big", "Big", "Big", "Small", "Small", "Big", "Small", "Small",
+      "Small", "Big", "Big", "Small", "Big", "Small", "Big", "Big", "Big", "Big",
+      "Small", "Big", "Big", "Small", "Big", "Small", "Big", "Big", "Big", "Small",
+      "Big", "Big", "Big", "Small", "Big", "Small", "Big", "Big", "Small", "Big"
     ];
 
     // Create 6 dropdowns
@@ -102,12 +110,21 @@
       container.appendChild(select);
     }
 
+    function playSound(id) {
+      const sound = document.getElementById(id);
+      if (sound) {
+        sound.currentTime = 0;
+        sound.play();
+      }
+    }
+
     function predict() {
       const pattern = [];
       for (let i = 0; i < inputLength; i++) {
         const val = document.getElementById("s" + i).value;
         if (val !== "Big" && val !== "Small") {
           document.getElementById("result").innerText = "❌ Please select all 6 inputs.";
+          playSound("errorSound");
           return;
         }
         pattern.push(val);
@@ -120,13 +137,18 @@
         const current = history.slice(i, i + inputLength).join("-");
         if (current === strPattern) {
           document.getElementById("result").innerText = `✅ Next: ${history[i + inputLength]}`;
+          playSound("successSound");
           found = true;
           break;
         }
       }
 
       if (!found) {
-        document.getElementById("result").innerText = "❌ Pattern not found in history.";
+        document.getElementById("result").innerHTML = `
+          ❌ Pattern not found in history.<br>
+          <img src="https://via.placeholder.com/500x200?text=No+Match+Found" alt="Not Found" style="margin-top:10px; max-width:100%; border-radius:12px;">
+        `;
+        playSound("errorSound");
       }
     }
   </script>
