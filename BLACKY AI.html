@@ -1,152 +1,139 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Big Small Pattern Tracker with OCR</title>
-    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@2.1.1/dist/tesseract.min.js"></script>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            background-color: #f4f4f9;
-        }
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-        .input-section {
-            margin-bottom: 20px;
-        }
-        .input-section button {
-            padding: 10px 15px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        .input-section button:disabled {
-            background-color: #ddd;
-            cursor: not-allowed;
-        }
-        .result-section {
-            margin-top: 20px;
-        }
-        .result-section ul {
-            list-style-type: none;
-            padding: 0;
-        }
-        .result-section ul li {
-            background-color: #f0f0f0;
-            margin: 5px 0;
-            padding: 10px;
-            border-radius: 5px;
-        }
-        .status {
-            font-size: 18px;
-            margin-top: 20px;
-            font-weight: bold;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>RajaGame Big/Small Tracker</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: url('https://images.unsplash.com/photo-1604382351680-699d8ad42937?auto=format&fit=crop&w=1470&q=80') no-repeat center center fixed;
+      background-size: cover;
+      color: #fff;
+    }
+
+    .container {
+      background: rgba(0, 0, 0, 0.85);
+      max-width: 600px;
+      margin: 50px auto;
+      padding: 20px;
+      border-radius: 16px;
+      box-shadow: 0 0 20px rgba(255,255,255,0.2);
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .inputs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+
+    select {
+      padding: 10px;
+      font-size: 1rem;
+      border-radius: 8px;
+      border: none;
+      width: 100px;
+      text-align: center;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      font-size: 1rem;
+      background-color: #28a745;
+      border: none;
+      border-radius: 10px;
+      color: white;
+      cursor: pointer;
+    }
+
+    .result {
+      margin-top: 20px;
+      text-align: center;
+      font-weight: bold;
+      font-size: 1.3rem;
+      color: #ff4d4d;
+    }
+  </style>
 </head>
 <body>
+  <div class="container">
+    <h2>🎯 RajaGame Predictor</h2>
+    <div class="inputs" id="input-container"></div>
+    <button onclick="predict()">🔮 Predict Next</button>
+    <div class="result" id="result">Enter 6 previous results.</div>
+  </div>
 
-<div class="container">
-    <h2>Big Small Pattern Tracker with OCR</h2>
+  <script>
+    const history = [
+      // Latest screenshot (top to bottom)
+      "Big", "Big", "Small", "Small", "Big", "Small", "Small", "Big", "Big", "Small",
 
-    <!-- Upload Image Section -->
-    <div class="input-section">
-        <input type="file" id="imageUpload" accept="image/*">
-        <button id="extractBtn" onclick="extractTextFromImage()" disabled>Extract Text</button>
-    </div>
+      // Older entries
+      "Small", "Small", "Small", "Big", "Small", "Small", "Big", "Big", "Big", "Big",
+      "Big", "Small", "Small", "Big", "Small", "Small", "Big", "Small", "Big", "Small",
+      "Big", "Small", "Small", "Small", "Big", "Big", "Small", "Big", "Small", "Big",
+      "Big", "Small", "Small", "Big", "Small", "Small", "Big", "Big", "Big", "Big",
+      "Big", "Small", "Small", "Big", "Small", "Small", "Big", "Small", "Big", "Small"
+    ];
 
-    <!-- Enter Big/Small Sequence -->
-    <div class="input-section">
-        <label for="inputValue">Enter Big/Small (e.g., Big or Small):</label>
-        <input type="text" id="inputValue" placeholder="Type 'Big' or 'Small'">
-        <button id="submitBtn" onclick="addToHistory()" disabled>Add</button>
-    </div>
+    const container = document.getElementById("input-container");
+    const inputLength = 6;
 
-    <div class="result-section">
-        <h3>Game History (Last 6 Digits)</h3>
-        <ul id="historyList"></ul>
-        <div class="status" id="statusMessage">Please add at least 6 results.</div>
-    </div>
-</div>
-
-<script>
-    let results = [];
-    let extractedData = [];
-
-    // Function to enable the Add button based on input
-    document.getElementById('inputValue').addEventListener('input', function() {
-        const value = this.value.toLowerCase().trim();
-        const button = document.getElementById('submitBtn');
-        if (value === 'big' || value === 'small') {
-            button.disabled = false;
-        } else {
-            button.disabled = true;
-        }
-    });
-
-    // Function to extract text from image using Tesseract.js (OCR)
-    function extractTextFromImage() {
-        const image = document.getElementById('imageUpload').files[0];
-        if (!image) {
-            alert("Please upload an image.");
-            return;
-        }
-
-        Tesseract.recognize(
-            image,
-            'eng', 
-            {
-                logger: (m) => console.log(m),
-            }
-        ).then(({ data: { text } }) => {
-            extractedData = text.split("\n").filter(line => line.trim().toLowerCase() === 'big' || line.trim().toLowerCase() === 'small');
-            console.log(extractedData);
-            alert("Text extracted from image successfully!");
-            document.getElementById('extractBtn').disabled = true; // Disable after extraction
-        });
+    // Create dropdowns
+    for (let i = 0; i < inputLength; i++) {
+      const select = document.createElement("select");
+      const opt1 = document.createElement("option");
+      opt1.value = "";
+      opt1.text = "--";
+      const opt2 = document.createElement("option");
+      opt2.value = "Big";
+      opt2.text = "Big";
+      const opt3 = document.createElement("option");
+      opt3.value = "Small";
+      opt3.text = "Small";
+      select.appendChild(opt1);
+      select.appendChild(opt2);
+      select.appendChild(opt3);
+      select.id = "s" + i;
+      container.appendChild(select);
     }
 
-    // Function to add Big/Small to history
-    function addToHistory() {
-        const inputValue = document.getElementById('inputValue').value.toLowerCase().trim();
-        results.push(inputValue);
-        displayHistory();
-        checkStatus();
-        document.getElementById('inputValue').value = '';  // Clear input field
-        document.getElementById('submitBtn').disabled = true;  // Disable button after click
-    }
-
-    // Displaying the history of results
-    function displayHistory() {
-        const historyList = document.getElementById('historyList');
-        historyList.innerHTML = '';
-        for (let i = Math.max(0, results.length - 6); i < results.length; i++) {
-            const li = document.createElement('li');
-            li.textContent = `Period ${i + 1}: ${results[i]}`;
-            historyList.appendChild(li);
+    function predict() {
+      const pattern = [];
+      for (let i = 0; i < inputLength; i++) {
+        const val = document.getElementById("s" + i).value;
+        if (val !== "Big" && val !== "Small") {
+          document.getElementById("result").innerText = "❌ Please select all 6 inputs.";
+          return;
         }
-    }
+        pattern.push(val);
+      }
 
-    // Check the status after 6 inputs
-    function checkStatus() {
-        const statusMessage = document.getElementById('statusMessage');
-        if (results.length < 6) {
-            statusMessage.textContent = 'Please add at least 6 results.';
-        } else {
-            statusMessage.textContent = 'You can now check the 6-digit sequence.';
+      const strPattern = pattern.join("-");
+      let found = false;
+
+      for (let i = 0; i <= history.length - (inputLength + 1); i++) {
+        const current = history.slice(i, i + inputLength).join("-");
+        if (current === strPattern) {
+          document.getElementById("result").innerText = `✅ Next: ${history[i + inputLength]}`;
+          found = true;
+          break;
         }
-    }
-</script>
+      }
 
+      if (!found) {
+        document.getElementById("result").innerText = "❌ Pattern not found in history.";
+      }
+    }
+  </script>
 </body>
 </html>
