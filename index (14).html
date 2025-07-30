@@ -1,99 +1,145 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Smart Big/Small Predictor</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>RajaGame Predictor (Big/Small Only)</title>
   <style>
     body {
-      background: #000;
-      color: #0f0;
-      font-family: monospace;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: #111;
+      color: #fff;
     }
 
-    #randomWord {
-      font-size: 32px;
-      font-weight: bold;
+    .container {
+      background: rgba(0, 0, 0, 0.85);
+      max-width: 400px;
+      margin: 50px auto;
       padding: 20px;
-      background-color: #111;
-      border: 2px solid #0f0;
-      border-radius: 10px;
-      margin-bottom: 20px;
-      transition: all 0.3s ease;
-    }
-
-    #timer {
-      font-size: 24px;
-      margin-bottom: 20px;
-    }
-
-    #history {
-      font-size: 16px;
-      color: #0f0;
+      border-radius: 16px;
+      box-shadow: 0 0 20px rgba(255,255,255,0.2);
       text-align: center;
-      max-width: 300px;
-      border-top: 1px solid #0f0;
-      padding-top: 10px;
+    }
+
+    h2 {
+      margin-bottom: 20px;
+    }
+
+    .inputs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+
+    select {
+      padding: 10px;
+      font-size: 1rem;
+      border-radius: 8px;
+      border: none;
+      width: 100px;
+      text-align: center;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      font-size: 1rem;
+      background-color: #28a745;
+      border: none;
+      border-radius: 10px;
+      color: white;
+      cursor: pointer;
+    }
+
+    .result {
+      margin-top: 20px;
+      font-weight: bold;
+      font-size: 1.5rem;
+      color: #ff4d4d;
+      opacity: 0;
+      transform: scale(0.9);
+      transition: all 0.5s ease-in-out;
+    }
+
+    .result.show {
+      opacity: 1;
+      transform: scale(1.2);
+      animation: pulse 1s infinite alternate;
+    }
+
+    @keyframes pulse {
+      from {
+        color: #ff4d4d;
+        text-shadow: 0 0 5px #ff4d4d;
+      }
+      to {
+        color: #00ffd5;
+        text-shadow: 0 0 10px #00ffd5;
+      }
     }
   </style>
 </head>
 <body>
-  <div id="randomWord">Loading...</div>
-  <div id="timer">00:00</div>
-  <div id="history">History:<br/></div>
+  <div class="container">
+    <h2>🎯 RajaGame Predictor</h2>
+    <div class="inputs" id="input-container"></div>
+    <button onclick="predict()">🔮 Predict Next</button>
+    <div class="result" id="result">Enter 6 Big/Small values.</div>
+  </div>
+
+  <!-- Sound -->
+  <audio id="sound" src="https://cdn.pixabay.com/download/audio/2022/10/30/audio_02840b3f79.mp3?filename=success-1-6297.mp3" preload="auto"></audio>
 
   <script>
-    let lastMinute = -1;
-    const history = [];
+    const container = document.getElementById("input-container");
+    const resultBox = document.getElementById("result");
+    const sound = document.getElementById("sound");
 
-    function smartPrediction() {
-      // Basic smart logic: reverse if last 2 same
-      let type;
-      if (history.length >= 2 && history[0].startsWith(history[1].split(' - ')[0])) {
-        type = history[0].startsWith('Big') ? 'Small' : 'Big';
-      } else {
-        type = Math.random() > 0.5 ? 'Big' : 'Small';
+    // Create 6 Big/Small select inputs
+    for (let i = 0; i < 6; i++) {
+      const select = document.createElement("select");
+      ["--", "Big", "Small"].forEach(val => {
+        const opt = document.createElement("option");
+        opt.value = val === "--" ? "" : val;
+        opt.textContent = val;
+        select.appendChild(opt);
+      });
+      container.appendChild(select);
+    }
+
+    function predict() {
+      const selects = container.querySelectorAll("select");
+      const types = [];
+
+      for (let i = 0; i < selects.length; i++) {
+        const val = selects[i].value;
+        if (!val) {
+          showResult("Please select all 6 Big/Small values.", false);
+          return;
+        }
+        types.push(val);
       }
 
-      const number = type === 'Big'
-        ? [5, 6, 7, 8, 9][Math.floor(Math.random() * 5)]
-        : [0, 1, 2, 3, 4][Math.floor(Math.random() * 5)];
+      const bigCount = types.filter(t => t === "Big").length;
+      const smallCount = types.filter(t => t === "Small").length;
 
-      return `${type} - ${number}`;
+      const predicted = bigCount > smallCount ? "Small" : "Big";
+      showResult(`Predicted Next: ${predicted}`, true);
     }
 
-    function updateHistory(prediction) {
-      history.unshift(prediction);
-      if (history.length > 5) history.pop(); // only last 5
-
-      document.getElementById('history').innerHTML = 'History:<br>' + history.map(p => `• ${p}`).join('<br>');
+    function showResult(msg, success) {
+      resultBox.textContent = msg;
+      if (success) {
+        resultBox.classList.add("show");
+        sound.currentTime = 0;
+        sound.play();
+      } else {
+        resultBox.classList.remove("show");
+      }
     }
-
-    function startTimer() {
-      setInterval(() => {
-        const now = new Date();
-        const minutes = now.getMinutes();
-        const seconds = now.getSeconds();
-
-        // Show timer
-        document.getElementById('timer').textContent =
-          String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
-
-        // Predict on new minute
-        if (seconds === 0 && lastMinute !== minutes) {
-          const prediction = smartPrediction();
-          document.getElementById('randomWord').textContent = prediction;
-          updateHistory(prediction);
-          lastMinute = minutes;
-        }
-      }, 1000);
-    }
-
-    startTimer();
   </script>
 </body>
 </html>
