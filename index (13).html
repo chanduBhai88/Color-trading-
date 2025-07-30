@@ -1,65 +1,141 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Prediction</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>RajaGame Predictor - 3 Number & 3 Big/Small</title>
   <style>
     body {
-      background: #000;
-      color: #0f0;
-      font-family: monospace;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      flex-direction: column;
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: #111;
+      color: #fff;
     }
 
-    #randomWord {
-      font-size: 32px;
-      font-weight: bold;
+    .container {
+      background: rgba(0, 0, 0, 0.85);
+      max-width: 400px;
+      margin: 50px auto;
       padding: 20px;
-      background-color: #111;
-      border: 2px solid #0f0;
-      border-radius: 10px;
+      border-radius: 16px;
+      box-shadow: 0 0 20px rgba(255,255,255,0.2);
+      text-align: center;
+    }
+
+    h2 {
       margin-bottom: 20px;
     }
 
-    #timer {
-      font-size: 24px;
-      color: #fff;
+    .inputs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+
+    select {
+      padding: 10px;
+      font-size: 1rem;
+      border-radius: 8px;
+      border: none;
+      width: 100px;
+      text-align: center;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      font-size: 1rem;
+      background-color: #28a745;
+      border: none;
+      border-radius: 10px;
+      color: white;
+      cursor: pointer;
+    }
+
+    .result {
+      margin-top: 20px;
+      font-weight: bold;
+      font-size: 1.3rem;
+      color: #ff4d4d;
     }
   </style>
 </head>
 <body>
-  <div id="randomWord">Loading...</div>
-  <div id="timer">00:00</div>
+  <div class="container">
+    <h2>🎯 RajaGame Predictor</h2>
+    <div class="inputs" id="input-container"></div>
+    <button onclick="predict()">🔮 Predict Next</button>
+    <div class="result" id="result">Enter 3 numbers & 3 big/small values.</div>
+  </div>
 
   <script>
-    let lastMinute = -1;
+    const container = document.getElementById("input-container");
 
-    function startTimer() {
-      setInterval(() => {
-        const now = new Date();
-        const minutes = now.getMinutes();
-        const seconds = now.getSeconds();
+    // Add 3 number inputs
+    for (let i = 0; i < 3; i++) {
+      const numberSelect = document.createElement("select");
+      const defaultOpt = document.createElement("option");
+      defaultOpt.value = "";
+      defaultOpt.textContent = "--";
+      numberSelect.appendChild(defaultOpt);
 
-        // Show timer
-        document.getElementById('timer').textContent =
-          String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
+      for (let n = 1; n <= 8; n++) {
+        const opt = document.createElement("option");
+        opt.value = n;
+        opt.textContent = n;
+        numberSelect.appendChild(opt);
+      }
 
-        // Change every new minute
-        if (seconds === 0 && lastMinute !== minutes) {
-          const colors = ['Red', 'Green', 'Violet'];
-          const randomColor = colors[Math.floor(Math.random() * colors.length)];
-          const randomNumber = Math.floor(Math.random() * 10); // 0–9
-          document.getElementById('randomWord').textContent = `${randomColor} - ${randomNumber}`;
-          lastMinute = minutes;
-        }
-      }, 1000);
+      container.appendChild(numberSelect);
     }
 
-    startTimer();
+    // Add 3 Big/Small inputs
+    for (let i = 0; i < 3; i++) {
+      const bigSmallSelect = document.createElement("select");
+      ["--", "Big", "Small"].forEach(val => {
+        const opt = document.createElement("option");
+        opt.value = val === "--" ? "" : val;
+        opt.textContent = val;
+        bigSmallSelect.appendChild(opt);
+      });
+
+      container.appendChild(bigSmallSelect);
+    }
+
+    function predict() {
+      const selects = container.querySelectorAll("select");
+
+      let numbers = [];
+      let types = [];
+
+      // First 3 are numbers
+      for (let i = 0; i < 3; i++) {
+        const val = parseInt(selects[i].value);
+        if (isNaN(val)) {
+          document.getElementById("result").textContent = "Please select all 3 numbers.";
+          return;
+        }
+        numbers.push(val);
+      }
+
+      // Next 3 are Big/Small
+      for (let i = 3; i < 6; i++) {
+        const val = selects[i].value;
+        if (!val) {
+          document.getElementById("result").textContent = "Please select all 3 Big/Small values.";
+          return;
+        }
+        types.push(val);
+      }
+
+      const bigCount = types.filter(t => t === "Big").length;
+      const smallCount = types.filter(t => t === "Small").length;
+
+      const predicted = bigCount > smallCount ? "Small" : "Big";
+      document.getElementById("result").textContent = `Predicted Next: ${predicted}`;
+    }
   </script>
 </body>
 </html>
