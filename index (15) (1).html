@@ -5,36 +5,64 @@
   <title>Big/Small Pattern Tracker</title>
   <style>
     body {
-      background: url('your-background.jpg') no-repeat center center fixed;
-      background-size: cover;
+      background-color: #ffffff;
       font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .tracker-box {
+      background-color: #1e1e1e;
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      max-width: 400px;
+      width: 100%;
+    }
+
+    .tracker-title {
       color: white;
       text-align: center;
-      padding: 20px;
+      font-size: 20px;
+      margin-bottom: 20px;
     }
-    .pattern-box {
+
+    .pattern-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(50px, 1fr));
+      grid-template-columns: repeat(6, 1fr);
       gap: 8px;
-      max-width: 600px;
-      margin: auto;
+      justify-items: center;
     }
+
     .cell {
-      padding: 10px;
-      border-radius: 8px;
+      width: 40px;
+      height: 40px;
+      border-radius: 6px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
       font-weight: bold;
+      color: white;
     }
+
     .Big {
-      background-color: #4caf50; /* Green */
+      background-color: #4caf50;
     }
+
     .Small {
-      background-color: #f44336; /* Red */
+      background-color: #f44336;
     }
   </style>
 </head>
 <body>
-  <h1>Big/Small Pattern Tracker</h1>
-  <div class="pattern-box" id="patternBox"></div>
+
+  <div class="tracker-box">
+    <div class="tracker-title">Big/Small Pattern Tracker</div>
+    <div class="pattern-grid" id="patternBox"></div>
+  </div>
 
   <script>
     const bigSmallHistory = [
@@ -53,9 +81,10 @@
     bigSmallHistory.forEach(item => {
       const div = document.createElement("div");
       div.className = `cell ${item}`;
-      div.textContent = item;
+      div.textContent = item === "Big" ? "Bi" : "Sn";
       box.appendChild(div);
     });
   </script>
+
 </body>
 </html>
