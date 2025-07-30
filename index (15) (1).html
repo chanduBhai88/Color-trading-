@@ -1,90 +1,132 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Big/Small Pattern Tracker</title>
-  <style>
-    body {
-      background-color: #ffffff;
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 20px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .tracker-box {
-      background-color: #1e1e1e;
-      border-radius: 16px;
-      padding: 20px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-      max-width: 400px;
-      width: 100%;
-    }
-
-    .tracker-title {
-      color: white;
-      text-align: center;
-      font-size: 20px;
-      margin-bottom: 20px;
-    }
-
-    .pattern-grid {
-      display: grid;
-      grid-template-columns: repeat(6, 1fr);
-      gap: 8px;
-      justify-items: center;
-    }
-
-    .cell {
-      width: 40px;
-      height: 40px;
-      border-radius: 6px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-weight: bold;
-      color: white;
-    }
-
-    .Big {
-      background-color: #4caf50;
-    }
-
-    .Small {
-      background-color: #f44336;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Big Small Pattern Tracker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f9;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .input-section {
+            margin-bottom: 20px;
+        }
+        .input-section input {
+            padding: 10px;
+            font-size: 16px;
+            width: 100%;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+        .input-section button {
+            padding: 10px 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .input-section button:disabled {
+            background-color: #ddd;
+            cursor: not-allowed;
+        }
+        .result-section {
+            margin-top: 20px;
+        }
+        .result-section ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        .result-section ul li {
+            background-color: #f0f0f0;
+            margin: 5px 0;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .status {
+            font-size: 18px;
+            margin-top: 20px;
+            font-weight: bold;
+        }
+    </style>
 </head>
 <body>
 
-  <div class="tracker-box">
-    <div class="tracker-title">Big/Small Pattern Tracker</div>
-    <div class="pattern-grid" id="patternBox"></div>
-  </div>
+<div class="container">
+    <h2>Big Small Pattern Tracker</h2>
+    <div class="input-section">
+        <label for="inputValue">Enter Big/Small (e.g., Big or Small):</label>
+        <input type="text" id="inputValue" placeholder="Type 'Big' or 'Small'">
+        <button id="submitBtn" onclick="addToHistory()" disabled>Add</button>
+    </div>
 
-  <script>
-    const bigSmallHistory = [
-      "Big", "Small", "Big", "Big", "Small", "Small", "Big", "Big", "Small", "Big",
-      "Big", "Small", "Small", "Big", "Big", "Small", "Big", "Big", "Small", "Small",
-      "Small", "Big", "Small", "Big", "Small", "Big", "Small", "Small", "Big", "Big",
-      "Small", "Small", "Big", "Big", "Big", "Big", "Small", "Small", "Big", "Small",
-      "Big", "Big", "Big", "Small", "Big", "Big", "Small", "Big", "Small", "Big",
-      "Big", "Small", "Small", "Big", "Small", "Big", "Small", "Small", "Small", "Big",
-      "Big", "Big", "Small", "Big",
-      "Small", "Small", "Small", "Big", "Big", "Small", "Small", "Big", "Small", "Small",
-      "Big", "Small", "Big", "Small", "Small", "Small", "Big"
-    ];
+    <div class="result-section">
+        <h3>Game History (Last 6 Digits)</h3>
+        <ul id="historyList">
+            <!-- Game history will be listed here -->
+        </ul>
+        <div class="status" id="statusMessage">Please add at least 6 results.</div>
+    </div>
+</div>
 
-    const box = document.getElementById("patternBox");
-    bigSmallHistory.forEach(item => {
-      const div = document.createElement("div");
-      div.className = `cell ${item}`;
-      div.textContent = item === "Big" ? "Bi" : "Sn";
-      box.appendChild(div);
+<script>
+    // Array to store the Big/Small results
+    let results = [];
+
+    // Function to enable/disable the add button based on input
+    document.getElementById('inputValue').addEventListener('input', function() {
+        const value = this.value.toLowerCase().trim();
+        const button = document.getElementById('submitBtn');
+        if (value === 'big' || value === 'small') {
+            button.disabled = false;
+        } else {
+            button.disabled = true;
+        }
     });
-  </script>
+
+    // Function to add input to history and display result
+    function addToHistory() {
+        const inputValue = document.getElementById('inputValue').value.toLowerCase().trim();
+        results.push(inputValue);
+        displayHistory();
+        checkStatus();
+        document.getElementById('inputValue').value = '';  // Clear input field
+        document.getElementById('submitBtn').disabled = true;  // Disable button after click
+    }
+
+    // Function to display history
+    function displayHistory() {
+        const historyList = document.getElementById('historyList');
+        historyList.innerHTML = '';
+        // Loop through the results and display the last 6 values
+        for (let i = Math.max(0, results.length - 6); i < results.length; i++) {
+            const li = document.createElement('li');
+            li.textContent = `Period ${i + 1}: ${results[i]}`;
+            historyList.appendChild(li);
+        }
+    }
+
+    // Function to check if we have at least 6 digits for a valid sequence
+    function checkStatus() {
+        const statusMessage = document.getElementById('statusMessage');
+        if (results.length < 6) {
+            statusMessage.textContent = 'Please add at least 6 results.';
+        } else {
+            statusMessage.textContent = 'You can now check the 6-digit sequence.';
+        }
+    }
+</script>
 
 </body>
 </html>
