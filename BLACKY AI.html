@@ -1,285 +1,134 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
   <title>MR.HACKER 3.0</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Rajdhani:wght@400;500;700&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    /* Aapka existing CSS bilkul same rahega, ismein koi change nahi kiya gaya */
-    /* Skip for brevity — aapka pehle se diya hua style tag waisa ka waisa use karo */
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to bottom right, #ff0033, #ff6680);
+      color: #cc0000;
+    }
+
+    .container {
+      padding: 20px;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 32px;
+      color: #cc0000;
+    }
+
+    .tags button {
+      margin: 5px;
+      padding: 8px 16px;
+      background: #ffd5d5;
+      border: none;
+      border-radius: 20px;
+      font-weight: bold;
+      color: #cc0000;
+    }
+
+    .box {
+      background: #fff;
+      border-radius: 12px;
+      padding: 10px 20px;
+      margin: 10px auto;
+      width: 250px;
+      font-size: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    .box i {
+      margin-right: 10px;
+    }
+
+    .refresh-btn {
+      background: #cc0000;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      padding: 12px 30px;
+      font-size: 16px;
+      margin: 20px 0;
+    }
+
+    .history {
+      background: #fff;
+      border-radius: 12px;
+      padding: 15px;
+      margin: 10px;
+      width: 250px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    .pending {
+      background: #fff0cc;
+      color: #cc6600;
+      padding: 4px 10px;
+      border-radius: 10px;
+      font-weight: bold;
+    }
   </style>
 </head>
 <body>
 
-  <!-- Header -->
-  <div class="header">
-    <i class="fas fa-arrow-left"></i> MR.HACKER 3.0
-  </div>
-
-  <!-- Title -->
-  <div class="top-section">
+  <div class="container">
     <h1>MR.HACKER</h1>
-    <div class="badges">
-      <span class="badge">VERSION 3.0</span>
-      <span class="badge">AI POWERED</span>
-      <span class="badge">ULTRA PRECISION</span>
+    <div class="tags">
+      <button>VERSION 3.0</button>
+      <button>AI POWERED</button>
+      <button>ULTRA PRECISION</button>
+    </div>
+
+    <div class="box"><span>📅</span><span id="period">00000</span></div>
+    <div class="box"><span>⏱️</span><span id="timer">59s</span></div>
+    <div class="box"><span>🎯</span><span id="result">--</span></div>
+
+    <button class="refresh-btn" onclick="refreshData()">🔄 REFRESH DATA</button>
+
+    <h3 style="margin-top: 20px;">🔁 HISTORY</h3>
+    <div class="history">
+      <p># <span id="historyPeriod">00000</span></p>
+      <p><strong>BIG</strong> <span class="pending">PENDING</span></p>
     </div>
   </div>
 
-  <!-- Prediction Card -->
-  <div class="card prediction-card glow">
-    <div class="info-container">
-      <div class="info-box">
-        <div class="info-label"><i class="fas fa-calendar-alt"></i></div>
-        <div class="info-value" id="currentPeriod">--</div>
-      </div>
-      <div class="info-box">
-        <div class="info-label"><i class="fas fa-clock"></i></div>
-        <div class="info-value" id="countdown">--</div>
-      </div>
-      <div class="info-box">
-        <div class="info-label"><i class="fas fa-bullseye"></i></div>
-        <div class="info-value" id="prediction">--</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Refresh Button -->
-  <button class="refresh-btn" id="refreshBtn">
-    <i class="fas fa-sync-alt"></i> 
-    <span id="refreshText">REFRESH DATA</span>
-    <div class="loading" id="refreshSpinner" style="display: none;"></div>
-  </button>
-
-  <!-- History -->
-  <div class="history-section">
-    <div class="section-header">
-      <div class="history-title"><i class="fas fa-history"></i>HISTORY</div>
-      <div class="history-count" id="historyCount">0</div>
-    </div>
-    <div class="history-list" id="historyItems"></div>
-  </div>
-
-  <!-- SCRIPT -->
   <script>
-    let historyData = [];
-    let currentPeriod = null;
-    let lastFetchedPeriod = null;
-    let currentPrediction = null;
-    let isRefreshing = false;
+    let period = 10399;
+    let timer = 59;
 
-    document.addEventListener('DOMContentLoaded', () => {
-      startCountdownSync();
-
-      document.getElementById('refreshBtn').addEventListener('click', function () {
-        if (!isRefreshing) {
-          manualRefresh();
-        }
-      });
-    });
-
-    function getLast5Digits(period) {
-      if (!period) return '--';
-      const str = period.toString();
-      return str.length <= 5 ? str : str.slice(-5);
+    function updateUI() {
+      document.getElementById("period").textContent = period;
+      document.getElementById("timer").textContent = timer + "s";
+      document.getElementById("historyPeriod").textContent = period;
     }
 
-    async function fetchGameResult() {
-      try {
-        const payload = {
-          pageSize: 10,
-          pageNo: 1,
-          typeId: 1,
-          language: 0,
-          random: "4a0522c6ecd8410496260e686be2a57c",
-          signature: "334B5E70A0C9B8918B0B15E517E2069C",
-          timestamp: Math.floor(Date.now() / 1000)
-        };
-
-        let response = await fetch("https://api.bdg88zf.com/api/webapi/GetNoaverageEmerdList", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload)
-        });
-
-        let data = await response.json();
-        let latest = data?.data?.list?.[0];
-        if (latest) {
-          return {
-            period: latest.issueNumber,
-            result: latest.number,
-            timestamp: Math.floor(Date.now() / 1000)
-          };
-        } else {
-          throw new Error("No data found");
-        }
-      } catch (error) {
-        console.error("API error:", error);
-        return null;
-      }
-    }
-
-    async function updatePrediction(forceUpdate = false) {
-      const apiResult = await fetchGameResult();
-      if (!apiResult) return;
-
-      if (apiResult.period === lastFetchedPeriod && !forceUpdate) return;
-
-      lastFetchedPeriod = apiResult.period;
-      currentPeriod = (BigInt(apiResult.period) + 1n).toString();
-      let prediction = autoPredict(apiResult.result);
-      currentPrediction = prediction.type;
-
-      document.getElementById("currentPeriod").textContent = getLast5Digits(currentPeriod);
-      const predictionEl = document.getElementById("prediction");
-      predictionEl.textContent = currentPrediction;
-      predictionEl.style.color = currentPrediction === "BIG" ? "var(--primary-color)" : "var(--info-color)";
-
-      const newHistory = {
-        period: currentPeriod,
-        result: apiResult.result,
-        prediction: currentPrediction,
-        status: "pending",
-        timestamp: apiResult.timestamp
-      };
-
-      historyData.unshift(newHistory);
-      updateHistory(newHistory);
-      checkWinLoss(apiResult);
-    }
-
-    async function manualRefresh() {
-      isRefreshing = true;
-      document.getElementById('refreshText').textContent = "REFRESHING";
-      document.getElementById('refreshSpinner').style.display = 'block';
-
-      try {
-        await updatePrediction(true);
-      } catch (e) {
-        console.error("Manual refresh error:", e);
-      } finally {
-        setTimeout(() => {
-          document.getElementById('refreshText').textContent = "REFRESH DATA";
-          document.getElementById('refreshSpinner').style.display = 'none';
-          isRefreshing = false;
-        }, 1000);
-      }
-    }
-
-    function advancedPrediction(history) {
-      if (history.length < 3) return "BIG";
-      const lastResults = history.slice(0, 5).map(h => h.result);
-      const fibWeights = [8, 5, 3, 2, 1];
-      let fibSum = 0;
-      let totalWeight = 0;
-
-      lastResults.forEach((result, i) => {
-        const weight = fibWeights[i] || 1;
-        fibSum += result * weight;
-        totalWeight += weight;
-      });
-
-      const fibPrediction = Math.round(fibSum / totalWeight) % 10;
-      let trend = 0;
-
-      for (let i = 1; i < lastResults.length; i++) {
-        if (lastResults[i] > lastResults[i - 1]) trend++;
-        else if (lastResults[i] < lastResults[i - 1]) trend--;
-      }
-
-      const trendPrediction = trend > 0 ? "SMALL" : "BIG";
-
-      const numberCount = {};
-      history.forEach(h => {
-        numberCount[h.result] = (numberCount[h.result] || 0) + 1;
-      });
-
-      const hot = Object.keys(numberCount).sort((a, b) => numberCount[b] - numberCount[a])[0];
-      const hotPrediction = hot >= 5 ? "BIG" : "SMALL";
-
-      const strategies = [
-        { prediction: fibPrediction >= 5 ? "BIG" : "SMALL", weight: 4 },
-        { prediction: trendPrediction, weight: 3 },
-        { prediction: hotPrediction, weight: 2 }
-      ];
-
-      let bigVotes = 0, smallVotes = 0;
-      strategies.forEach(s => {
-        if (s.prediction === "BIG") bigVotes += s.weight;
-        else smallVotes += s.weight;
-      });
-
-      return bigVotes > smallVotes ? "BIG" : "SMALL";
-    }
-
-    function autoPredict(actual) {
-      return { type: advancedPrediction(historyData) };
-    }
-
-    function checkWinLoss(apiResult) {
-      const actual = apiResult.result >= 5 ? "BIG" : "SMALL";
-      historyData.forEach(item => {
-        if (item.period === apiResult.period) {
-          item.status = item.prediction === actual ? "win" : "loss";
-        }
-      });
-      updateHistory();
-    }
-
-    function updateHistory(newItem = null) {
-      const list = document.getElementById("historyItems");
-
-      if (newItem) {
-        const el = createHistoryItem(newItem);
-        el.classList.add('slide-in');
-        list.insertBefore(el, list.firstChild);
+    function countdown() {
+      if (timer > 0) {
+        timer--;
       } else {
-        list.innerHTML = "";
-        historyData.slice(0, 10).forEach(item => {
-          list.appendChild(createHistoryItem(item));
-        });
+        timer = 59;
+        period++;
       }
-
-      document.getElementById("historyCount").textContent = historyData.filter(i => i.status !== "pending").length;
+      updateUI();
     }
 
-    function createHistoryItem(item) {
-      const div = document.createElement("div");
-      div.className = "history-item";
-
-      const statusClass = item.status === "win" ? "win" :
-                          item.status === "loss" ? "loss" : "pending";
-
-      const statusText = item.status.toUpperCase();
-      const icon = item.prediction === "BIG" ? "fa-arrow-up" : "fa-arrow-down";
-
-      div.innerHTML = `
-        <div class="history-period"><i class="fas fa-hashtag"></i> ${getLast5Digits(item.period)}</div>
-        <div class="history-details">
-          <div class="prediction ${item.prediction.toLowerCase()}">
-            <i class="fas ${icon}"></i> ${item.prediction}
-            <div class="status ${statusClass}">${statusText}</div>
-          </div>
-        </div>
-      `;
-      return div;
+    function refreshData() {
+      // This simulates new data being fetched.
+      alert("Data refreshed!");
+      document.getElementById("result").textContent = "BIG"; // or "SMALL"
     }
 
-    function startCountdownSync() {
-      updatePrediction(true);
-      setInterval(async () => {
-        const now = Date.now();
-        const seconds = Math.floor(now / 1000) % 60;
-        const remaining = 60 - seconds;
-        document.getElementById("countdown").textContent = `${remaining}s`;
-
-        if (remaining === 60 || remaining === 0) {
-          await updatePrediction();
-        }
-      }, 1000);
-    }
+    updateUI();
+    setInterval(countdown, 1000);
   </script>
+
 </body>
 </html>
