@@ -2,133 +2,184 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>MR.HACKER 3.0</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Khatarnak Predictor v6.4</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     body {
-      margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(to bottom right, #ff0033, #ff6680);
-      color: #cc0000;
+      background: #000;
+      color: #0f0;
+      font-family: monospace;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding-top: 30px;
+      min-height: 100vh;
     }
-
-    .container {
-      padding: 20px;
+    #randomWord {
+      font-size: 28px;
+      padding: 10px 20px;
+      margin: 10px;
+      border: 2px solid #0f0;
+      border-radius: 10px;
+    }
+    #timer {
+      font-size: 24px;
+      margin-bottom: 20px;
+      border: 2px solid #0f0;
+      padding: 6px 14px;
+      border-radius: 10px;
+      width: fit-content;
+    }
+    canvas {
+      background: #111;
+      border: 1px solid #0f0;
+      border-radius: 10px;
+      margin-top: 10px;
+    }
+    #historyTable {
+      margin-top: 20px;
+      border-collapse: collapse;
+      width: 90%;
+      max-width: 400px;
+    }
+    #historyTable th, #historyTable td {
+      border: 1px solid #0f0;
+      padding: 5px;
       text-align: center;
     }
-
-    h1 {
-      font-size: 32px;
-      color: #cc0000;
-    }
-
-    .tags button {
-      margin: 5px;
-      padding: 8px 16px;
-      background: #ffd5d5;
-      border: none;
-      border-radius: 20px;
-      font-weight: bold;
-      color: #cc0000;
-    }
-
-    .box {
-      background: #fff;
-      border-radius: 12px;
-      padding: 10px 20px;
-      margin: 10px auto;
-      width: 250px;
-      font-size: 20px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    }
-
-    .box i {
-      margin-right: 10px;
-    }
-
-    .refresh-btn {
-      background: #cc0000;
-      color: white;
-      border: none;
-      border-radius: 10px;
-      padding: 12px 30px;
-      font-size: 16px;
-      margin: 20px 0;
-    }
-
-    .history {
-      background: #fff;
-      border-radius: 12px;
-      padding: 15px;
-      margin: 10px;
-      width: 250px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    }
-
-    .pending {
-      background: #fff0cc;
-      color: #cc6600;
-      padding: 4px 10px;
-      border-radius: 10px;
-      font-weight: bold;
-    }
+    .big { color: #0ff; }
+    .small { color: #ff0; }
   </style>
 </head>
 <body>
+  <div id="randomWord">Loading...</div>
+  <div id="timer">60s</div>
+  <canvas id="myChart" width="300" height="200"></canvas>
 
-  <div class="container">
-    <h1>MR.HACKER</h1>
-    <div class="tags">
-      <button>VERSION 3.0</button>
-      <button>AI POWERED</button>
-      <button>ULTRA PRECISION</button>
-    </div>
+  <table id="historyTable">
+    <thead>
+      <tr><th>Time</th><th>Prediction</th></tr>
+    </thead>
+    <tbody id="historyBody"></tbody>
+  </table>
 
-    <div class="box"><span>📅</span><span id="period">00000</span></div>
-    <div class="box"><span>⏱️</span><span id="timer">59s</span></div>
-    <div class="box"><span>🎯</span><span id="result">--</span></div>
-
-    <button class="refresh-btn" onclick="refreshData()">🔄 REFRESH DATA</button>
-
-    <h3 style="margin-top: 20px;">🔁 HISTORY</h3>
-    <div class="history">
-      <p># <span id="historyPeriod">00000</span></p>
-      <p><strong>BIG</strong> <span class="pending">PENDING</span></p>
-    </div>
-  </div>
+  <audio id="alertSound" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" preload="auto"></audio>
 
   <script>
-    let period = 10399;
-    let timer = 59;
+    const API_URL = "https://your-api-url.com"; // Placeholder
+    let history = [];
+    let lastPrediction = "";
+    const bigNumbers = [5,6,7,8,9];
+    const smallNumbers = [0,1,2,3,4];
 
-    function updateUI() {
-      document.getElementById("period").textContent = period;
-      document.getElementById("timer").textContent = timer + "s";
-      document.getElementById("historyPeriod").textContent = period;
-    }
-
-    function countdown() {
-      if (timer > 0) {
-        timer--;
-      } else {
-        timer = 59;
-        period++;
+    const ctx = document.getElementById('myChart').getContext('2d');
+    const chart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: [],
+        datasets: [{
+          label: 'Predicted Number',
+          data: [],
+          backgroundColor: '#0f0'
+        }]
+      },
+      options: {
+        scales: {
+          y: { beginAtZero: true, ticks: { color: '#0f0' } },
+          x: { ticks: { color: '#0f0' } }
+        },
+        plugins: { legend: { labels: { color: '#0f0' } } }
       }
-      updateUI();
+    });
+
+    function updateChart(prediction, number) {
+      if (chart.data.labels.length >= 10) {
+        chart.data.labels.shift();
+        chart.data.datasets[0].data.shift();
+      }
+      chart.data.labels.push(prediction);
+      chart.data.datasets[0].data.push(number);
+      chart.update();
     }
 
-    function refreshData() {
-      // This simulates new data being fetched.
-      alert("Data refreshed!");
-      document.getElementById("result").textContent = "BIG"; // or "SMALL"
+    function updateHistoryTable(time, result, numberList) {
+      const historyBody = document.getElementById('historyBody');
+      const row = document.createElement('tr');
+      const typeClass = result.toLowerCase();
+      row.innerHTML = `<td>${time}</td><td class="${typeClass}">${result} → [${numberList.join(', ')}]</td>`;
+      historyBody.prepend(row);
+      while (historyBody.children.length > 5) {
+        historyBody.removeChild(historyBody.lastChild);
+      }
     }
 
-    updateUI();
-    setInterval(countdown, 1000);
+    function smartPredict(historyList) {
+      let result = "Big";
+      let candidates = bigNumbers;
+
+      if (historyList.length >= 4) {
+        const last4 = historyList.slice(-4);
+        const bigs = last4.filter(h => h.result === "Big").length;
+        const smalls = last4.filter(h => h.result === "Small").length;
+
+        if (bigs >= 3) {
+          result = "Small";
+          candidates = smallNumbers;
+        } else if (smalls >= 3) {
+          result = "Big";
+          candidates = bigNumbers;
+        } else {
+          const last = historyList[historyList.length - 1];
+          result = last.result === "Big" ? "Small" : "Big";
+          candidates = result === "Big" ? bigNumbers : smallNumbers;
+        }
+      } else {
+        result = Math.random() > 0.5 ? "Big" : "Small";
+        candidates = result === "Big" ? bigNumbers : smallNumbers;
+      }
+
+      const shuffled = candidates.sort(() => 0.5 - Math.random());
+      const pick = shuffled.slice(0, 2);
+      lastPrediction = { result, pick };
+      return { result, pick };
+    }
+
+    function playAlert() {
+      const alertSound = document.getElementById('alertSound');
+      alertSound.currentTime = 0;
+      alertSound.play();
+    }
+
+    // ⏱️ New countdown timer logic
+    function startCountdown() {
+      let counter = 60;
+
+      setInterval(() => {
+        document.getElementById('timer').textContent = counter + "s";
+
+        if (counter === 0) {
+          const now = new Date();
+          const timeStr = now.getHours().toString().padStart(2, '0') + ':' +
+                          now.getMinutes().toString().padStart(2, '0') + ':' +
+                          now.getSeconds().toString().padStart(2, '0');
+
+          const prediction = smartPredict(history);
+          document.getElementById('randomWord').textContent =
+            `${prediction.result} → [${prediction.pick.join(', ')}]`;
+
+          updateChart(prediction.result, prediction.pick[0]);
+          updateHistoryTable(timeStr, prediction.result, prediction.pick);
+          playAlert();
+
+          history.push({ result: prediction.result });
+          counter = 60; // reset countdown
+        } else {
+          counter--;
+        }
+      }, 1000);
+    }
+
+    startCountdown();
   </script>
-
 </body>
 </html>
