@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MR.HACKER 3.0</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #ff0033, #ffd6d6);
+      color: #b80000;
+    }
+
+    .container {
+      max-width: 400px;
+      margin: auto;
+      padding: 20px;
+      background: #fff;
+      border-radius: 20px;
+      box-shadow: 0 0 20px rgba(255, 0, 0, 0.2);
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 28px;
+      margin-bottom: 10px;
+      color: #cc0000;
+    }
+
+    .badges {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
+    .badge {
+      background: #ffcccc;
+      padding: 6px 12px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: bold;
+    }
+
+    .data-box {
+      background: #fff;
+      border: 2px solid #ffcccc;
+      border-radius: 12px;
+      padding: 10px;
+      margin: 10px 0;
+      font-size: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .data-box i {
+      color: #cc0000;
+    }
+
+    .refresh-btn {
+      background: #cc0000;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      font-size: 18px;
+      border-radius: 10px;
+      margin: 15px 0;
+      cursor: pointer;
+    }
+
+    .refresh-btn:hover {
+      background: #990000;
+    }
+
+    .history {
+      text-align: left;
+      padding-top: 10px;
+    }
+
+    .history h2 {
+      font-size: 18px;
+      color: #cc0000;
+    }
+
+    .history-item {
+      background: #fff4f4;
+      border: 1px solid #ffcccc;
+      border-radius: 10px;
+      padding: 10px;
+      margin-top: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .pending {
+      background: #fff1d6;
+      color: #cc6600;
+      padding: 4px 8px;
+      border-radius: 5px;
+      font-size: 12px;
+    }
+
+    .big {
+      color: red;
+      font-weight: bold;
+    }
+
+    .small {
+      color: blue;
+      font-weight: bold;
+    }
+
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>MR.HACKER</h1>
+    <div class="badges">
+      <div class="badge">VERSION 3.0</div>
+      <div class="badge">AI POWERED</div>
+      <div class="badge">ULTRA PRECISION</div>
+    </div>
+
+    <div class="data-box">
+      <i>📅</i>
+      <span id="currentPeriod">00000</span>
+    </div>
+
+    <div class="data-box">
+      <i>⏱</i>
+      <span id="countdown">60s</span>
+    </div>
+
+    <div class="data-box">
+      <i>🎯</i>
+      <span id="prediction">--</span>
+    </div>
+
+    <button class="refresh-btn" onclick="fetchPrediction()">🔄 REFRESH DATA</button>
+
+    <div class="history">
+      <h2>🔁 HISTORY</h2>
+      <div class="history-item">
+        <div>
+          <strong># <span id="historyPeriod">00000</span></strong><br/>
+          <span id="historyPrediction" class="big">BIG</span>
+        </div>
+        <div id="historyStatus" class="pending">PENDING</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let countdownInterval;
+    let countdown = 60;
+
+    function getLast5Digits(period) {
+      return period.slice(-5);
+    }
+
+    function fetchPrediction() {
+      fetch("https://raja.run/api/prediction/current")
+        .then((response) => response.json())
+        .then((data) => {
+          const apiResult = data.result;
+          const actualPeriod = apiResult.period;
+          const predictionPeriod = (BigInt(actualPeriod) + 1n).toString();
+
+          const predictedResult = apiResult.prediction; // BIG or SMALL
+
+          // Display actual period (not +1)
+          document.getElementById("currentPeriod").textContent = getLast5Digits(actualPeriod);
+          document.getElementById("prediction").textContent = predictedResult;
+
+          // For History section
+          document.getElementById("historyPeriod").textContent = getLast5Digits(actualPeriod);
+          document.getElementById("historyPrediction").textContent = predictedResult;
+
+          const status = apiResult.status || "PENDING";
+          document.getElementById("historyStatus").textContent = status;
+
+          document.getElementById("historyPrediction").className =
+            predictedResult === "BIG" ? "big" : "small";
+        })
+        .catch((error) => {
+          console.error("Prediction fetch error:", error);
+        });
+    }
+
+    function startCountdown() {
+      countdown = 60;
+      clearInterval(countdownInterval);
+      countdownInterval = setInterval(() => {
+        countdown--;
+        document.getElementById("countdown").textContent = countdown + "s";
+        if (countdown <= 0) {
+          clearInterval(countdownInterval);
+          fetchPrediction();
+          startCountdown();
+        }
+      }, 1000);
+    }
+
+    fetchPrediction();
+    startCountdown();
+  </script>
+</body>
+</html>
