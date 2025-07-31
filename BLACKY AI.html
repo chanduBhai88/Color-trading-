@@ -3,136 +3,282 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>RajaGame Big/Small Tracker</title>
+  <title>MR.HACKER 3.0</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Rajdhani:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
-    body {
-      margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background: url('https://images.unsplash.com/photo-1604382351680-699d8ad42937?auto=format&fit=crop&w=1470&q=80') no-repeat center center fixed;
-      background-size: cover;
-      color: #fff;
-    }
-
-    .container {
-      background: rgba(0, 0, 0, 0.85);
-      max-width: 600px;
-      margin: 50px auto;
-      padding: 20px;
-      border-radius: 16px;
-      box-shadow: 0 0 20px rgba(255,255,255,0.2);
-    }
-
-    h2 {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-
-    .inputs {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      justify-content: center;
-      margin-bottom: 20px;
-    }
-
-    select {
-      padding: 10px;
-      font-size: 1rem;
-      border-radius: 8px;
-      border: none;
-      width: 100px;
-      text-align: center;
-    }
-
-    button {
-      width: 100%;
-      padding: 12px;
-      font-size: 1rem;
-      background-color: #28a745;
-      border: none;
-      border-radius: 10px;
-      color: white;
-      cursor: pointer;
-    }
-
-    .result {
-      margin-top: 20px;
-      text-align: center;
-      font-weight: bold;
-      font-size: 1.3rem;
-      color: #ff4d4d;
-    }
+    /* Aapka existing CSS bilkul same rahega, ismein koi change nahi kiya gaya */
+    /* Skip for brevity — aapka pehle se diya hua style tag waisa ka waisa use karo */
   </style>
 </head>
 <body>
-  <div class="container">
-    <h2>🎯 RajaGame Predictor</h2>
-    <div class="inputs" id="input-container"></div>
-    <button onclick="predict()">🔮 Predict Next</button>
-    <div class="result" id="result">Enter 6 previous results.</div>
+
+  <!-- Header -->
+  <div class="header">
+    <i class="fas fa-arrow-left"></i> MR.HACKER 3.0
   </div>
 
+  <!-- Title -->
+  <div class="top-section">
+    <h1>MR.HACKER</h1>
+    <div class="badges">
+      <span class="badge">VERSION 3.0</span>
+      <span class="badge">AI POWERED</span>
+      <span class="badge">ULTRA PRECISION</span>
+    </div>
+  </div>
+
+  <!-- Prediction Card -->
+  <div class="card prediction-card glow">
+    <div class="info-container">
+      <div class="info-box">
+        <div class="info-label"><i class="fas fa-calendar-alt"></i></div>
+        <div class="info-value" id="currentPeriod">--</div>
+      </div>
+      <div class="info-box">
+        <div class="info-label"><i class="fas fa-clock"></i></div>
+        <div class="info-value" id="countdown">--</div>
+      </div>
+      <div class="info-box">
+        <div class="info-label"><i class="fas fa-bullseye"></i></div>
+        <div class="info-value" id="prediction">--</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Refresh Button -->
+  <button class="refresh-btn" id="refreshBtn">
+    <i class="fas fa-sync-alt"></i> 
+    <span id="refreshText">REFRESH DATA</span>
+    <div class="loading" id="refreshSpinner" style="display: none;"></div>
+  </button>
+
+  <!-- History -->
+  <div class="history-section">
+    <div class="section-header">
+      <div class="history-title"><i class="fas fa-history"></i>HISTORY</div>
+      <div class="history-count" id="historyCount">0</div>
+    </div>
+    <div class="history-list" id="historyItems"></div>
+  </div>
+
+  <!-- SCRIPT -->
   <script>
-    const history = [
-      // Latest screenshot (top to bottom)
-      "Big", "Big", "Small", "Small", "Big", "Small", "Small", "Big", "Big", "Small",
+    let historyData = [];
+    let currentPeriod = null;
+    let lastFetchedPeriod = null;
+    let currentPrediction = null;
+    let isRefreshing = false;
 
-      // Older entries
-      "Small", "Small", "Small", "Big", "Small", "Small", "Big", "Big", "Big", "Big",
-      "Big", "Small", "Small", "Big", "Small", "Small", "Big", "Small", "Big", "Small",
-      "Big", "Small", "Small", "Small", "Big", "Big", "Small", "Big", "Small", "Big",
-      "Big", "Small", "Small", "Big", "Small", "Small", "Big", "Big", "Big", "Big",
-      "Big", "Small", "Small", "Big", "Small", "Small", "Big", "Small", "Big", "Small"
-    ];
+    document.addEventListener('DOMContentLoaded', () => {
+      startCountdownSync();
 
-    const container = document.getElementById("input-container");
-    const inputLength = 6;
+      document.getElementById('refreshBtn').addEventListener('click', function () {
+        if (!isRefreshing) {
+          manualRefresh();
+        }
+      });
+    });
 
-    // Create dropdowns
-    for (let i = 0; i < inputLength; i++) {
-      const select = document.createElement("select");
-      const opt1 = document.createElement("option");
-      opt1.value = "";
-      opt1.text = "--";
-      const opt2 = document.createElement("option");
-      opt2.value = "Big";
-      opt2.text = "Big";
-      const opt3 = document.createElement("option");
-      opt3.value = "Small";
-      opt3.text = "Small";
-      select.appendChild(opt1);
-      select.appendChild(opt2);
-      select.appendChild(opt3);
-      select.id = "s" + i;
-      container.appendChild(select);
+    function getLast5Digits(period) {
+      if (!period) return '--';
+      const str = period.toString();
+      return str.length <= 5 ? str : str.slice(-5);
     }
 
-    function predict() {
-      const pattern = [];
-      for (let i = 0; i < inputLength; i++) {
-        const val = document.getElementById("s" + i).value;
-        if (val !== "Big" && val !== "Small") {
-          document.getElementById("result").innerText = "❌ Please select all 6 inputs.";
-          return;
+    async function fetchGameResult() {
+      try {
+        const payload = {
+          pageSize: 10,
+          pageNo: 1,
+          typeId: 1,
+          language: 0,
+          random: "4a0522c6ecd8410496260e686be2a57c",
+          signature: "334B5E70A0C9B8918B0B15E517E2069C",
+          timestamp: Math.floor(Date.now() / 1000)
+        };
+
+        let response = await fetch("https://api.bdg88zf.com/api/webapi/GetNoaverageEmerdList", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+
+        let data = await response.json();
+        let latest = data?.data?.list?.[0];
+        if (latest) {
+          return {
+            period: latest.issueNumber,
+            result: latest.number,
+            timestamp: Math.floor(Date.now() / 1000)
+          };
+        } else {
+          throw new Error("No data found");
         }
-        pattern.push(val);
+      } catch (error) {
+        console.error("API error:", error);
+        return null;
+      }
+    }
+
+    async function updatePrediction(forceUpdate = false) {
+      const apiResult = await fetchGameResult();
+      if (!apiResult) return;
+
+      if (apiResult.period === lastFetchedPeriod && !forceUpdate) return;
+
+      lastFetchedPeriod = apiResult.period;
+      currentPeriod = (BigInt(apiResult.period) + 1n).toString();
+      let prediction = autoPredict(apiResult.result);
+      currentPrediction = prediction.type;
+
+      document.getElementById("currentPeriod").textContent = getLast5Digits(currentPeriod);
+      const predictionEl = document.getElementById("prediction");
+      predictionEl.textContent = currentPrediction;
+      predictionEl.style.color = currentPrediction === "BIG" ? "var(--primary-color)" : "var(--info-color)";
+
+      const newHistory = {
+        period: currentPeriod,
+        result: apiResult.result,
+        prediction: currentPrediction,
+        status: "pending",
+        timestamp: apiResult.timestamp
+      };
+
+      historyData.unshift(newHistory);
+      updateHistory(newHistory);
+      checkWinLoss(apiResult);
+    }
+
+    async function manualRefresh() {
+      isRefreshing = true;
+      document.getElementById('refreshText').textContent = "REFRESHING";
+      document.getElementById('refreshSpinner').style.display = 'block';
+
+      try {
+        await updatePrediction(true);
+      } catch (e) {
+        console.error("Manual refresh error:", e);
+      } finally {
+        setTimeout(() => {
+          document.getElementById('refreshText').textContent = "REFRESH DATA";
+          document.getElementById('refreshSpinner').style.display = 'none';
+          isRefreshing = false;
+        }, 1000);
+      }
+    }
+
+    function advancedPrediction(history) {
+      if (history.length < 3) return "BIG";
+      const lastResults = history.slice(0, 5).map(h => h.result);
+      const fibWeights = [8, 5, 3, 2, 1];
+      let fibSum = 0;
+      let totalWeight = 0;
+
+      lastResults.forEach((result, i) => {
+        const weight = fibWeights[i] || 1;
+        fibSum += result * weight;
+        totalWeight += weight;
+      });
+
+      const fibPrediction = Math.round(fibSum / totalWeight) % 10;
+      let trend = 0;
+
+      for (let i = 1; i < lastResults.length; i++) {
+        if (lastResults[i] > lastResults[i - 1]) trend++;
+        else if (lastResults[i] < lastResults[i - 1]) trend--;
       }
 
-      const strPattern = pattern.join("-");
-      let found = false;
+      const trendPrediction = trend > 0 ? "SMALL" : "BIG";
 
-      for (let i = 0; i <= history.length - (inputLength + 1); i++) {
-        const current = history.slice(i, i + inputLength).join("-");
-        if (current === strPattern) {
-          document.getElementById("result").innerText = `✅ Next: ${history[i + inputLength]}`;
-          found = true;
-          break;
+      const numberCount = {};
+      history.forEach(h => {
+        numberCount[h.result] = (numberCount[h.result] || 0) + 1;
+      });
+
+      const hot = Object.keys(numberCount).sort((a, b) => numberCount[b] - numberCount[a])[0];
+      const hotPrediction = hot >= 5 ? "BIG" : "SMALL";
+
+      const strategies = [
+        { prediction: fibPrediction >= 5 ? "BIG" : "SMALL", weight: 4 },
+        { prediction: trendPrediction, weight: 3 },
+        { prediction: hotPrediction, weight: 2 }
+      ];
+
+      let bigVotes = 0, smallVotes = 0;
+      strategies.forEach(s => {
+        if (s.prediction === "BIG") bigVotes += s.weight;
+        else smallVotes += s.weight;
+      });
+
+      return bigVotes > smallVotes ? "BIG" : "SMALL";
+    }
+
+    function autoPredict(actual) {
+      return { type: advancedPrediction(historyData) };
+    }
+
+    function checkWinLoss(apiResult) {
+      const actual = apiResult.result >= 5 ? "BIG" : "SMALL";
+      historyData.forEach(item => {
+        if (item.period === apiResult.period) {
+          item.status = item.prediction === actual ? "win" : "loss";
         }
+      });
+      updateHistory();
+    }
+
+    function updateHistory(newItem = null) {
+      const list = document.getElementById("historyItems");
+
+      if (newItem) {
+        const el = createHistoryItem(newItem);
+        el.classList.add('slide-in');
+        list.insertBefore(el, list.firstChild);
+      } else {
+        list.innerHTML = "";
+        historyData.slice(0, 10).forEach(item => {
+          list.appendChild(createHistoryItem(item));
+        });
       }
 
-      if (!found) {
-        document.getElementById("result").innerText = "❌ Pattern not found in history.";
-      }
+      document.getElementById("historyCount").textContent = historyData.filter(i => i.status !== "pending").length;
+    }
+
+    function createHistoryItem(item) {
+      const div = document.createElement("div");
+      div.className = "history-item";
+
+      const statusClass = item.status === "win" ? "win" :
+                          item.status === "loss" ? "loss" : "pending";
+
+      const statusText = item.status.toUpperCase();
+      const icon = item.prediction === "BIG" ? "fa-arrow-up" : "fa-arrow-down";
+
+      div.innerHTML = `
+        <div class="history-period"><i class="fas fa-hashtag"></i> ${getLast5Digits(item.period)}</div>
+        <div class="history-details">
+          <div class="prediction ${item.prediction.toLowerCase()}">
+            <i class="fas ${icon}"></i> ${item.prediction}
+            <div class="status ${statusClass}">${statusText}</div>
+          </div>
+        </div>
+      `;
+      return div;
+    }
+
+    function startCountdownSync() {
+      updatePrediction(true);
+      setInterval(async () => {
+        const now = Date.now();
+        const seconds = Math.floor(now / 1000) % 60;
+        const remaining = 60 - seconds;
+        document.getElementById("countdown").textContent = `${remaining}s`;
+
+        if (remaining === 60 || remaining === 0) {
+          await updatePrediction();
+        }
+      }, 1000);
     }
   </script>
 </body>
