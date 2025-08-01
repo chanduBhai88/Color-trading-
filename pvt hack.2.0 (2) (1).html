@@ -7,7 +7,7 @@
   <style>
     body { background:#3d1f1f; color:#f0f0f0; font-family: system-ui,-apple-system,BlinkMacSystemFont,sans-serif; padding:1rem; }
     .card { background:#4b2d2d; border-radius:12px; padding:1rem; margin-bottom:1rem; box-shadow:0 8px 24px rgba(0,0,0,0.3); }
-    input, select { padding:8px; border-radius:6px; border:none; margin-right:4px; margin-bottom:6px; width:60px; }
+    input { padding:8px; border-radius:6px; border:none; margin-right:4px; margin-bottom:6px; width:60px; }
     button { padding:10px 16px; border:none; border-radius:8px; cursor:pointer; background:#f0b040; color:#1f1f1f; font-weight:600; }
     .result { margin-top:1rem; font-size:1.2rem; }
     .badge { display:inline-block; padding:6px 12px; border-radius:999px; background:#222; margin-right:6px; }
@@ -16,57 +16,15 @@
 <body>
   <div class="card">
     <h2>RajaGame Predictor (6 inputs → 3 numbers)</h2>
-    <p>Last 6 results dalo (Number 0-9 + Color):</p>
+    <p>Last 6 results dalo (Number 0-9):</p>
     <div id="inputs">
-      <!-- six rows -->
-      <div class="row">
-        <input type="number" min="0" max="9" placeholder="Num" class="num" />
-        <select class="color">
-          <option value="red">Red</option>
-          <option value="green">Green</option>
-          <option value="violet">Violet</option>
-        </select>
-      </div>
-      <div class="row">
-        <input type="number" min="0" max="9" placeholder="Num" class="num" />
-        <select class="color">
-          <option value="red">Red</option>
-          <option value="green">Green</option>
-          <option value="violet">Violet</option>
-        </select>
-      </div>
-      <div class="row">
-        <input type="number" min="0" max="9" placeholder="Num" class="num" />
-        <select class="color">
-          <option value="red">Red</option>
-          <option value="green">Green</option>
-          <option value="violet">Violet</option>
-        </select>
-      </div>
-      <div class="row">
-        <input type="number" min="0" max="9" placeholder="Num" class="num" />
-        <select class="color">
-          <option value="red">Red</option>
-          <option value="green">Green</option>
-          <option value="violet">Violet</option>
-        </select>
-      </div>
-      <div class="row">
-        <input type="number" min="0" max="9" placeholder="Num" class="num" />
-        <select class="color">
-          <option value="red">Red</option>
-          <option value="green">Green</option>
-          <option value="violet">Violet</option>
-        </select>
-      </div>
-      <div class="row">
-        <input type="number" min="0" max="9" placeholder="Num" class="num" />
-        <select class="color">
-          <option value="red">Red</option>
-          <option value="green">Green</option>
-          <option value="violet">Violet</option>
-        </select>
-      </div>
+      <!-- six number inputs -->
+      <div class="row"><input type="number" min="0" max="9" placeholder="Num" class="num" /></div>
+      <div class="row"><input type="number" min="0" max="9" placeholder="Num" class="num" /></div>
+      <div class="row"><input type="number" min="0" max="9" placeholder="Num" class="num" /></div>
+      <div class="row"><input type="number" min="0" max="9" placeholder="Num" class="num" /></div>
+      <div class="row"><input type="number" min="0" max="9" placeholder="Num" class="num" /></div>
+      <div class="row"><input type="number" min="0" max="9" placeholder="Num" class="num" /></div>
     </div>
     <button onclick="predict()">Predict Next 3</button>
     <div class="result" id="output"></div>
@@ -88,7 +46,6 @@
 
     function predict() {
       const nums = Array.from(document.querySelectorAll('.num')).map(i => parseInt(i.value));
-      const colors = Array.from(document.querySelectorAll('.color')).map(s => s.value);
       if (nums.some(n => isNaN(n))) {
         document.getElementById('output').innerText = '6 numbers daaliye (0-9).';
         return;
@@ -105,28 +62,18 @@
         predictedBS = lastBS;
       }
 
-      // Color: alternate from last non-violet if possible
-      let lastColor = colors[colors.length -1];
-      let predictedColor;
-      if (lastColor === 'red') predictedColor = 'green';
-      else if (lastColor === 'green') predictedColor = 'red';
-      else predictedColor = 'green'; // violet fallback
-
       // Number logic candidates:
-      // 1. Most frequent number among last 6
       const mode = majority(nums);
-      // 2. Neighbor of mode: +1 or -1 bounded 0-9
       const neighbors = [];
       if (mode !== null) {
         if (mode -1 >= 0) neighbors.push(mode -1);
         if (mode +1 <= 9) neighbors.push(mode +1);
       }
-      // 3. Parity flip: if last three have same parity, pick opposite parity number near middle
+      // Parity flip
       const last3nums = nums.slice(-3);
       const parity = last3nums.map(n => n % 2);
       let parityCandidate = null;
       if (parity.every(p => p === parity[0])) {
-        // flip parity: choose smallest number of opposite parity not in recent
         const targetParity = parity[0] === 0 ? 1 : 0;
         for (let i = 1; i <=9; i++) {
           if (i % 2 === targetParity) {
@@ -136,12 +83,11 @@
         }
       }
 
-      // Build candidate list: prefer mode, neighbor, parity flip
       const candidates = [];
       if (mode !== null) candidates.push(mode);
       neighbors.forEach(n => { if (!candidates.includes(n)) candidates.push(n); });
       if (parityCandidate !== null && !candidates.includes(parityCandidate)) candidates.push(parityCandidate);
-      // Fill to 3 with fallback based on predictedBS: if Big pick 7/9 else 1/3/5
+      // Fallback based on predicted Big/Small
       const fallback = predictedBS === 'Big' ? [9,7,8] : [1,3,5];
       for (const f of fallback) {
         if (candidates.length >= 3) break;
@@ -153,7 +99,6 @@
       const out = document.getElementById('output');
       out.innerHTML = `
         <div class="badge">Predicted Big/Small: <strong>${predictedBS}</strong></div>
-        <div class="badge">Predicted Color: <strong>${predictedColor}</strong></div>
         <div class="badge">Top 3 Numbers: <strong>${top3.join(', ')}</strong></div>
       `;
     }
