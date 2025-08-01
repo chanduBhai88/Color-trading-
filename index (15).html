@@ -112,7 +112,7 @@
     <h2>❤️ RajaGame Predictor</h2>
     <div class="inputs" id="input-container"></div>
     <button onclick="predict()">🔮 Predict Next</button>
-    <div class="result" id="result">Enter last 9 Big/Small results.</div>
+    <div class="result" id="result">Enter last 7 Big/Small results.</div>
 
     <div class="memory" id="memory-box">
       <h4>🧠 Last 5 Predictions:</h4>
@@ -140,7 +140,7 @@
     const memoryList = document.getElementById("memory-list");
     const memory = [];
 
-    const inputLength = 9;
+    const inputLength = 7; // 👈 changed from 9 to 7
 
     // Create dropdowns
     for (let i = 0; i < inputLength; i++) {
@@ -186,7 +186,7 @@
       for (let i = 0; i < inputLength; i++) {
         const val = document.getElementById("s" + i).value;
         if (!val) {
-          showResult("❌ Please select all 9 inputs.", false);
+          showResult("❌ Please select all 7 inputs.", false);
           return;
         }
         pattern.push(val);
