@@ -15,44 +15,33 @@
 
     .container {
       background: rgba(0, 0, 0, 0.75);
-      max-width: 600px;
-      margin: 30px auto;
-      padding: 25px;
+      max-width: 500px;
+      margin: 50px auto;
+      padding: 20px;
       border-radius: 20px;
       box-shadow: 0 0 25px rgba(255,0,100,0.5);
       text-align: center;
     }
 
     h2 {
-      margin-bottom: 15px;
+      margin-bottom: 20px;
     }
 
     .inputs {
-      display: flex;
-      flex-wrap: wrap;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
       gap: 10px;
-      justify-content: center;
-      margin-bottom: 15px;
+      justify-items: center;
+      margin-bottom: 20px;
     }
 
-    select, textarea {
+    select {
       padding: 10px;
       font-size: 1rem;
       border-radius: 8px;
       border: none;
-      text-align: center;
-    }
-
-    select {
       width: 100px;
-    }
-
-    textarea {
-      width: 100%;
-      min-height: 80px;
-      resize: vertical;
-      background: rgba(255,255,255,0.05);
-      color: #fff;
+      text-align: center;
     }
 
     button {
@@ -64,20 +53,12 @@
       border-radius: 10px;
       color: white;
       cursor: pointer;
-      margin-top: 8px;
-    }
-
-    .small-btn {
-      width: auto;
-      display: inline-block;
-      padding: 8px 14px;
-      margin: 4px;
     }
 
     .result {
       margin-top: 20px;
       font-weight: bold;
-      font-size: 1.4rem;
+      font-size: 1.5rem;
       color: #ff4d4d;
       opacity: 0;
       transform: scale(0.9);
@@ -86,7 +67,7 @@
 
     .result.show {
       opacity: 1;
-      transform: scale(1.15);
+      transform: scale(1.2);
       animation: pulse 1s infinite alternate;
     }
 
@@ -124,115 +105,43 @@
       margin-bottom: 4px;
       color: #fff;
     }
-
-    .history-display {
-      text-align: left;
-      margin-top: 15px;
-      background: rgba(255,255,255,0.05);
-      padding: 12px;
-      border-radius: 10px;
-      font-size: 0.9rem;
-      max-height: 160px;
-      overflow: auto;
-      word-break: break-word;
-    }
-
-    .flex-row {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      justify-content: center;
-      margin-bottom: 10px;
-    }
-
-    .label {
-      font-size: 0.8rem;
-      margin-bottom: 4px;
-      display: block;
-      text-align: left;
-    }
-
-    .inline {
-      display: inline-block;
-    }
-
-    .hint {
-      font-size: 0.7rem;
-      color: #ccc;
-      margin-top: 4px;
-    }
-
-    .upload-area {
-      margin: 10px 0;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      align-items: center;
-    }
-
-    .small-text {
-      font-size: 0.8rem;
-    }
   </style>
 </head>
 <body>
   <div class="container">
     <h2>❤️ RajaGame Predictor</h2>
-
-    <!-- Sequence input -->
-    <div class="flex-row">
-      <div style="flex:1; min-width:260px;">
-        <label class="label">Paste Big/Small history (comma separated, latest at end):</label>
-        <textarea id="manual-history" placeholder="e.g. Big,Small,Big,Big,Small,..."></textarea>
-        <div class="hint">You can transcribe the 40 from your 4 images here. Latest result should be last, predictor uses last 7.</div>
-        <button onclick="loadManualHistory()">Load History</button>
-      </div>
-      <div style="flex:1; min-width:200px;">
-        <label class="label">Or upload image with visible last 7:</label>
-        <div class="upload-area">
-          <input type="file" id="imageInput" accept="image/*" />
-          <div class="hint">OCR will try to extract the last 7 Big/Small and auto-fill dropdowns.</div>
-        </div>
-      </div>
-    </div>
-
     <div class="inputs" id="input-container"></div>
-    <div class="flex-row" style="margin-top:0;">
-      <button style="flex:1;" onclick="predict()">🔮 Predict Next</button>
-    </div>
-    <div class="result" id="result">Enter last 7 Big/Small results or load from history.</div>
+    <button onclick="predict()">🔮 Predict Next</button>
+    <div class="result" id="result">Enter last 7 Big/Small results.</div>
 
-    <div class="history-display" id="current-history">
-      <strong>Current history (most recent at end):</strong><br>
-      <span id="history-text">(none loaded yet)</span>
-    </div>
-
-    <!-- 🧠 Memory of last 5 predictions -->
     <div class="memory" id="memory-box">
       <h4>🧠 Last 5 Predictions:</h4>
       <ul id="memory-list"></ul>
     </div>
   </div>
 
-  <!-- 🔊 Sound Effects -->
+  <!-- Sound Effects -->
   <audio id="successSound" src="https://cdn.pixabay.com/audio/2023/03/25/audio_c6191129df.mp3"></audio>
   <audio id="errorSound" src="https://cdn.pixabay.com/audio/2022/03/15/audio_37f6e33a1f.mp3"></audio>
-  <!-- New tune -->
   <audio id="resultTune" src="Phone Notification Sound.mp3"></audio>
 
-  <!-- OCR library -->
-  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
   <script>
-    let history = []; // will be replaced by manual load
-    const inputLength = 7;
+    const history = [
+      'Small', 'Small', 'Big', 'Big', 'Small', 'Small', 'Big', 'Small', 'Big', 'Big',
+      'Small', 'Small', 'Big', 'Small', 'Big', 'Big', 'Small', 'Small', 'Big', 'Small',
+      'Big', 'Big', 'Small', 'Big', 'Big', 'Small', 'Small', 'Big', 'Small', 'Big',
+      'Big', 'Small', 'Big', 'Big', 'Big', 'Big', 'Small', 'Small', 'Small', 'Big',
+      'Small', 'Small', 'Big', 'Small', 'Small', 'Small', 'Small', 'Small', 'Big', 'Big'
+    ];
 
     const container = document.getElementById("input-container");
     const resultBox = document.getElementById("result");
     const memoryList = document.getElementById("memory-list");
     const memory = [];
-    const historyText = document.getElementById("history-text");
 
-    // create dropdowns
+    const inputLength = 7;
+
+    // Create dropdowns
     for (let i = 0; i < inputLength; i++) {
       const select = document.createElement("select");
       ["--", "Big", "Small"].forEach(val => {
@@ -249,7 +158,7 @@
       const sound = document.getElementById(id);
       if (sound) {
         sound.currentTime = 0;
-        sound.play().catch(()=>{ /* ignore autoplay block */ });
+        sound.play();
       }
     }
 
@@ -271,40 +180,7 @@
       memoryList.innerHTML = memory.map(item => `<li>${item}</li>`).join('');
     }
 
-    function normalizeInputArray(arr) {
-      return arr
-        .map(s => s.trim().toLowerCase())
-        .filter(s => s === "big" || s === "small")
-        .map(s => s.charAt(0).toUpperCase() + s.slice(1));
-    }
-
-    function refreshHistoryDisplay() {
-      if (history.length === 0) {
-        historyText.textContent = '(none loaded yet)';
-      } else {
-        historyText.textContent = history.join(", ");
-      }
-    }
-
-    function loadManualHistory() {
-      const raw = document.getElementById("manual-history").value;
-      if (!raw.trim()) {
-        showResult("❌ Please paste a comma-separated Big/Small list.", false);
-        return;
-      }
-      const parsed = raw.split(",").map(s => s.trim()).filter(s => s);
-      const normalized = normalizeInputArray(parsed);
-      if (normalized.length === 0) {
-        showResult("❌ No valid Big/Small found in input.", false);
-        return;
-      }
-      history = normalized; // replace
-      refreshHistoryDisplay();
-      showResult(`✅ Loaded history (${history.length} entries).`, true);
-    }
-
     function predict() {
-      // gather last 7 from dropdowns
       const pattern = [];
       for (let i = 0; i < inputLength; i++) {
         const val = document.getElementById("s" + i).value;
@@ -313,10 +189,6 @@
           return;
         }
         pattern.push(val);
-      }
-
-      if (history.length === 0) {
-        showResult("⚠️ No history loaded; prediction will use fallback only.", false);
       }
 
       const strPattern = pattern.join("-");
@@ -336,43 +208,9 @@
 
       showResult(`⚠️ Pattern not found. Fallback: <b>${fallback}</b><br>
         <img src="https://via.placeholder.com/500x200/ffb6c1/000000?text=Heart+Fallback" alt="No Match" style="margin-top:10px; max-width:100%; border-radius:12px;">`, false);
+
       updateMemory(`⚠️ ${strPattern} ➜ <b>${fallback}</b> (fallback)`);
     }
-
-    // OCR logic to extract last 7 Big/Small from an uploaded image
-    document.getElementById("imageInput").addEventListener("change", async function(e) {
-      const file = e.target.files[0];
-      if (!file) return;
-      showResult("🔍 Image processing...", false);
-      try {
-        const { data: { text } } = await Tesseract.recognize(file, 'eng', { logger: m => console.log(m) });
-        const words = text
-          .replace(/\r\n/g, ' ')
-          .split(/\s+/)
-          .map(w => w.trim().toLowerCase())
-          .filter(w => w === 'big' || w === 'small')
-          .map(w => w.charAt(0).toUpperCase() + w.slice(1));
-
-        if (words.length < 7) {
-          showResult("❌ OCR found fewer than 7 Big/Small entries.", false);
-          return;
-        }
-
-        const last7 = words.slice(-7);
-        for (let i = 0; i < 7; i++) {
-          const sel = document.getElementById("s" + i);
-          if (sel) sel.value = last7[i];
-        }
-        showResult("✅ Auto-filled last 7 from image. Click Predict.", true);
-      } catch (err) {
-        console.error(err);
-        showResult("❌ OCR failed. Try a clearer crop.", false);
-      }
-    });
-
-    // initialize with a small default sample so UI isn't empty
-    history = ["Big","Small","Big","Big","Small","Small","Big","Big","Small","Big","Small","Small","Big","Big"];
-    refreshHistoryDisplay();
   </script>
 </body>
 </html>
