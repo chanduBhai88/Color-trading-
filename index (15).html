@@ -28,10 +28,10 @@
     }
 
     .inputs {
-      display: flex;
-      flex-wrap: wrap;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
       gap: 10px;
-      justify-content: center;
+      justify-items: center;
       margin-bottom: 20px;
     }
 
@@ -112,49 +112,35 @@
     <h2>❤️ RajaGame Predictor</h2>
     <div class="inputs" id="input-container"></div>
     <button onclick="predict()">🔮 Predict Next</button>
-    <div class="result" id="result">Enter last 7 Big/Small results.</div>
+    <div class="result" id="result">Enter last 9 Big/Small results.</div>
 
-    <!-- 🧠 Memory of last 5 predictions -->
     <div class="memory" id="memory-box">
       <h4>🧠 Last 5 Predictions:</h4>
       <ul id="memory-list"></ul>
     </div>
   </div>
 
-  <!-- 🔊 Sound Effects -->
+  <!-- Sound Effects -->
   <audio id="successSound" src="https://cdn.pixabay.com/audio/2023/03/25/audio_c6191129df.mp3"></audio>
   <audio id="errorSound" src="https://cdn.pixabay.com/audio/2022/03/15/audio_37f6e33a1f.mp3"></audio>
-  <!-- New tune provided by user -->
   <audio id="resultTune" src="Phone Notification Sound.mp3"></audio>
 
   <script>
     const history = [
-      // Original + extracted Big/Small results
-      "Small", "Big", "Big", "Small", "Big", "Big", "Big", "Small", "Big", "Small",
-      "Small", "Big", "Small", "Small", "Big", "Big", "Big", "Small", "Big", "Big",
-      "Small", "Big", "Big", "Big", "Small", "Small", "Big", "Big", "Small", "Small",
-      "Small", "Small", "Big", "Big", "Big", "Big", "Big", "Big", "Small", "Big",
-      "Small", "Small", "Big", "Small", "Small", "Small", "Big", "Big", "Big", "Big",
-      "Small", "Big", "Big", "Big", "Big", "Small", "Small", "Big", "Small", "Small",
-      "Small", "Big", "Big", "Small", "Big", "Small", "Big", "Big", "Big", "Big",
-      "Small", "Big", "Big", "Small", "Big", "Small", "Big", "Big", "Big", "Small",
-      "Big", "Big", "Big", "Small", "Big", "Small", "Big", "Big", "Small", "Big",
-      "Big", "Small", "Small", "Small", "Small", "Small", "Small", "Small", "Small", "Small",
-      "Small", "Small", "Small", "Big", "Small", "Big", "Small", "Big", "Small", "Big",
-      "Small", "Small"
-    "Big", "Small", "Small", "Small", "Big", "Big", "Big", "Small", "Small", "Big",
-    "Big", "Big", "Big", "Small", "Small", "Small", "Big", "Big", "Small", "Small",
-    "Big", "Big", "Small", "Small", "Big", "Big", "Big", "Small", "Small", "Big",
-    "Small", "Small", "Big", "Big", "Small", "Small", "Small", "Small", "Big", "Big",
-    "Big", "Small", "Small", "Big", "Small", "Small", "Big", "Big", "Small", "Big"
-  ];
+      "Big", "Small", "Big", "Big", "Small", "Small", "Big", "Big", "Small",
+      "Big", "Small", "Small", "Big", "Big", "Small", "Small", "Big", "Big",
+      "Big", "Small", "Small", "Big", "Small", "Small", "Big", "Big", "Small",
+      "Small", "Big", "Big", "Big", "Small", "Big", "Small", "Big", "Big",
+      "Big", "Small", "Big", "Big", "Big", "Small", "Big", "Small", "Small",
+      "Big", "Small", "Small", "Big", "Big", "Big", "Small", "Small", "Big"
+    ];
 
     const container = document.getElementById("input-container");
     const resultBox = document.getElementById("result");
     const memoryList = document.getElementById("memory-list");
     const memory = [];
 
-    const inputLength = 7; // changed to 7
+    const inputLength = 9;
 
     // Create dropdowns
     for (let i = 0; i < inputLength; i++) {
@@ -179,7 +165,6 @@
 
     function showResult(msg, success) {
       resultBox.innerHTML = msg;
-      // play the provided tune on every result
       playSound("resultTune");
       if (success) {
         resultBox.classList.add("show");
@@ -193,7 +178,6 @@
     function updateMemory(entry) {
       memory.unshift(entry);
       if (memory.length > 5) memory.pop();
-
       memoryList.innerHTML = memory.map(item => `<li>${item}</li>`).join('');
     }
 
@@ -202,7 +186,7 @@
       for (let i = 0; i < inputLength; i++) {
         const val = document.getElementById("s" + i).value;
         if (!val) {
-          showResult("❌ Please select all 7 inputs.", false);
+          showResult("❌ Please select all 9 inputs.", false);
           return;
         }
         pattern.push(val);
