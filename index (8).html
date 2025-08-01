@@ -1,127 +1,154 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>VIP Predictor</title>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+  <title>Wingo Big Small Predictor</title>
   <style>
     body {
-      margin: 0;
-      background: #000;
-      color: #0f0;
-      font-family: 'Orbitron', sans-serif;
-      overflow: hidden;
-    }
-    canvas {
-      position: fixed;
-      top: 0;
-      left: 0;
-      z-index: -1;
-    }
-    #loginPage, #mainPanel {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-    }
-    h2, h3, h1 {
-      text-shadow: 0 0 10px #0f0;
-    }
-    input, button {
-      margin: 10px;
-      padding: 10px;
-      background: #000;
-      border: 2px solid #0f0;
-      color: #0f0;
-      font-family: 'Orbitron', sans-serif;
-      border-radius: 5px;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to right, #ffffff, #c8facc); /* white to green */
       text-align: center;
+      padding-top: 40px;
     }
-    button:hover {
-      background: #0f0;
-      color: #000;
+    h2 {
+      font-size: 28px;
+      color: #1b5e20;
     }
-    #mainPanel {
-      display: none;
-      flex-direction: column;
-      gap: 10px;
+    .box {
+      background: #ffffff;
+      display: inline-block;
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      margin-top: 20px;
+    }
+    #result {
+      font-size: 32px;
+      margin: 10px 0;
+    }
+    .Big {
+      color: white;
+      background-color: #4caf50;
+      padding: 10px 20px;
+      border-radius: 10px;
+    }
+    .Small {
+      color: white;
+      background-color: #f44336;
+      padding: 10px 20px;
+      border-radius: 10px;
+    }
+    #number {
+      font-size: 24px;
+      color: #444;
+    }
+    #timer {
+      font-size: 20px;
+      color: #2e7d32;
+      margin-top: 15px;
+    }
+    #history {
+      margin-top: 30px;
+    }
+    .history-item {
+      display: inline-block;
+      margin: 5px;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+    .BigH {
+      background-color: #c8e6c9;
+      color: #2e7d32;
+    }
+    .SmallH {
+      background-color: #ffcdd2;
+      color: #b71c1c;
+    }
+    #prediction {
+      font-size: 20px;
+      color: #1b5e20;
+      margin-top: 20px;
     }
   </style>
 </head>
 <body>
-  <canvas id="matrix"></canvas>
 
-  <div id="loginPage">
-    <h2>ENTER PAID KEY</h2>
-    <input id="keyInput" placeholder="Enter Access Key" />
-    <button onclick="checkKey()">Submit</button>
-    <button onclick="buyKey()">Buy Key</button>
+  <h2>🎯 Big / Small - Smart Predictor Wingo</h2>
+  <div class="box">
+    <div id="result">Loading...</div>
+    <div id="number">Number: --</div>
+    <div id="timer">⏳ Next result in: <span id="countdown">60</span> sec</div>
+    <div id="prediction">🤖 Prediction: --</div>
   </div>
 
-  <div id="mainPanel">
-    <h1>Access Granted</h1>
-    <p>Welcome to the VIP Panel</p>
+  <div id="history">
+    <h3>🕓 Last 5 Results:</h3>
+    <div id="historyList"></div>
   </div>
 
   <script>
-    function checkKey() {
-      const key = document.getElementById("keyInput").value.trim();
-      if (key === "123456") {
-        alert("Access Granted!");
-        document.getElementById("loginPage").style.display = "none";
-        document.getElementById("mainPanel").style.display = "flex";
+    let countdown = 60;
+    let resultHistory = [];
+
+    function generateResult() {
+      const randomNum = Math.floor(Math.random() * 100); // 0–99
+      const resultType = randomNum >= 50 ? "Big" : "Small";
+
+      // Show result
+      document.getElementById("result").innerHTML = `<span class="${resultType}">${resultType}</span>`;
+      document.getElementById("number").innerText = `Number: ${randomNum}`;
+
+      // Save to history
+      resultHistory.unshift({ type: resultType, number: randomNum });
+      if (resultHistory.length > 5) resultHistory.pop();
+      updateHistory();
+
+      // Update prediction
+      updatePrediction();
+
+      countdown = 60;
+    }
+
+    function updateHistory() {
+      const historyDiv = document.getElementById("historyList");
+      historyDiv.innerHTML = resultHistory.map(item => {
+        const cls = item.type === "Big" ? "BigH" : "SmallH";
+        return `<span class="history-item ${cls}">${item.type} (${item.number})</span>`;
+      }).join("");
+    }
+
+    function updatePrediction() {
+      if (resultHistory.length < 3) {
+        document.getElementById("prediction").innerText = `🤖 Prediction: Wait for data...`;
+        return;
+      }
+
+      // Count Big/Small in last 3 results
+      const last3 = resultHistory.slice(0, 3);
+      let bigCount = 0;
+      let smallCount = 0;
+      last3.forEach(item => {
+        item.type === "Big" ? bigCount++ : smallCount++;
+      });
+
+      const prediction = bigCount > smallCount ? "Big" : "Small";
+      document.getElementById("prediction").innerHTML = `🤖 Prediction: <b>${prediction}</b>`;
+    }
+
+    // Countdown Timer
+    setInterval(() => {
+      if (countdown > 0) {
+        countdown--;
       } else {
-        alert("Invalid Key!");
+        generateResult(); // Every 60 sec
+        countdown = 60;
       }
-    }
+      document.getElementById("countdown").innerText = countdown;
+    }, 1000);
 
-    function buyKey() {
-      // Change to your actual Telegram username
-      window.location.href = "https://t.me/YourTelegramUsername";
-    }
+    // Start first result
+    generateResult();
   </script>
 
-  <script>
-    // Matrix Background Animation
-    const canvas = document.getElementById('matrix');
-    const ctx = canvas.getContext('2d');
-
-    canvas.height = window.innerHeight;
-    canvas.width = window.innerWidth;
-
-    const letters = '01';
-    const fontSize = 16;
-    const columns = canvas.width / fontSize;
-
-    const drops = Array.from({ length: columns }, () => 1);
-
-    function draw() {
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-      ctx.fillStyle = '#0f0';
-      ctx.font = fontSize + 'px monospace';
-
-      for (let i = 0; i < drops.length; i++) {
-        const text = letters[Math.floor(Math.random() * letters.length)];
-        ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-
-        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
-          drops[i] = 0;
-        }
-        drops[i]++;
-      }
-    }
-
-    setInterval(draw, 33);
-
-    // Resize canvas on window resize
-    window.addEventListener('resize', () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-    });
-  </script>
 </body>
 </html>
