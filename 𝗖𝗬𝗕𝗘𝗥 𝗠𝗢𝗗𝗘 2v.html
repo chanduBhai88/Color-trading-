@@ -3,316 +3,320 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Universal Prediction Tool</title>
+    <title>BDG Game: Wingo 1-Minute Color Trading</title>
     <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, #1a1a2e, #16213e);
-            color: #fff;
+        * {
             margin: 0;
-            padding: 20px;
-            min-height: 100vh;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
         }
         
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            background-color: rgba(255, 255, 255, 0.1);
+        body {
+            background: #111;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+        
+        .game-container {
+            background: #222;
             border-radius: 15px;
-            padding: 30px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
         }
         
         h1 {
-            text-align: center;
-            color: #f8f8f8;
-            margin-bottom: 30px;
-            font-size: 2.5rem;
-            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+            color: #ffcc00;
+            margin-bottom: 15px;
+            font-size: 24px;
+            text-transform: uppercase;
         }
         
-        .prediction-area {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-        
-        .input-group {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-        
-        label {
+        .timer {
+            font-size: 40px;
+            margin: 10px 0;
+            color: #ff5555;
             font-weight: bold;
-            color: #e94560;
         }
         
-        select, input, textarea {
-            padding: 12px;
-            border-radius: 8px;
-            border: none;
-            background-color: rgba(255, 255, 255, 0.9);
-            font-size: 16px;
+        .color-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .color-option {
+            height: 120px;
+            border-radius: 10px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            font-size: 18px;
+            transition: transform 0.3s, box-shadow 0.3s;
+            user-select: none;
+        }
+        
+        .color-option:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+        }
+        
+        .color-option:active {
+            transform: scale(0.95);
+        }
+        
+        #red {
+            background: #ff4d4d;
+        }
+        
+        #green {
+            background: #4dff4d;
+        }
+        
+        #blue {
+            background: #4d4dff;
+        }
+        
+        #yellow {
+            background: #ffff4d;
+            color: #000;
+        }
+        
+        .controls {
+            margin: 20px 0;
         }
         
         button {
-            background-color: #e94560;
+            background: #ff5555;
             color: white;
             border: none;
-            padding: 15px;
+            padding: 12px 25px;
+            font-size: 16px;
             border-radius: 8px;
-            font-size: 18px;
             cursor: pointer;
+            margin: 5px;
             transition: all 0.3s;
-            margin-top: 15px;
         }
         
         button:hover {
-            background-color: #ff6b81;
-            transform: translateY(-2px);
+            background: #ff3333;
+            transform: translateY(-3px);
+        }
+        
+        button:disabled {
+            background: #555;
+            cursor: not-allowed;
         }
         
         .result {
-            margin-top: 30px;
-            padding: 20px;
-            background-color: rgba(0, 0, 0, 0.3);
-            border-radius: 10px;
-            min-height: 100px;
+            margin-top: 15px;
+            font-size: 18px;
+            min-height: 50px;
             display: flex;
             flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
+            gap: 10px;
         }
         
-        .prediction-text {
-            font-size: 22px;
-            margin-bottom: 15px;
-            color: #f8f8f8;
+        .win {
+            color: #4dff4d;
+            font-weight: bold;
         }
         
-        .confidence {
-            font-style: italic;
-            color: #a5a5a5;
+        .lose {
+            color: #ff4d4d;
+            font-weight: bold;
         }
         
-        .crystal-ball {
-            width: 120px;
-            height: 120px;
-            background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.8), rgba(100,200,255,0.4));
-            border-radius: 50%;
-            margin: 20px auto;
-            position: relative;
-            box-shadow: inset 0 0 50px rgba(255,255,255,0.3),
-                        0 0 30px rgba(100,200,255,0.5);
+        .score {
+            font-size: 20px;
+            margin-top: 10px;
+            color: #ffcc00;
         }
         
-        .crystal-ball::before {
-            content: '';
-            position: absolute;
-            width: 40%;
-            height: 40%;
-            background: rgba(255,255,255,0.3);
-            border-radius: 50%;
-            top: 20%;
-            left: 20%;
-            filter: blur(5px);
+        /* Animation for winning */
+        @keyframes glow {
+            0% { box-shadow: 0 0 10px rgba(255, 255, 255, 0.5); }
+            50% { box-shadow: 0 0 30px rgba(255, 215, 0, 0.8); }
+            100% { box-shadow: 0 0 10px rgba(255, 255, 255, 0.5); }
         }
         
-        @media (max-width: 600px) {
-            .container {
-                padding: 15px;
-            }
-            
-            h1 {
-                font-size: 1.8rem;
-            }
+        .glow {
+            animation: glow 1.5s infinite;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Universal Prediction Tool</h1>
+    <div class="game-container">
+        <h1>BDG Game: Wingo 1-Minute Color Trading</h1>
+        <div class="timer" id="timer">01:00</div>
         
-        <div class="prediction-area">
-            <div class="input-group">
-                <label for="category">Prediction Category:</label>
-                <select id="category">
-                    <option value="love">Love & Relationships</option>
-                    <option value="career">Career</option>
-                    <option value="finance">Finance</option>
-                    <option value="health">Health</option>
-                    <option value="general">General Future</option>
-                </select>
-            </div>
-            
-            <div class="input-group">
-                <label for="timeframe">Timeframe:</label>
-                <select id="timeframe">
-                    <option value="week">Next Week</option>
-                    <option value="month">Next Month</option>
-                    <option value="year">Next Year</option>
-                    <option value="custom">Custom</option>
-                </select>
-            </div>
-            
-            <div class="input-group" id="customDateGroup" style="display: none;">
-                <label for="customDate">Enter Specific Date:</label>
-                <input type="date" id="customDate">
-            </div>
-            
-            <div class="input-group">
-                <label for="question">Your Question (optional):</label>
-                <textarea id="question" rows="3" placeholder="Ask your question here..."></textarea>
-            </div>
-            
-            <button id="predictBtn">Get Prediction</button>
+        <div class="color-grid">
+            <div class="color-option" id="red" data-color="red">RED</div>
+            <div class="color-option" id="green" data-color="green">GREEN</div>
+            <div class="color-option" id="blue" data-color="blue">BLUE</div>
+            <div class="color-option" id="yellow" data-color="yellow">YELLOW</div>
         </div>
         
-        <div class="crystal-ball"></div>
+        <div class="controls">
+            <button id="startBtn">Start Game</button>
+            <button id="resetBtn" disabled>Reset</button>
+        </div>
         
         <div class="result" id="result">
-            <p class="prediction-text">Your prediction will appear here...</p>
-            <p class="confidence"></p>
+            <div>Select a color and wait for the result!</div>
         </div>
+        
+        <div class="score" id="score">Score: 0</div>
     </div>
 
     <script>
+        // Game Variables
+        let timeLeft = 60;
+        let timer;
+        let gameActive = false;
+        let score = 0;
+        let selectedColor = null;
+        let winningColor = null;
+        
         // DOM Elements
-        const categorySelect = document.getElementById('category');
-        const timeframeSelect = document.getElementById('timeframe');
-        const customDateGroup = document.getElementById('customDateGroup');
-        const customDateInput = document.getElementById('customDate');
-        const questionInput = document.getElementById('question');
-        const predictBtn = document.getElementById('predictBtn');
-        const resultDiv = document.getElementById('result');
-        const predictionText = document.querySelector('.prediction-text');
-        const confidenceText = document.querySelector('.confidence');
+        const timerElement = document.getElementById('timer');
+        const colorOptions = document.querySelectorAll('.color-option');
+        const startBtn = document.getElementById('startBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const resultElement = document.getElementById('result');
+        const scoreElement = document.getElementById('score');
         
-        // Prediction data
-        const predictions = {
-            love: [
-                "A new romantic opportunity will present itself when you least expect it.",
-                "Your current relationship will deepen with meaningful communication.",
-                "Someone from your past will re-enter your life with important lessons.",
-                "Focus on self-love first, and the right person will appear at the perfect time.",
-                "A misunderstanding will be resolved, bringing you closer to someone special."
-            ],
-            career: [
-                "An unexpected job opportunity will come your way - be ready to say yes!",
-                "Your hard work will be recognized by those in positions of authority.",
-                "Consider learning a new skill - it will open doors you didn't know existed.",
-                "A colleague will become an important ally in your professional growth.",
-                "Don't be afraid to ask for what you deserve - the timing is right."
-            ],
-            finance: [
-                "An unexpected financial gain is coming your way.",
-                "Be cautious with new investments - research thoroughly before committing.",
-                "Your financial situation will improve through disciplined saving.",
-                "An old debt will be resolved in your favor.",
-                "Consider diversifying your income streams for greater stability."
-            ],
-            health: [
-                "Your energy levels will increase if you prioritize rest and nutrition.",
-                "A small health concern will resolve itself with proper attention.",
-                "Consider trying a new form of exercise - your body will thank you.",
-                "Mental health should be your priority - practice daily mindfulness.",
-                "Your sleep quality will improve if you establish a consistent routine."
-            ],
-            general: [
-                "A long-held wish will come true in an unexpected way.",
-                "You will meet someone who will change your perspective on life.",
-                "Trust your intuition - it's guiding you in the right direction.",
-                "An obstacle you've been facing will soon be removed.",
-                "Good news is coming your way - be patient and stay positive."
-            ]
-        };
-        
-        // Timeframe modifiers
-        const timeframeModifiers = {
-            week: ["very soon", "in the coming days", "within the week"],
-            month: ["in the next few weeks", "before the month ends", "as this month unfolds"],
-            year: ["sometime this year", "as the seasons change", "when the time is right"],
-            custom: ["on that special day", "at that significant time", "when that date arrives"]
-        };
-        
-        // Confidence levels
-        const confidenceLevels = [
-            "High confidence",
-            "Moderate confidence",
-            "Strong indication",
-            "Clear signs point to this",
-            "The universe strongly suggests"
-        ];
-        
-        // Event Listeners
-        timeframeSelect.addEventListener('change', function() {
-            if (this.value === 'custom') {
-                customDateGroup.style.display = 'block';
-                // Set min date to tomorrow
-                const tomorrow = new Date();
-                tomorrow.setDate(tomorrow.getDate() + 1);
-                customDateInput.min = tomorrow.toISOString().split('T')[0];
-            } else {
-                customDateGroup.style.display = 'none';
-            }
-        });
-        
-        predictBtn.addEventListener('click', generatePrediction);
-        
-        // Generate prediction
-        function generatePrediction() {
-            // Show loading state
-            predictionText.textContent = "Consulting the cosmic energies...";
-            confidenceText.textContent = "";
+        // Initialize Game
+        function initGame() {
+            timeLeft = 60;
+            updateTimer();
+            score = 0;
+            updateScore();
+            resultElement.innerHTML = `<div>Select a color and wait for the result!</div>`;
+            selectedColor = null;
+            winningColor = null;
             
-            // Get selected values
-            const category = categorySelect.value;
-            const timeframe = timeframeSelect.value;
-            const question = questionInput.value.trim();
-            
-            // Determine timeframe text
-            let timeframeText;
-            if (timeframe === 'custom' && customDateInput.value) {
-                const date = new Date(customDateInput.value);
-                timeframeText = `on ${date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}`;
-            } else {
-                const modifiers = timeframeModifiers[timeframe];
-                timeframeText = modifiers[Math.floor(Math.random() * modifiers.length)];
-            }
-            
-            // Simulate "processing" delay
-            setTimeout(() => {
-                // Get random prediction
-                const categoryPredictions = predictions[category];
-                const randomPrediction = categoryPredictions[Math.floor(Math.random() * categoryPredictions.length)];
-                
-                // Get random confidence
-                const randomConfidence = confidenceLevels[Math.floor(Math.random() * confidenceLevels.length)];
-                
-                // Format final prediction
-                let finalPrediction = randomPrediction;
-                if (question) {
-                    finalPrediction = `Regarding "${question}", ${randomPrediction.toLowerCase()}`;
-                }
-                
-                // Display results
-                predictionText.textContent = `${finalPrediction} ${timeframeText}.`;
-                confidenceText.textContent = `${randomConfidence} (${Math.floor(Math.random() * 41) + 60}% accuracy)`;
-                
-                // Add animation
-                resultDiv.style.animation = 'none';
-                setTimeout(() => {
-                    resultDiv.style.animation = 'glow 1.5s ease-out';
-                }, 10);
-                
-            }, 1500);
+            // Remove glow effects
+            colorOptions.forEach(option => {
+                option.classList.remove('glow');
+            });
         }
         
-        // Initialize with current date
-        const today = new Date();
-        customDateInput.value = today.toISOString().split('T')[0];
+        // Start Game
+        function startGame() {
+            if (gameActive) return;
+            
+            gameActive = true;
+            initGame();
+            
+            // Disable start button, enable reset
+            startBtn.disabled = true;
+            resetBtn.disabled = false;
+            
+            // Start timer
+            timer = setInterval(() => {
+                timeLeft--;
+                updateTimer();
+                
+                if (timeLeft <= 0) {
+                    endGame();
+                }
+                
+                // Every 5 seconds, pick a random winner
+                if (timeLeft % 5 === 0 && selectedColor) {
+                    determineWinner();
+                }
+            }, 1000);
+        }
+        
+        // End Game
+        function endGame() {
+            clearInterval(timer);
+            gameActive = false;
+            startBtn.disabled = false;
+            resultElement.innerHTML += `<div class="lose">Time's up! Final Score: ${score}</div>`;
+        }
+        
+        // Update Timer Display
+        function updateTimer() {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            
+            // Blink if time is running out
+            if (timeLeft <= 10) {
+                timerElement.style.animation = 'blink 1s infinite';
+            } else {
+                timerElement.style.animation = 'none';
+            }
+        }
+        
+        // Select Color
+        colorOptions.forEach(option => {
+            option.addEventListener('click', () => {
+                if (!gameActive) return;
+                
+                // Reset previous selection
+                colorOptions.forEach(opt => opt.classList.remove('glow'));
+                
+                // Set new selection
+                selectedColor = option.dataset.color;
+                option.classList.add('glow');
+                
+                resultElement.innerHTML = `<div>You selected: <strong>${selectedColor.toUpperCase()}</strong></div>`;
+            });
+        });
+        
+        // Determine Winner (Random)
+        function determineWinner() {
+            if (!selectedColor) return;
+            
+            const colors = ['red', 'green', 'blue', 'yellow'];
+            winningColor = colors[Math.floor(Math.random() * colors.length)];
+            
+            if (selectedColor === winningColor) {
+                score += 10;
+                resultElement.innerHTML += `<div class="win">WIN! ${winningColor.toUpperCase()} was correct! +10 points</div>`;
+            } else {
+                score = Math.max(0, score - 5);
+                resultElement.innerHTML += `<div class="lose">LOSE! Winning color was ${winningColor.toUpperCase()}. -5 points</div>`;
+            }
+            
+            updateScore();
+            selectedColor = null;
+            
+            // Reset selection UI
+            colorOptions.forEach(opt => opt.classList.remove('glow'));
+        }
+        
+        // Update Score
+        function updateScore() {
+            scoreElement.textContent = `Score: ${score}`;
+        }
+        
+        // Reset Game
+        resetBtn.addEventListener('click', () => {
+            clearInterval(timer);
+            gameActive = false;
+            initGame();
+            startBtn.disabled = false;
+            resetBtn.disabled = true;
+        });
+        
+        // Start Game on Button Click
+        startBtn.addEventListener('click', startGame);
     </script>
 </body>
 </html>
