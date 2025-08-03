@@ -1,220 +1,255 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Khatarnak Predictor v6.4</title>
-  <style>
-    body {
-      margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(to bottom right, #000000, #4b0082);
-      color: #00ff00;
-      text-align: center;
-      padding: 20px;
-    }
-
-    h1 {
-      color: #ff0055;
-      font-size: 2.2em;
-      margin-bottom: 10px;
-    }
-
-    #countdown {
-      font-size: 28px;
-      font-weight: bold;
-      margin-bottom: 10px;
-      color: #00ffcc;
-    }
-
-    #randomWord {
-      font-size: 24px;
-      margin-bottom: 20px;
-      color: #00ffcc;
-    }
-
-    #myChart {
-      width: 90%;
-      max-width: 500px;
-      margin: 20px auto;
-    }
-
-    table {
-      width: 90%;
-      max-width: 500px;
-      margin: 0 auto;
-      border-collapse: collapse;
-    }
-
-    th, td {
-      padding: 8px;
-      border: 1px solid #00ff00;
-      color: #fff;
-    }
-
-    th {
-      background-color: #111;
-    }
-
-    .big {
-      color: #0f0;
-    }
-
-    .small {
-      color: #f00;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Big-Small Pattern Predictor</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .input-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, select {
+            padding: 8px;
+            width: 100%;
+            box-sizing: border-box;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 4px;
+            background-color: #e9f7ef;
+            display: none;
+        }
+        .sequence {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-bottom: 10px;
+        }
+        .sequence-item {
+            padding: 5px 10px;
+            border-radius: 4px;
+        }
+        .big {
+            background-color: #ffcccc;
+            color: #cc0000;
+        }
+        .small {
+            background-color: #ccffcc;
+            color: #006600;
+        }
+        .prediction {
+            font-weight: bold;
+            font-size: 18px;
+        }
+    </style>
 </head>
 <body>
-  <h1>Khatarnak Predictor v6.4</h1>
-  <div id="countdown">Loading...</div>
-  <div id="randomWord">Prediction will appear here...</div>
-  <canvas id="myChart"></canvas>
+    <div class="container">
+        <h1>Big-Small Pattern Predictor</h1>
+        
+        <div class="input-group">
+            <label for="sequence">Enter 8 Big/Small values:</label>
+            <div class="sequence" id="inputSequence">
+                <!-- Input items will be added here -->
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <button onclick="addValue('Big')">Add Big</button>
+                <button onclick="addValue('Small')">Add Small</button>
+                <button onclick="clearSequence()">Clear</button>
+            </div>
+        </div>
+        
+        <button onclick="predictNext()">Predict Next Value</button>
+        
+        <div id="result">
+            <h3>Prediction Result:</h3>
+            <p>Based on the pattern:</p>
+            <div class="sequence" id="patternSequence"></div>
+            <p>The next value is likely to be: <span class="prediction" id="prediction"></span></p>
+        </div>
+    </div>
 
-  <h3>Recent Predictions</h3>
-  <table>
-    <thead>
-      <tr>
-        <th>Time</th>
-        <th>Prediction</th>
-      </tr>
-    </thead>
-    <tbody id="historyBody"></tbody>
-  </table>
+    <script>
+        // सभी Big-Small पैटर्न्स (आपके द्वारा दिए गए)
+        const patterns = [
+            ["Big", "Big", "Small", "Big", "Small", "Small", "Big", "Small", "Big", "Big"],
+            ["Big", "Small", "Big", "Small", "Big", "Big", "Small", "Small", "Small", "Big"],
+            ["Big", "Big", "Big", "Small", "Small", "Small", "Small", "Small", "Small", "Small"],
+            ["Big", "Small", "Big", "Big", "Small", "Big", "Small", "Small", "Big", "Big"],
+            ["Small", "Small", "Small", "Small", "Small", "Big", "Big", "Big", "Big", "Small"],
+            ["Small", "Big", "Big", "Small", "Big", "Small", "Big", "Small", "Big", "Big"],
+            ["Big", "Small", "Small", "Small", "Small", "Small", "Big", "Big", "Big", "Big"],
+            ["Big", "Small", "Small", "Small", "Big", "Small", "Big", "Small", "Big", "Big"],
+            ["Small", "Small", "Small", "Small", "Small", "Small", "Small", "Big", "Big", "Small"],
+            ["Big", "Small", "Small", "Small", "Small", "Small", "Small", "Big", "Big", "Small"],
+            ["Small", "Big", "Big", "Small", "Small", "Small", "Small", "Big", "Big", "Big"],
+            ["Big", "Small", "Small", "Small", "Big", "Big", "Big", "Small", "Big", "Small"],
+            ["Small", "Small", "Small", "Small", "Small", "Big", "Big", "Big", "Big", "Small"],
+            ["Small", "Big", "Big", "Small", "Big", "Small", "Big", "Small", "Big", "Big"],
+            ["Big", "Small", "Small", "Small", "Small", "Small", "Big", "Big", "Big", "Big"],
+            ["Small", "Small", "Big", "Big", "Small", "Big", "Small", "Small", "Small", "Small"],
+            ["Small", "Big", "Big", "Small", "Small", "Small", "Big", "Big", "Big", "Small"],
+            ["Big", "Small", "Small", "Big", "Small", "Big", "Big", "Big", "Big", "Small"],
+            ["Small", "Small", "Big", "Small", "Big", "Big", "Big", "Small", "Big", "Small"],
+            ["Big", "Big", "Small", "Small", "Big", "Small", "Big", "Big", "Big", "Small"],
+            // आपके नए पैटर्न्स
+            ["Small", "Big", "Big", "Big", "Big", "Big", "Big", "Big", "Small", "Small"],
+            ["Big", "Small", "Small", "Small", "Big", "Small", "Small", "Big", "Big", "Small"],
+            ["Big", "Big", "Small", "Small", "Small", "Big", "Big", "Small", "Big", "Big"],
+            ["Small", "Big", "Big", "Small", "Small", "Small", "Big", "Big", "Big", "Small"],
+            ["Big", "Small", "Small", "Big", "Small", "Big", "Big", "Big", "Big", "Small"],
+            ["Small", "Small", "Big", "Small", "Big", "Big", "Big", "Small", "Big", "Small"],
+            ["Big", "Big", "Small", "Small", "Big", "Small", "Big", "Big", "Big", "Small"]
+        ];
 
-  <audio id="alertSound" src="https://www.soundjay.com/buttons/sounds/beep-07.mp3" preload="auto"></audio>
+        let inputSequence = [];
 
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script>
-    const countdownEl = document.getElementById('countdown');
-    const alertSound = document.getElementById('alertSound');
-    let history = [];
-
-    function updateCountdown() {
-      const now = new Date();
-      const seconds = now.getSeconds();
-      const remaining = 60 - seconds;
-      countdownEl.textContent = remaining + 's';
-    }
-
-    function playAlert() {
-      alertSound.currentTime = 0;
-      alertSound.play();
-    }
-
-    function smartPredict(historyList) {
-      let result = "Big";
-      let candidates = [5, 6, 7, 8, 9];
-
-      if (historyList.length >= 4) {
-        const last4 = historyList.slice(-4);
-        const bigs = last4.filter(h => h.result === "Big").length;
-        const smalls = last4.filter(h => h.result === "Small").length;
-
-        if (bigs >= 3) {
-          result = "Small";
-          candidates = [0, 1, 2, 3, 4];
-        } else if (smalls >= 3) {
-          result = "Big";
-          candidates = [5, 6, 7, 8, 9];
-        } else {
-          const last = historyList[historyList.length - 1];
-          result = last.result === "Big" ? "Small" : "Big";
-          candidates = result === "Big" ? [5, 6, 7, 8, 9] : [0, 1, 2, 3, 4];
-        }
-      } else {
-        result = Math.random() > 0.5 ? "Big" : "Small";
-        candidates = result === "Big" ? [5, 6, 7, 8, 9] : [0, 1, 2, 3, 4];
-      }
-
-      const shuffled = candidates.sort(() => 0.5 - Math.random());
-      const pick = shuffled.slice(0, 2);
-
-      return { result, pick };
-    }
-
-    function updateChart(prediction, number) {
-      const ctx = document.getElementById('myChart').getContext('2d');
-      if (!window.myChart) {
-        window.myChart = new Chart(ctx, {
-          type: 'bar',
-          data: {
-            labels: [],
-            datasets: [{
-              label: 'Predicted Number',
-              data: [],
-              backgroundColor: '#00ffcc'
-            }]
-          },
-          options: {
-            scales: {
-              y: {
-                beginAtZero: true,
-                ticks: { color: '#00ffcc' }
-              },
-              x: {
-                ticks: { color: '#00ffcc' }
-              }
-            },
-            plugins: {
-              legend: {
-                labels: {
-                  color: '#00ffcc'
-                }
-              }
+        function addValue(value) {
+            if (inputSequence.length >= 8) {
+                alert("You can only enter 8 values. Click 'Predict' or 'Clear' to start over.");
+                return;
             }
-          }
-        });
-      }
+            inputSequence.push(value);
+            updateInputDisplay();
+        }
 
-      if (myChart.data.labels.length >= 10) {
-        myChart.data.labels.shift();
-        myChart.data.datasets[0].data.shift();
-      }
+        function clearSequence() {
+            inputSequence = [];
+            updateInputDisplay();
+            document.getElementById('result').style.display = 'none';
+        }
 
-      myChart.data.labels.push(prediction.result);
-      myChart.data.datasets[0].data.push(number);
-      myChart.update();
-    }
+        function updateInputDisplay() {
+            const container = document.getElementById('inputSequence');
+            container.innerHTML = '';
+            
+            inputSequence.forEach((value, index) => {
+                const item = document.createElement('div');
+                item.className = `sequence-item ${value.toLowerCase()}`;
+                item.textContent = `${value}`;
+                container.appendChild(item);
+            });
+            
+            // Add empty placeholders for remaining inputs
+            for (let i = inputSequence.length; i < 8; i++) {
+                const item = document.createElement('div');
+                item.className = 'sequence-item';
+                item.textContent = '?';
+                container.appendChild(item);
+            }
+        }
 
-    function updateHistoryTable(time, result, numberList) {
-      const historyBody = document.getElementById('historyBody');
-      const row = document.createElement('tr');
-      const typeClass = result.toLowerCase();
-      row.innerHTML = `<td>${time}</td><td class="${typeClass}">${result} → [${numberList.join(', ')}]</td>`;
-      historyBody.prepend(row);
-      while (historyBody.children.length > 5) {
-        historyBody.removeChild(historyBody.lastChild);
-      }
-    }
+        function predictNext() {
+            if (inputSequence.length !== 8) {
+                alert("Please enter exactly 8 values before predicting.");
+                return;
+            }
 
-    let lastCheckedMinute = -1;
+            // Find matching patterns
+            const matches = [];
+            
+            for (const pattern of patterns) {
+                for (let i = 0; i <= pattern.length - 9; i++) {
+                    let match = true;
+                    for (let j = 0; j < 8; j++) {
+                        if (pattern[i + j] !== inputSequence[j]) {
+                            match = false;
+                            break;
+                        }
+                    }
+                    if (match) {
+                        matches.push({
+                            pattern: pattern,
+                            index: i,
+                            nextValue: pattern[i + 8]
+                        });
+                    }
+                }
+            }
 
-    setInterval(() => {
-      const now = new Date();
-      const minutes = now.getMinutes();
-      const seconds = now.getSeconds();
-      updateCountdown();
+            // Count predictions
+            const predictionCounts = { Big: 0, Small: 0 };
+            matches.forEach(match => {
+                predictionCounts[match.nextValue]++;
+            });
 
-      if (seconds === 0 && minutes !== lastCheckedMinute) {
-        const prediction = smartPredict(history);
-        const pick = prediction.pick;
+            // Determine result
+            let result;
+            if (matches.length === 0) {
+                result = "No matching pattern found";
+            } else {
+                const total = predictionCounts.Big + predictionCounts.Small;
+                const bigPercent = Math.round((predictionCounts.Big / total) * 100);
+                const smallPercent = Math.round((predictionCounts.Small / total) * 100);
+                
+                if (predictionCounts.Big > predictionCounts.Small) {
+                    result = "Big";
+                } else if (predictionCounts.Small > predictionCounts.Big) {
+                    result = "Small";
+                } else {
+                    result = "Equal probability for Big and Small";
+                }
 
-        document.getElementById('randomWord').textContent =
-          `${prediction.result} → [${pick.join(', ')}]`;
+                // Show one of the matching patterns
+                const exampleMatch = matches[0];
+                const patternDisplay = document.getElementById('patternSequence');
+                patternDisplay.innerHTML = '';
+                
+                for (let i = 0; i < 9; i++) {
+                    const item = document.createElement('div');
+                    item.className = `sequence-item ${exampleMatch.pattern[exampleMatch.index + i].toLowerCase()}`;
+                    item.textContent = exampleMatch.pattern[exampleMatch.index + i];
+                    if (i === 8) {
+                        item.style.border = "2px solid #000";
+                    }
+                    patternDisplay.appendChild(item);
+                }
+            }
 
-        updateChart(prediction, pick[0]);
+            // Display result
+            document.getElementById('prediction').textContent = result;
+            document.getElementById('result').style.display = 'block';
+        }
 
-        const timeStr = String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
-        updateHistoryTable(timeStr, prediction.result, pick);
-
-        playAlert();
-
-        history.push({ result: prediction.result });
-
-        lastCheckedMinute = minutes;
-      }
-    }, 1000);
-  </script>
+        // Initialize display
+        updateInputDisplay();
+    </script>
 </body>
 </html>
