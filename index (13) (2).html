@@ -7,32 +7,34 @@
   <style>
     body {
       font-family: system-ui,-apple-system,BlinkMacSystemFont,sans-serif;
-      background: #0f0f17;
+      background: #111;
       color: #fff;
       padding: 20px;
-      max-width: 600px;
+      max-width: 640px;
       margin: auto;
     }
-    h1 { font-size: 1.5rem; margin-bottom: 0.5rem; }
+    h1 { font-size: 1.6rem; margin-bottom: 0.5rem; }
     textarea {
       width: 100%; 
       min-height: 140px; 
-      padding: 10px; 
+      padding: 12px; 
       border-radius: 8px; 
-      border: none;
+      border: 1px solid #444;
       resize: vertical;
       font-family: monospace;
       font-size: 0.9rem;
+      background: #1f1f2a;
+      color: #eee;
     }
     .box {
-      background: rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.04);
       padding: 16px;
       border-radius: 12px;
       margin-top: 12px;
     }
-    .inline { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .inline { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-top:8px; }
     button {
-      background: #ff4081;
+      background: #2563eb;
       border: none;
       padding: 12px 18px;
       border-radius: 8px;
@@ -43,31 +45,33 @@
       min-width: 140px;
     }
     button:disabled {
-      background: #555;
+      background: #444;
       cursor: not-allowed;
     }
     .sequence {
-      background: rgba(255,255,255,0.1);
-      padding: 10px;
+      background: #1e2a44;
+      padding: 12px;
       border-radius: 6px;
       font-weight: bold;
-      margin-top: 8px;
+      margin-top: 12px;
+      word-break: break-word;
     }
     .note { font-size: 0.8rem; color: #bbb; margin-top: 4px; }
+    .error { color: #ff6b6b; margin-top:6px; }
   </style>
 </head>
 <body>
   <h1>Big/Small Last 7 Extractor</h1>
   <div class="box">
-    <label for="rawInput">Paste raw pattern (like the one you gave):</label>
+    <label for="rawInput">Paste raw pattern:</label>
     <textarea id="rawInput" placeholder="e.g. 'Small', 'Big', 'Small', 'Big', ..."></textarea>
-    <div class="note">Will extract all occurrences of Big or Small (case-insensitive) and take the last 7. If fewer than 7 present, Predict Next stays disabled.</div>
-    <div style="margin-top:12px;" class="inline">
+    <div class="note">Automatically extracts all "Big"/"Small" (case-insensitive) and shows the last 7. If fewer than 7, prediction disabled.</div>
+    <div class="inline">
       <button id="extractBtn">Extract Last 7</button>
       <button id="predictBtn" disabled>🔮 Predict Next</button>
     </div>
     <div id="sequenceDisplay" class="sequence" aria-live="polite">Last 7 sequence: —</div>
-    <div id="error" class="note" style="color:#f88;"></div>
+    <div id="error" class="note error"></div>
   </div>
 
   <script>
@@ -76,6 +80,7 @@
         const v = m[0].toLowerCase();
         return v === "big" ? "Big" : "Small";
       });
+      console.log("All parsed entries:", matches);
       if (matches.length < 7) return null;
       return matches.slice(-7);
     }
@@ -90,34 +95,31 @@
       if (seq) {
         sequenceDisplay.textContent = "Last 7 sequence: " + seq.join(', ');
         errorDiv.textContent = "";
+        predictBtn.disabled = false;
       } else {
         sequenceDisplay.textContent = "Last 7 sequence: —";
-        errorDiv.textContent = "Need at least 7 occurrences of Big/Small to enable prediction.";
+        errorDiv.textContent = "Kam se kam 7 Big/Small chahiye. Jo mila: " + extractLast7(rawInput.value)?.length || 0; 
+        predictBtn.disabled = true;
       }
-      predictBtn.disabled = !seq;
     }
 
     extractBtn.addEventListener('click', () => {
-      const raw = rawInput.value;
-      const last7 = extractLast7(raw);
+      const last7 = extractLast7(rawInput.value);
       updateDisplay(last7);
     });
 
-    // Also auto-update on paste or input after short debounce
-    let debounce;
     rawInput.addEventListener('input', () => {
-      clearTimeout(debounce);
-      debounce = setTimeout(() => {
+      // auto update without needing click
+      setTimeout(() => {
         const last7 = extractLast7(rawInput.value);
         updateDisplay(last7);
-      }, 300);
+      }, 200);
     });
 
     predictBtn.addEventListener('click', () => {
-      const lastText = sequenceDisplay.textContent;
       if (predictBtn.disabled) return;
-      alert("Predicting next based on: " + lastText.replace("Last 7 sequence: ", ""));
-      // Yahan aap apna actual prediction logic call kar sakte ho.
+      const seqText = sequenceDisplay.textContent.replace("Last 7 sequence: ", "");
+      alert("Next predict ke liye base sequence: " + seqText);
     });
   </script>
 </body>
