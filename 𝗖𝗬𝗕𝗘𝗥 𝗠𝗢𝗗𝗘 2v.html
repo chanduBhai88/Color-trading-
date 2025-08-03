@@ -3,218 +3,279 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Big Small Number Predictor</title>
+    <title>BDG Game Wingo - 1 Minute Projector</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            max-width: 600px;
+            background-color: #121212;
+            color: white;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+        
+        .container {
+            max-width: 800px;
             margin: 0 auto;
             padding: 20px;
-            background-color: #f5f5f5;
         }
-        .container {
-            background-color: white;
-            padding: 20px;
+        
+        .projector-screen {
+            background-color: #000;
+            border: 10px solid #333;
             border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            height: 400px;
+            margin: 20px 0;
+            position: relative;
+            overflow: hidden;
         }
-        h1 {
-            color: #333;
-            text-align: center;
+        
+        .game-title {
+            font-size: 2.5rem;
+            color: #ffcc00;
+            margin-bottom: 10px;
+            text-shadow: 0 0 10px rgba(255, 204, 0, 0.7);
         }
-        .rules {
-            background-color: #f0f8ff;
-            padding: 15px;
-            border-radius: 5px;
-            margin-bottom: 20px;
+        
+        .timer {
+            font-size: 3rem;
+            margin: 20px 0;
+            color: #ff5555;
         }
-        .input-section {
-            margin-bottom: 20px;
+        
+        .numbers-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            margin: 20px auto;
+            max-width: 500px;
         }
-        input {
-            padding: 8px;
-            width: 100px;
-            margin-right: 10px;
+        
+        .number {
+            background-color: #333;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin: 0 auto;
         }
-        button {
-            padding: 8px 15px;
+        
+        .number.selected {
+            background-color: #ffcc00;
+            color: #000;
+            transform: scale(1.1);
+            box-shadow: 0 0 15px #ffcc00;
+        }
+        
+        .number.matched {
             background-color: #4CAF50;
             color: white;
+        }
+        
+        .controls {
+            margin: 20px 0;
+        }
+        
+        button {
+            background-color: #ff5555;
+            color: white;
             border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #45a049;
-        }
-        .results {
-            margin-top: 20px;
-            padding: 15px;
-            background-color: #e8f5e9;
+            padding: 10px 20px;
+            font-size: 1.2rem;
             border-radius: 5px;
-            display: none;
+            cursor: pointer;
+            margin: 0 10px;
+            transition: all 0.3s;
         }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
+        
+        button:hover {
+            background-color: #ff3333;
+            transform: scale(1.05);
         }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
+        
+        .projector-light {
+            position: absolute;
+            top: -100px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 70%);
+            pointer-events: none;
+            z-index: -1;
         }
-        th {
-            background-color: #f2f2f2;
+        
+        .result {
+            font-size: 1.5rem;
+            margin: 20px 0;
+            min-height: 30px;
         }
-        .big {
-            color: green;
-            font-weight: bold;
-        }
-        .small {
-            color: red;
-            font-weight: bold;
+        
+        .score {
+            font-size: 1.8rem;
+            color: #ffcc00;
+            margin: 10px 0;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Big Small Number Predictor</h1>
+        <h1 class="game-title">BDG Game Wingo</h1>
+        <p>Match the projected numbers in 1 minute!</p>
         
-        <div class="rules">
-            <h3>Rules:</h3>
-            <ul>
-                <li>Numbers 0-4 are <span class="small">Small</span></li>
-                <li>Numbers 5-9 are <span class="big">Big</span></li>
-                <li>Enter period numbers one by one</li>
-                <li>Click "Show Result" to see predictions after entering multiple periods</li>
-            </ul>
+        <div class="projector-screen">
+            <div class="projector-light"></div>
+            <div class="timer" id="timer">01:00</div>
+            <div class="numbers-grid" id="numbersGrid"></div>
+            <div class="result" id="result"></div>
+            <div class="score" id="score">Score: 0</div>
         </div>
         
-        <div class="input-section">
-            <input type="number" id="numberInput" min="0" max="9" placeholder="Enter 0-9">
-            <button onclick="addNumber()">Add Number</button>
-            <button onclick="showResult()">Show Result</button>
-            <button onclick="resetData()" style="background-color: #f44336;">Reset</button>
-        </div>
-        
-        <div id="numberList"></div>
-        
-        <div id="results" class="results">
-            <h2>Prediction Results</h2>
-            <div id="stats"></div>
-            <div id="prediction"></div>
-            <h3>Last 3 Periods:</h3>
-            <table id="lastPeriods">
-                <tr>
-                    <th>Period</th>
-                    <th>Number</th>
-                    <th>Type</th>
-                </tr>
-            </table>
+        <div class="controls">
+            <button id="startBtn">Start Game</button>
+            <button id="resetBtn">Reset</button>
         </div>
     </div>
 
     <script>
-        let periodData = [];
-        let periodCount = 0; // Added to track period numbers independently
+        // Game variables
+        let timeLeft = 60;
+        let timerInterval;
+        let gameActive = false;
+        let score = 0;
+        let currentNumbers = [];
+        let selectedNumbers = [];
         
-        function addNumber() {
-            const input = document.getElementById('numberInput');
-            const number = parseInt(input.value);
-            
-            if (isNaN(number) || number < 0 || number > 9) {
-                alert('Please enter a valid number between 0-9');
-                return;
+        // DOM elements
+        const timerElement = document.getElementById('timer');
+        const numbersGrid = document.getElementById('numbersGrid');
+        const startBtn = document.getElementById('startBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const resultElement = document.getElementById('result');
+        const scoreElement = document.getElementById('score');
+        
+        // Initialize the game
+        function initGame() {
+            // Create number grid
+            numbersGrid.innerHTML = '';
+            for (let i = 1; i <= 25; i++) {
+                const numberElement = document.createElement('div');
+                numberElement.className = 'number';
+                numberElement.textContent = i;
+                numberElement.dataset.number = i;
+                numberElement.addEventListener('click', () => selectNumber(i));
+                numbersGrid.appendChild(numberElement);
             }
             
-            periodCount++; // Increment period count
-            periodData.push({
-                period: periodCount,
-                number: number
-            });
-            input.value = '';
-            updateNumberList();
+            // Generate random numbers to match
+            currentNumbers = [];
+            while (currentNumbers.length < 5) {
+                const randomNum = Math.floor(Math.random() * 25) + 1;
+                if (!currentNumbers.includes(randomNum)) {
+                    currentNumbers.push(randomNum);
+                }
+            }
+            
+            selectedNumbers = [];
+            score = 0;
+            updateScore();
+            resultElement.textContent = 'Match these numbers: ' + currentNumbers.join(', ');
         }
         
-        function updateNumberList() {
-            const numberList = document.getElementById('numberList');
-            numberList.innerHTML = '<h3>Entered Numbers:</h3>';
+        // Start the game
+        function startGame() {
+            if (gameActive) return;
             
-            if (periodData.length === 0) {
-                numberList.innerHTML += '<p>No numbers entered yet</p>';
-                return;
-            }
+            gameActive = true;
+            timeLeft = 60;
+            initGame();
             
-            let listHtml = '<div>';
-            periodData.forEach(item => {
-                const type = item.number >= 5 ? 'big' : 'small';
-                listHtml += `<span class="${type}">Period ${item.period}: ${item.number} (${type === 'big' ? 'Big' : 'Small'})</span><br>`;
-            });
-            listHtml += '</div>';
-            numberList.innerHTML += listHtml;
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                updateTimer();
+                
+                if (timeLeft <= 0) {
+                    endGame();
+                }
+            }, 1000);
+            
+            startBtn.disabled = true;
         }
         
-        function showResult() {
-            if (periodData.length === 0) {
-                alert('Please enter some numbers first');
-                return;
+        // End the game
+        function endGame() {
+            clearInterval(timerInterval);
+            gameActive = false;
+            startBtn.disabled = false;
+            resultElement.textContent = `Game Over! Final Score: ${score}`;
+        }
+        
+        // Update timer display
+        function updateTimer() {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            
+            // Blink when time is running out
+            if (timeLeft <= 10) {
+                timerElement.style.animation = 'blink 0.5s infinite';
             }
+        }
+        
+        // Select a number
+        function selectNumber(number) {
+            if (!gameActive || selectedNumbers.includes(number)) return;
             
-            const resultsDiv = document.getElementById('results');
-            const statsDiv = document.getElementById('stats');
-            const predictionDiv = document.getElementById('prediction');
-            const lastPeriodsTable = document.getElementById('lastPeriods');
+            const numberElement = document.querySelector(`.number[data-number="${number}"]`);
+            numberElement.classList.add('selected');
             
-            // Clear previous table rows (except header)
-            while (lastPeriodsTable.rows.length > 1) {
-                lastPeriodsTable.deleteRow(1);
-            }
-            
-            // Calculate stats
-            const bigCount = periodData.filter(item => item.number >= 5).length;
-            const smallCount = periodData.length - bigCount;
-            const bigPercent = periodData.length > 0 ? (bigCount / periodData.length * 100).toFixed(1) : 0;
-            const smallPercent = periodData.length > 0 ? (smallCount / periodData.length * 100).toFixed(1) : 0;
-            
-            // Update stats
-            statsDiv.innerHTML = `
-                <p>Total periods entered: ${periodData.length}</p>
-                <p>Big numbers appeared: ${bigCount} times (${bigPercent}%)</p>
-                <p>Small numbers appeared: ${smallCount} times (${smallPercent}%)</p>
-            `;
-            
-            // Make prediction
-            let predictionText = '';
-            if (bigCount > smallCount) {
-                predictionText = '<p class="small">Prediction: Next number is more likely to be Small</p>';
-            } else if (smallCount > bigCount) {
-                predictionText = '<p class="big">Prediction: Next number is more likely to be Big</p>';
+            if (currentNumbers.includes(number)) {
+                selectedNumbers.push(number);
+                numberElement.classList.add('matched');
+                score += 10;
+                updateScore();
+                
+                if (selectedNumbers.length === currentNumbers.length) {
+                    resultElement.textContent = 'All numbers matched! Generating new set...';
+                    setTimeout(() => {
+                        initGame();
+                    }, 1500);
+                }
             } else {
-                predictionText = '<p>Prediction: Equal chance for Big or Small</p>';
+                score = Math.max(0, score - 5);
+                updateScore();
             }
-            predictionDiv.innerHTML = predictionText;
-            
-            // Show last 3 periods (or all if less than 3)
-            const startIndex = Math.max(0, periodData.length - 3);
-            for (let i = startIndex; i < periodData.length; i++) {
-                const item = periodData[i];
-                const type = item.number >= 5 ? 'Big' : 'Small';
-                const row = lastPeriodsTable.insertRow();
-                row.insertCell(0).textContent = item.period;
-                row.insertCell(1).textContent = item.number;
-                row.insertCell(2).textContent = type;
-            }
-            
-            resultsDiv.style.display = 'block';
         }
         
-        function resetData() {
-            periodData = [];
-            periodCount = 0;
-            document.getElementById('numberList').innerHTML = '<h3>Entered Numbers:</h3><p>No numbers entered yet</p>';
-            document.getElementById('results').style.display = 'none';
+        // Update score display
+        function updateScore() {
+            scoreElement.textContent = `Score: ${score}`;
         }
+        
+        // Reset the game
+        function resetGame() {
+            clearInterval(timerInterval);
+            gameActive = false;
+            timeLeft = 60;
+            updateTimer();
+            timerElement.style.animation = '';
+            startBtn.disabled = false;
+            initGame();
+            resultElement.textContent = 'Game reset. Click Start to begin!';
+        }
+        
+        // Event listeners
+        startBtn.addEventListener('click', startGame);
+        resetBtn.addEventListener('click', resetGame);
+        
+        // Initialize on load
+        initGame();
     </script>
 </body>
 </html>
