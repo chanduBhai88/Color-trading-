@@ -7,7 +7,7 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            max-width: 600px;
+            max-width: 800px;
             margin: 0 auto;
             padding: 20px;
             background-color: #f5f5f5;
@@ -16,21 +16,33 @@
             color: #333;
             text-align: center;
         }
-        .input-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-bottom: 20px;
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
-        select {
+        .input-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, select {
             padding: 8px;
-            font-size: 16px;
+            width: 100%;
+            box-sizing: border-box;
+            border: 1px solid #ddd;
+            border-radius: 4px;
         }
         button {
-            padding: 10px 20px;
             background-color: #4CAF50;
             color: white;
+            padding: 10px 15px;
             border: none;
+            border-radius: 4px;
             cursor: pointer;
             font-size: 16px;
         }
@@ -40,124 +52,196 @@
         #result {
             margin-top: 20px;
             padding: 15px;
-            border-radius: 5px;
-            background-color: #e9e9e9;
+            border-radius: 4px;
+            background-color: #e9f7ef;
+            display: none;
         }
-        .match {
-            color: green;
-            font-weight: bold;
+        .sequence {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-bottom: 10px;
         }
-        .no-match {
-            color: red;
+        .sequence-item {
+            padding: 5px 10px;
+            border-radius: 4px;
+        }
+        .big {
+            background-color: #ffcccc;
+            color: #cc0000;
+        }
+        .small {
+            background-color: #ccffcc;
+            color: #006600;
         }
         .prediction {
-            color: #1a73e8;
             font-weight: bold;
+            font-size: 18px;
         }
     </style>
 </head>
 <body>
-    <h1>Big-Small Pattern Predictor</h1>
-    <p>8 बार "Big" या "Small" चुनें (अगले 2 वैल्यूज का पूर्वानुमान देखने के लिए):</p>
-    
-    <div class="input-container" id="inputs">
-        <!-- यहाँ 8 ड्रॉपडाउन जनरेट होंगे -->
+    <div class="container">
+        <h1>Big-Small Pattern Predictor</h1>
+        
+        <div class="input-group">
+            <label for="sequence">Enter 7 Big/Small values:</label>
+            <div class="sequence" id="inputSequence">
+                <!-- Input items will be added here -->
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <button onclick="addValue('Big')">Add Big</button>
+                <button onclick="addValue('Small')">Add Small</button>
+                <button onclick="clearSequence()">Clear</button>
+            </div>
+        </div>
+        
+        <button onclick="predictNext()">Predict Next Value</button>
+        
+        <div id="result">
+            <h3>Prediction Result:</h3>
+            <p>Based on the pattern:</p>
+            <div class="sequence" id="patternSequence"></div>
+            <p>The next value is likely to be: <span class="prediction" id="prediction"></span></p>
+        </div>
     </div>
-    
-    <button onclick="validateInput()">पूर्वानुमान देखें</button>
-    
-    <div id="result"></div>
 
     <script>
-        // आपके पैटर्न्स (हर एक 10 इनपुट्स का)
+        // All the patterns you provided
         const patterns = [
-            ['Big', 'Big', 'Small', 'Big', 'Small', 'Small', 'Big', 'Small', 'Big', 'Big'],
-            ['Big', 'Big', 'Big', 'Small', 'Small', 'Small', 'Small', 'Small', 'Small'],
-            ['Big', 'Small', 'Big', 'Big', 'Small', 'Big', 'Small', 'Small', 'Big', 'Big'],
-            ['Small', 'Small', 'Small', 'Small', 'Small', 'Big', 'Big', 'Big', 'Big', 'Small'],
-            ['Small', 'Big', 'Big', 'Small', 'Big', 'Small', 'Big', 'Small', 'Big', 'Big'],
-            ['Big', 'Small', 'Small', 'Small', 'Small', 'Small', 'Big', 'Big', 'Big', 'Big'],
-            ['Big', 'Small', 'Small', 'Small', 'Big', 'Small', 'Big', 'Small', 'Big', 'Big'],
-            ['Small', 'Small', 'Small', 'Small', 'Small', 'Small', 'Small', 'Big', 'Big', 'Small'],
-            ['Big', 'Small', 'Small', 'Small', 'Small', 'Small', 'Small', 'Big', 'Big', 'Small'],
-            ['Small', 'Big', 'Big', 'Small', 'Small', 'Small', 'Small', 'Big', 'Big', 'Big'],
-            ['Big', 'Big', 'Small', 'Big', 'Small', 'Small', 'Big', 'Small', 'Big', 'Big'],
-            ['Big', 'Small', 'Small', 'Small', 'Big', 'Big', 'Big', 'Small', 'Big', 'Small'],
-            ['Small', 'Small', 'Small', 'Small', 'Small', 'Big', 'Big', 'Big', 'Big', 'Small'],
-            ['Small', 'Big', 'Big', 'Small', 'Big', 'Small', 'Big', 'Small', 'Big', 'Big'],
-            ['Big', 'Small', 'Small', 'Small', 'Small', 'Small', 'Big', 'Big', 'Big', 'Big'],
-            ['Big', 'Small', 'Small', 'Big', 'Small', 'Big', 'Big', 'Big', 'Big', 'Small'],
-            ['Small', 'Small', 'Big', 'Small', 'Big', 'Big', 'Big', 'Small', 'Big', 'Small'],
-            ['Big', 'Big', 'Small', 'Small', 'Big', 'Small', 'Big', 'Big', 'Big', 'Small']
+            ["Big", "Big", "Small", "Big", "Small", "Small", "Big", "Small", "Big", "Big"],
+            ["Big", "Small", "Big", "Small", "Big", "Big", "Small", "Small", "Small", "Big"],
+            ["Big", "Big", "Big", "Small", "Small", "Small", "Small", "Small", "Small", "Small"],
+            ["Big", "Small", "Big", "Big", "Small", "Big", "Small", "Small", "Big", "Big"],
+            ["Small", "Small", "Small", "Small", "Small", "Big", "Big", "Big", "Big", "Small"],
+            ["Small", "Big", "Big", "Small", "Big", "Small", "Big", "Small", "Big", "Big"],
+            ["Big", "Small", "Small", "Small", "Small", "Small", "Big", "Big", "Big", "Big"],
+            ["Big", "Small", "Small", "Small", "Big", "Small", "Big", "Small", "Big", "Big"],
+            ["Small", "Small", "Small", "Small", "Small", "Small", "Small", "Big", "Big", "Small"],
+            ["Big", "Small", "Small", "Small", "Small", "Small", "Small", "Big", "Big", "Small"],
+            ["Small", "Big", "Big", "Small", "Small", "Small", "Small", "Big", "Big", "Big"],
+            ["Big", "Small", "Small", "Small", "Big", "Big", "Big", "Small", "Big", "Small"],
+            ["Small", "Small", "Small", "Small", "Small", "Big", "Big", "Big", "Big", "Small"],
+            ["Small", "Big", "Big", "Small", "Big", "Small", "Big", "Small", "Big", "Big"],
+            ["Big", "Small", "Small", "Small", "Small", "Small", "Big", "Big", "Big", "Big"],
+            ["Small", "Small", "Big", "Big", "Small", "Big", "Small", "Small", "Small", "Small"],
+            ["Small", "Big", "Big", "Small", "Small", "Small", "Big", "Big", "Big", "Small"],
+            ["Big", "Small", "Small", "Big", "Small", "Big", "Big", "Big", "Big", "Small"],
+            ["Small", "Small", "Big", "Small", "Big", "Big", "Big", "Small", "Big", "Small"],
+            ["Big", "Big", "Small", "Small", "Big", "Small", "Big", "Big", "Big", "Small"]
         ];
 
-        // पेज लोड होने पर 8 ड्रॉपडाउन बनाएँ
-        window.onload = function() {
-            const container = document.getElementById('inputs');
-            for (let i = 0; i < 8; i++) {
-                const select = document.createElement('select');
-                select.id = `input${i}`;
-                select.innerHTML = `
-                    <option value="">-- चुनें --</option>
-                    <option value="Big">Big</option>
-                    <option value="Small">Small</option>
-                `;
-                container.appendChild(select);
+        let inputSequence = [];
+
+        function addValue(value) {
+            if (inputSequence.length >= 7) {
+                alert("You can only enter 7 values. Click 'Predict' or 'Clear' to start over.");
+                return;
             }
-        };
+            inputSequence.push(value);
+            updateInputDisplay();
+        }
 
-        // वैलिडेशन और पूर्वानुमान फंक्शन
-        function validateInput() {
-            const userInput = [];
-            let isValid = true;
+        function clearSequence() {
+            inputSequence = [];
+            updateInputDisplay();
+            document.getElementById('result').style.display = 'none';
+        }
 
-            // यूजर इनपुट इकट्ठा करें
-            for (let i = 0; i < 8; i++) {
-                const select = document.getElementById(`input${i}`);
-                const value = select.value;
-                if (!value) {
-                    isValid = false;
-                    alert(`कृपया ${i+1}वाँ ऑप्शन चुनें!`);
-                    break;
-                }
-                userInput.push(value);
-            }
-
-            if (!isValid) return;
-
-            // पैटर्न से मिलान चेक करें और अगले 2 वैल्यूज प्रेडिक्ट करें
-            let matchedPattern = null;
-            for (const pattern of patterns) {
-                let isMatch = true;
-                for (let i = 0; i < 8; i++) {
-                    if (pattern[i] !== userInput[i]) {
-                        isMatch = false;
-                        break;
-                    }
-                }
-                if (isMatch) {
-                    matchedPattern = pattern;
-                    break;
-                }
-            }
-
-            // रिजल्ट दिखाएँ
-            const resultDiv = document.getElementById('result');
-            if (matchedPattern) {
-                const nextTwo = matchedPattern.slice(8, 10); // 9वाँ और 10वाँ वैल्यू
-                resultDiv.innerHTML = `
-                    <p class="match">मिलान पैटर्न मिला!</p>
-                    <p>आपका इनपुट: ${userInput.join(', ')}</p>
-                    <p class="prediction">अगले 2 पूर्वानुमान: ${nextTwo.join(', ')}</p>
-                    <p>पूरा पैटर्न: ${matchedPattern.join(', ')}</p>
-                `;
-            } else {
-                resultDiv.innerHTML = `
-                    <p class="no-match">कोई मिलान नहीं मिला। आपका इनपुट किसी भी पैटर्न से मेल नहीं खाता।</p>
-                    <p>आपका इनपुट: ${userInput.join(', ')}</p>
-                `;
+        function updateInputDisplay() {
+            const container = document.getElementById('inputSequence');
+            container.innerHTML = '';
+            
+            inputSequence.forEach((value, index) => {
+                const item = document.createElement('div');
+                item.className = `sequence-item ${value.toLowerCase()}`;
+                item.textContent = `${value}`;
+                container.appendChild(item);
+            });
+            
+            // Add empty placeholders for remaining inputs
+            for (let i = inputSequence.length; i < 7; i++) {
+                const item = document.createElement('div');
+                item.className = 'sequence-item';
+                item.textContent = '?';
+                container.appendChild(item);
             }
         }
+
+        function predictNext() {
+            if (inputSequence.length !== 7) {
+                alert("Please enter exactly 7 values before predicting.");
+                return;
+            }
+
+            // Find matching patterns
+            const matches = [];
+            
+            for (const pattern of patterns) {
+                for (let i = 0; i <= pattern.length - 8; i++) {
+                    let match = true;
+                    for (let j = 0; j < 7; j++) {
+                        if (pattern[i + j] !== inputSequence[j]) {
+                            match = false;
+                            break;
+                        }
+                    }
+                    if (match) {
+                        matches.push({
+                            pattern: pattern,
+                            index: i,
+                            nextValue: pattern[i + 7]
+                        });
+                    }
+                }
+            }
+
+            // Count predictions
+            const predictionCounts = { Big: 0, Small: 0 };
+            matches.forEach(match => {
+                predictionCounts[match.nextValue]++;
+            });
+
+            // Determine result
+            let result;
+            if (matches.length === 0) {
+                result = "No matching pattern found";
+            } else {
+                const total = predictionCounts.Big + predictionCounts.Small;
+                const bigPercent = Math.round((predictionCounts.Big / total) * 100);
+                const smallPercent = Math.round((predictionCounts.Small / total) * 100);
+                
+                if (predictionCounts.Big > predictionCounts.Small) {
+                    result = "Big";
+                } else if (predictionCounts.Small > predictionCounts.Big) {
+                    result = "Small";
+                } else {
+                    result = "Equal probability for Big and Small";
+                }
+
+                // Show one of the matching patterns
+                const exampleMatch = matches[0];
+                const patternDisplay = document.getElementById('patternSequence');
+                patternDisplay.innerHTML = '';
+                
+                for (let i = 0; i < 8; i++) {
+                    const item = document.createElement('div');
+                    item.className = `sequence-item ${exampleMatch.pattern[exampleMatch.index + i].toLowerCase()}`;
+                    item.textContent = exampleMatch.pattern[exampleMatch.index + i];
+                    if (i === 7) {
+                        item.style.border = "2px solid #000";
+                    }
+                    patternDisplay.appendChild(item);
+                }
+            }
+
+            // Display result
+            document.getElementById('prediction').textContent = result;
+            document.getElementById('result').style.display = 'block';
+        }
+
+        // Initialize display
+        updateInputDisplay();
     </script>
 </body>
 </html>
