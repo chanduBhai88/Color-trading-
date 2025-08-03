@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Big-Small Pattern Predictor</title>
+    <title>Big-Small Pattern Predictor with Raja Games Data</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            max-width: 800px;
+            max-width: 1000px;
             margin: 0 auto;
             padding: 20px;
             background-color: #f5f5f5;
@@ -45,6 +45,8 @@
             border-radius: 4px;
             cursor: pointer;
             font-size: 16px;
+            margin-right: 10px;
+            margin-bottom: 10px;
         }
         button:hover {
             background-color: #45a049;
@@ -59,40 +61,127 @@
         .sequence {
             display: flex;
             flex-wrap: wrap;
-            gap: 5px;
-            margin-bottom: 10px;
+            gap: 10px;
+            margin-bottom: 20px;
+            align-items: center;
         }
         .sequence-item {
-            padding: 5px 10px;
+            padding: 8px 12px;
             border-radius: 4px;
+            text-align: center;
+            min-width: 60px;
         }
         .big {
             background-color: #ffcccc;
             color: #cc0000;
+            border: 1px solid #cc0000;
         }
         .small {
             background-color: #ccffcc;
             color: #006600;
+            border: 1px solid #006600;
         }
         .prediction {
             font-weight: bold;
             font-size: 18px;
+        }
+        .pattern-image {
+            width: 40px;
+            height: 40px;
+            object-fit: contain;
+        }
+        .match-info {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f0f8ff;
+            border-radius: 4px;
+        }
+        .stats {
+            margin-top: 15px;
+            padding: 10px;
+            background-color: #fffaf0;
+            border-radius: 4px;
+        }
+        .image-option {
+            display: inline-block;
+            margin-right: 15px;
+            margin-bottom: 15px;
+            text-align: center;
+            cursor: pointer;
+        }
+        .image-option img {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border: 2px solid transparent;
+            border-radius: 4px;
+        }
+        .image-option.selected img {
+            border-color: #4CAF50;
+        }
+        .image-legend {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .data-source {
+            font-size: 12px;
+            color: #666;
+            text-align: center;
+            margin-top: 20px;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Big-Small Pattern Predictor</h1>
+        <div class="data-source">Incorporating patterns from Raja Games lottery data</div>
+        
+        <div class="image-legend">
+            <div class="legend-item">
+                <div class="sequence-item big">B</div>
+                <span>Big (6-9)</span>
+            </div>
+            <div class="legend-item">
+                <div class="sequence-item small">S</div>
+                <span>Small (0-5)</span>
+            </div>
+        </div>
+        
+        <div class="input-group">
+            <label>Select display style:</label>
+            <div>
+                <div class="image-option selected" onclick="selectImageType('numbers')">
+                    <div class="sequence-item big">B</div>
+                    <div>Letters</div>
+                </div>
+                <div class="image-option" onclick="selectImageType('numbers')">
+                    <div class="sequence-item big">6</div>
+                    <div>Numbers</div>
+                </div>
+                <div class="image-option" onclick="selectImageType('arrows')">
+                    <div class="sequence-item big">↑</div>
+                    <div>Arrows</div>
+                </div>
+            </div>
+        </div>
         
         <div class="input-group">
             <label for="sequence">Enter 8 Big/Small values:</label>
             <div class="sequence" id="inputSequence">
                 <!-- Input items will be added here -->
             </div>
-            <div style="display: flex; gap: 10px;">
+            <div>
                 <button onclick="addValue('Big')">Add Big</button>
                 <button onclick="addValue('Small')">Add Small</button>
                 <button onclick="clearSequence()">Clear</button>
+                <button onclick="generateRandom()">Random</button>
             </div>
         </div>
         
@@ -103,12 +192,25 @@
             <p>Based on the pattern:</p>
             <div class="sequence" id="patternSequence"></div>
             <p>The next value is likely to be: <span class="prediction" id="prediction"></span></p>
+            
+            <div class="stats" id="stats">
+                <p>Pattern matches found: <span id="matchCount">0</span></p>
+                <p>Big predictions: <span id="bigCount">0</span> (<span id="bigPercent">0</span>%)</p>
+                <p>Small predictions: <span id="smallCount">0</span> (<span id="smallPercent">0</span>%)</p>
+            </div>
+            
+            <div class="match-info">
+                <h4>Matching Pattern Example:</h4>
+                <div class="sequence" id="fullPattern"></div>
+                <p>This pattern continues with: <span id="patternNextValue"></span></p>
+            </div>
         </div>
     </div>
 
     <script>
-        // सभी Big-Small पैटर्न्स (आपके द्वारा दिए गए)
+        // All Big-Small patterns from Raja Games screenshots plus original patterns
         const patterns = [
+            // Original patterns
             ["Big", "Big", "Small", "Big", "Small", "Small", "Big", "Small", "Big", "Big"],
             ["Big", "Small", "Big", "Small", "Big", "Big", "Small", "Small", "Small", "Big"],
             ["Big", "Big", "Big", "Small", "Small", "Small", "Small", "Small", "Small", "Small"],
@@ -121,25 +223,61 @@
             ["Big", "Small", "Small", "Small", "Small", "Small", "Small", "Big", "Big", "Small"],
             ["Small", "Big", "Big", "Small", "Small", "Small", "Small", "Big", "Big", "Big"],
             ["Big", "Small", "Small", "Small", "Big", "Big", "Big", "Small", "Big", "Small"],
-            ["Small", "Small", "Small", "Small", "Small", "Big", "Big", "Big", "Big", "Small"],
-            ["Small", "Big", "Big", "Small", "Big", "Small", "Big", "Small", "Big", "Big"],
-            ["Big", "Small", "Small", "Small", "Small", "Small", "Big", "Big", "Big", "Big"],
-            ["Small", "Small", "Big", "Big", "Small", "Big", "Small", "Small", "Small", "Small"],
-            ["Small", "Big", "Big", "Small", "Small", "Small", "Big", "Big", "Big", "Small"],
-            ["Big", "Small", "Small", "Big", "Small", "Big", "Big", "Big", "Big", "Small"],
-            ["Small", "Small", "Big", "Small", "Big", "Big", "Big", "Small", "Big", "Small"],
-            ["Big", "Big", "Small", "Small", "Big", "Small", "Big", "Big", "Big", "Small"],
-            // आपके नए पैटर्न्स
-            ["Small", "Big", "Big", "Big", "Big", "Big", "Big", "Big", "Small", "Small"],
-            ["Big", "Small", "Small", "Small", "Big", "Small", "Small", "Big", "Big", "Small"],
-            ["Big", "Big", "Small", "Small", "Small", "Big", "Big", "Small", "Big", "Big"],
-            ["Small", "Big", "Big", "Small", "Small", "Small", "Big", "Big", "Big", "Small"],
-            ["Big", "Small", "Small", "Big", "Small", "Big", "Big", "Big", "Big", "Small"],
-            ["Small", "Small", "Big", "Small", "Big", "Big", "Big", "Small", "Big", "Small"],
-            ["Big", "Big", "Small", "Small", "Big", "Small", "Big", "Big", "Big", "Small"]
+            
+            // Patterns from Screenshot_20250803_174839.jpg
+            ["Small", "Big", "Big", "Big", "Small", "Small", "Small", "Small", "Small", "Small"],
+            ["Big", "Big", "Big", "Small", "Small", "Small", "Small", "Big", "Big", "Big"],
+            ["Small", "Small", "Small", "Small", "Small", "Big", "Big", "Small", "Small", "Small"],
+            
+            // Patterns from Screenshot_20250803_175112.jpg
+            ["Big", "Big", "Small", "Small", "Big", "Big", "Small", "Small", "Small", "Small"],
+            ["Big", "Big", "Big", "Small", "Small", "Big", "Big", "Small", "Small", "Small"],
+            
+            // Patterns from Screenshot_20250803_180037.jpg
+            ["Small", "Small", "Small", "Big", "Small", "Small", "Big", "Small", "Small", "Big"],
+            ["Small", "Small", "Big", "Small", "Small", "Big", "Big", "Small", "Small", "Big"],
+            
+            // Patterns from Screenshot_20250803_180043.jpg
+            ["Big", "Big", "Big", "Big", "Small", "Big", "Big", "Big", "Big", "Small"],
+            ["Big", "Big", "Big", "Big", "Small", "Big", "Big", "Big", "Small", "Small"],
+            
+            // Patterns from Screenshot_20250803_180056.jpg
+            ["Small", "Small", "Small", "Small", "Small", "Big", "Small", "Big", "Small", "Big"],
+            ["Small", "Small", "Small", "Small", "Big", "Big", "Small", "Big", "Small", "Big"],
+            
+            // Patterns from Screenshot_20250803_180109.jpg
+            ["Big", "Big", "Big", "Big", "Big", "Big", "Big", "Big", "Small", "Small"],
+            ["Big", "Big", "Big", "Big", "Big", "Big", "Big", "Small", "Small", "Small"],
+            
+            // Additional patterns observed in the data
+            ["Small", "Big", "Small", "Big", "Small", "Big", "Small", "Big", "Small", "Big"],
+            ["Big", "Small", "Big", "Small", "Big", "Small", "Big", "Small", "Big", "Small"],
+            ["Small", "Small", "Small", "Big", "Big", "Big", "Small", "Small", "Small", "Big"],
+            ["Big", "Big", "Big", "Small", "Small", "Small", "Big", "Big", "Big", "Small"]
         ];
 
         let inputSequence = [];
+        let imageType = 'numbers';
+
+        function selectImageType(type) {
+            imageType = type;
+            document.querySelectorAll('.image-option').forEach(el => {
+                el.classList.remove('selected');
+            });
+            event.currentTarget.classList.add('selected');
+            updateInputDisplay();
+        }
+
+        function getImageForValue(value, isPrediction = false) {
+            if (imageType === 'numbers') {
+                return value === 'Big' ? 'B' : 'S';
+            } else if (imageType === 'arrows') {
+                return value === 'Big' ? '↑' : '↓';
+            } else {
+                // Default to numbers if type is not recognized
+                return value === 'Big' ? 'B' : 'S';
+            }
+        }
 
         function addValue(value) {
             if (inputSequence.length >= 8) {
@@ -147,6 +285,14 @@
                 return;
             }
             inputSequence.push(value);
+            updateInputDisplay();
+        }
+
+        function generateRandom() {
+            inputSequence = [];
+            for (let i = 0; i < 8; i++) {
+                inputSequence.push(Math.random() > 0.5 ? 'Big' : 'Small');
+            }
             updateInputDisplay();
         }
 
@@ -163,7 +309,7 @@
             inputSequence.forEach((value, index) => {
                 const item = document.createElement('div');
                 item.className = `sequence-item ${value.toLowerCase()}`;
-                item.textContent = `${value}`;
+                item.textContent = getImageForValue(value);
                 container.appendChild(item);
             });
             
@@ -214,6 +360,8 @@
             let result;
             if (matches.length === 0) {
                 result = "No matching pattern found";
+                document.getElementById('stats').style.display = 'none';
+                document.querySelector('.match-info').style.display = 'none';
             } else {
                 const total = predictionCounts.Big + predictionCounts.Small;
                 const bigPercent = Math.round((predictionCounts.Big / total) * 100);
@@ -227,6 +375,14 @@
                     result = "Equal probability for Big and Small";
                 }
 
+                // Update stats
+                document.getElementById('matchCount').textContent = matches.length;
+                document.getElementById('bigCount').textContent = predictionCounts.Big;
+                document.getElementById('smallCount').textContent = predictionCounts.Small;
+                document.getElementById('bigPercent').textContent = bigPercent;
+                document.getElementById('smallPercent').textContent = smallPercent;
+                document.getElementById('stats').style.display = 'block';
+
                 // Show one of the matching patterns
                 const exampleMatch = matches[0];
                 const patternDisplay = document.getElementById('patternSequence');
@@ -235,12 +391,38 @@
                 for (let i = 0; i < 9; i++) {
                     const item = document.createElement('div');
                     item.className = `sequence-item ${exampleMatch.pattern[exampleMatch.index + i].toLowerCase()}`;
-                    item.textContent = exampleMatch.pattern[exampleMatch.index + i];
+                    item.textContent = getImageForValue(exampleMatch.pattern[exampleMatch.index + i], i === 8);
                     if (i === 8) {
                         item.style.border = "2px solid #000";
+                        item.style.fontWeight = "bold";
                     }
                     patternDisplay.appendChild(item);
                 }
+
+                // Show full pattern
+                const fullPatternDisplay = document.getElementById('fullPattern');
+                fullPatternDisplay.innerHTML = '';
+                
+                for (let i = 0; i < exampleMatch.pattern.length; i++) {
+                    const item = document.createElement('div');
+                    item.className = `sequence-item ${exampleMatch.pattern[i].toLowerCase()}`;
+                    item.textContent = getImageForValue(exampleMatch.pattern[i]);
+                    
+                    // Highlight the matching segment
+                    if (i >= exampleMatch.index && i < exampleMatch.index + 8) {
+                        item.style.boxShadow = "0 0 0 2px #4CAF50";
+                    }
+                    // Highlight the prediction
+                    if (i === exampleMatch.index + 8) {
+                        item.style.border = "2px solid #000";
+                        item.style.fontWeight = "bold";
+                    }
+                    
+                    fullPatternDisplay.appendChild(item);
+                }
+
+                document.getElementById('patternNextValue').textContent = exampleMatch.nextValue;
+                document.querySelector('.match-info').style.display = 'block';
             }
 
             // Display result
