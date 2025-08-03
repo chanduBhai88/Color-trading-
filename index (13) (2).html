@@ -2,76 +2,83 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Big/Small Last 7 Extractor</title>
+  <title>Big/Small Last 7 + Prediction</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <style>
     body {
-      font-family: system-ui,-apple-system,BlinkMacSystemFont,sans-serif;
-      background: #111;
+      background: #0f0f17;
       color: #fff;
-      padding: 20px;
-      max-width: 640px;
-      margin: auto;
+      font-family: system-ui,-apple-system,BlinkMacSystemFont,sans-serif;
+      max-width: 600px;
+      margin: 30px auto;
+      padding: 0 16px;
     }
-    h1 { font-size: 1.6rem; margin-bottom: 0.5rem; }
+    h1 { font-size: 1.6rem; margin-bottom: 8px; }
+    .card {
+      background: rgba(255,255,255,0.07);
+      padding: 16px 18px;
+      border-radius: 12px;
+      margin-bottom: 18px;
+    }
     textarea {
-      width: 100%; 
-      min-height: 140px; 
-      padding: 12px; 
-      border-radius: 8px; 
-      border: 1px solid #444;
-      resize: vertical;
+      width: 100%;
+      min-height: 120px;
+      border-radius: 8px;
+      border: none;
+      padding: 12px;
       font-family: monospace;
       font-size: 0.9rem;
-      background: #1f1f2a;
-      color: #eee;
+      resize: vertical;
+      background: #1e2230;
+      color: #e8e8e8;
+      box-sizing: border-box;
     }
-    .box {
-      background: rgba(255,255,255,0.04);
-      padding: 16px;
-      border-radius: 12px;
+    .buttons {
+      display: flex;
+      gap: 10px;
       margin-top: 12px;
+      flex-wrap: wrap;
     }
-    .inline { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-top:8px; }
     button {
-      background: #2563eb;
+      flex: 1;
+      min-width: 140px;
+      padding: 12px 16px;
       border: none;
-      padding: 12px 18px;
       border-radius: 8px;
       cursor: pointer;
       font-weight: 600;
-      color: white;
-      flex: 1;
-      min-width: 140px;
     }
-    button:disabled {
-      background: #444;
-      cursor: not-allowed;
-    }
-    .sequence {
-      background: #1e2a44;
+    #extractBtn { background: #2563eb; color: #fff; }
+    #predictBtn { background: #ff4081; color: #fff; }
+    button:disabled { background: #444; cursor: not-allowed; }
+    .display {
+      margin-top: 14px;
+      background: #1f2a50;
       padding: 12px;
-      border-radius: 6px;
-      font-weight: bold;
-      margin-top: 12px;
+      border-radius: 8px;
+      font-size: 1rem;
       word-break: break-word;
     }
-    .note { font-size: 0.8rem; color: #bbb; margin-top: 4px; }
-    .error { color: #ff6b6b; margin-top:6px; }
+    .label { font-weight: 600; margin-bottom: 4px; display: block; }
+    .small { font-size: 0.75rem; color: #bbb; margin-top: 4px; }
+    .warning { color: #ff9b72; margin-top: 6px; }
   </style>
 </head>
 <body>
-  <h1>Big/Small Last 7 Extractor</h1>
-  <div class="box">
-    <label for="rawInput">Paste raw pattern:</label>
-    <textarea id="rawInput" placeholder="e.g. 'Small', 'Big', 'Small', 'Big', ..."></textarea>
-    <div class="note">Automatically extracts all "Big"/"Small" (case-insensitive) and shows the last 7. If fewer than 7, prediction disabled.</div>
-    <div class="inline">
+  <h1>Big/Small Last 7 + Prediction</h1>
+  <div class="card">
+    <div>
+      <span class="label">Paste raw pattern:</span>
+      <textarea id="rawInput" placeholder="e.g. 'Small', 'Big', 'Small', 'Big', ..."></textarea>
+      <div class="small">Extracts all occurrences of Big/Small and uses last 7. Prediction appears only when 7 present.</div>
+    </div>
+    <div class="buttons">
       <button id="extractBtn">Extract Last 7</button>
       <button id="predictBtn" disabled>🔮 Predict Next</button>
     </div>
-    <div id="sequenceDisplay" class="sequence" aria-live="polite">Last 7 sequence: —</div>
-    <div id="error" class="note error"></div>
+    <div id="sequenceDisplay" class="display">Last 7 sequence: —</div>
+    <div id="predictionDisplay" class="display">Next prediction: —</div>
+    <div id="error" class="small warning"></div>
   </div>
 
   <script>
@@ -80,46 +87,57 @@
         const v = m[0].toLowerCase();
         return v === "big" ? "Big" : "Small";
       });
-      console.log("All parsed entries:", matches);
       if (matches.length < 7) return null;
       return matches.slice(-7);
+    }
+
+    // simple prediction: if last two are same, return opposite; else repeat last
+    function predictNext(seq7) {
+      if (!seq7 || seq7.length !== 7) return null;
+      const last = seq7[6];
+      const secondLast = seq7[5];
+      if (last === secondLast) {
+        return last === "Big" ? "Small" : "Big";
+      }
+      return last;
     }
 
     const rawInput = document.getElementById('rawInput');
     const extractBtn = document.getElementById('extractBtn');
     const predictBtn = document.getElementById('predictBtn');
     const sequenceDisplay = document.getElementById('sequenceDisplay');
+    const predictionDisplay = document.getElementById('predictionDisplay');
     const errorDiv = document.getElementById('error');
 
-    function updateDisplay(seq) {
-      if (seq) {
-        sequenceDisplay.textContent = "Last 7 sequence: " + seq.join(', ');
-        errorDiv.textContent = "";
+    function updateAll() {
+      const raw = rawInput.value;
+      const last7 = extractLast7(raw);
+      if (last7) {
+        sequenceDisplay.textContent = "Last 7 sequence: " + last7.join(', ');
         predictBtn.disabled = false;
+        errorDiv.textContent = "";
+        const next = predictNext(last7);
+        predictionDisplay.textContent = "Next prediction: " + (next || '—');
       } else {
         sequenceDisplay.textContent = "Last 7 sequence: —";
-        errorDiv.textContent = "Kam se kam 7 Big/Small chahiye. Jo mila: " + extractLast7(rawInput.value)?.length || 0; 
+        predictionDisplay.textContent = "Next prediction: —";
         predictBtn.disabled = true;
+        const count = [...raw.matchAll(/\b(Big|Small)\b/gi)].length;
+        errorDiv.textContent = `7 entries chahiye, abhi sirf ${count} mile.`;
       }
     }
 
-    extractBtn.addEventListener('click', () => {
-      const last7 = extractLast7(rawInput.value);
-      updateDisplay(last7);
-    });
-
+    extractBtn.addEventListener('click', updateAll);
     rawInput.addEventListener('input', () => {
-      // auto update without needing click
-      setTimeout(() => {
-        const last7 = extractLast7(rawInput.value);
-        updateDisplay(last7);
-      }, 200);
+      setTimeout(updateAll, 200);
     });
 
     predictBtn.addEventListener('click', () => {
-      if (predictBtn.disabled) return;
-      const seqText = sequenceDisplay.textContent.replace("Last 7 sequence: ", "");
-      alert("Next predict ke liye base sequence: " + seqText);
+      const raw = rawInput.value;
+      const last7 = extractLast7(raw);
+      if (!last7) return;
+      const next = predictNext(last7);
+      alert("Next prediction: " + (next || '—'));
     });
   </script>
 </body>
