@@ -3,349 +3,236 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BDG Game: Wingo 1-Minute Color Trading</title>
+    <title>BDG Color Trading Prediction Tool</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Arial', sans-serif;
-        }
-        
         body {
-            background: #111;
-            color: #fff;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            overflow: hidden;
-        }
-        
-        .game-container {
-            background: #222;
-            border-radius: 15px;
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
             padding: 20px;
-            width: 90%;
-            max-width: 500px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
-            text-align: center;
-            position: relative;
-            overflow: hidden;
+            background-color: #f5f5f5;
         }
-        
-        h1 {
-            color: #ffcc00;
-            margin-bottom: 15px;
-            font-size: 24px;
-            text-transform: uppercase;
-        }
-        
-        .timer {
-            font-size: 40px;
-            margin: 10px 0;
-            color: #ff5555;
-            font-weight: bold;
-        }
-        
-        .next-round-timer {
-            font-size: 16px;
-            color: #aaa;
-            margin-bottom: 10px;
-        }
-        
-        .color-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            margin: 20px 0;
-        }
-        
-        .color-option {
-            height: 120px;
+        .container {
+            background-color: white;
             border-radius: 10px;
-            cursor: pointer;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .game-info {
             display: flex;
-            justify-content: center;
-            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding: 10px;
+            background-color: #f0f0f0;
+            border-radius: 5px;
+        }
+        .prediction-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .color-prediction {
+            font-size: 24px;
             font-weight: bold;
+            margin: 10px 0;
+        }
+        .red {
+            color: #e74c3c;
+        }
+        .green {
+            color: #2ecc71;
+        }
+        .violet {
+            color: #9b59b6;
+        }
+        .number-prediction {
+            font-size: 28px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        .size-prediction {
             font-size: 18px;
-            transition: transform 0.3s, box-shadow 0.3s;
-            user-select: none;
+            color: #555;
         }
-        
-        .color-option:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+        .confidence {
+            margin-top: 10px;
+            font-style: italic;
         }
-        
-        .color-option:active {
-            transform: scale(0.95);
-        }
-        
-        #red {
-            background: #ff4d4d;
-        }
-        
-        #green {
-            background: #4dff4d;
-        }
-        
-        #blue {
-            background: #4d4dff;
-        }
-        
-        #yellow {
-            background: #ffff4d;
-            color: #000;
-        }
-        
-        .controls {
+        .timer {
+            font-size: 20px;
+            text-align: center;
             margin: 20px 0;
+            font-weight: bold;
         }
-        
         button {
-            background: #ff5555;
+            background-color: #3498db;
             color: white;
             border: none;
-            padding: 12px 25px;
-            font-size: 16px;
-            border-radius: 8px;
+            padding: 10px 20px;
+            border-radius: 5px;
             cursor: pointer;
-            margin: 5px;
-            transition: all 0.3s;
+            font-size: 16px;
+            display: block;
+            margin: 0 auto;
         }
-        
         button:hover {
-            background: #ff3333;
-            transform: translateY(-3px);
+            background-color: #2980b9;
         }
-        
-        button:disabled {
-            background: #555;
-            cursor: not-allowed;
+        .history {
+            margin-top: 20px;
         }
-        
-        .result {
-            margin-top: 15px;
-            font-size: 18px;
-            min-height: 50px;
+        .history-item {
             display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-        
-        .win {
-            color: #4dff4d;
-            font-weight: bold;
-        }
-        
-        .lose {
-            color: #ff4d4d;
-            font-weight: bold;
-        }
-        
-        .score {
-            font-size: 20px;
-            margin-top: 10px;
-            color: #ffcc00;
-        }
-        
-        /* Animation for winning */
-        @keyframes glow {
-            0% { box-shadow: 0 0 10px rgba(255, 255, 255, 0.5); }
-            50% { box-shadow: 0 0 30px rgba(255, 215, 0, 0.8); }
-            100% { box-shadow: 0 0 10px rgba(255, 255, 255, 0.5); }
-        }
-        
-        .glow {
-            animation: glow 1.5s infinite;
+            justify-content: space-between;
+            padding: 8px;
+            border-bottom: 1px solid #eee;
         }
     </style>
 </head>
 <body>
-    <div class="game-container">
-        <h1>BDG Game: Wingo 1-Minute Color Trading</h1>
-        <div class="timer" id="timer">01:00</div>
-        <div class="next-round-timer" id="nextRoundTimer">Next result in: 5s</div>
-        
-        <div class="color-grid">
-            <div class="color-option" id="red" data-color="red">RED</div>
-            <div class="color-option" id="green" data-color="green">GREEN</div>
-            <div class="color-option" id="blue" data-color="blue">BLUE</div>
-            <div class="color-option" id="yellow" data-color="yellow">YELLOW</div>
+    <div class="container">
+        <h1>BDG Color Trading Prediction</h1>
+        <div class="game-info">
+            <div>Game: Wingo 1-Minute</div>
+            <div id="current-time">Time: 00:00:00</div>
         </div>
         
-        <div class="controls">
-            <button id="startBtn">Start Game</button>
-            <button id="resetBtn" disabled>Reset</button>
+        <div class="timer" id="timer">Next round starts in: 60s</div>
+        
+        <div class="prediction-card">
+            <h3>Current Prediction</h3>
+            <div class="color-prediction" id="color-pred">-</div>
+            <div class="number-prediction" id="number-pred">-</div>
+            <div class="size-prediction" id="size-pred">-</div>
+            <div class="confidence" id="confidence">Confidence: -</div>
         </div>
         
-        <div class="result" id="result">
-            <div>Select a color and wait for the result!</div>
-        </div>
+        <button id="generate-btn">Generate Prediction</button>
         
-        <div class="score" id="score">Score: 0</div>
+        <div class="history">
+            <h3>Prediction History</h3>
+            <div id="history-list"></div>
+        </div>
     </div>
 
     <script>
-        // Game Variables
-        let timeLeft = 60;
-        let nextRoundTime = 5;
-        let gameActive = false;
-        let score = 0;
-        let selectedColor = null;
-        let winningColor = null;
-        let timer;
-        let roundTimer;
+        const colors = ['Red', 'Green', 'Violet'];
+        const numbers = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+        let countdown = 60;
+        let timerInterval;
+        let roundEndTime;
         
-        // DOM Elements
-        const timerElement = document.getElementById('timer');
-        const nextRoundTimerElement = document.getElementById('nextRoundTimer');
-        const colorOptions = document.querySelectorAll('.color-option');
-        const startBtn = document.getElementById('startBtn');
-        const resetBtn = document.getElementById('resetBtn');
-        const resultElement = document.getElementById('result');
-        const scoreElement = document.getElementById('score');
+        // DOM elements
+        const colorPredEl = document.getElementById('color-pred');
+        const numberPredEl = document.getElementById('number-pred');
+        const sizePredEl = document.getElementById('size-pred');
+        const confidenceEl = document.getElementById('confidence');
+        const timerEl = document.getElementById('timer');
+        const historyListEl = document.getElementById('history-list');
+        const currentTimeEl = document.getElementById('current-time');
+        const generateBtn = document.getElementById('generate-btn');
         
-        // Initialize Game
-        function initGame() {
-            timeLeft = 60;
-            nextRoundTime = 5;
-            updateTimer();
-            updateNextRoundTimer();
-            score = 0;
-            updateScore();
-            resultElement.innerHTML = `<div>Select a color and wait for the result!</div>`;
-            selectedColor = null;
-            winningColor = null;
-            
-            // Remove glow effects
-            colorOptions.forEach(option => {
-                option.classList.remove('glow');
-            });
+        // Update current time
+        function updateCurrentTime() {
+            const now = new Date();
+            currentTimeEl.textContent = `Time: ${now.toLocaleTimeString()}`;
         }
         
-        // Start Game
-        function startGame() {
-            if (gameActive) return;
+        // Generate a prediction
+        function generatePrediction() {
+            const color = colors[Math.floor(Math.random() * colors.length)];
+            const number = numbers[Math.floor(Math.random() * numbers.length)];
+            let size;
             
-            gameActive = true;
-            initGame();
+            if (number === 0) {
+                size = "Special (0)";
+            } else if (number < 5) {
+                size = "Small (1-4)";
+            } else {
+                size = "Big (5-9)";
+            }
             
-            // Disable start button, enable reset
-            startBtn.disabled = true;
-            resetBtn.disabled = false;
+            const confidence = Math.floor(Math.random() * 36) + 60; // 60-95%
             
-            // Start main game timer
-            timer = setInterval(() => {
-                timeLeft--;
-                updateTimer();
+            return { color, number, size, confidence };
+        }
+        
+        // Display prediction
+        function displayPrediction(prediction) {
+            // Clear previous color classes
+            colorPredEl.className = 'color-prediction';
+            
+            // Set new prediction
+            colorPredEl.textContent = prediciton.color;
+            colorPredEl.classList.add(prediction.color.toLowerCase());
+            
+            numberPredEl.textContent = prediction.number;
+            sizePredEl.textContent = prediction.size;
+            confidenceEl.textContent = `Confidence: ${prediction.confidence}%`;
+            
+            // Add to history
+            const now = new Date();
+            const historyItem = document.createElement('div');
+            historyItem.className = 'history-item';
+            historyItem.innerHTML = `
+                <span>${now.toLocaleTimeString()}</span>
+                <span class="${prediction.color.toLowerCase()}">${prediction.color}</span>
+                <span>${prediction.number} (${prediction.size})</span>
+                <span>${prediction.confidence}%</span>
+            `;
+            historyListEl.prepend(historyItem);
+            
+            // Keep only last 10 history items
+            if (historyListEl.children.length > 10) {
+                historyListEl.removeChild(historyListEl.lastChild);
+            }
+        }
+        
+        // Start countdown timer
+        function startTimer() {
+            roundEndTime = new Date();
+            roundEndTime.setSeconds(roundEndTime.getSeconds() + 60);
+            
+            timerInterval = setInterval(() => {
+                const now = new Date();
+                const diff = Math.floor((roundEndTime - now) / 1000);
                 
-                if (timeLeft <= 0) {
-                    endGame();
+                if (diff <= 0) {
+                    countdown = 60;
+                    roundEndTime = new Date();
+                    roundEndTime.setSeconds(roundEndTime.getSeconds() + 60);
+                    timerEl.textContent = `Next round starts in: 60s`;
+                    
+                    // Auto-generate prediction at round start
+                    const prediction = generatePrediction();
+                    displayPrediction(prediction);
+                } else {
+                    countdown = diff;
+                    timerEl.textContent = `Next round starts in: ${countdown}s`;
                 }
             }, 1000);
-            
-            // Start round timer (every 5 seconds)
-            roundTimer = setInterval(() => {
-                nextRoundTime--;
-                updateNextRoundTimer();
-                
-                if (nextRoundTime <= 0) {
-                    determineWinner();
-                    nextRoundTime = 5; // Reset for next round
-                    updateNextRoundTimer();
-                }
-            }, 1000);
         }
         
-        // End Game
-        function endGame() {
-            clearInterval(timer);
-            clearInterval(roundTimer);
-            gameActive = false;
-            startBtn.disabled = false;
-            resultElement.innerHTML += `<div class="lose">Time's up! Final Score: ${score}</div>`;
-        }
+        // Initialize
+        updateCurrentTime();
+        setInterval(updateCurrentTime, 1000);
+        startTimer();
         
-        // Update Timer Display
-        function updateTimer() {
-            const minutes = Math.floor(timeLeft / 60);
-            const seconds = timeLeft % 60;
-            timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-            
-            // Blink if time is running out
-            if (timeLeft <= 10) {
-                timerElement.style.animation = 'blink 1s infinite';
-            } else {
-                timerElement.style.animation = 'none';
-            }
-        }
-        
-        // Update Next Round Timer
-        function updateNextRoundTimer() {
-            nextRoundTimerElement.textContent = `Next result in: ${nextRoundTime}s`;
-        }
-        
-        // Select Color
-        colorOptions.forEach(option => {
-            option.addEventListener('click', () => {
-                if (!gameActive) return;
-                
-                // Reset previous selection
-                colorOptions.forEach(opt => opt.classList.remove('glow'));
-                
-                // Set new selection
-                selectedColor = option.dataset.color;
-                option.classList.add('glow');
-                
-                resultElement.innerHTML = `<div>You selected: <strong>${selectedColor.toUpperCase()}</strong></div>`;
-            });
+        // Button click handler
+        generateBtn.addEventListener('click', () => {
+            const prediction = generatePrediction();
+            displayPrediction(prediction);
         });
         
-        // Determine Winner (Random)
-        function determineWinner() {
-            if (!selectedColor) {
-                resultElement.innerHTML += `<div>No color selected! Try again.</div>`;
-                return;
-            }
-            
-            const colors = ['red', 'green', 'blue', 'yellow'];
-            winningColor = colors[Math.floor(Math.random() * colors.length)];
-            
-            if (selectedColor === winningColor) {
-                score += 10;
-                resultElement.innerHTML += `<div class="win">WIN! ${winningColor.toUpperCase()} was correct! +10 points</div>`;
-            } else {
-                score = Math.max(0, score - 5);
-                resultElement.innerHTML += `<div class="lose">LOSE! Winning color was ${winningColor.toUpperCase()}. -5 points</div>`;
-            }
-            
-            updateScore();
-            selectedColor = null;
-            
-            // Reset selection UI
-            colorOptions.forEach(opt => opt.classList.remove('glow'));
-        }
-        
-        // Update Score
-        function updateScore() {
-            scoreElement.textContent = `Score: ${score}`;
-        }
-        
-        // Reset Game
-        resetBtn.addEventListener('click', () => {
-            clearInterval(timer);
-            clearInterval(roundTimer);
-            gameActive = false;
-            initGame();
-            startBtn.disabled = false;
-            resetBtn.disabled = true;
-        });
-        
-        // Start Game on Button Click
-        startBtn.addEventListener('click', startGame);
+        // Generate initial prediction
+        const initialPrediction = generatePrediction();
+        displayPrediction(initialPrediction);
     </script>
 </body>
 </html>
