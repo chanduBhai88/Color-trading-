@@ -48,6 +48,12 @@
             font-weight: bold;
         }
         
+        .next-round-timer {
+            font-size: 16px;
+            color: #aaa;
+            margin-bottom: 10px;
+        }
+        
         .color-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -161,6 +167,7 @@
     <div class="game-container">
         <h1>BDG Game: Wingo 1-Minute Color Trading</h1>
         <div class="timer" id="timer">01:00</div>
+        <div class="next-round-timer" id="nextRoundTimer">Next result in: 5s</div>
         
         <div class="color-grid">
             <div class="color-option" id="red" data-color="red">RED</div>
@@ -184,14 +191,17 @@
     <script>
         // Game Variables
         let timeLeft = 60;
-        let timer;
+        let nextRoundTime = 5;
         let gameActive = false;
         let score = 0;
         let selectedColor = null;
         let winningColor = null;
+        let timer;
+        let roundTimer;
         
         // DOM Elements
         const timerElement = document.getElementById('timer');
+        const nextRoundTimerElement = document.getElementById('nextRoundTimer');
         const colorOptions = document.querySelectorAll('.color-option');
         const startBtn = document.getElementById('startBtn');
         const resetBtn = document.getElementById('resetBtn');
@@ -201,7 +211,9 @@
         // Initialize Game
         function initGame() {
             timeLeft = 60;
+            nextRoundTime = 5;
             updateTimer();
+            updateNextRoundTimer();
             score = 0;
             updateScore();
             resultElement.innerHTML = `<div>Select a color and wait for the result!</div>`;
@@ -225,7 +237,7 @@
             startBtn.disabled = true;
             resetBtn.disabled = false;
             
-            // Start timer
+            // Start main game timer
             timer = setInterval(() => {
                 timeLeft--;
                 updateTimer();
@@ -233,10 +245,17 @@
                 if (timeLeft <= 0) {
                     endGame();
                 }
+            }, 1000);
+            
+            // Start round timer (every 5 seconds)
+            roundTimer = setInterval(() => {
+                nextRoundTime--;
+                updateNextRoundTimer();
                 
-                // Every 5 seconds, pick a random winner
-                if (timeLeft % 5 === 0 && selectedColor) {
+                if (nextRoundTime <= 0) {
                     determineWinner();
+                    nextRoundTime = 5; // Reset for next round
+                    updateNextRoundTimer();
                 }
             }, 1000);
         }
@@ -244,6 +263,7 @@
         // End Game
         function endGame() {
             clearInterval(timer);
+            clearInterval(roundTimer);
             gameActive = false;
             startBtn.disabled = false;
             resultElement.innerHTML += `<div class="lose">Time's up! Final Score: ${score}</div>`;
@@ -261,6 +281,11 @@
             } else {
                 timerElement.style.animation = 'none';
             }
+        }
+        
+        // Update Next Round Timer
+        function updateNextRoundTimer() {
+            nextRoundTimerElement.textContent = `Next result in: ${nextRoundTime}s`;
         }
         
         // Select Color
@@ -281,7 +306,10 @@
         
         // Determine Winner (Random)
         function determineWinner() {
-            if (!selectedColor) return;
+            if (!selectedColor) {
+                resultElement.innerHTML += `<div>No color selected! Try again.</div>`;
+                return;
+            }
             
             const colors = ['red', 'green', 'blue', 'yellow'];
             winningColor = colors[Math.floor(Math.random() * colors.length)];
@@ -309,6 +337,7 @@
         // Reset Game
         resetBtn.addEventListener('click', () => {
             clearInterval(timer);
+            clearInterval(roundTimer);
             gameActive = false;
             initGame();
             startBtn.disabled = false;
