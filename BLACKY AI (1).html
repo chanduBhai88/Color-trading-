@@ -1,212 +1,157 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>MR.HACKER 3.0</title>
-  <style>
-    body {
-      margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(135deg, #ff0033, #ffd6d6);
-      color: #b80000;
-    }
-
-    .container {
-      max-width: 400px;
-      margin: auto;
-      padding: 20px;
-      background: #fff;
-      border-radius: 20px;
-      box-shadow: 0 0 20px rgba(255, 0, 0, 0.2);
-      text-align: center;
-    }
-
-    h1 {
-      font-size: 28px;
-      margin-bottom: 10px;
-      color: #cc0000;
-    }
-
-    .badges {
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-      margin-bottom: 15px;
-    }
-
-    .badge {
-      background: #ffcccc;
-      padding: 6px 12px;
-      border-radius: 12px;
-      font-size: 12px;
-      font-weight: bold;
-    }
-
-    .data-box {
-      background: #fff;
-      border: 2px solid #ffcccc;
-      border-radius: 12px;
-      padding: 10px;
-      margin: 10px 0;
-      font-size: 20px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .data-box i {
-      color: #cc0000;
-    }
-
-    .refresh-btn {
-      background: #cc0000;
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      font-size: 18px;
-      border-radius: 10px;
-      margin: 15px 0;
-      cursor: pointer;
-    }
-
-    .refresh-btn:hover {
-      background: #990000;
-    }
-
-    .history {
-      text-align: left;
-      padding-top: 10px;
-    }
-
-    .history h2 {
-      font-size: 18px;
-      color: #cc0000;
-    }
-
-    .history-item {
-      background: #fff4f4;
-      border: 1px solid #ffcccc;
-      border-radius: 10px;
-      padding: 10px;
-      margin-top: 8px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .pending {
-      background: #fff1d6;
-      color: #cc6600;
-      padding: 4px 8px;
-      border-radius: 5px;
-      font-size: 12px;
-    }
-
-    .big {
-      color: red;
-      font-weight: bold;
-    }
-
-    .small {
-      color: blue;
-      font-weight: bold;
-    }
-
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Big-Small Pattern Validator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .input-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        select {
+            padding: 8px;
+            font-size: 16px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            background-color: #e9e9e9;
+        }
+        .match {
+            color: green;
+            font-weight: bold;
+        }
+        .no-match {
+            color: red;
+        }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <h1>MR.HACKER</h1>
-    <div class="badges">
-      <div class="badge">VERSION 3.0</div>
-      <div class="badge">AI POWERED</div>
-      <div class="badge">ULTRA PRECISION</div>
+    <h1>Big-Small Pattern Validator</h1>
+    <p>8 बार "Big" या "Small" चुनें:</p>
+    
+    <div class="input-container" id="inputs">
+        <!-- यहाँ 8 ड्रॉपडाउन जनरेट होंगे -->
     </div>
+    
+    <button onclick="validateInput()">सबमिट करें</button>
+    
+    <div id="result"></div>
 
-    <div class="data-box">
-      <i>📅</i>
-      <span id="currentPeriod">00000</span>
-    </div>
+    <script>
+        // आपके पैटर्न्स (हर एक 10 इनपुट्स का है, लेकिन हम सिर्फ पहले 8 चेक करेंगे)
+        const patterns = [
+            ['Big', 'Big', 'Small', 'Big', 'Small', 'Small', 'Big', 'Small', 'Big', 'Big'],
+            ['Big', 'Big', 'Big', 'Small', 'Small', 'Small', 'Small', 'Small', 'Small'],
+            ['Big', 'Small', 'Big', 'Big', 'Small', 'Big', 'Small', 'Small', 'Big', 'Big'],
+            ['Small', 'Small', 'Small', 'Small', 'Small', 'Big', 'Big', 'Big', 'Big', 'Small'],
+            ['Small', 'Big', 'Big', 'Small', 'Big', 'Small', 'Big', 'Small', 'Big', 'Big'],
+            ['Big', 'Small', 'Small', 'Small', 'Small', 'Small', 'Big', 'Big', 'Big', 'Big'],
+            ['Big', 'Small', 'Small', 'Small', 'Big', 'Small', 'Big', 'Small', 'Big', 'Big'],
+            ['Small', 'Small', 'Small', 'Small', 'Small', 'Small', 'Small', 'Big', 'Big', 'Small'],
+            ['Big', 'Small', 'Small', 'Small', 'Small', 'Small', 'Small', 'Big', 'Big', 'Small'],
+            ['Small', 'Big', 'Big', 'Small', 'Small', 'Small', 'Small', 'Big', 'Big', 'Big'],
+            ['Big', 'Big', 'Small', 'Big', 'Small', 'Small', 'Big', 'Small', 'Big', 'Big'],
+            ['Big', 'Small', 'Small', 'Small', 'Big', 'Big', 'Big', 'Small', 'Big', 'Small'],
+            ['Small', 'Small', 'Small', 'Small', 'Small', 'Big', 'Big', 'Big', 'Big', 'Small'],
+            ['Small', 'Big', 'Big', 'Small', 'Big', 'Small', 'Big', 'Small', 'Big', 'Big'],
+            ['Big', 'Small', 'Small', 'Small', 'Small', 'Small', 'Big', 'Big', 'Big', 'Big'],
+            ['Big', 'Small', 'Small', 'Big', 'Small', 'Big', 'Big', 'Big', 'Big', 'Small'],
+            ['Small', 'Small', 'Big', 'Small', 'Big', 'Big', 'Big', 'Small', 'Big', 'Small'],
+            ['Big', 'Big', 'Small', 'Small', 'Big', 'Small', 'Big', 'Big', 'Big', 'Small']
+        ];
 
-    <div class="data-box">
-      <i>⏱</i>
-      <span id="countdown">60s</span>
-    </div>
+        // पेज लोड होने पर 8 ड्रॉपडाउन बनाएँ
+        window.onload = function() {
+            const container = document.getElementById('inputs');
+            for (let i = 0; i < 8; i++) {
+                const select = document.createElement('select');
+                select.id = `input${i}`;
+                select.innerHTML = `
+                    <option value="">-- चुनें --</option>
+                    <option value="Big">Big</option>
+                    <option value="Small">Small</option>
+                `;
+                container.appendChild(select);
+            }
+        };
 
-    <div class="data-box">
-      <i>🎯</i>
-      <span id="prediction">--</span>
-    </div>
+        // वैलिडेशन फंक्शन
+        function validateInput() {
+            const userInput = [];
+            let isValid = true;
 
-    <button class="refresh-btn" onclick="fetchPrediction()">🔄 REFRESH DATA</button>
+            // यूजर इनपुट इकट्ठा करें
+            for (let i = 0; i < 8; i++) {
+                const select = document.getElementById(`input${i}`);
+                const value = select.value;
+                if (!value) {
+                    isValid = false;
+                    alert(`कृपया ${i+1}वाँ ऑप्शन चुनें!`);
+                    break;
+                }
+                userInput.push(value);
+            }
 
-    <div class="history">
-      <h2>🔁 HISTORY</h2>
-      <div class="history-item">
-        <div>
-          <strong># <span id="historyPeriod">00000</span></strong><br/>
-          <span id="historyPrediction" class="big">BIG</span>
-        </div>
-        <div id="historyStatus" class="pending">PENDING</div>
-      </div>
-    </div>
-  </div>
+            if (!isValid) return;
 
-  <script>
-    let countdownInterval;
-    let countdown = 60;
+            // पैटर्न से मिलान चेक करें
+            let matchedPatternIndex = -1;
+            for (let i = 0; i < patterns.length; i++) {
+                let match = true;
+                for (let j = 0; j < 8; j++) {
+                    if (patterns[i][j] !== userInput[j]) {
+                        match = false;
+                        break;
+                    }
+                }
+                if (match) {
+                    matchedPatternIndex = i + 1; // 1-बेस्ड इंडेक्स
+                    break;
+                }
+            }
 
-    function getLast5Digits(period) {
-      return period.slice(-5);
-    }
-
-    function fetchPrediction() {
-      fetch("https://raja.run/api/prediction/current")
-        .then((response) => response.json())
-        .then((data) => {
-          const apiResult = data.result;
-          const actualPeriod = apiResult.period;
-          const predictionPeriod = (BigInt(actualPeriod) + 1n).toString();
-
-          const predictedResult = apiResult.prediction; // BIG or SMALL
-
-          // Display actual period (not +1)
-          document.getElementById("currentPeriod").textContent = getLast5Digits(actualPeriod);
-          document.getElementById("prediction").textContent = predictedResult;
-
-          // For History section
-          document.getElementById("historyPeriod").textContent = getLast5Digits(actualPeriod);
-          document.getElementById("historyPrediction").textContent = predictedResult;
-
-          const status = apiResult.status || "PENDING";
-          document.getElementById("historyStatus").textContent = status;
-
-          document.getElementById("historyPrediction").className =
-            predictedResult === "BIG" ? "big" : "small";
-        })
-        .catch((error) => {
-          console.error("Prediction fetch error:", error);
-        });
-    }
-
-    function startCountdown() {
-      countdown = 60;
-      clearInterval(countdownInterval);
-      countdownInterval = setInterval(() => {
-        countdown--;
-        document.getElementById("countdown").textContent = countdown + "s";
-        if (countdown <= 0) {
-          clearInterval(countdownInterval);
-          fetchPrediction();
-          startCountdown();
+            // रिजल्ट दिखाएँ
+            const resultDiv = document.getElementById('result');
+            if (matchedPatternIndex !== -1) {
+                resultDiv.innerHTML = `
+                    <p class="match">सफल! आपका इनपुट <strong>पैटर्न ${matchedPatternIndex}</strong> से मिलता है।</p>
+                    <p>आपका इनपुट: ${userInput.join(', ')}</p>
+                    <p>मिलान पैटर्न: ${patterns[matchedPatternIndex-1].slice(0, 8).join(', ')}</p>
+                `;
+            } else {
+                resultDiv.innerHTML = `
+                    <p class="no-match">कोई मिलान नहीं मिला। आपका इनपुट किसी भी पैटर्न से मेल नहीं खाता।</p>
+                    <p>आपका इनपुट: ${userInput.join(', ')}</p>
+                `;
+            }
         }
-      }, 1000);
-    }
-
-    fetchPrediction();
-    startCountdown();
-  </script>
+    </script>
 </body>
 </html>
