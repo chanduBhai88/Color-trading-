@@ -208,4 +208,25 @@
 
       const strPattern = pattern.join("-");
       for (let i = 0; i <= history.length - (inputLength + 1); i++) {
-        const current = history.slice(i, i + inputLength).
+        const current = history.slice(i, i + inputLength).join("-");
+        if (current === strPattern) {
+          const next = history[i + inputLength];
+          showResult(`✅ Matched! Predicted Next: <b>${next}</b>`, true);
+          updateMemory(`✅ ${strPattern} ➜ <b>${next}</b>`);
+          return;
+        }
+      }
+
+      // Fallback logic
+      const bigCount = pattern.filter(p => p === "Big").length;
+      const smallCount = pattern.filter(p => p === "Small").length;
+      const fallback = bigCount > smallCount ? "Small" : "Big";
+
+      showResult(`⚠️ Pattern not found. Fallback: <b>${fallback}</b><br>
+        <img src="https://via.placeholder.com/500x200/ffb6c1/000000?text=Heart+Fallback" alt="No Match" style="margin-top:10px; max-width:100%; border-radius:12px;">`, false);
+
+      updateMemory(`⚠️ ${strPattern} ➜ <b>${fallback}</b> (fallback)`);
+    }
+  </script>
+</body>
+</html>
