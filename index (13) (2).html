@@ -2,219 +2,123 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>❤️ RajaGame Predictor (Big/Small)</title>
+  <title>Big/Small Last 7 Extractor</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <style>
     body {
-      margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background: url('https://images.unsplash.com/photo-1589998059171-988d887df646?auto=format&fit=crop&w=1470&q=80') no-repeat center center fixed;
-      background-size: cover;
+      font-family: system-ui,-apple-system,BlinkMacSystemFont,sans-serif;
+      background: #0f0f17;
       color: #fff;
-    }
-
-    .container {
-      background: rgba(0, 0, 0, 0.75);
-      max-width: 500px;
-      margin: 50px auto;
       padding: 20px;
-      border-radius: 20px;
-      box-shadow: 0 0 25px rgba(255,0,100,0.5);
-      text-align: center;
+      max-width: 600px;
+      margin: auto;
     }
-
-    h2 {
-      margin-bottom: 20px;
-    }
-
-    .inputs {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-      justify-items: center;
-      margin-bottom: 20px;
-    }
-
-    select {
-      padding: 10px;
-      font-size: 1rem;
-      border-radius: 8px;
+    h1 { font-size: 1.5rem; margin-bottom: 0.5rem; }
+    textarea {
+      width: 100%; 
+      min-height: 140px; 
+      padding: 10px; 
+      border-radius: 8px; 
       border: none;
-      width: 100px;
-      text-align: center;
+      resize: vertical;
+      font-family: monospace;
+      font-size: 0.9rem;
     }
-
-    button {
-      width: 100%;
-      padding: 12px;
-      font-size: 1rem;
-      background-color: #ff4081;
-      border: none;
-      border-radius: 10px;
-      color: white;
-      cursor: pointer;
-    }
-
-    .result {
-      margin-top: 20px;
-      font-weight: bold;
-      font-size: 1.5rem;
-      color: #ff4d4d;
-      opacity: 0;
-      transform: scale(0.9);
-      transition: all 0.5s ease-in-out;
-    }
-
-    .result.show {
-      opacity: 1;
-      transform: scale(1.2);
-      animation: pulse 1s infinite alternate;
-    }
-
-    @keyframes pulse {
-      from {
-        color: #ff4d4d;
-        text-shadow: 0 0 5px #ff4d4d;
-      }
-      to {
-        color: #ffeb3b;
-        text-shadow: 0 0 10px #ffeb3b;
-      }
-    }
-
-    .memory {
-      margin-top: 25px;
-      text-align: left;
-      background: rgba(255, 255, 255, 0.1);
-      padding: 15px;
+    .box {
+      background: rgba(255,255,255,0.08);
+      padding: 16px;
       border-radius: 12px;
+      margin-top: 12px;
     }
-
-    .memory h4 {
-      margin: 0 0 10px;
-      font-size: 1rem;
-      color: #ffc0cb;
+    .inline { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    button {
+      background: #ff4081;
+      border: none;
+      padding: 12px 18px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      color: white;
+      flex: 1;
+      min-width: 140px;
     }
-
-    .memory ul {
-      padding-left: 20px;
-      margin: 0;
+    button:disabled {
+      background: #555;
+      cursor: not-allowed;
     }
-
-    .memory li {
-      margin-bottom: 4px;
-      color: #fff;
+    .sequence {
+      background: rgba(255,255,255,0.1);
+      padding: 10px;
+      border-radius: 6px;
+      font-weight: bold;
+      margin-top: 8px;
     }
+    .note { font-size: 0.8rem; color: #bbb; margin-top: 4px; }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h2>❤️ RajaGame Predictor</h2>
-    <div class="inputs" id="input-container"></div>
-    <button onclick="predict()">🔮 Predict Next</button>
-    <div class="result" id="result">Enter last 7 Big/Small results.</div>
-
-    <div class="memory" id="memory-box">
-      <h4>🧠 Last 5 Predictions:</h4>
-      <ul id="memory-list"></ul>
+  <h1>Big/Small Last 7 Extractor</h1>
+  <div class="box">
+    <label for="rawInput">Paste raw pattern (like the one you gave):</label>
+    <textarea id="rawInput" placeholder="e.g. 'Small', 'Big', 'Small', 'Big', ..."></textarea>
+    <div class="note">Will extract all occurrences of Big or Small (case-insensitive) and take the last 7. If fewer than 7 present, Predict Next stays disabled.</div>
+    <div style="margin-top:12px;" class="inline">
+      <button id="extractBtn">Extract Last 7</button>
+      <button id="predictBtn" disabled>🔮 Predict Next</button>
     </div>
+    <div id="sequenceDisplay" class="sequence" aria-live="polite">Last 7 sequence: —</div>
+    <div id="error" class="note" style="color:#f88;"></div>
   </div>
 
-  <!-- Sound Effects -->
-  <audio id="successSound" src="https://cdn.pixabay.com/audio/2023/03/25/audio_c6191129df.mp3"></audio>
-  <audio id="errorSound" src="https://cdn.pixabay.com/audio/2022/03/15/audio_37f6e33a1f.mp3"></audio>
-  <audio id="resultTune" src="Phone Notification Sound.mp3"></audio>
-
   <script>
-    const history = [
-      // newest extracted from latest screenshot (top first)
-      "Small","Small","Small","Big","Big","Small","Big","Small","Small","Small",
-      "Big","Small","Big","Big","Big","Small","Small","Small","Small","Small",
-      // previous combined history (from earlier images)
-      'Small', 'Small', 'Big', 'Big', 'Small', 'Small', 'Big', 'Small', 'Big', 'Big',
-      'Small', 'Small', 'Big', 'Small', 'Big', 'Big', 'Small', 'Small', 'Big', 'Small',
-      'Big', 'Big', 'Small', 'Big', 'Big', 'Small', 'Small', 'Big', 'Small', 'Big',
-      'Big', 'Small', 'Big', 'Big', 'Big', 'Big', 'Small', 'Small', 'Small', 'Big',
-      'Small', 'Small', 'Big', 'Small', 'Small', 'Small', 'Small', 'Small', 'Big', 'Big'
-    ];
-
-    const container = document.getElementById("input-container");
-    const resultBox = document.getElementById("result");
-    const memoryList = document.getElementById("memory-list");
-    const memory = [];
-
-    const inputLength = 7;
-
-    // Create dropdowns
-    for (let i = 0; i < inputLength; i++) {
-      const select = document.createElement("select");
-      ["--", "Big", "Small"].forEach(val => {
-        const opt = document.createElement("option");
-        opt.value = val === "--" ? "" : val;
-        opt.textContent = val;
-        select.appendChild(opt);
+    function extractLast7(rawText) {
+      const matches = [...rawText.matchAll(/\b(Big|Small)\b/gi)].map(m => {
+        const v = m[0].toLowerCase();
+        return v === "big" ? "Big" : "Small";
       });
-      select.id = "s" + i;
-      container.appendChild(select);
+      if (matches.length < 7) return null;
+      return matches.slice(-7);
     }
 
-    function playSound(id) {
-      const sound = document.getElementById(id);
-      if (sound) {
-        sound.currentTime = 0;
-        sound.play();
-      }
-    }
+    const rawInput = document.getElementById('rawInput');
+    const extractBtn = document.getElementById('extractBtn');
+    const predictBtn = document.getElementById('predictBtn');
+    const sequenceDisplay = document.getElementById('sequenceDisplay');
+    const errorDiv = document.getElementById('error');
 
-    function showResult(msg, success) {
-      resultBox.innerHTML = msg;
-      playSound("resultTune");
-      if (success) {
-        resultBox.classList.add("show");
-        playSound("successSound");
+    function updateDisplay(seq) {
+      if (seq) {
+        sequenceDisplay.textContent = "Last 7 sequence: " + seq.join(', ');
+        errorDiv.textContent = "";
       } else {
-        resultBox.classList.remove("show");
-        playSound("errorSound");
+        sequenceDisplay.textContent = "Last 7 sequence: —";
+        errorDiv.textContent = "Need at least 7 occurrences of Big/Small to enable prediction.";
       }
+      predictBtn.disabled = !seq;
     }
 
-    function updateMemory(entry) {
-      memory.unshift(entry);
-      if (memory.length > 5) memory.pop();
-      memoryList.innerHTML = memory.map(item => `<li>${item}</li>`).join('');
-    }
+    extractBtn.addEventListener('click', () => {
+      const raw = rawInput.value;
+      const last7 = extractLast7(raw);
+      updateDisplay(last7);
+    });
 
-    function predict() {
-      const pattern = [];
-      for (let i = 0; i < inputLength; i++) {
-        const val = document.getElementById("s" + i).value;
-        if (!val) {
-          showResult("❌ Please select all 7 inputs.", false);
-          return;
-        }
-        pattern.push(val);
-      }
+    // Also auto-update on paste or input after short debounce
+    let debounce;
+    rawInput.addEventListener('input', () => {
+      clearTimeout(debounce);
+      debounce = setTimeout(() => {
+        const last7 = extractLast7(rawInput.value);
+        updateDisplay(last7);
+      }, 300);
+    });
 
-      const strPattern = pattern.join("-");
-      for (let i = 0; i <= history.length - (inputLength + 1); i++) {
-        const current = history.slice(i, i + inputLength).join("-");
-        if (current === strPattern) {
-          const next = history[i + inputLength];
-          showResult(`✅ Matched! Predicted Next: <b>${next}</b>`, true);
-          updateMemory(`✅ ${strPattern} ➜ <b>${next}</b>`);
-          return;
-        }
-      }
-
-      const bigCount = pattern.filter(p => p === "Big").length;
-      const smallCount = pattern.filter(p => p === "Small").length;
-      const fallback = bigCount > smallCount ? "Small" : "Big";
-
-      showResult(`⚠️ Pattern not found. Fallback: <b>${fallback}</b><br>
-        <img src="https://via.placeholder.com/500x200/ffb6c1/000000?text=Heart+Fallback" alt="No Match" style="margin-top:10px; max-width:100%; border-radius:12px;">`, false);
-
-      updateMemory(`⚠️ ${strPattern} ➜ <b>${fallback}</b> (fallback)`);
-    }
+    predictBtn.addEventListener('click', () => {
+      const lastText = sequenceDisplay.textContent;
+      if (predictBtn.disabled) return;
+      alert("Predicting next based on: " + lastText.replace("Last 7 sequence: ", ""));
+      // Yahan aap apna actual prediction logic call kar sakte ho.
+    });
   </script>
 </body>
 </html>
