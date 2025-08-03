@@ -117,6 +117,7 @@
 
     <script>
         let periodData = [];
+        let periodCount = 0; // Added to track period numbers independently
         
         function addNumber() {
             const input = document.getElementById('numberInput');
@@ -127,7 +128,11 @@
                 return;
             }
             
-            periodData.push(number);
+            periodCount++; // Increment period count
+            periodData.push({
+                period: periodCount,
+                number: number
+            });
             input.value = '';
             updateNumberList();
         }
@@ -142,9 +147,9 @@
             }
             
             let listHtml = '<div>';
-            periodData.forEach((num, index) => {
-                const type = num >= 5 ? 'big' : 'small';
-                listHtml += `<span class="${type}">Period ${index+1}: ${num} (${type === 'big' ? 'Big' : 'Small'})</span><br>`;
+            periodData.forEach(item => {
+                const type = item.number >= 5 ? 'big' : 'small';
+                listHtml += `<span class="${type}">Period ${item.period}: ${item.number} (${type === 'big' ? 'Big' : 'Small'})</span><br>`;
             });
             listHtml += '</div>';
             numberList.innerHTML += listHtml;
@@ -167,10 +172,10 @@
             }
             
             // Calculate stats
-            const bigCount = periodData.filter(num => num >= 5).length;
+            const bigCount = periodData.filter(item => item.number >= 5).length;
             const smallCount = periodData.length - bigCount;
-            const bigPercent = (bigCount / periodData.length * 100).toFixed(1);
-            const smallPercent = (smallCount / periodData.length * 100).toFixed(1);
+            const bigPercent = periodData.length > 0 ? (bigCount / periodData.length * 100).toFixed(1) : 0;
+            const smallPercent = periodData.length > 0 ? (smallCount / periodData.length * 100).toFixed(1) : 0;
             
             // Update stats
             statsDiv.innerHTML = `
@@ -190,14 +195,14 @@
             }
             predictionDiv.innerHTML = predictionText;
             
-            // Show last 3 periods
+            // Show last 3 periods (or all if less than 3)
             const startIndex = Math.max(0, periodData.length - 3);
             for (let i = startIndex; i < periodData.length; i++) {
-                const num = periodData[i];
-                const type = num >= 5 ? 'Big' : 'Small';
+                const item = periodData[i];
+                const type = item.number >= 5 ? 'Big' : 'Small';
                 const row = lastPeriodsTable.insertRow();
-                row.insertCell(0).textContent = i + 1;
-                row.insertCell(1).textContent = num;
+                row.insertCell(0).textContent = item.period;
+                row.insertCell(1).textContent = item.number;
                 row.insertCell(2).textContent = type;
             }
             
@@ -206,6 +211,7 @@
         
         function resetData() {
             periodData = [];
+            periodCount = 0;
             document.getElementById('numberList').innerHTML = '<h3>Entered Numbers:</h3><p>No numbers entered yet</p>';
             document.getElementById('results').style.display = 'none';
         }
