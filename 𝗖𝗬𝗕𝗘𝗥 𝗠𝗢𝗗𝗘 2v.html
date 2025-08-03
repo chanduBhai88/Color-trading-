@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Big Small Number Predictor</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .rules {
+            background-color: #f0f8ff;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .input-section {
+            margin-bottom: 20px;
+        }
+        input {
+            padding: 8px;
+            width: 100px;
+            margin-right: 10px;
+        }
+        button {
+            padding: 8px 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .results {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #e8f5e9;
+            border-radius: 5px;
+            display: none;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .big {
+            color: green;
+            font-weight: bold;
+        }
+        .small {
+            color: red;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Big Small Number Predictor</h1>
+        
+        <div class="rules">
+            <h3>Rules:</h3>
+            <ul>
+                <li>Numbers 0-4 are <span class="small">Small</span></li>
+                <li>Numbers 5-9 are <span class="big">Big</span></li>
+                <li>Enter period numbers one by one</li>
+                <li>Click "Show Result" to see predictions after entering multiple periods</li>
+            </ul>
+        </div>
+        
+        <div class="input-section">
+            <input type="number" id="numberInput" min="0" max="9" placeholder="Enter 0-9">
+            <button onclick="addNumber()">Add Number</button>
+            <button onclick="showResult()">Show Result</button>
+            <button onclick="resetData()" style="background-color: #f44336;">Reset</button>
+        </div>
+        
+        <div id="numberList"></div>
+        
+        <div id="results" class="results">
+            <h2>Prediction Results</h2>
+            <div id="stats"></div>
+            <div id="prediction"></div>
+            <h3>Last 3 Periods:</h3>
+            <table id="lastPeriods">
+                <tr>
+                    <th>Period</th>
+                    <th>Number</th>
+                    <th>Type</th>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        let periodData = [];
+        
+        function addNumber() {
+            const input = document.getElementById('numberInput');
+            const number = parseInt(input.value);
+            
+            if (isNaN(number) || number < 0 || number > 9) {
+                alert('Please enter a valid number between 0-9');
+                return;
+            }
+            
+            periodData.push(number);
+            input.value = '';
+            updateNumberList();
+        }
+        
+        function updateNumberList() {
+            const numberList = document.getElementById('numberList');
+            numberList.innerHTML = '<h3>Entered Numbers:</h3>';
+            
+            if (periodData.length === 0) {
+                numberList.innerHTML += '<p>No numbers entered yet</p>';
+                return;
+            }
+            
+            let listHtml = '<div>';
+            periodData.forEach((num, index) => {
+                const type = num >= 5 ? 'big' : 'small';
+                listHtml += `<span class="${type}">Period ${index+1}: ${num} (${type === 'big' ? 'Big' : 'Small'})</span><br>`;
+            });
+            listHtml += '</div>';
+            numberList.innerHTML += listHtml;
+        }
+        
+        function showResult() {
+            if (periodData.length === 0) {
+                alert('Please enter some numbers first');
+                return;
+            }
+            
+            const resultsDiv = document.getElementById('results');
+            const statsDiv = document.getElementById('stats');
+            const predictionDiv = document.getElementById('prediction');
+            const lastPeriodsTable = document.getElementById('lastPeriods');
+            
+            // Clear previous table rows (except header)
+            while (lastPeriodsTable.rows.length > 1) {
+                lastPeriodsTable.deleteRow(1);
+            }
+            
+            // Calculate stats
+            const bigCount = periodData.filter(num => num >= 5).length;
+            const smallCount = periodData.length - bigCount;
+            const bigPercent = (bigCount / periodData.length * 100).toFixed(1);
+            const smallPercent = (smallCount / periodData.length * 100).toFixed(1);
+            
+            // Update stats
+            statsDiv.innerHTML = `
+                <p>Total periods entered: ${periodData.length}</p>
+                <p>Big numbers appeared: ${bigCount} times (${bigPercent}%)</p>
+                <p>Small numbers appeared: ${smallCount} times (${smallPercent}%)</p>
+            `;
+            
+            // Make prediction
+            let predictionText = '';
+            if (bigCount > smallCount) {
+                predictionText = '<p class="small">Prediction: Next number is more likely to be Small</p>';
+            } else if (smallCount > bigCount) {
+                predictionText = '<p class="big">Prediction: Next number is more likely to be Big</p>';
+            } else {
+                predictionText = '<p>Prediction: Equal chance for Big or Small</p>';
+            }
+            predictionDiv.innerHTML = predictionText;
+            
+            // Show last 3 periods
+            const startIndex = Math.max(0, periodData.length - 3);
+            for (let i = startIndex; i < periodData.length; i++) {
+                const num = periodData[i];
+                const type = num >= 5 ? 'Big' : 'Small';
+                const row = lastPeriodsTable.insertRow();
+                row.insertCell(0).textContent = i + 1;
+                row.insertCell(1).textContent = num;
+                row.insertCell(2).textContent = type;
+            }
+            
+            resultsDiv.style.display = 'block';
+        }
+        
+        function resetData() {
+            periodData = [];
+            document.getElementById('numberList').innerHTML = '<h3>Entered Numbers:</h3><p>No numbers entered yet</p>';
+            document.getElementById('results').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
