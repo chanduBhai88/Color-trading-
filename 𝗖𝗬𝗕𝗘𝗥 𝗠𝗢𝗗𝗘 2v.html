@@ -103,7 +103,7 @@
             <div id="current-time">Time: 00:00:00</div>
         </div>
         
-        <div class="timer" id="timer">Next round starts in: 60s</div>
+        <div class="timer" id="timer">Current Round: 00:00</div>
         
         <div class="prediction-card">
             <h3>Current Prediction</h3>
@@ -126,9 +126,6 @@
         const colorWeights = [40, 40, 20]; // Red: 40%, Green: 40%, Violet: 20%
         const numbers = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
         const numberWeights = [5, 10, 10, 10, 10, 10, 10, 10, 10, 15]; // 0:5%, 1-4:40%, 5-9:55%
-        let countdown = 60;
-        let timerInterval;
-        let roundEndTime;
         
         // DOM elements
         const colorPredEl = document.getElementById('color-pred');
@@ -158,6 +155,18 @@
         function updateCurrentTime() {
             const now = new Date();
             currentTimeEl.textContent = `Time: ${now.toLocaleTimeString()}`;
+            
+            // Get current seconds (0-59)
+            const seconds = now.getSeconds();
+            const displaySeconds = seconds < 10 ? `0${seconds}` : seconds;
+            
+            // Update timer display
+            timerEl.textContent = `Current Round: 00:${displaySeconds}`;
+            
+            // Check if new minute has started (seconds = 0)
+            if(seconds === 0) {
+                generateNewPrediction();
+            }
         }
         
         // Generate a prediction
@@ -177,6 +186,12 @@
             const confidence = Math.floor(Math.random() * 36) + 50; // 50-85%
             
             return { color, number, size, confidence };
+        }
+        
+        // Generate and display new prediction
+        function generateNewPrediction() {
+            const prediction = generatePrediction();
+            displayPrediction(prediction);
         }
         
         // Display prediction
@@ -210,45 +225,15 @@
             }
         }
         
-        // Start countdown timer
-        function startTimer() {
-            roundEndTime = new Date();
-            roundEndTime.setSeconds(roundEndTime.getSeconds() + 60);
-            
-            timerInterval = setInterval(() => {
-                const now = new Date();
-                const diff = Math.floor((roundEndTime - now) / 1000);
-                
-                if (diff <= 0) {
-                    countdown = 60;
-                    roundEndTime = new Date();
-                    roundEndTime.setSeconds(roundEndTime.getSeconds() + 60);
-                    timerEl.textContent = `Next round starts in: 60s`;
-                    
-                    // Auto-generate prediction at round start
-                    const prediction = generatePrediction();
-                    displayPrediction(prediction);
-                } else {
-                    countdown = diff;
-                    timerEl.textContent = `Next round starts in: ${countdown}s`;
-                }
-            }, 1000);
-        }
-        
         // Initialize
         updateCurrentTime();
         setInterval(updateCurrentTime, 1000);
-        startTimer();
-        
-        // Button click handler
-        generateBtn.addEventListener('click', () => {
-            const prediction = generatePrediction();
-            displayPrediction(prediction);
-        });
         
         // Generate initial prediction
-        const initialPrediction = generatePrediction();
-        displayPrediction(initialPrediction);
+        generateNewPrediction();
+        
+        // Button click handler
+        generateBtn.addEventListener('click', generateNewPrediction);
     </script>
 </body>
 </html>
