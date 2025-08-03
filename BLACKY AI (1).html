@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Big-Small Pattern Validator</title>
+    <title>Big-Small Pattern Predictor</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -50,22 +50,26 @@
         .no-match {
             color: red;
         }
+        .prediction {
+            color: #1a73e8;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
-    <h1>Big-Small Pattern Validator</h1>
-    <p>8 बार "Big" या "Small" चुनें:</p>
+    <h1>Big-Small Pattern Predictor</h1>
+    <p>8 बार "Big" या "Small" चुनें (अगले 2 वैल्यूज का पूर्वानुमान देखने के लिए):</p>
     
     <div class="input-container" id="inputs">
         <!-- यहाँ 8 ड्रॉपडाउन जनरेट होंगे -->
     </div>
     
-    <button onclick="validateInput()">सबमिट करें</button>
+    <button onclick="validateInput()">पूर्वानुमान देखें</button>
     
     <div id="result"></div>
 
     <script>
-        // आपके पैटर्न्स (हर एक 10 इनपुट्स का है, लेकिन हम सिर्फ पहले 8 चेक करेंगे)
+        // आपके पैटर्न्स (हर एक 10 इनपुट्स का)
         const patterns = [
             ['Big', 'Big', 'Small', 'Big', 'Small', 'Small', 'Big', 'Small', 'Big', 'Big'],
             ['Big', 'Big', 'Big', 'Small', 'Small', 'Small', 'Small', 'Small', 'Small'],
@@ -102,7 +106,7 @@
             }
         };
 
-        // वैलिडेशन फंक्शन
+        // वैलिडेशन और पूर्वानुमान फंक्शन
         function validateInput() {
             const userInput = [];
             let isValid = true;
@@ -121,29 +125,31 @@
 
             if (!isValid) return;
 
-            // पैटर्न से मिलान चेक करें
-            let matchedPatternIndex = -1;
-            for (let i = 0; i < patterns.length; i++) {
-                let match = true;
-                for (let j = 0; j < 8; j++) {
-                    if (patterns[i][j] !== userInput[j]) {
-                        match = false;
+            // पैटर्न से मिलान चेक करें और अगले 2 वैल्यूज प्रेडिक्ट करें
+            let matchedPattern = null;
+            for (const pattern of patterns) {
+                let isMatch = true;
+                for (let i = 0; i < 8; i++) {
+                    if (pattern[i] !== userInput[i]) {
+                        isMatch = false;
                         break;
                     }
                 }
-                if (match) {
-                    matchedPatternIndex = i + 1; // 1-बेस्ड इंडेक्स
+                if (isMatch) {
+                    matchedPattern = pattern;
                     break;
                 }
             }
 
             // रिजल्ट दिखाएँ
             const resultDiv = document.getElementById('result');
-            if (matchedPatternIndex !== -1) {
+            if (matchedPattern) {
+                const nextTwo = matchedPattern.slice(8, 10); // 9वाँ और 10वाँ वैल्यू
                 resultDiv.innerHTML = `
-                    <p class="match">सफल! आपका इनपुट <strong>पैटर्न ${matchedPatternIndex}</strong> से मिलता है।</p>
+                    <p class="match">मिलान पैटर्न मिला!</p>
                     <p>आपका इनपुट: ${userInput.join(', ')}</p>
-                    <p>मिलान पैटर्न: ${patterns[matchedPatternIndex-1].slice(0, 8).join(', ')}</p>
+                    <p class="prediction">अगले 2 पूर्वानुमान: ${nextTwo.join(', ')}</p>
+                    <p>पूरा पैटर्न: ${matchedPattern.join(', ')}</p>
                 `;
             } else {
                 resultDiv.innerHTML = `
