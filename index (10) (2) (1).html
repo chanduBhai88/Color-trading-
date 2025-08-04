@@ -1,264 +1,197 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Khatarnak Predictor v3.1 Ultra Logic</title>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron&display=swap" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <style>
-    :root {
-      --bg: #111;
-      --text: #0f0;
-      --card: #222;
-      --button: #0f0;
-      --button-text: #000;
-    }
-    body.light {
-      --bg: #fff;
-      --text: #000;
-      --card: #eee;
-      --button: #000;
-      --button-text: #0f0;
-    }
-    body {
-      margin: 0;
-      font-family: 'Orbitron', sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 20px;
-    }
-    .panel {
-      width: 100%;
-      max-width: 500px;
-      background: var(--card);
-      padding: 20px;
-      border-radius: 20px;
-      box-shadow: 0 0 20px var(--text);
-    }
-    .tabs {
-      display: flex;
-      justify-content: space-around;
-      margin-bottom: 10px;
-    }
-    .tab-btn {
-      padding: 10px;
-      background: var(--button);
-      color: var(--button-text);
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
-    }
-    .hidden { display: none; }
-    .timer, .prediction, .result {
-      text-align: center;
-      margin: 10px 0;
-    }
-    .history {
-      background: var(--bg);
-      padding: 10px;
-      border-radius: 10px;
-      max-height: 100px;
-      overflow-y: auto;
-      font-size: 14px;
-    }
-    canvas {
-      margin-top: 20px;
-    }
-    .btns {
-      text-align: center;
-      margin-top: 10px;
-    }
-    .win { background: green; color: white; padding: 5px; border-radius: 10px; margin-top: 5px; }
-    .lose { background: red; color: white; padding: 5px; border-radius: 10px; margin-top: 5px; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WINGO BIG-SMALL Predictor</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #ff0000;
+            color: white;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+            background-image: linear-gradient(to bottom, #ff0000, #cc0000);
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        .container {
+            background-color: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+            max-width: 500px;
+            margin: 0 auto;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px #000;
+        }
+        
+        .timer {
+            font-size: 3rem;
+            margin: 20px 0;
+            color: #ffff00;
+            text-shadow: 2px 2px 4px #000;
+        }
+        
+        .prediction {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin: 30px 0;
+            padding: 15px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            text-shadow: 2px 2px 4px #000;
+        }
+        
+        .history {
+            margin-top: 30px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .history-item {
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 8px 15px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        
+        .big {
+            color: #00ff00;
+        }
+        
+        .small {
+            color: #3498db;
+        }
+        
+        .next-prediction {
+            font-size: 1.5rem;
+            margin-top: 20px;
+            color: #ffff00;
+        }
+    </style>
 </head>
 <body>
-  <div class="panel">
-    <div class="tabs">
-      <button class="tab-btn" onclick="switchTab('color')">Color</button>
-      <button class="tab-btn" onclick="switchTab('number')">Number</button>
-      <button class="tab-btn" onclick="switchTab('matrix')">Matrix</button>
-      <button class="tab-btn" onclick="switchTab('coin')">Coin</button>
+    <div class="container">
+        <h1>WINGO BIG-SMALL PREDICTOR</h1>
+        <div class="timer" id="timer">01:00</div>
+        
+        <div class="current-result">
+            <div id="currentResult">Waiting for next prediction...</div>
+        </div>
+        
+        <div class="prediction" id="prediction">-</div>
+        
+        <div class="next-prediction" id="nextPrediction">Next prediction in 60 seconds</div>
+        
+        <div class="history" id="history"></div>
     </div>
 
-    <div class="timer" id="timer">Next round in: 60s</div>
-
-    <!-- Color Tab -->
-    <div id="color" class="tab">
-      <div class="prediction" id="colorPred">Prediction: ...</div>
-      <div class="result" id="colorRes">Result: ...</div>
-      <div class="history" id="colorHist"></div>
-      <canvas id="colorChart" width="400" height="200"></canvas>
-    </div>
-
-    <!-- Number Tab -->
-    <div id="number" class="tab hidden">
-      <div class="prediction" id="numberPred">Prediction: ...</div>
-      <div class="result" id="numberRes">Result: ...</div>
-    </div>
-
-    <!-- Matrix Tab -->
-    <div id="matrix" class="tab hidden">
-      <div class="prediction" id="matrixPred">Prediction: ...</div>
-      <div class="result" id="matrixRes">Result: ...</div>
-      <div id="matrixAlert"></div>
-    </div>
-
-    <!-- Coin Tab -->
-    <div id="coin" class="tab hidden">
-      <div class="prediction" id="coinPred">Prediction: ...</div>
-      <div class="result" id="coinRes">Result: ...</div>
-    </div>
-
-    <div class="btns">
-      <button onclick="resetGame()">Reset</button>
-      <button onclick="toggleTheme()">Toggle Theme</button>
-    </div>
-  </div>
-
-  <!-- Audio Elements -->
-  <audio id="winSound" src="https://assets.mixkit.co/sfx/preview/mixkit-game-level-completed-2059.mp3"></audio>
-  <audio id="loseSound" src="https://assets.mixkit.co/sfx/preview/mixkit-wrong-answer-fail-notification-946.mp3"></audio>
-
-  <script>
-    const tabs = ["color", "number", "matrix", "coin"];
-    const matrixGrid = ["A1","A2","A3","B1","B2","B3","C1","C2","C3"];
-    let counter = 60, interval;
-    let currentPrediction = {};
-    const timerEl = document.getElementById("timer");
-    const colorHistArr = [];
-
-    const colorCtx = document.getElementById("colorChart").getContext('2d');
-    const colorChart = new Chart(colorCtx, {
-      type: 'line',
-      data: {
-        labels: [],
-        datasets: [{
-          label: 'Color Trend',
-          data: [],
-          borderColor: 'lime',
-          backgroundColor: 'transparent',
-          tension: 0.3
-        }]
-      },
-      options: {
-        scales: {
-          y: {
-            ticks: {
-              callback: val => val === 1 ? 'Red' : val === 2 ? 'Green' : 'Violet',
-              min: 1, max: 3, stepSize: 1
+    <script>
+        // Game variables
+        let timer = 60;
+        let countdown;
+        let history = [];
+        const maxHistory = 5;
+        
+        // DOM elements
+        const timerElement = document.getElementById('timer');
+        const predictionElement = document.getElementById('prediction');
+        const currentResultElement = document.getElementById('currentResult');
+        const nextPredictionElement = document.getElementById('nextPrediction');
+        const historyElement = document.getElementById('history');
+        
+        // Start the countdown
+        startCountdown();
+        
+        function startCountdown() {
+            timer = 60;
+            updateTimerDisplay();
+            
+            countdown = setInterval(() => {
+                timer--;
+                updateTimerDisplay();
+                
+                if (timer <= 0) {
+                    clearInterval(countdown);
+                    generateResult();
+                    startCountdown();
+                }
+            }, 1000);
+        }
+        
+        function updateTimerDisplay() {
+            const minutes = Math.floor(timer / 60);
+            const seconds = timer % 60;
+            timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            nextPredictionElement.textContent = `Next prediction in ${timer} seconds`;
+        }
+        
+        function generateResult() {
+            // Generate random result (BIG or SMALL)
+            const result = Math.random() > 0.5 ? 'BIG' : 'SMALL';
+            
+            // Generate prediction (smart algorithm)
+            const prediction = predictNext();
+            
+            // Update display
+            currentResultElement.innerHTML = `Last result: <span class="${result.toLowerCase()}">${result}</span>`;
+            predictionElement.textContent = prediction;
+            predictionElement.className = 'prediction ' + prediction.toLowerCase();
+            
+            // Add to history
+            history.unshift({ result, prediction });
+            if (history.length > maxHistory) {
+                history.pop();
             }
-          }
+            
+            updateHistoryDisplay();
         }
-      }
-    });
-
-    function switchTab(tab) {
-      tabs.forEach(t => document.getElementById(t).classList.add("hidden"));
-      document.getElementById(tab).classList.remove("hidden");
-    }
-
-    function randomFrom(arr) {
-      return arr[Math.floor(Math.random() * arr.length)];
-    }
-
-    function fakeAPICall() {
-      return {
-        color: randomFrom(["Red", "Green", "Violet"]),
-        number: Math.floor(Math.random() * 10),
-        matrix: randomFrom(matrixGrid),
-        coin: Math.random() < 0.5 ? "Heads" : "Tails"
-      };
-    }
-
-    function playSound(type) {
-      const sound = document.getElementById(type === 'win' ? 'winSound' : 'loseSound');
-      sound.play();
-    }
-
-    function checkWin(pred, res, el) {
-      if (pred === res) {
-        el.innerHTML += `<div class="win">✅ You Win!</div>`;
-        playSound('win');
-      } else {
-        el.innerHTML += `<div class="lose">❌ You Lose</div>`;
-        playSound('lose');
-      }
-    }
-
-    function generatePrediction() {
-      currentPrediction = fakeAPICall();
-      document.getElementById("colorPred").innerText = `Prediction: ${currentPrediction.color}`;
-      document.getElementById("numberPred").innerText = `Prediction: ${currentPrediction.number}`;
-      document.getElementById("matrixPred").innerText = `Prediction: ${currentPrediction.matrix}`;
-      document.getElementById("coinPred").innerText = `Prediction: ${currentPrediction.coin}`;
-    }
-
-    function updateAll() {
-      const result = fakeAPICall();
-
-      // Color
-      document.getElementById("colorRes").innerText = `Result: ${result.color}`;
-      checkWin(currentPrediction.color, result.color, document.getElementById("colorRes"));
-      colorHistArr.unshift(`${new Date().toLocaleTimeString()} → ${result.color}`);
-      if (colorHistArr.length > 5) colorHistArr.pop();
-      document.getElementById("colorHist").innerHTML = colorHistArr.join("<br>");
-      const colorNum = result.color === "Red" ? 1 : result.color === "Green" ? 2 : 3;
-      colorChart.data.labels.push(new Date().toLocaleTimeString());
-      colorChart.data.datasets[0].data.push(colorNum);
-      if (colorChart.data.labels.length > 10) {
-        colorChart.data.labels.shift();
-        colorChart.data.datasets[0].data.shift();
-      }
-      colorChart.update();
-
-      // Number
-      document.getElementById("numberRes").innerText = `Result: ${result.number}`;
-      checkWin(currentPrediction.number, result.number, document.getElementById("numberRes"));
-
-      // Matrix
-      document.getElementById("matrixRes").innerText = `Result: ${result.matrix}`;
-      document.getElementById("matrixAlert").innerHTML = "";
-      checkWin(currentPrediction.matrix, result.matrix, document.getElementById("matrixAlert"));
-
-      // Coin
-      document.getElementById("coinRes").innerText = `Result: ${result.coin}`;
-      checkWin(currentPrediction.coin, result.coin, document.getElementById("coinRes"));
-    }
-
-    function startTimer() {
-      generatePrediction();
-      updateAll();
-      interval = setInterval(() => {
-        counter--;
-        timerEl.innerText = `Next round in: ${counter}s`;
-        if (counter === 0) {
-          counter = 60;
-          generatePrediction();
-          updateAll();
+        
+        function predictNext() {
+            if (history.length < 3) {
+                return Math.random() > 0.5 ? 'BIG' : 'SMALL';
+            }
+            
+            // Count recent results
+            const lastThree = history.slice(0, 3);
+            const counts = { BIG: 0, SMALL: 0 };
+            
+            lastThree.forEach(item => {
+                counts[item.result]++;
+            });
+            
+            // Predict the less frequent one (opposite strategy)
+            if (counts.BIG > counts.SMALL) {
+                return 'SMALL';
+            } else if (counts.SMALL > counts.BIG) {
+                return 'BIG';
+            } else {
+                return Math.random() > 0.5 ? 'BIG' : 'SMALL';
+            }
         }
-      }, 1000);
-    }
-
-    function resetGame() {
-      clearInterval(interval);
-      counter = 60;
-      document.getElementById("timer").innerText = "Next round in: 60s";
-      startTimer();
-    }
-
-    function toggleTheme() {
-      document.body.classList.toggle("light");
-    }
-
-    window.onload = () => {
-      switchTab("color");
-      startTimer();
-    };
-  </script>
+        
+        function updateHistoryDisplay() {
+            historyElement.innerHTML = '';
+            
+            history.forEach(item => {
+                const historyItem = document.createElement('div');
+                historyItem.className = `history-item ${item.result.toLowerCase()}`;
+                historyItem.textContent = item.result;
+                historyItem.title = `Predicted: ${item.prediction}`;
+                historyElement.appendChild(historyItem);
+            });
+        }
+        
+        // Generate first result immediately
+        generateResult();
+    </script>
 </body>
 </html>
