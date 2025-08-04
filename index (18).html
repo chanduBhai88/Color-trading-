@@ -172,6 +172,52 @@
             background-color: rgba(255, 0, 0, 0.1);
         }
 
+        /* New styles for 7-digit input */
+        .digit-input {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .digit-btn {
+            width: 40px;
+            height: 40px;
+            font-size: 18px;
+            background-color: #111;
+            color: #0f0;
+            border: 1px solid #0f0;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .digit-btn.selected-big {
+            background-color: rgba(0, 255, 0, 0.2);
+            color: #0f0;
+        }
+
+        .digit-btn.selected-small {
+            background-color: rgba(255, 0, 0, 0.2);
+            color: #f00;
+        }
+
+        .submit-btn {
+            background-color: #111;
+            color: #0f0;
+            border: 1px solid #0f0;
+            padding: 10px 20px;
+            margin-top: 10px;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+        }
+
+        .submit-btn:hover {
+            background-color: #0f0;
+            color: #000;
+        }
+
         @media (max-width: 768px) {
             .stat-box {
                 width: 100%;
@@ -184,6 +230,10 @@
             .choice-buttons {
                 flex-direction: column;
                 gap: 10px;
+            }
+            
+            .digit-input {
+                flex-wrap: wrap;
             }
         }
 
@@ -228,36 +278,36 @@
     <div class="container">
         <h1 class="glitch">IN999 PATTERN ANALYZER</h1>
         
-        <div class="choice-buttons">
-            <button class="choice-btn big" id="bigBtn">BIG</button>
-            <button class="choice-btn small" id="smallBtn">SMALL</button>
+        <div class="digit-input" id="digitInput">
+            <!-- 7 digit buttons will be added here -->
         </div>
+        <button class="submit-btn" id="submitBtn">ANALYZE PATTERN</button>
         
         <div class="result">
             <div class="result-title">PREDICTION RESULT</div>
-            <div id="predictionResult">Select Big or Small to see prediction</div>
+            <div id="predictionResult">Enter 7-digit pattern and click Analyze</div>
         </div>
         
         <div class="stats">
             <div class="stat-box">
                 <h3>TOTAL STATS</h3>
-                <p>Big: <span class="big" id="totalBig">245</span></p>
-                <p>Small: <span class="small" id="totalSmall">245</span></p>
-                <p>Total Rounds: <span id="totalRounds">490</span></p>
+                <p>Big: <span class="big" id="totalBig">0</span></p>
+                <p>Small: <span class="small" id="totalSmall">0</span></p>
+                <p>Total Rounds: <span id="totalRounds">0</span></p>
             </div>
             
             <div class="stat-box">
                 <h3>RECENT TREND</h3>
-                <p>Last 50: <span class="big">55% Big</span></p>
-                <p>Last 20: <span class="big">58% Big</span></p>
-                <p>Last 10: <span class="small">60% Small</span></p>
+                <p>Last 50: <span id="last50Trend">-</span></p>
+                <p>Last 20: <span id="last20Trend">-</span></p>
+                <p>Last 10: <span id="last10Trend">-</span></p>
             </div>
             
             <div class="stat-box">
                 <h3>PATTERN ANALYSIS</h3>
-                <p>Max Big Streak: <span class="big">6</span></p>
-                <p>Max Small Streak: <span class="small">5</span></p>
-                <p>Reversal Probability: <span>68%</span></p>
+                <p>Max Big Streak: <span class="big" id="maxBigStreak">0</span></p>
+                <p>Max Small Streak: <span class="small" id="maxSmallStreak">0</span></p>
+                <p>Reversal Probability: <span id="reversalProb">-</span></p>
             </div>
         </div>
         
@@ -268,93 +318,213 @@
     </div>
 
     <script>
-        // Sample data patterns (Big = true, Small = false)
-        const simulatedPatterns = [
-            // First 100
-            false,true,false,true,true,false,true,false,true,true,
-            true,false,false,true,false,true,true,false,false,false,
-            false,false,true,false,false,false,true,false,false,false,
-            true,true,false,true,true,false,true,true,false,true,
-            false,false,false,true,false,true,false,false,true,false,
-            true,true,true,false,true,true,false,true,true,false,
-            false,true,false,true,false,false,true,false,true,false,
-            true,false,true,true,false,true,false,true,true,true,
-            false,true,true,false,false,true,false,false,true,true,
-            true,false,false,false,true,false,true,false,false,true,
+        // Initialize patterns array
+        let fullPatterns = [];
+        
+        // Create 7-digit input buttons
+        const digitInput = document.getElementById('digitInput');
+        for (let i = 0; i < 7; i++) {
+            const btn = document.createElement('button');
+            btn.className = 'digit-btn';
+            btn.textContent = (i + 1);
+            btn.dataset.position = i;
+            btn.dataset.selected = 'none';
             
-            // Last 100
-            false,true,true,false,true,true,true,true,true,false,
-            true,false,false,true,false,true,true,true,false,true,
-            false,true,false,false,true,false,true,false,false,false,
-            true,true,true,false,true,true,false,true,false,true,
-            false,true,true,true,false,true,false,false,false,false,
-            true,false,true,false,true,false,true,false,false,false,
-            true,true,true,false,true,true,false,true,false,true,
-            false,false,true,false,false,false,true,false,true,false,
-            true,true,false,false,true,true,false,true,true,true,
-            true,false,true,false,false,true,true,false,true,true
-        ];
-
-        const fullPatterns = simulatedPatterns;
-
-        // Button click handlers
-        document.getElementById('bigBtn').addEventListener('click', () => analyzeResult(true));
-        document.getElementById('smallBtn').addEventListener('click', () => analyzeResult(false));
-
-        function analyzeResult(isBig) {
-            // Add the new result
-            fullPatterns.push(isBig);
+            btn.addEventListener('click', function() {
+                if (this.dataset.selected === 'none') {
+                    this.dataset.selected = 'big';
+                    this.classList.add('selected-big');
+                    this.textContent = 'B';
+                } else if (this.dataset.selected === 'big') {
+                    this.dataset.selected = 'small';
+                    this.classList.remove('selected-big');
+                    this.classList.add('selected-small');
+                    this.textContent = 'S';
+                } else {
+                    this.dataset.selected = 'none';
+                    this.classList.remove('selected-small');
+                    this.textContent = (i + 1);
+                }
+            });
             
-            // Calculate prediction
-            let prediction;
+            digitInput.appendChild(btn);
+        }
+        
+        // Submit button handler
+        document.getElementById('submitBtn').addEventListener('click', function() {
+            const digitButtons = document.querySelectorAll('.digit-btn');
+            let pattern = [];
+            let allSelected = true;
+            
+            digitButtons.forEach(btn => {
+                if (btn.dataset.selected === 'big') {
+                    pattern.push(true);
+                } else if (btn.dataset.selected === 'small') {
+                    pattern.push(false);
+                } else {
+                    allSelected = false;
+                }
+            });
+            
+            if (!allSelected) {
+                alert('Please select all 7 digits (Big or Small)');
+                return;
+            }
+            
+            // Add the pattern to history
+            fullPatterns = fullPatterns.concat(pattern);
+            
+            // Analyze the pattern
+            analyzePattern();
+            
+            // Reset the buttons
+            digitButtons.forEach(btn => {
+                btn.dataset.selected = 'none';
+                btn.className = 'digit-btn';
+                btn.textContent = parseInt(btn.dataset.position) + 1;
+            });
+        });
+        
+        function analyzePattern() {
+            // Calculate stats
+            const totalBig = fullPatterns.filter(x => x).length;
+            const totalSmall = fullPatterns.filter(x => !x).length;
+            
+            // Update basic stats
+            document.getElementById('totalBig').textContent = totalBig;
+            document.getElementById('totalSmall').textContent = totalSmall;
+            document.getElementById('totalRounds').textContent = fullPatterns.length;
+            
+            // Calculate trends
+            const last50 = fullPatterns.slice(-50);
+            const last50Big = last50.filter(x => x).length;
+            const last50Small = last50.length - last50Big;
+            
+            const last20 = fullPatterns.slice(-20);
+            const last20Big = last20.filter(x => x).length;
+            const last20Small = last20.length - last20Big;
+            
             const last10 = fullPatterns.slice(-10);
-            const lastBig = last10.filter(x => x).length;
-            const lastSmall = last10.filter(x => !x).length;
+            const last10Big = last10.filter(x => x).length;
+            const last10Small = last10.length - last10Big;
             
-            if (lastBig >= 7) {
-                prediction = {
-                    result: "Small",
-                    confidence: "68%",
-                    reason: "Strong Big streak (reversal likely)"
-                };
-            } else if (lastSmall >= 7) {
-                prediction = {
-                    result: "Big",
-                    confidence: "65%",
-                    reason: "Strong Small streak (reversal likely)"
-                };
-            } else {
-                // Default prediction based on overall probability
-                const bigCount = fullPatterns.filter(x => x).length;
-                const smallCount = fullPatterns.filter(x => !x).length;
-                const bigProbability = bigCount / fullPatterns.length;
+            // Update trend display
+            document.getElementById('last50Trend').innerHTML = 
+                `<span class="big">${Math.round(last50Big/last50.length*100)}% Big</span>, 
+                 <span class="small">${Math.round(last50Small/last50.length*100)}% Small</span>`;
+            
+            document.getElementById('last20Trend').innerHTML = 
+                last20.length > 0 ? 
+                `<span class="big">${Math.round(last20Big/last20.length*100)}% Big</span>, 
+                 <span class="small">${Math.round(last20Small/last20.length*100)}% Small</span>` : '-';
+            
+            document.getElementById('last10Trend').innerHTML = 
+                last10.length > 0 ? 
+                `<span class="big">${Math.round(last10Big/last10.length*100)}% Big</span>, 
+                 <span class="small">${Math.round(last10Small/last10.length*100)}% Small</span>` : '-';
+            
+            // Calculate streaks
+            let currentStreak = 0;
+            let currentType = null;
+            let maxBigStreak = 0;
+            let maxSmallStreak = 0;
+            
+            fullPatterns.forEach(result => {
+                if (currentType === null) {
+                    currentType = result;
+                    currentStreak = 1;
+                } else if (currentType === result) {
+                    currentStreak++;
+                } else {
+                    if (currentType && currentStreak > maxBigStreak) {
+                        maxBigStreak = currentStreak;
+                    } else if (!currentType && currentStreak > maxSmallStreak) {
+                        maxSmallStreak = currentStreak;
+                    }
+                    currentType = result;
+                    currentStreak = 1;
+                }
+            });
+            
+            // Check the last streak
+            if (currentType && currentStreak > maxBigStreak) {
+                maxBigStreak = currentStreak;
+            } else if (!currentType && currentStreak > maxSmallStreak) {
+                maxSmallStreak = currentStreak;
+            }
+            
+            document.getElementById('maxBigStreak').textContent = maxBigStreak;
+            document.getElementById('maxSmallStreak').textContent = maxSmallStreak;
+            
+            // Calculate reversal probability (simplified)
+            let reversalProb = '50%';
+            if (fullPatterns.length >= 3) {
+                const last = fullPatterns[fullPatterns.length - 1];
+                const secondLast = fullPatterns[fullPatterns.length - 2];
+                const thirdLast = fullPatterns[fullPatterns.length - 3];
                 
-                if (bigProbability > 0.55) {
+                if (last === secondLast && secondLast === thirdLast) {
+                    // After 3 same results, higher chance of reversal
+                    reversalProb = '68%';
+                } else if (last !== secondLast) {
+                    // After a change, slightly higher chance of continuation
+                    reversalProb = '55%';
+                }
+            }
+            document.getElementById('reversalProb').textContent = reversalProb;
+            
+            // Generate prediction
+            let prediction;
+            if (last10.length >= 5) {
+                if (last10Big >= 7) {
                     prediction = {
                         result: "Small",
-                        confidence: Math.round(bigProbability * 100) + "%",
-                        reason: "Overall Big probability is high (reversal likely)"
+                        confidence: "72%",
+                        reason: "Strong Big streak in last 10 (reversal likely)"
                     };
-                } else if (bigProbability < 0.45) {
+                } else if (last10Small >= 7) {
                     prediction = {
                         result: "Big",
-                        confidence: Math.round((1 - bigProbability) * 100) + "%",
-                        reason: "Overall Small probability is high (reversal likely)"
+                        confidence: "70%",
+                        reason: "Strong Small streak in last 10 (reversal likely)"
                     };
                 } else {
-                    // If close to 50-50, predict same as last
-                    prediction = {
-                        result: isBig ? "Small" : "Big",
-                        confidence: "55%",
-                        reason: "Balanced probability (slight reversal tendency)"
-                    };
+                    // If no strong streak, predict based on overall trend
+                    const bigProb = totalBig / fullPatterns.length;
+                    if (bigProb > 0.55) {
+                        prediction = {
+                            result: "Small",
+                            confidence: Math.round(bigProb * 100) + "%",
+                            reason: "Overall Big probability is high (reversal likely)"
+                        };
+                    } else if (bigProb < 0.45) {
+                        prediction = {
+                            result: "Big",
+                            confidence: Math.round((1 - bigProb) * 100) + "%",
+                            reason: "Overall Small probability is high (reversal likely)"
+                        };
+                    } else {
+                        // If balanced, predict same as last
+                        const lastResult = fullPatterns[fullPatterns.length - 1];
+                        prediction = {
+                            result: lastResult ? "Small" : "Big",
+                            confidence: "58%",
+                            reason: "Balanced probability (slight reversal tendency)"
+                        };
+                    }
                 }
+            } else {
+                prediction = {
+                    result: "Insufficient data",
+                    confidence: "-",
+                    reason: "Need more patterns to make prediction"
+                };
             }
             
             // Display result
             const resultDiv = document.getElementById('predictionResult');
             resultDiv.innerHTML = `
-                <div style="margin-bottom:10px;">Current result: <span class="${isBig ? 'big' : 'small'}">${isBig ? 'BIG' : 'SMALL'}</span></div>
+                <div style="margin-bottom:10px;">Last 7-digit pattern: ${getLastPatterns(7)}</div>
                 <div style="font-size:24px;margin:15px 0;">
                     Next prediction: 
                     <span class="${prediction.result === 'Big' ? 'big' : 'small'}" style="font-size:32px;">
@@ -368,47 +538,23 @@
                 </div>
             `;
             
-            // Update stats
-            updateStats();
-        }
-
-        function getLastPatterns(count) {
-            const last = fullPatterns.slice(-count);
-            return last.map(p => p ? '<span class="big">B</span>' : '<span class="small">S</span>').join(' ');
-        }
-
-        function updateStats() {
-            const totalBig = fullPatterns.filter(x => x).length;
-            const totalSmall = fullPatterns.filter(x => !x).length;
-            
-            document.getElementById('totalBig').textContent = totalBig;
-            document.getElementById('totalSmall').textContent = totalSmall;
-            document.getElementById('totalRounds').textContent = fullPatterns.length;
-            
-            // Update recent trends
-            const last50 = fullPatterns.slice(-50);
-            const last50Big = last50.filter(x => x).length;
-            
-            const last20 = fullPatterns.slice(-20);
-            const last20Big = last20.filter(x => x).length;
-            
-            const last10 = fullPatterns.slice(-10);
-            const last10Big = last10.filter(x => x).length;
-            
             // Update matrix display
             const matrixDiv = document.getElementById('patternMatrix');
             matrixDiv.innerHTML = '';
             
-            last50.forEach((pattern, index) => {
+            const displayPatterns = fullPatterns.slice(-50);
+            displayPatterns.forEach((pattern, index) => {
                 const cell = document.createElement('div');
                 cell.className = `matrix-cell ${pattern ? 'big' : 'small'}`;
                 cell.textContent = pattern ? 'B' : 'S';
                 matrixDiv.appendChild(cell);
             });
         }
-
-        // Initialize
-        updateStats();
+        
+        function getLastPatterns(count) {
+            const last = fullPatterns.slice(-count);
+            return last.map(p => p ? '<span class="big">B</span>' : '<span class="small">S</span>').join(' ');
+        }
     </script>
 </body>
 </html>
