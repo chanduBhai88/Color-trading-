@@ -1,66 +1,69 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="hi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WINGO BIG-SMALL Predictor</title>
+    <title>WINGO LIVE BIG-SMALL PREDICTOR</title>
     <style>
         body {
             font-family: 'Arial', sans-serif;
-            background-color: #ff0000;
+            background: linear-gradient(135deg, #ff0000, #cc0000);
             color: white;
             text-align: center;
             margin: 0;
             padding: 20px;
-            background-image: linear-gradient(to bottom, #ff0000, #cc0000);
-            height: 100vh;
-            overflow: hidden;
+            min-height: 100vh;
         }
         
         .container {
-            background-color: rgba(0, 0, 0, 0.3);
+            background: rgba(0, 0, 0, 0.3);
             border-radius: 15px;
             padding: 20px;
             max-width: 500px;
             margin: 0 auto;
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            border: 2px solid gold;
         }
         
         h1 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
+            font-size: 2.2rem;
+            margin-bottom: 15px;
             text-shadow: 2px 2px 4px #000;
+            color: #fff;
+        }
+        
+        .timer-container {
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 50%;
+            width: 150px;
+            height: 150px;
+            margin: 20px auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 3px solid gold;
         }
         
         .timer {
-            font-size: 3rem;
-            margin: 20px 0;
+            font-size: 2.5rem;
+            font-weight: bold;
             color: #ffff00;
-            text-shadow: 2px 2px 4px #000;
+            text-shadow: 0 0 10px #ffff00;
+        }
+        
+        .prediction-box {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border: 1px dashed white;
         }
         
         .prediction {
-            font-size: 2.5rem;
+            font-size: 3rem;
             font-weight: bold;
-            margin: 30px 0;
-            padding: 15px;
-            background-color: rgba(255, 255, 255, 0.2);
-            border-radius: 10px;
+            margin: 10px 0;
             text-shadow: 2px 2px 4px #000;
-        }
-        
-        .history {
-            margin-top: 30px;
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-        }
-        
-        .history-item {
-            background-color: rgba(255, 255, 255, 0.1);
-            padding: 8px 15px;
-            border-radius: 5px;
-            font-weight: bold;
         }
         
         .big {
@@ -68,130 +71,159 @@
         }
         
         .small {
-            color: #3498db;
+            color: #00bfff;
         }
         
-        .next-prediction {
-            font-size: 1.5rem;
+        .history {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
             margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .history-item {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 8px 15px;
+            border-radius: 5px;
+            font-weight: bold;
+            min-width: 60px;
+        }
+        
+        .status {
+            margin-top: 15px;
+            font-style: italic;
             color: #ffff00;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>WINGO BIG-SMALL PREDICTOR</h1>
-        <div class="timer" id="timer">01:00</div>
+        <h1>🎰 WINGO BIG-SMALL PREDICTOR</h1>
         
-        <div class="current-result">
-            <div id="currentResult">Waiting for next prediction...</div>
+        <div class="timer-container">
+            <div class="timer" id="timer">01:00</div>
         </div>
         
-        <div class="prediction" id="prediction">-</div>
+        <div class="prediction-box">
+            <div>अगला प्रेडिक्शन:</div>
+            <div class="prediction" id="prediction">-</div>
+        </div>
         
-        <div class="next-prediction" id="nextPrediction">Next prediction in 60 seconds</div>
+        <div class="status" id="status">अगला रिजल्ट 60 सेकंड में...</div>
         
-        <div class="history" id="history"></div>
+        <div>
+            <div>पिछले रिजल्ट:</div>
+            <div class="history" id="history"></div>
+        </div>
     </div>
 
     <script>
-        // Game variables
-        let timer = 60;
-        let countdown;
-        let history = [];
-        const maxHistory = 5;
+        // गेम वेरिएबल्स
+        let timeLeft = 60;
+        let countdownInterval;
+        let gameHistory = [];
+        const MAX_HISTORY = 5;
         
-        // DOM elements
+        // DOM एलिमेंट्स
         const timerElement = document.getElementById('timer');
         const predictionElement = document.getElementById('prediction');
-        const currentResultElement = document.getElementById('currentResult');
-        const nextPredictionElement = document.getElementById('nextPrediction');
+        const statusElement = document.getElementById('status');
         const historyElement = document.getElementById('history');
         
-        // Start the countdown
-        startCountdown();
+        // इनिशियलाइजेशन
+        startNewRound();
         
-        function startCountdown() {
-            timer = 60;
-            updateTimerDisplay();
+        function startNewRound() {
+            // टाइमर रीसेट
+            timeLeft = 60;
+            updateTimer();
             
-            countdown = setInterval(() => {
-                timer--;
-                updateTimerDisplay();
+            // काउंटडाइन शुरू
+            countdownInterval = setInterval(() => {
+                timeLeft--;
+                updateTimer();
                 
-                if (timer <= 0) {
-                    clearInterval(countdown);
+                if (timeLeft <= 0) {
+                    clearInterval(countdownInterval);
                     generateResult();
-                    startCountdown();
+                    startNewRound();
                 }
             }, 1000);
+            
+            // नया प्रेडिक्शन जनरेट करें
+            generatePrediction();
         }
         
-        function updateTimerDisplay() {
-            const minutes = Math.floor(timer / 60);
-            const seconds = timer % 60;
-            timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-            nextPredictionElement.textContent = `Next prediction in ${timer} seconds`;
+        function updateTimer() {
+            const mins = Math.floor(timeLeft / 60);
+            const secs = timeLeft % 60;
+            timerElement.textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+            statusElement.textContent = timeLeft > 0 
+                ? `अगला रिजल्ट ${timeLeft} सेकंड में...` 
+                : "नया रिजल्ट जनरेट हो रहा है...";
+        }
+        
+        function generatePrediction() {
+            // स्मार्ट प्रेडिक्शन अल्गोरिदम
+            const prediction = calculatePrediction();
+            predictionElement.textContent = prediction;
+            predictionElement.className = `prediction ${prediction.toLowerCase()}`;
         }
         
         function generateResult() {
-            // Generate random result (BIG or SMALL)
+            // रैंडम रिजल्ट (BIG/SMALL)
             const result = Math.random() > 0.5 ? 'BIG' : 'SMALL';
             
-            // Generate prediction (smart algorithm)
-            const prediction = predictNext();
+            // हिस्ट्री में जोड़ें
+            gameHistory.unshift({
+                result,
+                prediction: predictionElement.textContent
+            });
             
-            // Update display
-            currentResultElement.innerHTML = `Last result: <span class="${result.toLowerCase()}">${result}</span>`;
-            predictionElement.textContent = prediction;
-            predictionElement.className = 'prediction ' + prediction.toLowerCase();
-            
-            // Add to history
-            history.unshift({ result, prediction });
-            if (history.length > maxHistory) {
-                history.pop();
+            if (gameHistory.length > MAX_HISTORY) {
+                gameHistory.pop();
             }
             
             updateHistoryDisplay();
         }
         
-        function predictNext() {
-            if (history.length < 3) {
+        function calculatePrediction() {
+            if (gameHistory.length < 3) {
                 return Math.random() > 0.5 ? 'BIG' : 'SMALL';
             }
             
-            // Count recent results
-            const lastThree = history.slice(0, 3);
-            const counts = { BIG: 0, SMALL: 0 };
+            // पिछले 3 रिजल्ट्स का विश्लेषण
+            const lastThree = gameHistory.slice(0, 3);
+            const resultCount = { BIG: 0, SMALL: 0 };
             
             lastThree.forEach(item => {
-                counts[item.result]++;
+                resultCount[item.result]++;
             });
             
-            // Predict the less frequent one (opposite strategy)
-            if (counts.BIG > counts.SMALL) {
+            // ऑपोजिट स्ट्रैटेजी (जो कम आया उसे प्रेडिक्ट करो)
+            if (resultCount.BIG > resultCount.SMALL) {
                 return 'SMALL';
-            } else if (counts.SMALL > counts.BIG) {
+            } else if (resultCount.SMALL > resultCount.BIG) {
                 return 'BIG';
-            } else {
-                return Math.random() > 0.5 ? 'BIG' : 'SMALL';
             }
+            
+            return Math.random() > 0.5 ? 'BIG' : 'SMALL';
         }
         
         function updateHistoryDisplay() {
             historyElement.innerHTML = '';
             
-            history.forEach(item => {
+            gameHistory.forEach((item, index) => {
                 const historyItem = document.createElement('div');
                 historyItem.className = `history-item ${item.result.toLowerCase()}`;
-                historyItem.textContent = item.result;
-                historyItem.title = `Predicted: ${item.prediction}`;
+                historyItem.innerHTML = `
+                    <div>${item.result}</div>
+                    <small>${item.prediction === item.result ? '✓' : '✗'}</small>
+                `;
                 historyElement.appendChild(historyItem);
             });
         }
-        
-        // Generate first result immediately
-        generateResult();
     </script>
 </body>
 </html>
