@@ -57,47 +57,36 @@
             margin-top: 10px;
         }
 
-        .input-section {
+        .choice-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
             margin-bottom: 30px;
         }
 
-        input {
+        .choice-btn {
             background-color: #111;
             color: #0f0;
             border: 1px solid #0f0;
-            padding: 10px;
-            width: 100%;
-            font-size: 18px;
-            font-family: 'Courier New', monospace;
-            margin-bottom: 15px;
-        }
-
-        input:focus {
-            outline: none;
-            box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
-        }
-
-        button {
-            background-color: #111;
-            color: #0f0;
-            border: 1px solid #0f0;
-            padding: 12px 25px;
-            font-size: 16px;
+            padding: 15px 30px;
+            font-size: 20px;
             cursor: pointer;
             font-family: 'Courier New', monospace;
             transition: all 0.3s;
             position: relative;
             overflow: hidden;
+            min-width: 120px;
+            text-align: center;
         }
 
-        button:hover {
+        .choice-btn:hover {
             background-color: #0f0;
             color: #000;
             text-shadow: 0 0 5px #000;
             box-shadow: 0 0 15px rgba(0, 255, 0, 0.7);
         }
 
-        button::after {
+        .choice-btn::after {
             content: "";
             position: absolute;
             top: 0;
@@ -108,7 +97,7 @@
             transition: all 0.5s;
         }
 
-        button:hover::after {
+        .choice-btn:hover::after {
             left: 100%;
         }
 
@@ -191,6 +180,11 @@
             .matrix {
                 grid-template-columns: repeat(5, 1fr);
             }
+            
+            .choice-buttons {
+                flex-direction: column;
+                gap: 10px;
+            }
         }
 
         /* Hacker animation effects */
@@ -234,14 +228,14 @@
     <div class="container">
         <h1 class="glitch">IN999 PATTERN ANALYZER</h1>
         
-        <div class="input-section">
-            <input type="text" id="resultInput" placeholder="Enter 'Big' or 'Small'...">
-            <button id="analyzeBtn">ANALYZE PATTERN</button>
+        <div class="choice-buttons">
+            <button class="choice-btn big" id="bigBtn">BIG</button>
+            <button class="choice-btn small" id="smallBtn">SMALL</button>
         </div>
         
         <div class="result">
-            <div class="result-title">ANALYSIS RESULT</div>
-            <div id="predictionResult">Waiting for input...</div>
+            <div class="result-title">PREDICTION RESULT</div>
+            <div id="predictionResult">Select Big or Small to see prediction</div>
         </div>
         
         <div class="stats">
@@ -274,24 +268,9 @@
     </div>
 
     <script>
-        // All patterns from 49 images (490 rounds)
-        const allPatterns = [
-            // Image 1/50 to 49/50 patterns (Big = true, Small = false)
-            // This is a compressed version of all your data
-            // Format: [true, false, true, ...] where true=Big, false=Small
-            // Actual data would be all 490 entries from your 49 images
-            // For space, I'm showing a sample - real implementation would have all
-            false, true, false, true, true, false, true, false, true, true,  // 1/50
-            true, false, false, true, false, true, true, false, false, false, // 2/50
-            // ... (all 490 entries would be here)
-            // Last 10 from image 49/50:
-            true, false, true, false, false, true, true, false, true, true
-        ];
-
-        // In a real implementation, we'd have all 490 entries
-        // For this example, I'll simulate with the first 100 and last 100
+        // Sample data patterns (Big = true, Small = false)
         const simulatedPatterns = [
-            // First 100 (images 1-10)
+            // First 100
             false,true,false,true,true,false,true,false,true,true,
             true,false,false,true,false,true,true,false,false,false,
             false,false,true,false,false,false,true,false,false,false,
@@ -303,7 +282,7 @@
             false,true,true,false,false,true,false,false,true,true,
             true,false,false,false,true,false,true,false,false,true,
             
-            // Last 100 (images 40-49)
+            // Last 100
             false,true,true,false,true,true,true,true,true,false,
             true,false,false,true,false,true,true,true,false,true,
             false,true,false,false,true,false,true,false,false,false,
@@ -316,23 +295,17 @@
             true,false,true,false,false,true,true,false,true,true
         ];
 
-        // Initialize with simulated data
         const fullPatterns = simulatedPatterns;
 
-        document.getElementById('analyzeBtn').addEventListener('click', function() {
-            const input = document.getElementById('resultInput').value.trim().toLowerCase();
-            
-            if (input !== 'big' && input !== 'small') {
-                document.getElementById('predictionResult').innerHTML = 
-                    '<span style="color:#f00">ERROR:</span> Please enter either "Big" or "Small"';
-                return;
-            }
-            
-            // Add the new result to our patterns
-            const isBig = input === 'big';
+        // Button click handlers
+        document.getElementById('bigBtn').addEventListener('click', () => analyzeResult(true));
+        document.getElementById('smallBtn').addEventListener('click', () => analyzeResult(false));
+
+        function analyzeResult(isBig) {
+            // Add the new result
             fullPatterns.push(isBig);
             
-            // Simple prediction algorithm based on recent patterns
+            // Calculate prediction
             let prediction;
             const last10 = fullPatterns.slice(-10);
             const lastBig = last10.filter(x => x).length;
@@ -378,14 +351,14 @@
                 }
             }
             
-            // Display result with hacker-style animation
+            // Display result
             const resultDiv = document.getElementById('predictionResult');
             resultDiv.innerHTML = `
-                <div style="margin-bottom:10px;">Current result: <span class="${isBig ? 'big' : 'small'}">${input.toUpperCase()}</span></div>
+                <div style="margin-bottom:10px;">Current result: <span class="${isBig ? 'big' : 'small'}">${isBig ? 'BIG' : 'SMALL'}</span></div>
                 <div style="font-size:24px;margin:15px 0;">
                     Next prediction: 
                     <span class="${prediction.result === 'Big' ? 'big' : 'small'}" style="font-size:32px;">
-                        ${prediction.result}
+                        ${prediction.result.toUpperCase()}
                     </span>
                 </div>
                 <div>Confidence: <span class="big">${prediction.confidence}</span></div>
@@ -397,7 +370,7 @@
             
             // Update stats
             updateStats();
-        });
+        }
 
         function getLastPatterns(count) {
             const last = fullPatterns.slice(-count);
@@ -415,15 +388,12 @@
             // Update recent trends
             const last50 = fullPatterns.slice(-50);
             const last50Big = last50.filter(x => x).length;
-            const last50Small = last50.filter(x => !x).length;
             
             const last20 = fullPatterns.slice(-20);
             const last20Big = last20.filter(x => x).length;
-            const last20Small = last20.filter(x => !x).length;
             
             const last10 = fullPatterns.slice(-10);
             const last10Big = last10.filter(x => x).length;
-            const last10Small = last10.filter(x => !x).length;
             
             // Update matrix display
             const matrixDiv = document.getElementById('patternMatrix');
