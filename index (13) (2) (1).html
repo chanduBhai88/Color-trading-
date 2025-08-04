@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BDG Number Prediction Tool</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .game-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding: 10px;
+            background-color: #f0f0f0;
+            border-radius: 5px;
+        }
+        .prediction-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .number-prediction {
+            font-size: 28px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        .size-prediction {
+            font-size: 18px;
+            color: #555;
+        }
+        .win-level {
+            margin-top: 10px;
+            font-weight: bold;
+            color: #2ecc71;
+        }
+        .timer {
+            font-size: 20px;
+            text-align: center;
+            margin: 20px 0;
+            font-weight: bold;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            display: block;
+            margin: 0 auto;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        .history {
+            margin-top: 20px;
+        }
+        .history-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px;
+            border-bottom: 1px solid #eee;
+        }
+        .small {
+            color: #3498db;
+        }
+        .big {
+            color: #e74c3c;
+        }
+        .special {
+            color: #9b59b6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>BDG Number Prediction</h1>
+        <div class="game-info">
+            <div>Game: Wingo 1-Minute</div>
+            <div id="current-time">Time: 00:00:00</div>
+        </div>
+        
+        <div class="timer" id="timer">Current Round: 00:00</div>
+        
+        <div class="prediction-card">
+            <h3>Current Prediction</h3>
+            <div class="number-prediction" id="number-pred">-</div>
+            <div class="size-prediction" id="size-pred">-</div>
+            <div class="win-level" id="win-level">-</div>
+        </div>
+        
+        <button id="generate-btn">Generate Prediction</button>
+        
+        <div class="history">
+            <h3>Prediction History</h3>
+            <div id="history-list"></div>
+        </div>
+    </div>
+
+    <script>
+        const numbers = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+        // Improved weights for better win probability
+        // Small numbers (1-4) appear together, Big numbers (5-9) appear together
+        const numberWeights = [5, 20, 20, 20, 20, 15, 15, 15, 15, 15];
+        
+        // DOM elements
+        const numberPredEl = document.getElementById('number-pred');
+        const sizePredEl = document.getElementById('size-pred');
+        const winLevelEl = document.getElementById('win-level');
+        const timerEl = document.getElementById('timer');
+        const historyListEl = document.getElementById('history-list');
+        const currentTimeEl = document.getElementById('current-time');
+        const generateBtn = document.getElementById('generate-btn');
+        
+        // Weighted random selection
+        function weightedRandom(items, weights) {
+            let totalWeight = weights.reduce((a, b) => a + b, 0);
+            let random = Math.random() * totalWeight;
+            let weightSum = 0;
+            
+            for (let i = 0; i < items.length; i++) {
+                weightSum += weights[i];
+                if (random <= weightSum) return items[i];
+            }
+            
+            return items[0];
+        }
+        
+        // Update current time
+        function updateCurrentTime() {
+            const now = new Date();
+            currentTimeEl.textContent = `Time: ${now.toLocaleTimeString()}`;
+            
+            // Get current seconds (0-59)
+            const seconds = now.getSeconds();
+            const displaySeconds = seconds < 10 ? `0${seconds}` : seconds;
+            
+            // Update timer display
+            timerEl.textContent = `Current Round: 00:${displaySeconds}`;
+            
+            // Check if new minute has started (seconds = 0)
+            if(seconds === 0) {
+                generateNewPrediction();
+            }
+        }
+        
+        // Generate a prediction
+        function generatePrediction() {
+            const number = weightedRandom(numbers, numberWeights);
+            let size, winLevel;
+            
+            if (number === 0) {
+                size = "Special (0)";
+                winLevel = "Win Level: 3 (High)";
+            } else if (number < 5) {
+                // For small numbers, predict the next 2 small numbers
+                const nextSmall1 = weightedRandom([1, 2, 3, 4], [25, 25, 25, 25]);
+                const nextSmall2 = weightedRandom([1, 2, 3, 4], [25, 25, 25, 25]);
+                size = `Small (${number}, ${nextSmall1}, ${nextSmall2})`;
+                winLevel = "Win Level: 1 (Medium)";
+            } else {
+                // For big numbers, predict the next 2 big numbers
+                const nextBig1 = weightedRandom([5, 6, 7, 8, 9], [20, 20, 20, 20, 20]);
+                const nextBig2 = weightedRandom([5, 6, 7, 8, 9], [20, 20, 20, 20, 20]);
+                size = `Big (${number}, ${nextBig1}, ${nextBig2})`;
+                winLevel = "Win Level: 2 (High)";
+            }
+            
+            return { number, size, winLevel };
+        }
+        
+        // Generate and display new prediction
+        function generateNewPrediction() {
+            const prediction = generatePrediction();
+            displayPrediction(prediction);
+        }
+        
+        // Display prediction
+        function displayPrediction(prediction) {
+            // Clear previous classes
+            numberPredEl.className = 'number-prediction';
+            
+            // Set new prediction
+            numberPredEl.textContent = prediction.number;
+            
+            // Add appropriate class
+            if (prediction.number === 0) {
+                numberPredEl.classList.add('special');
+            } else if (prediction.number < 5) {
+                numberPredEl.classList.add('small');
+            } else {
+                numberPredEl.classList.add('big');
+            }
+            
+            sizePredEl.textContent = prediction.size;
+            winLevelEl.textContent = prediction.winLevel;
+            
+            // Add to history
+            const now = new Date();
+            const historyItem = document.createElement('div');
+            historyItem.className = 'history-item';
+            
+            // Determine size class for history item
+            let sizeClass = '';
+            if (prediction.number === 0) {
+                sizeClass = 'special';
+            } else if (prediction.number < 5) {
+                sizeClass = 'small';
+            } else {
+                sizeClass = 'big';
+            }
+            
+            historyItem.innerHTML = `
+                <span>${now.toLocaleTimeString()}</span>
+                <span class="${sizeClass}">${prediction.number}</span>
+                <span>${prediction.size}</span>
+                <span class="win-level">${prediction.winLevel.split(":")[1].trim()}</span>
+            `;
+            historyListEl.prepend(historyItem);
+            
+            // Keep only last 10 history items
+            if (historyListEl.children.length > 10) {
+                historyListEl.removeChild(historyListEl.lastChild);
+            }
+        }
+        
+        // Initialize
+        updateCurrentTime();
+        setInterval(updateCurrentTime, 1000);
+        
+        // Generate initial prediction
+        generateNewPrediction();
+        
+        // Button click handler
+        generateBtn.addEventListener('click', generateNewPrediction);
+    </script>
+</body>
+</html>
