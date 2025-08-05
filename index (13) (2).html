@@ -1,232 +1,220 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="hi">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>❤️ RajaGame Predictor (Big/Small)</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RAJA GAMES - Predictor</title>
   <style>
     body {
-      margin: 0;
       font-family: 'Segoe UI', sans-serif;
-      background: url('https://images.unsplash.com/photo-1589998059171-988d887df646?auto=format&fit=crop&w=1470&q=80') no-repeat center center fixed;
-      background-size: cover;
+      background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
       color: #fff;
-    }
-
-    .container {
-      background: rgba(0, 0, 0, 0.75);
-      max-width: 500px;
-      margin: 50px auto;
+      text-align: center;
       padding: 20px;
-      border-radius: 20px;
-      box-shadow: 0 0 25px rgba(255,0,100,0.5);
-      text-align: center;
     }
-
-    h2 {
-      margin-bottom: 20px;
+    h1 {
+      color: #ff69b4;
+      font-size: 32px;
+      text-shadow: 1px 1px 4px #000;
     }
-
-    .inputs {
+    .grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(8, 50px);
       gap: 10px;
-      justify-items: center;
-      margin-bottom: 20px;
+      justify-content: center;
+      margin: 20px 0;
     }
-
-    select {
+    .bs-btn {
+      background: #333;
+      color: #fff;
+      border: 2px solid #777;
       padding: 10px;
-      font-size: 1rem;
+      font-size: 18px;
+      cursor: pointer;
       border-radius: 8px;
-      border: none;
-      width: 100px;
-      text-align: center;
+      transition: transform 0.2s;
     }
-
+    .bs-btn:hover {
+      transform: scale(1.1);
+    }
+    .bs-btn.B {
+      background: #1976d2;
+    }
+    .bs-btn.S {
+      background: #d32f2f;
+    }
+    #result {
+      font-size: 24px;
+      margin-top: 20px;
+    }
+    .history {
+      margin-top: 30px;
+      text-align: left;
+      max-width: 500px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .history-item {
+      background: #222;
+      padding: 8px;
+      margin-bottom: 5px;
+      border-radius: 5px;
+      font-family: monospace;
+    }
     button {
-      width: 100%;
-      padding: 12px;
-      font-size: 1rem;
-      background-color: #ff4081;
+      margin: 5px;
+      padding: 10px 20px;
+      font-size: 18px;
       border: none;
       border-radius: 10px;
-      color: white;
       cursor: pointer;
+      background: #ff4081;
+      color: white;
+      transition: background 0.3s;
     }
-
-    .result {
-      margin-top: 20px;
-      font-weight: bold;
-      font-size: 1.5rem;
-      color: #ff4d4d;
-      opacity: 0;
-      transform: scale(0.9);
-      transition: all 0.5s ease-in-out;
-    }
-
-    .result.show {
-      opacity: 1;
-      transform: scale(1.2);
-      animation: pulse 1s infinite alternate;
-    }
-
-    @keyframes pulse {
-      from {
-        color: #ff4d4d;
-        text-shadow: 0 0 5px #ff4d4d;
-      }
-      to {
-        color: #ffeb3b;
-        text-shadow: 0 0 10px #ffeb3b;
-      }
-    }
-
-    .memory {
-      margin-top: 25px;
-      text-align: left;
-      background: rgba(255, 255, 255, 0.1);
-      padding: 15px;
-      border-radius: 12px;
-    }
-
-    .memory h4 {
-      margin: 0 0 10px;
-      font-size: 1rem;
-      color: #ffc0cb;
-    }
-
-    .memory ul {
-      padding-left: 20px;
-      margin: 0;
-    }
-
-    .memory li {
-      margin-bottom: 4px;
-      color: #fff;
+    button:hover {
+      background: #f50057;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h2>❤️ RajaGame Predictor</h2>
-    <div class="inputs" id="input-container"></div>
-    <button onclick="predict()">🔮 Predict Next</button>
-    <div class="result" id="result">Enter last 7 Big/Small results.</div>
 
-    <div class="memory" id="memory-box">
-      <h4>🧠 Last 5 Predictions:</h4>
-      <ul id="memory-list"></ul>
-    </div>
+  <h1>❤️ RAJA GAMES Predictor</h1>
+
+  <div class="grid" id="inputGrid"></div>
+
+  <button onclick="predictNext()">🔮 Predict Next</button>
+  <button onclick="clearSelection()">🧹 Clear</button>
+
+  <div id="result">अगला परिणाम: -</div>
+
+  <div class="history">
+    <h3>🧠 Last 10 Predictions:</h3>
+    <div id="historyList"></div>
   </div>
 
-  <!-- Sound Effects -->
-  <audio id="successSound" src="https://cdn.pixabay.com/audio/2023/03/25/audio_c6191129df.mp3"></audio>
-  <audio id="errorSound" src="https://cdn.pixabay.com/audio/2022/03/15/audio_37f6e33a1f.mp3"></audio>
-  <audio id="resultTune" src="Phone Notification Sound.mp3"></audio>
-
   <script>
-    const history = [
-      // Merged history (old + your data)
-      "Small", "Small", "Small", "Big", "Big", "Small", "Big", "Small", "Small", "Small",
-      "Big", "Small", "Big", "Big", "Big", "Small", "Small", "Small", "Small", "Small",
-      'Small', 'Small', 'Big', 'Big', 'Small', 'Small', 'Big', 'Small', 'Big', 'Big',
-      'Small', 'Small', 'Big', 'Small', 'Big', 'Big', 'Small', 'Small', 'Big', 'Small',
-      'Big', 'Big', 'Small', 'Big', 'Big', 'Small', 'Small', 'Big', 'Small', 'Big',
-      'Big', 'Small', 'Big', 'Big', 'Big', 'Big', 'Small', 'Small', 'Small', 'Big',
-      'Small', 'Small', 'Big', 'Small', 'Small',
-      'Small', 'Big', 'Big', 'Small', 'Big', 'Big', 'Small', 'Big', 'Small', 'Big',
-      'Big', 'Small', 'Big', 'Big', 'Small', 'Big', 'Small', 'Big', 'Big', 'Big',
-      'Small', 'Small', 'Big', 'Small', 'Big', 'Big', 'Big', 'Small', 'Big', 'Big',
-      'Small', 'Big', 'Big', 'Big', 'Big', 'Small', 'Small', 'Small', 'Big', 'Small',
-      'Small', 'Big', 'Small', 'Small', 'Small', 'Big', 'Small', 'Small', 'Big', 'Big',
-      'Small', 'Small', 'Big', 'Small', 'Big', 'Big', 'Small', 'Small', 'Big', 'Small',
-      'Small', 'Big', 'Big', 'Big', 'Small', 'Small', 'Small', 'Small', 'Small', 'Small',
-      'Big', 'Small', 'Small', 'Small', 'Big', 'Small', 'Small', 'Big', 'Big', 'Small',
-      'Big', 'Big', 'Small', 'Small', 'Big', 'Small', 'Small', 'Big', 'Big', 'Small',
-      'Small', 'Small', 'Big', 'Big', 'Small', 'Small', 'Small', 'Big', 'Small', 'Big',
-      'Small', 'Small', 'Small', 'Big', 'Big', 'Big', 'Small', 'Big', 'Small', 'Small',
-      'Big', 'Small', 'Small', 'Big', 'Small', 'Big', 'Small', 'Small', 'Small', 'Big',
-      'Small', 'Big', 'Small', 'Small', 'Small', 'Big', 'Big', 'Big', 'Big', 'Small'
+    const patternsDatabase = [
+      // 👇 Original 50+ patterns (from your original code)
+      ['B','B','B','S','S','B','B','B','S','S'], ['S','S','B','B','S','S','S','B','B','S'],
+      ['B','S','B','S','B','S','B','S','B','S'], ['B','B','S','S','B','B','S','S','B','B'],
+      ['B','B','B','B','S','S','S','S','B','B'], ['S','B','S','B','S','B','S','B','S','B'],
+      ['B','S','S','B','B','S','S','B','B','S'], ['S','S','S','B','B','B','S','S','S','B'],
+      ['B','B','S','B','S','B','B','S','B','S'], ['B','S','S','B','B','S','S','B','B','S'],
+      ['S','B','S','B','B','B','S','S','B','S'], ['S','B','B','B','B','S','B','B','B','B'],
+      ['B','B','B','B','B','B','B','B','B','B'], ['S','B','S','S','S','B','B','S','B','B'],
+      ['B','S','S','B','B','S','S','B','B','B'], ['B','B','B','B','B','S','S','B','B','S'],
+      ['B','S','S','B','B','B','B','B','B','B'], ['B','S','S','B','B','B','B','S','S','S'],
+      ['B','B','S','B','B','B','S','S','B','S'], ['B','S','S','S','S','B','S','S','S','S'],
+      ['B','B','B','B','B','B','B','S','S','S'], ['S','S','S','B','S','S','B','S','S','B'],
+      ['B','B','S','S','B','B','B','B','S','S'], ['S','S','S','B','S','S','B','S','S','B'],
+      ['B','B','S','S','S','S','B','S','B','B'], ['S','B','S','S','B','B','S','S','S','B'],
+      ['B','B','B','S','S','S','B','B','S','B'], ['S','S','B','B','S','B','S','S','B','B'],
+      ['S','S','S','S','B','B','B','B','S','S'], ['S','B','S','S','S','B','S','S','S','S'],
+      ['B','S','B','B','B','S','S','B','B','B'], ['B','B','S','S','B','B','B','B','S','S'],
+      ['S','B','B','S','S','B','S','S','B','S'], ['B','S','B','B','B','B','S','S','B','B'],
+      ['B','B','B','B','S','B','S','B','B','B'], ['S','B','B','B','S','B','B','B','B','B'],
+      ['S','S','S','S','B','B','B','B','B','S'], ['B','B','B','B','B','B','S','B','B','B'],
+      ['S','B','S','B','B','S','B','B','S','B'], ['B','S','B','S','B','B','S','B','B','B'],
+      ['S','B','B','S','B','B','B','S','B','B'], ['B','S','S','B','B','B','B','S','B','B'],
+      ['B','B','S','S','B','B','S','B','B','B'], ['B','B','B','B','B','S','B','B','B','B'],
+      ['S','B','B','B','B','B','S','B','B','B'], ['B','B','S','B','B','B','B','S','B','B'],
+      ['B','S','B','B','B','B','S','B','B','B'], ['B','B','B','B','B','B','B','B','B','B'],
+
+      // 👇 New 11 patterns you just gave (added at bottom)
+      ['B', 'S', 'S', 'S', 'S', 'S', 'B', 'B', 'S'],
+      ['S', 'B', 'S', 'S', 'S', 'S', 'B', 'B', 'S', 'S'],
+      ['S', 'S', 'B', 'B', 'S', 'B', 'S', 'S', 'S', 'S'],
+      ['S', 'B', 'B', 'S', 'B', 'S', 'B', 'B', 'S', 'S'],
+      ['S', 'S', 'B', 'S', 'S', 'S', 'B', 'B', 'B', 'B'],
+      ['S', 'S', 'S', 'S', 'S', 'B', 'S', 'S', 'S'],
+      ['B', 'B', 'B', 'S', 'S', 'S', 'S', 'S', 'S', 'B'],
+      ['S', 'B', 'B', 'B', 'B', 'B', 'B', 'S', 'S', 'S'],
+      ['B', 'B', 'S', 'S', 'B', 'S', 'S', 'S', 'S', 'B'],
+      ['S', 'S', 'B', 'B', 'B', 'S', 'S', 'B'],
+      ['S', 'S', 'B', 'B', 'S', 'B', 'S', 'S', 'B', 'B']
     ];
 
-    const container = document.getElementById("input-container");
-    const resultBox = document.getElementById("result");
-    const memoryList = document.getElementById("memory-list");
-    const memory = [];
-    const inputLength = 7;
+    let selected = Array(8).fill(null);
+    let predictionHistory = [];
 
-    // Create dropdowns
-    for (let i = 0; i < inputLength; i++) {
-      const select = document.createElement("select");
-      ["--", "Big", "Small"].forEach(val => {
-        const opt = document.createElement("option");
-        opt.value = val === "--" ? "" : val;
-        opt.textContent = val;
-        select.appendChild(opt);
-      });
-      select.id = "s" + i;
-      container.appendChild(select);
-    }
-
-    function playSound(id) {
-      const sound = document.getElementById(id);
-      if (sound) {
-        sound.currentTime = 0;
-        sound.play();
+    function initInputGrid() {
+      const grid = document.getElementById('inputGrid');
+      grid.innerHTML = '';
+      for (let i = 0; i < 8; i++) {
+        const btn = document.createElement('button');
+        btn.className = 'bs-btn';
+        btn.textContent = '-';
+        btn.dataset.index = i;
+        btn.onclick = () => toggle(btn);
+        grid.appendChild(btn);
       }
     }
 
-    function showResult(msg, success) {
-      resultBox.innerHTML = msg;
-      playSound("resultTune");
-      if (success) {
-        resultBox.classList.add("show");
-        playSound("successSound");
+    function toggle(btn) {
+      const index = parseInt(btn.dataset.index);
+      if (!selected[index]) {
+        selected[index] = 'B';
+        btn.textContent = 'B';
+        btn.className = 'bs-btn B';
+      } else if (selected[index] === 'B') {
+        selected[index] = 'S';
+        btn.textContent = 'S';
+        btn.className = 'bs-btn S';
       } else {
-        resultBox.classList.remove("show");
-        playSound("errorSound");
+        selected[index] = null;
+        btn.textContent = '-';
+        btn.className = 'bs-btn';
       }
     }
 
-    function updateMemory(entry) {
-      memory.unshift(entry);
-      if (memory.length > 5) memory.pop();
-      memoryList.innerHTML = memory.map(item => `<li>${item}</li>`).join('');
+    function clearSelection() {
+      selected = Array(8).fill(null);
+      initInputGrid();
+      document.getElementById('result').innerText = 'अगला परिणाम: -';
     }
 
-    function predict() {
-      const pattern = [];
-      for (let i = 0; i < inputLength; i++) {
-        const val = document.getElementById("s" + i).value;
-        if (!val) {
-          showResult("❌ Please select all 7 inputs.", false);
-          return;
+    function predictNext() {
+      if (selected.includes(null)) {
+        alert("कृपया 8 इनपुट चुनें (B/S)");
+        return;
+      }
+
+      const inputStr = selected.join('');
+      let found = false;
+
+      for (const pattern of patternsDatabase) {
+        for (let i = 0; i <= pattern.length - 9; i++) {
+          const slice = pattern.slice(i, i + 8).join('');
+          if (slice === inputStr) {
+            const nextValue = pattern[i + 8];
+            showResult(nextValue);
+            addHistory(inputStr, nextValue);
+            found = true;
+            break;
+          }
         }
-        pattern.push(val);
+        if (found) break;
       }
 
-      const strPattern = pattern.join("-");
-      for (let i = 0; i <= history.length - (inputLength + 1); i++) {
-        const current = history.slice(i, i + inputLength).join("-");
-        if (current === strPattern) {
-          const next = history[i + inputLength];
-          showResult(`✅ Matched! Predicted Next: <b>${next}</b>`, true);
-          updateMemory(`✅ ${strPattern} ➜ <b>${next}</b>`);
-          return;
-        }
+      if (!found) {
+        document.getElementById('result').innerHTML = "🔍 <b>Result: No Match</b>";
       }
-
-      // Fallback logic
-      const bigCount = pattern.filter(p => p === "Big").length;
-      const smallCount = pattern.filter(p => p === "Small").length;
-      const fallback = bigCount > smallCount ? "Small" : "Big";
-
-      showResult(`⚠️ Pattern not found. Fallback: <b>${fallback}</b><br>
-        <img src="https://via.placeholder.com/500x200/ffb6c1/000000?text=Heart+Fallback" alt="No Match" style="margin-top:10px; max-width:100%; border-radius:12px;">`, false);
-
-      updateMemory(`⚠️ ${strPattern} ➜ <b>${fallback}</b> (fallback)`);
     }
+
+    function showResult(val) {
+      document.getElementById('result').innerHTML = `✅ अगला परिणाम: <b>${val}</b>`;
+    }
+
+    function addHistory(input, output) {
+      predictionHistory.unshift(`${input} → ${output}`);
+      if (predictionHistory.length > 10) predictionHistory.pop();
+
+      const historyDiv = document.getElementById('historyList');
+      historyDiv.innerHTML = predictionHistory.map(h => `<div class="history-item">${h}</div>`).join('');
+    }
+
+    window.onload = initInputGrid;
   </script>
 </body>
 </html>
