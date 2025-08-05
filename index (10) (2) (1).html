@@ -1,258 +1,145 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="hi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WINGO LIVE BIG-SMALL PREDICTOR</title>
+    <title>RAJA GAMES - Big/Small Predictor</title>
     <style>
         body {
             font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, #ff0000, #cc0000);
-            color: white;
-            text-align: center;
-            margin: 0;
-            padding: 20px;
-            min-height: 100vh;
-        }
-        
-        .container {
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 15px;
-            padding: 20px;
-            max-width: 500px;
+            max-width: 600px;
             margin: 0 auto;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
-            border: 2px solid gold;
+            padding: 20px;
+            background-color: #f5f5f5;
         }
-        
-        h1 {
-            font-size: 2.2rem;
-            margin-bottom: 15px;
-            text-shadow: 2px 2px 4px #000;
-            color: #fff;
-        }
-        
-        .clock {
-            font-size: 1.5rem;
-            margin: 10px 0;
-            color: #ffff00;
-        }
-        
-        .timer-container {
-            background: rgba(0, 0, 0, 0.5);
-            border-radius: 50%;
-            width: 150px;
-            height: 150px;
-            margin: 20px auto;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 3px solid gold;
-        }
-        
-        .timer {
-            font-size: 2.5rem;
-            font-weight: bold;
-            color: #ffff00;
-            text-shadow: 0 0 10px #ffff00;
-        }
-        
-        .prediction-box {
-            background: rgba(255, 255, 255, 0.15);
-            padding: 15px;
+        .container {
+            background-color: white;
+            padding: 20px;
             border-radius: 10px;
-            margin: 20px 0;
-            border: 1px dashed white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
         }
-        
-        .prediction {
-            font-size: 3rem;
-            font-weight: bold;
+        h1 {
+            color: #d35400;
+            text-align: center;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
             margin: 10px 0;
-            text-shadow: 2px 2px 4px #000;
-        }
-        
-        .big {
-            color: #00ff00;
-        }
-        
-        .small {
-            color: #00bfff;
-        }
-        
-        .history {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            margin-top: 20px;
-            flex-wrap: wrap;
-        }
-        
-        .history-item {
-            background: rgba(255, 255, 255, 0.2);
-            padding: 8px 15px;
+            border: 1px solid #ddd;
             border-radius: 5px;
-            font-weight: bold;
-            min-width: 60px;
         }
-        
-        .status {
-            margin-top: 15px;
-            font-style: italic;
-            color: #ffff00;
+        button {
+            background-color: #2ecc71;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            margin: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button.wrong {
+            background-color: #e74c3c;
+        }
+        #result {
+            font-size: 24px;
+            font-weight: bold;
+            margin: 20px 0;
+            text-align: center;
+            min-height: 40px;
+        }
+        .correct {
+            color: #27ae60;
+        }
+        .random {
+            color: #f39c12;
+        }
+        .pattern-info {
+            font-size: 14px;
+            color: #7f8c8d;
+            margin-top: 20px;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🎰 WINGO BIG-SMALL PREDICTOR</h1>
-        
-        <!-- REAL-TIME CLOCK -->
-        <div class="clock" id="realTimeClock"></div>
-        
-        <!-- COUNTDOWN TIMER -->
-        <div class="timer-container">
-            <div class="timer" id="countdownTimer">00:00</div>
-        </div>
-        
-        <div class="prediction-box">
-            <div>Next Prediction:</div>
-            <div class="prediction" id="predictionText">-</div>
-        </div>
-        
-        <div class="status" id="statusText">Loading...</div>
+        <h1>RAJA GAMES</h1>
+        <h2>Big/Small Predictor</h2>
         
         <div>
-            <div>Last Results:</div>
-            <div class="history" id="historyResults"></div>
+            <label for="userInput">8 अंकों का B/S इनपुट दें (जैसे: BBSSBSBB):</label>
+            <input type="text" id="userInput" maxlength="8" placeholder="BBSSBSBB">
+            <button onclick="predictNext()">Predict Next</button>
+        </div>
+        
+        <div id="result">अगला परिणाम: -</div>
+        
+        <div>
+            <button onclick="handleChoice('right')">✔ Right</button>
+            <button class="wrong" onclick="handleChoice('wrong')">✖ Wrong</button>
+        </div>
+        
+        <div class="pattern-info">
+            <p>पैटर्न डेटा: 
+                <span id="patternData">B,B,B,S,S,B,B,B,S,S,B,S,B,S,B,B,B,B,B,B</span>
+            </p>
         </div>
     </div>
 
     <script>
-        // Game Variables
-        let gameHistory = [];
-        const MAX_HISTORY = 5;
-        
-        // DOM Elements
-        const realTimeClock = document.getElementById('realTimeClock');
-        const countdownTimer = document.getElementById('countdownTimer');
-        const predictionText = document.getElementById('predictionText');
-        const statusText = document.getElementById('statusText');
-        const historyResults = document.getElementById('historyResults');
-        
-        // Initialize
-        updateRealTimeClock();
-        startNewRound();
-        
-        // Update Real-Time Clock (HH:MM:SS)
-        function updateRealTimeClock() {
-            const now = new Date();
-            const hours = now.getHours().toString().padStart(2, '0');
-            const minutes = now.getMinutes().toString().padStart(2, '0');
-            const seconds = now.getSeconds().toString().padStart(2, '0');
+        // आपके इमेजेस से निकाला गया पैटर्न
+        const pattern = ['B', 'B', 'B', 'S', 'S', 'B', 'B', 'B', 'S', 'S', 'B', 'S', 'B', 'S', 'B', 'B', 'B', 'B', 'B', 'B'];
+        let userSequence = [];
+        let currentPrediction = '';
+
+        function predictNext() {
+            const input = document.getElementById('userInput').value.toUpperCase();
             
-            realTimeClock.textContent = `Current Time: ${hours}:${minutes}:${seconds}`;
-            
-            setTimeout(updateRealTimeClock, 1000);
-        }
-        
-        // Start New Round (Every 1 Minute)
-        function startNewRound() {
-            const now = new Date();
-            const currentSeconds = now.getSeconds();
-            const secondsLeft = 60 - currentSeconds;
-            
-            // Update Countdown Timer
-            updateCountdown(secondsLeft);
-            
-            // Generate Prediction at :00 seconds
-            if (currentSeconds === 0) {
-                generateResult();
+            if (input.length !== 8 || !/^[BS]+$/.test(input)) {
+                alert("कृपया ठीक 8 अंक B/S में दें!");
+                return;
             }
             
-            // Check every second
-            setTimeout(startNewRound, 1000);
+            userSequence = input.split('');
+            updatePrediction();
         }
-        
-        // Update Countdown Display
-        function updateCountdown(seconds) {
-            const displaySeconds = seconds % 60;
-            countdownTimer.textContent = `00:${displaySeconds.toString().padStart(2, '0')}`;
+
+        function updatePrediction() {
+            const resultDiv = document.getElementById('result');
             
-            // Update Status
-            if (seconds > 10) {
-                statusText.textContent = `Next result in ${seconds} seconds`;
+            // पैटर्न मिलान
+            for (let i = 0; i < pattern.length - userSequence.length; i++) {
+                const match = pattern.slice(i, i + userSequence.length).join('') === userSequence.join('');
+                if (match) {
+                    currentPrediction = pattern[i + userSequence.length];
+                    resultDiv.innerHTML = `अगला परिणाम: <span class="correct">${currentPrediction}</span>`;
+                    return;
+                }
+            }
+            
+            // डिफॉल्ट (रैंडम)
+            currentPrediction = Math.random() > 0.5 ? 'B' : 'S';
+            resultDiv.innerHTML = `अगला परिणाम: <span class="random">${currentPrediction} (रैंडम)</span>`;
+        }
+
+        function handleChoice(choice) {
+            if (!userSequence.length) {
+                alert("पहले Predict बटन दबाएं!");
+                return;
+            }
+            
+            if (choice === 'right') {
+                userSequence.push(currentPrediction);
+                alert(`सीक्वेंस अपडेट की गई: ${userSequence.join('')}`);
             } else {
-                statusText.textContent = `Get ready! Result coming in ${seconds}...`;
-            }
-        }
-        
-        // Generate New Result
-        function generateResult() {
-            // 1. Generate Random Result (BIG/SMALL)
-            const result = Math.random() > 0.5 ? 'BIG' : 'SMALL';
-            
-            // 2. Generate Prediction (Smart Algorithm)
-            const prediction = calculatePrediction();
-            
-            // 3. Update Display
-            predictionText.textContent = prediction;
-            predictionText.className = `prediction ${prediction.toLowerCase()}`;
-            
-            // 4. Add to History
-            gameHistory.unshift({
-                result,
-                prediction,
-                time: new Date().toLocaleTimeString()
-            });
-            
-            if (gameHistory.length > MAX_HISTORY) {
-                gameHistory.pop();
+                const newDigit = Math.random() > 0.5 ? 'B' : 'S';
+                userSequence.push(newDigit);
+                alert(`नया अंक जोड़ा: ${newDigit}\nनया सीक्वेंस: ${userSequence.join('')}`);
             }
             
-            updateHistoryDisplay();
-            
-            // 5. Show Result for 10 Seconds
-            statusText.textContent = `Result: ${result} (Predicted: ${prediction})`;
-        }
-        
-        // Smart Prediction Algorithm
-        function calculatePrediction() {
-            if (gameHistory.length < 3) {
-                return Math.random() > 0.5 ? 'BIG' : 'SMALL';
-            }
-            
-            // Analyze Last 3 Results
-            const lastThree = gameHistory.slice(0, 3);
-            const resultCount = { BIG: 0, SMALL: 0 };
-            
-            lastThree.forEach(item => {
-                resultCount[item.result]++;
-            });
-            
-            // Opposite Strategy
-            if (resultCount.BIG > resultCount.SMALL) {
-                return 'SMALL';
-            } else if (resultCount.SMALL > resultCount.BIG) {
-                return 'BIG';
-            }
-            
-            return Math.random() > 0.5 ? 'BIG' : 'SMALL';
-        }
-        
-        // Update History Display
-        function updateHistoryDisplay() {
-            historyResults.innerHTML = '';
-            
-            gameHistory.forEach(item => {
-                const historyItem = document.createElement('div');
-                historyItem.className = `history-item ${item.result.toLowerCase()}`;
-                historyItem.innerHTML = `
-                    <div>${item.result}</div>
-                    <small>${item.time}</small>
-                `;
-                historyResults.appendChild(historyItem);
-            });
+            updatePrediction();
         }
     </script>
 </body>
