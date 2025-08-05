@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="hi">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>RAJA GAMES - Predictor</title>
   <style>
     body {
@@ -94,66 +94,7 @@
   </div>
 
   <script>
-    const patternsDatabase = [
-      ['B','B','B','S','S','B','B','B','S','S'],
-      ['S','S','B','B','S','S','S','B','B','S'],
-      ['B','S','B','S','B','S','B','S','B','S'],
-      ['B','B','S','S','B','B','S','S','B','B'],
-      ['B','B','B','B','S','S','S','S','B','B'],
-      ['S','B','S','B','S','B','S','B','S','B'],
-      ['B','S','S','B','B','S','S','B','B','S'],
-      ['S','S','S','B','B','B','S','S','S','B'],
-      ['B','B','S','B','S','B','B','S','B','S'],
-      ['B','S','S','B','B','S','S','B','B','S'],
-      ['S','B','S','B','B','B','S','S','B','S'],
-      ['S','B','B','B','B','S','B','B','B','B'],
-      ['B','B','B','B','B','B','B','B','B','B'],
-      ['S','B','S','S','S','B','B','S','B','B'],
-      ['B','S','S','B','B','S','S','B','B','B'],
-      ['B','B','B','B','B','S','S','B','B','S'],
-      ['B','S','S','B','B','B','B','B','B','B'],
-      ['B','S','S','B','B','B','B','S','S','S'],
-      ['B','B','S','B','B','B','S','S','B','S'],
-      ['B','S','S','S','S','B','S','S','S','S'],
-      ['B','B','B','B','B','B','B','S','S','S'],
-      ['S','S','S','B','S','S','B','S','S','B'],
-      ['B','B','S','S','B','B','B','B','S','S'],
-      ['S','S','S','B','S','S','B','S','S','B'],
-      ['B','B','S','S','S','S','B','S','B','B'],
-      ['S','B','S','S','B','B','S','S','S','B'],
-      ['B','B','B','S','S','S','B','B','S','B'],
-      ['S','S','B','B','S','B','S','S','B','B'],
-      ['S','S','S','S','B','B','B','B','S','S'],
-      ['S','B','S','S','S','B','S','S','S','S'],
-      ['B','S','B','B','B','S','S','B','B','B'],
-      ['B','B','S','S','B','B','B','B','S','S'],
-      ['S','B','B','S','S','B','S','S','B','S'],
-      ['B','S','B','B','B','B','S','S','B','B'],
-      ['B','B','B','B','S','B','S','B','B','B'],
-      ['S','B','B','B','S','B','B','B','B','B'],
-      ['S','S','S','S','B','B','B','B','B','S'],
-      ['B','B','B','B','B','B','S','B','B','B'],
-      ['S','B','S','B','B','S','B','B','S','B'],
-      ['B','S','B','S','B','B','S','B','B','B'],
-      ['S','B','B','S','B','B','B','S','B','B'],
-      ['B','S','S','B','B','B','B','S','B','B'],
-      ['B','B','S','S','B','B','S','B','B','B'],
-      ['B','B','B','B','B','S','B','B','B','B'],
-      ['S','B','B','B','B','B','S','B','B','B'],
-      ['B','B','S','B','B','B','B','S','B','B'],
-      ['B','S','B','B','B','B','S','B','B','B'],
-      ['B','B','B','B','B','B','B','B','B','B'],
-      ['B','S','S','S','S','S','B','B','S'],
-      ['S','B','S','S','S','S','B','B','S','S'],
-      ['S','S','B','B','S','B','S','S','S','S'],
-      ['S','B','B','S','B','S','B','B','S','S'],
-      ['S','S','B','S','S','S','B','B','B','B'],
-      ['S','S','S','S','S','B','S','S','S'],
-      ['B','B','B','S','S','S','S','S','S','B'],
-      ['S','B','B','B','B','B','B','S','S','S'],
-      ['B','B','S','S','B','S','S','S','S','B'],
-      ['S','S','B','B','S','B','S','S','B','B']
-    ];
+    const patternSequence = [...'SBBSBBBSBBBSBBSBBSBSBSSSSSSSSSBSBBSSSBBSBBSSBBBSSBSSSSSBBBBSSSBBSBBBSSBBBSBSBSSBBBBBSBBSBSSSBBSSSBBBBBSBBSSBBSSSBSBBSBSSSSBSSBBSBSSBBBSSBSSSSBBBBBSSSSSSBSSSBBBBSBSBBBSSBSBBSSBSBBBBSBSSSSSSBBSBSBSSBSBSBSBSBSBBSSSBBBBSBSBBSBBSSSBBSSBSBBBSBBBSBSBBSBSBBSSSBBSBSSSSB'];
 
     let selected = Array(8).fill(null);
     let predictionHistory = [];
@@ -201,23 +142,14 @@
       }
 
       const inputStr = selected.join('');
-      let found = false;
+      const patternStr = patternSequence.join('');
+      const index = patternStr.indexOf(inputStr);
 
-      for (const pattern of patternsDatabase) {
-        for (let i = 0; i <= pattern.length - 9; i++) {
-          const slice = pattern.slice(i, i + 8).join('');
-          if (slice === inputStr) {
-            const nextValue = pattern[i + 8];
-            showResult(nextValue);
-            addHistory(inputStr, nextValue);
-            found = true;
-            break;
-          }
-        }
-        if (found) break;
-      }
-
-      if (!found) {
+      if (index !== -1 && index + 8 < patternSequence.length) {
+        const nextValue = patternSequence[index + 8];
+        showResult(nextValue);
+        addHistory(inputStr, nextValue);
+      } else {
         document.getElementById('result').innerHTML = "🔍 <b>Result: No Match</b>";
       }
     }
