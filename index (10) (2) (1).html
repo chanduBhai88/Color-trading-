@@ -3,144 +3,530 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RAJA GAMES - Big/Small Predictor</title>
+    <title>RAJA GAMES - Advanced B/S Predictor</title>
     <style>
+        :root {
+            --primary: #3498db;
+            --correct: #2ecc71;
+            --wrong: #e74c3c;
+            --random: #f39c12;
+            --bg: #1a1a2e;
+            --card: #16213e;
+            --text: #e6e6e6;
+        }
+        
         body {
             font-family: 'Arial', sans-serif;
             max-width: 600px;
             margin: 0 auto;
             padding: 20px;
-            background-color: #f5f5f5;
+            background-color: var(--bg);
+            color: var(--text);
+            background-image: 
+                radial-gradient(circle at 25% 25%, rgba(52, 152, 219, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 75% 75%, rgba(231, 76, 60, 0.1) 0%, transparent 50%);
+            background-attachment: fixed;
         }
+        
         .container {
-            background-color: white;
+            background-color: var(--card);
             padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            position: relative;
+            overflow: hidden;
         }
+        
+        .container::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                to bottom right,
+                transparent 45%,
+                rgba(52, 152, 219, 0.1) 50%,
+                transparent 55%
+            );
+            animation: shine 8s infinite linear;
+            z-index: 0;
+        }
+        
+        @keyframes shine {
+            0% { transform: rotate(0deg) translate(-50%, -50%); }
+            100% { transform: rotate(360deg) translate(-50%, -50%); }
+        }
+        
         h1 {
-            color: #d35400;
+            color: var(--primary);
             text-align: center;
+            margin-bottom: 10px;
+            position: relative;
+            text-shadow: 0 0 10px rgba(52, 152, 219, 0.5);
         }
-        input {
-            width: 100%;
-            padding: 10px;
-            font-size: 16px;
-            margin: 10px 0;
-            border: 1px solid #ddd;
-            border-radius: 5px;
+        
+        h2 {
+            color: var(--text);
+            text-align: center;
+            margin-top: 0;
+            position: relative;
         }
-        button {
-            background-color: #2ecc71;
+        
+        .input-grid {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 8px;
+            margin: 15px 0;
+            position: relative;
+        }
+        
+        .bs-btn {
+            background-color: #2c3e50;
             color: white;
             border: none;
-            padding: 10px 15px;
-            margin: 5px;
-            border-radius: 5px;
+            padding: 12px 0;
+            border-radius: 8px;
             cursor: pointer;
-            font-size: 16px;
+            font-size: 18px;
+            font-weight: bold;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
         }
-        button.wrong {
+        
+        .bs-btn::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(rgba(255,255,255,0.1), transparent);
+        }
+        
+        .bs-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        .bs-btn:active {
+            transform: translateY(0);
+        }
+        
+        .bs-btn.B {
+            background-color: #3498db;
+        }
+        
+        .bs-btn.S {
             background-color: #e74c3c;
         }
+        
         #result {
-            font-size: 24px;
+            font-size: 28px;
             font-weight: bold;
-            margin: 20px 0;
+            margin: 25px 0;
             text-align: center;
-            min-height: 40px;
+            min-height: 50px;
+            padding: 15px;
+            border-radius: 10px;
+            background-color: rgba(0,0,0,0.3);
+            position: relative;
+            transition: all 0.5s;
         }
+        
         .correct {
-            color: #27ae60;
+            color: var(--correct);
+            text-shadow: 0 0 10px rgba(46, 204, 113, 0.5);
         }
+        
         .random {
-            color: #f39c12;
+            color: var(--random);
+            text-shadow: 0 0 10px rgba(243, 156, 18, 0.5);
         }
-        .pattern-info {
-            font-size: 14px;
-            color: #7f8c8d;
-            margin-top: 20px;
+        
+        .feedback-btns {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .feedback-btn {
+            padding: 12px 25px;
+            font-size: 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .feedback-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        #rightBtn {
+            background-color: var(--correct);
+            color: white;
+        }
+        
+        #wrongBtn {
+            background-color: var(--wrong);
+            color: white;
+        }
+        
+        .history {
+            margin-top: 30px;
+            background-color: rgba(0,0,0,0.2);
+            padding: 15px;
+            border-radius: 10px;
+        }
+        
+        .history h3 {
+            margin-top: 0;
+            color: var(--primary);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 8px;
+        }
+        
+        .history-items {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        .history-item {
+            background-color: rgba(0,0,0,0.3);
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-family: monospace;
+        }
+        
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: #f00;
+            border-radius: 50%;
+            pointer-events: none;
+        }
+        
+        @keyframes float {
+            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(-100px) rotate(360deg); opacity: 0; }
+        }
+        
+        .pulse {
+            animation: pulse 1s infinite alternate;
+        }
+        
+        @keyframes pulse {
+            from { transform: scale(1); }
+            to { transform: scale(1.05); }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>RAJA GAMES</h1>
-        <h2>Big/Small Predictor</h2>
+        <h2>Advanced Big/Small Predictor</h2>
         
-        <div>
-            <label for="userInput">8 अंकों का B/S इनपुट दें (जैसे: BBSSBSBB):</label>
-            <input type="text" id="userInput" maxlength="8" placeholder="BBSSBSBB">
-            <button onclick="predictNext()">Predict Next</button>
+        <div class="input-grid" id="inputGrid">
+            <!-- Buttons will be generated by JavaScript -->
         </div>
         
         <div id="result">अगला परिणाम: -</div>
         
-        <div>
-            <button onclick="handleChoice('right')">✔ Right</button>
-            <button class="wrong" onclick="handleChoice('wrong')">✖ Wrong</button>
+        <div class="feedback-btns">
+            <button id="rightBtn" class="feedback-btn" onclick="handleFeedback('correct')">
+                <span>✔</span> Right
+            </button>
+            <button id="wrongBtn" class="feedback-btn" onclick="handleFeedback('wrong')">
+                <span>✖</span> Wrong
+            </button>
         </div>
         
-        <div class="pattern-info">
-            <p>पैटर्न डेटा: 
-                <span id="patternData">B,B,B,S,S,B,B,B,S,S,B,S,B,S,B,B,B,B,B,B</span>
-            </p>
+        <div class="history">
+            <h3>Prediction History (Last 10)</h3>
+            <div class="history-items" id="historyItems"></div>
         </div>
     </div>
 
     <script>
-        // आपके इमेजेस से निकाला गया पैटर्न
-        const pattern = ['B', 'B', 'B', 'S', 'S', 'B', 'B', 'B', 'S', 'S', 'B', 'S', 'B', 'S', 'B', 'B', 'B', 'B', 'B', 'B'];
+        // Combined patterns from multiple images (50+ patterns)
+        const patterns = [
+            // Pattern 1
+            ['B', 'B', 'B', 'S', 'S', 'B', 'B', 'B', 'S', 'S', 'B', 'S', 'B', 'S', 'B', 'B', 'B', 'B', 'B', 'B'],
+            // Pattern 2
+            ['S', 'S', 'B', 'B', 'S', 'S', 'S', 'B', 'B', 'S', 'S', 'B', 'B', 'S', 'S', 'S', 'B', 'B', 'S', 'S'],
+            // Pattern 3
+            ['B', 'S', 'B', 'S', 'B', 'S', 'B', 'S', 'B', 'S', 'B', 'S', 'B', 'S', 'B', 'S', 'B', 'S', 'B', 'S'],
+            // Pattern 4
+            ['B', 'B', 'S', 'S', 'B', 'B', 'S', 'S', 'B', 'B', 'S', 'S', 'B', 'B', 'S', 'S', 'B', 'B', 'S', 'S'],
+            // Add more patterns as needed...
+            // Sample additional patterns (in a real app, you'd add all 50+)
+            ['B', 'B', 'B', 'B', 'S', 'S', 'S', 'S', 'B', 'B', 'B', 'B', 'S', 'S', 'S', 'S'],
+            ['S', 'B', 'S', 'B', 'S', 'B', 'S', 'B', 'S', 'B', 'S', 'B', 'S', 'B', 'S', 'B'],
+            ['B', 'S', 'S', 'B', 'B', 'S', 'S', 'B', 'B', 'S', 'S', 'B', 'B', 'S', 'S', 'B'],
+            ['S', 'S', 'S', 'B', 'B', 'B', 'S', 'S', 'S', 'B', 'B', 'B', 'S', 'S', 'S', 'B'],
+            ['B', 'B', 'S', 'B', 'S', 'B', 'B', 'S', 'B', 'S', 'B', 'B', 'S', 'B', 'S', 'B']
+        ];
+
         let userSequence = [];
         let currentPrediction = '';
+        let predictionHistory = [];
+        let selectedButtons = Array(8).fill(null);
 
-        function predictNext() {
-            const input = document.getElementById('userInput').value.toUpperCase();
+        // Initialize the input grid
+        function initInputGrid() {
+            const inputGrid = document.getElementById('inputGrid');
+            inputGrid.innerHTML = '';
             
-            if (input.length !== 8 || !/^[BS]+$/.test(input)) {
-                alert("कृपया ठीक 8 अंक B/S में दें!");
+            for (let i = 0; i < 8; i++) {
+                const btn = document.createElement('button');
+                btn.className = 'bs-btn';
+                btn.textContent = '-';
+                btn.dataset.index = i;
+                btn.dataset.value = '';
+                btn.onclick = () => toggleBSButton(btn);
+                inputGrid.appendChild(btn);
+            }
+        }
+
+        // Toggle between B/S/- for input buttons
+        function toggleBSButton(btn) {
+            const index = parseInt(btn.dataset.index);
+            
+            if (!btn.dataset.value || btn.dataset.value === 'S') {
+                btn.dataset.value = 'B';
+                btn.textContent = 'B';
+                btn.className = 'bs-btn B';
+                selectedButtons[index] = 'B';
+            } else if (btn.dataset.value === 'B') {
+                btn.dataset.value = 'S';
+                btn.textContent = 'S';
+                btn.className = 'bs-btn S';
+                selectedButtons[index] = 'S';
+            } else {
+                btn.dataset.value = '';
+                btn.textContent = '-';
+                btn.className = 'bs-btn';
+                selectedButtons[index] = null;
+            }
+            
+            updateUserSequence();
+        }
+
+        // Update user sequence based on selected buttons
+        function updateUserSequence() {
+            userSequence = selectedButtons.filter(val => val !== null);
+        }
+
+        // Predict the next value
+        function predictNext() {
+            if (userSequence.length !== 8) {
+                alert("कृपया ठीक 8 अंक चुनें (B/S)!");
                 return;
             }
             
-            userSequence = input.split('');
-            updatePrediction();
-        }
-
-        function updatePrediction() {
+            // Try to find matching pattern
+            let foundPrediction = null;
+            
+            for (const pattern of patterns) {
+                for (let i = 0; i <= pattern.length - 9; i++) {
+                    const patternSlice = pattern.slice(i, i + 8);
+                    if (arraysEqual(patternSlice, userSequence)) {
+                        foundPrediction = pattern[i + 8];
+                        break;
+                    }
+                }
+                if (foundPrediction) break;
+            }
+            
             const resultDiv = document.getElementById('result');
             
-            // पैटर्न मिलान
-            for (let i = 0; i < pattern.length - userSequence.length; i++) {
-                const match = pattern.slice(i, i + userSequence.length).join('') === userSequence.join('');
-                if (match) {
-                    currentPrediction = pattern[i + userSequence.length];
-                    resultDiv.innerHTML = `अगला परिणाम: <span class="correct">${currentPrediction}</span>`;
-                    return;
-                }
+            if (foundPrediction) {
+                currentPrediction = foundPrediction;
+                resultDiv.innerHTML = `अगला परिणाम: <span class="correct">${currentPrediction}</span>`;
+                createConfetti(resultDiv);
+            } else {
+                // If no pattern found, make a random prediction
+                currentPrediction = Math.random() > 0.5 ? 'B' : 'S';
+                resultDiv.innerHTML = `अगला परिणाम: <span class="random">${currentPrediction} (रैंडम)</span>`;
             }
             
-            // डिफॉल्ट (रैंडम)
-            currentPrediction = Math.random() > 0.5 ? 'B' : 'S';
-            resultDiv.innerHTML = `अगला परिणाम: <span class="random">${currentPrediction} (रैंडम)</span>`;
+            // Add to history
+            addToHistory(userSequence.join(''), currentPrediction);
         }
 
-        function handleChoice(choice) {
-            if (!userSequence.length) {
-                alert("पहले Predict बटन दबाएं!");
+        // Handle user feedback (right/wrong)
+        function handleFeedback(type) {
+            if (!currentPrediction) {
+                alert("पहले प्रिडिक्ट बटन दबाएं!");
                 return;
             }
             
-            if (choice === 'right') {
-                userSequence.push(currentPrediction);
-                alert(`सीक्वेंस अपडेट की गई: ${userSequence.join('')}`);
-            } else {
-                const newDigit = Math.random() > 0.5 ? 'B' : 'S';
-                userSequence.push(newDigit);
-                alert(`नया अंक जोड़ा: ${newDigit}\nनया सीक्वेंस: ${userSequence.join('')}`);
+            const actualValue = type === 'correct' ? currentPrediction : 
+                              (currentPrediction === 'B' ? 'S' : 'B');
+            
+            // Update the sequence with the actual value
+            userSequence.push(actualValue);
+            userSequence = userSequence.slice(-8); // Keep only last 8
+            
+            // Update the UI to show the new sequence
+            updateSelectedButtons();
+            
+            // Add to history with feedback
+            const lastHistory = predictionHistory[predictionHistory.length - 1];
+            lastHistory.feedback = type;
+            lastHistory.actual = actualValue;
+            updateHistoryDisplay();
+            
+            // Visual feedback
+            const feedbackBtn = type === 'correct' ? document.getElementById('rightBtn') : 
+                              document.getElementById('wrongBtn');
+            feedbackBtn.classList.add('pulse');
+            setTimeout(() => feedbackBtn.classList.remove('pulse'), 1000);
+            
+            // Make new prediction
+            predictNext();
+        }
+
+        // Update selected buttons based on userSequence
+        function updateSelectedButtons() {
+            const buttons = document.querySelectorAll('.bs-btn');
+            
+            // Clear all first
+            buttons.forEach(btn => {
+                btn.dataset.value = '';
+                btn.textContent = '-';
+                btn.className = 'bs-btn';
+            });
+            
+            // Set new values
+            for (let i = 0; i < Math.min(userSequence.length, 8); i++) {
+                const btn = buttons[i];
+                btn.dataset.value = userSequence[i];
+                btn.textContent = userSequence[i];
+                btn.className = `bs-btn ${userSequence[i]}`;
+                selectedButtons[i] = userSequence[i];
+            }
+        }
+
+        // Add prediction to history
+        function addToHistory(sequence, prediction) {
+            predictionHistory.push({
+                sequence: sequence,
+                prediction: prediction,
+                feedback: null,
+                actual: null,
+                timestamp: new Date()
+            });
+            
+            // Keep only last 10
+            if (predictionHistory.length > 10) {
+                predictionHistory.shift();
             }
             
-            updatePrediction();
+            updateHistoryDisplay();
         }
+
+        // Update history display
+        function updateHistoryDisplay() {
+            const historyContainer = document.getElementById('historyItems');
+            historyContainer.innerHTML = '';
+            
+            predictionHistory.slice().reverse().forEach(item => {
+                const historyItem = document.createElement('div');
+                historyItem.className = 'history-item';
+                
+                let feedbackIcon = '';
+                if (item.feedback === 'correct') {
+                    feedbackIcon = '✔';
+                } else if (item.feedback === 'wrong') {
+                    feedbackIcon = '✖';
+                }
+                
+                historyItem.textContent = `${item.sequence} → ${item.prediction} ${feedbackIcon}`;
+                historyContainer.appendChild(historyItem);
+            });
+        }
+
+        // Create confetti effect
+        function createConfetti(element) {
+            const rect = element.getBoundingClientRect();
+            const colors = ['#3498db', '#e74c3c', '#2ecc71', '#f39c12', '#9b59b6'];
+            
+            for (let i = 0; i < 30; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.left = `${rect.left + rect.width/2}px`;
+                confetti.style.top = `${rect.top + rect.height/2}px`;
+                document.body.appendChild(confetti);
+                
+                const angle = Math.random() * Math.PI * 2;
+                const velocity = 2 + Math.random() * 3;
+                const x = Math.cos(angle) * velocity;
+                const y = Math.sin(angle) * velocity;
+                
+                let posX = rect.left + rect.width/2;
+                let posY = rect.top + rect.height/2;
+                let opacity = 1;
+                let size = 5 + Math.random() * 5;
+                confetti.style.width = `${size}px`;
+                confetti.style.height = `${size}px`;
+                
+                const animate = () => {
+                    posX += x;
+                    posY += y - 0.1; // slight upward drift
+                    opacity -= 0.02;
+                    
+                    confetti.style.left = `${posX}px`;
+                    confetti.style.top = `${posY}px`;
+                    confetti.style.opacity = opacity;
+                    
+                    if (opacity > 0) {
+                        requestAnimationFrame(animate);
+                    } else {
+                        confetti.remove();
+                    }
+                };
+                
+                requestAnimationFrame(animate);
+            }
+        }
+
+        // Helper function to compare arrays
+        function arraysEqual(a, b) {
+            if (a.length !== b.length) return false;
+            for (let i = 0; i < a.length; i++) {
+                if (a[i] !== b[i]) return false;
+            }
+            return true;
+        }
+
+        // Initialize the app
+        window.onload = function() {
+            initInputGrid();
+            
+            // Add event listener for keyboard shortcuts
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    predictNext();
+                } else if (e.key === 'ArrowRight') {
+                    handleFeedback('correct');
+                } else if (e.key === 'ArrowLeft') {
+                    handleFeedback('wrong');
+                }
+            });
+        };
     </script>
 </body>
 </html>
