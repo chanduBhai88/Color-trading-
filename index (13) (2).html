@@ -3,134 +3,271 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BS Click Generator</title>
+    <title>BS Sequence Predictor</title>
     <style>
         body {
-            font-family: 'Arial', sans-serif;
-            background: #16213e;
-            color: white;
-            text-align: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            color: #fff;
+            margin: 0;
             padding: 20px;
             min-height: 100vh;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
         }
+        
         .container {
-            background: rgba(26, 26, 46, 0.8);
-            padding: 30px;
+            background: rgba(26, 26, 46, 0.85);
             border-radius: 15px;
+            padding: 30px;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
             width: 90%;
-            max-width: 400px;
+            max-width: 500px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
+        
         h1 {
+            text-align: center;
+            margin-bottom: 30px;
             color: #e94560;
+        }
+        
+        .sequence-display {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
             margin-bottom: 30px;
         }
-        #resultBox {
-            font-size: 80px;
-            height: 120px;
+        
+        .sequence-char {
+            width: 40px;
+            height: 40px;
             display: flex;
             align-items: center;
             justify-content: center;
             background: rgba(15, 52, 96, 0.5);
-            border-radius: 10px;
-            margin: 20px 0;
-            transition: all 0.3s;
+            border-radius: 8px;
+            font-size: 20px;
+            font-weight: bold;
         }
-        #resultBox.show {
-            transform: scale(1.1);
+        
+        .next-char {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             background: rgba(233, 69, 96, 0.5);
+            border-radius: 12px;
+            font-size: 32px;
+            font-weight: bold;
+            animation: pulse 2s infinite;
         }
-        #generateBtn {
-            background: #e94560;
-            color: white;
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            justify-content: center;
+        }
+        
+        button {
+            padding: 12px 24px;
             border: none;
-            padding: 15px 30px;
-            font-size: 18px;
-            border-radius: 50px;
+            border-radius: 8px;
+            font-weight: bold;
             cursor: pointer;
             transition: all 0.3s;
-            width: 100%;
-            margin-bottom: 30px;
+            font-size: 16px;
         }
-        #generateBtn:hover {
-            background: #ff6b81;
+        
+        #addB {
+            background: #0f3460;
+            color: white;
+        }
+        
+        #addS {
+            background: #533483;
+            color: white;
+        }
+        
+        #predictBtn {
+            background: #e94560;
+            color: white;
+        }
+        
+        #clearBtn {
+            background: #333;
+            color: white;
+        }
+        
+        button:hover {
             transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
         }
-        .memory {
+        
+        .history {
             margin-top: 30px;
-            padding: 15px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 10px;
         }
-        .memory-item {
+        
+        .history h3 {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 10px;
+        }
+        
+        .history-item {
             padding: 10px;
-            margin: 8px 0;
-            background: rgba(0,0,0,0.2);
-            border-radius: 5px;
-            font-size: 18px;
+            margin-bottom: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 6px;
+            display: flex;
+            justify-content: space-between;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>BS Click Generator</h1>
+        <h1>BS Sequence Predictor</h1>
         
-        <button id="generateBtn">Click for Next Result</button>
+        <div class="sequence-display" id="sequenceDisplay">
+            <!-- 8 sequence characters will appear here -->
+        </div>
         
-        <div id="resultBox"></div>
+        <div class="next-char" id="nextChar">?</div>
         
-        <div class="memory">
-            <h3>Last 3 Results</h3>
-            <div id="memoryList"></div>
+        <div class="button-group">
+            <button id="addB">Add B</button>
+            <button id="addS">Add S</button>
+            <button id="predictBtn">Predict Next</button>
+            <button id="clearBtn">Clear</button>
+        </div>
+        
+        <div class="history">
+            <h3>Last 10 Predictions:</h3>
+            <div id="historyList"></div>
         </div>
     </div>
 
     <script>
-        const fullSequence = 'SBBSBBBSBBBSBBSBBSBSBSSSSSSSSSBSBBSSSBBSBBSSBBBSSBSSSSSBBBBSSSBBSBBBSSBBBSBSBSSBBBBBSBBSBSSSBBSSSBBBBBSBBSSBBSSSBSBBSBSSSSBSSBBSBSSBBBSSBSSSSBBBBBSSSSSSBSSSBBBBSBSBBBSSBSBBSSBSBBBBSBSSSSSSBBSBSBSSBSBSBSBSBSBBSSSBBBBSBSBBSBBSSSBBSSBSBBBSBBBSBSBBSBSBBSSSBBSBSSSSB';
-        let position = 0;
-        let memory = [];
+        // DOM elements
+        const sequenceDisplay = document.getElementById('sequenceDisplay');
+        const nextChar = document.getElementById('nextChar');
+        const addB = document.getElementById('addB');
+        const addS = document.getElementById('addS');
+        const predictBtn = document.getElementById('predictBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const historyList = document.getElementById('historyList');
         
-        document.getElementById('generateBtn').addEventListener('click', function() {
-            const resultBox = document.getElementById('resultBox');
-            
-            // Reset animation
-            resultBox.classList.remove('show');
-            resultBox.textContent = '';
-            
-            // Get next character
-            if (position >= fullSequence.length) position = 0;
-            const result = fullSequence[position];
-            position++;
-            
-            // Display with animation
-            setTimeout(() => {
-                resultBox.textContent = result;
-                resultBox.classList.add('show');
-                
-                // Add to memory
-                addToMemory(result);
-            }, 100);
-        });
+        // Initialize sequence with 8 empty slots
+        let sequence = Array(8).fill('');
+        let history = [];
         
-        function addToMemory(result) {
-            memory.unshift(result);
-            if (memory.length > 3) memory.pop();
-            updateMemory();
-        }
+        // Training data - patterns from your sequence
+        const patternMap = {
+            // These patterns are derived from your long sequence
+            'SBBSBBBS': 'B',
+            'BBSBBBBS': 'B',
+            'BSBBBSSB': 'B',
+            'SBBBSSBB': 'B',
+            'BBBSSBBS': 'S',
+            'BBSSBBBS': 'B',
+            'BSSBBBSS': 'B',
+            'SSBBBSSB': 'S',
+            'SBBBSBSB': 'B',
+            'BBBSBSBB': 'S',
+            // Add more patterns as needed
+        };
         
-        function updateMemory() {
-            const memoryList = document.getElementById('memoryList');
-            memoryList.innerHTML = '';
-            memory.forEach((item, index) => {
+        // Initialize display
+        function updateDisplay() {
+            sequenceDisplay.innerHTML = '';
+            sequence.forEach(char => {
                 const div = document.createElement('div');
-                div.className = 'memory-item';
-                div.textContent = `${index+1}. ${item}`;
-                memoryList.appendChild(div);
+                div.className = 'sequence-char';
+                div.textContent = char || '-';
+                sequenceDisplay.appendChild(div);
             });
         }
+        
+        // Add character to sequence
+        function addChar(char) {
+            sequence.shift(); // Remove first character
+            sequence.push(char); // Add new character at end
+            updateDisplay();
+        }
+        
+        // Predict next character based on current sequence
+        function predictNext() {
+            const currentPattern = sequence.join('');
+            
+            // Try to find matching pattern
+            let prediction = patternMap[currentPattern];
+            
+            // If no exact match, find similar pattern
+            if (!prediction) {
+                for (const [pattern, value] of Object.entries(patternMap)) {
+                    if (currentPattern.endsWith(pattern.slice(0, -1))) {
+                        prediction = value;
+                        break;
+                    }
+                }
+            }
+            
+            // If still no prediction, use random
+            if (!prediction) {
+                prediction = Math.random() > 0.5 ? 'B' : 'S';
+            }
+            
+            // Display prediction
+            nextChar.textContent = prediction;
+            
+            // Add to history
+            history.unshift({
+                sequence: currentPattern,
+                prediction: prediction
+            });
+            
+            if (history.length > 10) {
+                history.pop();
+            }
+            
+            updateHistory();
+        }
+        
+        // Update history display
+        function updateHistory() {
+            historyList.innerHTML = '';
+            history.forEach((item, index) => {
+                const div = document.createElement('div');
+                div.className = 'history-item';
+                div.innerHTML = `<span>${item.sequence}</span> <span>- ${item.prediction}</span>`;
+                historyList.appendChild(div);
+            });
+        }
+        
+        // Clear everything
+        function clearAll() {
+            sequence = Array(8).fill('');
+            nextChar.textContent = '?';
+            updateDisplay();
+        }
+        
+        // Event listeners
+        addB.addEventListener('click', () => addChar('B'));
+        addS.addEventListener('click', () => addChar('S'));
+        predictBtn.addEventListener('click', predictNext);
+        clearBtn.addEventListener('click', clearAll);
+        
+        // Initialize
+        updateDisplay();
     </script>
 </body>
 </html>
