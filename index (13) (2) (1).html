@@ -3,255 +3,286 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BDG Number Prediction Tool</title>
+    <title>BS Sequence Predictor</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            max-width: 600px;
-            margin: 0 auto;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            color: #fff;
+            margin: 0;
             padding: 20px;
-            background-color: #f5f5f5;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
+
         .container {
-            background-color: white;
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            background: rgba(26, 26, 46, 0.85);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            width: 90%;
+            max-width: 500px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
+
         h1 {
-            color: #333;
             text-align: center;
+            margin-bottom: 30px;
+            color: #e94560;
         }
-        .game-info {
+
+        .sequence-display {
             display: flex;
-            justify-content: space-between;
-            margin-bottom: 20px;
-            padding: 10px;
-            background-color: #f0f0f0;
-            border-radius: 5px;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 30px;
         }
-        .prediction-card {
-            border: 1px solid #ddd;
+
+        .sequence-char {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(15, 52, 96, 0.5);
             border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-        .number-prediction {
-            font-size: 28px;
-            font-weight: bold;
-            margin: 10px 0;
-        }
-        .size-prediction {
-            font-size: 18px;
-            color: #555;
-        }
-        .win-level {
-            margin-top: 10px;
-            font-weight: bold;
-            color: #2ecc71;
-        }
-        .timer {
             font-size: 20px;
-            text-align: center;
-            margin: 20px 0;
             font-weight: bold;
         }
+
+        .next-char {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(233, 69, 96, 0.5);
+            border-radius: 12px;
+            font-size: 32px;
+            font-weight: bold;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            justify-content: center;
+        }
+
         button {
-            background-color: #3498db;
-            color: white;
+            padding: 12px 24px;
             border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
+            border-radius: 8px;
+            font-weight: bold;
             cursor: pointer;
+            transition: all 0.3s;
             font-size: 16px;
-            display: block;
-            margin: 0 auto;
         }
+
+        #addB {
+            background: #0f3460;
+            color: white;
+        }
+
+        #addS {
+            background: #533483;
+            color: white;
+        }
+
+        #predictBtn {
+            background: #e94560;
+            color: white;
+        }
+
+        #clearBtn {
+            background: #333;
+            color: white;
+        }
+
         button:hover {
-            background-color: #2980b9;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
         }
+
+        /* NEW: Active button style */
+        button.active {
+            box-shadow: 0 0 10px 2px #fff;
+            transform: scale(1.05);
+        }
+
+        /* Optional: specific glow color per button */
+        #addB.active {
+            box-shadow: 0 0 10px 2px #00f;
+        }
+
+        #addS.active {
+            box-shadow: 0 0 10px 2px #c0f;
+        }
+
         .history {
-            margin-top: 20px;
+            margin-top: 30px;
         }
+
+        .history h3 {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 10px;
+        }
+
         .history-item {
+            padding: 10px;
+            margin-bottom: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 6px;
             display: flex;
             justify-content: space-between;
-            padding: 8px;
-            border-bottom: 1px solid #eee;
-        }
-        .small {
-            color: #3498db;
-        }
-        .big {
-            color: #e74c3c;
-        }
-        .special {
-            color: #9b59b6;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>BDG Number Prediction</h1>
-        <div class="game-info">
-            <div>Game: Wingo 1-Minute</div>
-            <div id="current-time">Time: 00:00:00</div>
+        <h1>BS Sequence Predictor</h1>
+
+        <div class="sequence-display" id="sequenceDisplay">
+            <!-- 8 sequence characters will appear here -->
         </div>
-        
-        <div class="timer" id="timer">Current Round: 00:00</div>
-        
-        <div class="prediction-card">
-            <h3>Current Prediction</h3>
-            <div class="number-prediction" id="number-pred">-</div>
-            <div class="size-prediction" id="size-pred">-</div>
-            <div class="win-level" id="win-level">-</div>
+
+        <div class="next-char" id="nextChar">?</div>
+
+        <div class="button-group">
+            <button id="addB">Add B</button>
+            <button id="addS">Add S</button>
+            <button id="predictBtn">Predict Next</button>
+            <button id="clearBtn">Clear</button>
         </div>
-        
-        <button id="generate-btn">Generate Prediction</button>
-        
+
         <div class="history">
-            <h3>Prediction History</h3>
-            <div id="history-list"></div>
+            <h3>Last 10 Predictions:</h3>
+            <div id="historyList"></div>
         </div>
     </div>
 
     <script>
-        const numbers = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
-        // Improved weights for better win probability
-        // Small numbers (1-4) appear together, Big numbers (5-9) appear together
-        const numberWeights = [5, 20, 20, 20, 20, 15, 15, 15, 15, 15];
-        
-        // DOM elements
-        const numberPredEl = document.getElementById('number-pred');
-        const sizePredEl = document.getElementById('size-pred');
-        const winLevelEl = document.getElementById('win-level');
-        const timerEl = document.getElementById('timer');
-        const historyListEl = document.getElementById('history-list');
-        const currentTimeEl = document.getElementById('current-time');
-        const generateBtn = document.getElementById('generate-btn');
-        
-        // Weighted random selection
-        function weightedRandom(items, weights) {
-            let totalWeight = weights.reduce((a, b) => a + b, 0);
-            let random = Math.random() * totalWeight;
-            let weightSum = 0;
-            
-            for (let i = 0; i < items.length; i++) {
-                weightSum += weights[i];
-                if (random <= weightSum) return items[i];
-            }
-            
-            return items[0];
+        const sequenceDisplay = document.getElementById('sequenceDisplay');
+        const nextChar = document.getElementById('nextChar');
+        const addB = document.getElementById('addB');
+        const addS = document.getElementById('addS');
+        const predictBtn = document.getElementById('predictBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const historyList = document.getElementById('historyList');
+
+        let sequence = Array(8).fill('');
+        let history = [];
+
+        const patternMap = {
+            'SBBSBBBS': 'B',
+            'BBSBBBBS': 'B',
+            'BSBBBSSB': 'B',
+            'SBBBSSBB': 'B',
+            'BBBSSBBS': 'S',
+            'BBSSBBBS': 'B',
+            'BSSBBBSS': 'B',
+            'SSBBBSSB': 'S',
+            'SBBBSBSB': 'B',
+            'BBBSBSBB': 'S',
+            // More patterns can be added here
+        };
+
+        function updateDisplay() {
+            sequenceDisplay.innerHTML = '';
+            sequence.forEach(char => {
+                const div = document.createElement('div');
+                div.className = 'sequence-char';
+                div.textContent = char || '-';
+                sequenceDisplay.appendChild(div);
+            });
         }
-        
-        // Update current time
-        function updateCurrentTime() {
-            const now = new Date();
-            currentTimeEl.textContent = `Time: ${now.toLocaleTimeString()}`;
-            
-            // Get current seconds (0-59)
-            const seconds = now.getSeconds();
-            const displaySeconds = seconds < 10 ? `0${seconds}` : seconds;
-            
-            // Update timer display
-            timerEl.textContent = `Current Round: 00:${displaySeconds}`;
-            
-            // Check if new minute has started (seconds = 0)
-            if(seconds === 0) {
-                generateNewPrediction();
-            }
+
+        function addChar(char) {
+            sequence.shift();
+            sequence.push(char);
+            updateDisplay();
         }
-        
-        // Generate a prediction
-        function generatePrediction() {
-            const number = weightedRandom(numbers, numberWeights);
-            let size, winLevel;
-            
-            if (number === 0) {
-                size = "Special (0)";
-                winLevel = "Win Level: 3 (High)";
-            } else if (number < 5) {
-                // For small numbers, predict the next 2 small numbers
-                const nextSmall1 = weightedRandom([1, 2, 3, 4], [25, 25, 25, 25]);
-                const nextSmall2 = weightedRandom([1, 2, 3, 4], [25, 25, 25, 25]);
-                size = `Small (${number}, ${nextSmall1}, ${nextSmall2})`;
-                winLevel = "Win Level: 1 (Medium)";
-            } else {
-                // For big numbers, predict the next 2 big numbers
-                const nextBig1 = weightedRandom([5, 6, 7, 8, 9], [20, 20, 20, 20, 20]);
-                const nextBig2 = weightedRandom([5, 6, 7, 8, 9], [20, 20, 20, 20, 20]);
-                size = `Big (${number}, ${nextBig1}, ${nextBig2})`;
-                winLevel = "Win Level: 2 (High)";
+
+        function predictNext() {
+            const currentPattern = sequence.join('');
+            let prediction = patternMap[currentPattern];
+
+            if (!prediction) {
+                for (const [pattern, value] of Object.entries(patternMap)) {
+                    if (currentPattern.endsWith(pattern.slice(0, -1))) {
+                        prediction = value;
+                        break;
+                    }
+                }
             }
-            
-            return { number, size, winLevel };
+
+            if (!prediction) {
+                prediction = Math.random() > 0.5 ? 'B' : 'S';
+            }
+
+            nextChar.textContent = prediction;
+
+            history.unshift({
+                sequence: currentPattern,
+                prediction: prediction
+            });
+
+            if (history.length > 10) {
+                history.pop();
+            }
+
+            updateHistory();
         }
-        
-        // Generate and display new prediction
-        function generateNewPrediction() {
-            const prediction = generatePrediction();
-            displayPrediction(prediction);
+
+        function updateHistory() {
+            historyList.innerHTML = '';
+            history.forEach((item, index) => {
+                const div = document.createElement('div');
+                div.className = 'history-item';
+                div.innerHTML = `<span>${item.sequence}</span> <span>- ${item.prediction}</span>`;
+                historyList.appendChild(div);
+            });
         }
-        
-        // Display prediction
-        function displayPrediction(prediction) {
-            // Clear previous classes
-            numberPredEl.className = 'number-prediction';
-            
-            // Set new prediction
-            numberPredEl.textContent = prediction.number;
-            
-            // Add appropriate class
-            if (prediction.number === 0) {
-                numberPredEl.classList.add('special');
-            } else if (prediction.number < 5) {
-                numberPredEl.classList.add('small');
-            } else {
-                numberPredEl.classList.add('big');
-            }
-            
-            sizePredEl.textContent = prediction.size;
-            winLevelEl.textContent = prediction.winLevel;
-            
-            // Add to history
-            const now = new Date();
-            const historyItem = document.createElement('div');
-            historyItem.className = 'history-item';
-            
-            // Determine size class for history item
-            let sizeClass = '';
-            if (prediction.number === 0) {
-                sizeClass = 'special';
-            } else if (prediction.number < 5) {
-                sizeClass = 'small';
-            } else {
-                sizeClass = 'big';
-            }
-            
-            historyItem.innerHTML = `
-                <span>${now.toLocaleTimeString()}</span>
-                <span class="${sizeClass}">${prediction.number}</span>
-                <span>${prediction.size}</span>
-                <span class="win-level">${prediction.winLevel.split(":")[1].trim()}</span>
-            `;
-            historyListEl.prepend(historyItem);
-            
-            // Keep only last 10 history items
-            if (historyListEl.children.length > 10) {
-                historyListEl.removeChild(historyListEl.lastChild);
-            }
+
+        function clearAll() {
+            sequence = Array(8).fill('');
+            nextChar.textContent = '?';
+            updateDisplay();
+            addB.classList.remove('active');
+            addS.classList.remove('active');
         }
-        
-        // Initialize
-        updateCurrentTime();
-        setInterval(updateCurrentTime, 1000);
-        
-        // Generate initial prediction
-        generateNewPrediction();
-        
-        // Button click handler
-        generateBtn.addEventListener('click', generateNewPrediction);
+
+        // 🔥 Set Active Button Glow Effect
+        function setActiveButton(button) {
+            addB.classList.remove('active');
+            addS.classList.remove('active');
+            button.classList.add('active');
+        }
+
+        addB.addEventListener('click', () => {
+            addChar('B');
+            setActiveButton(addB);
+        });
+
+        addS.addEventListener('click', () => {
+            addChar('S');
+            setActiveButton(addS);
+        });
+
+        predictBtn.addEventListener('click', predictNext);
+        clearBtn.addEventListener('click', clearAll);
+
+        updateDisplay();
     </script>
 </body>
 </html>
