@@ -129,15 +129,12 @@
     // Set default theme
     changeTheme('theme1');
 
-    const patterns = [
-      'SSBSBSBBSSBSBSSSBSBB','SSBSSSBSSSBSSBSSSBB','BSBBBSBBSBSBSSSBSSB',
-      'BSBSSSBSSSSBSBBBSBS','SSBSSBSBSSSBSSSBSSB','SBSSSBSSBBBSBBSBSSB',
-      'BSBSBSSSBSSSBSSSBBS','SBSSBBBSBSBSSSBSSSB','SBBSBSSSSBSSSSBSSSB',
-      'SSSBSSSBBSBBBSBSBSS','SSBSSSBSSSSSBSSSBSS','BSBSSBBBSBSSBSSSSSB',
-      'SSBBSSSBSSBBBSBSBBS','SSSBSSBSSBSBSBSSBSS','SSSSBBBSBSBBBSBSBBS',
-      'SSSSBBSSSBSSSSSBSSS','SSBBSSSBBSBBBSBSBBS','SSSBBSBSSBSBSBSSSSB',
-      'SBSSSBSSBBSSBBBSBBS','SBSSSBSSBBSSSSSSSSS','BBSS'
-    ];
+    const fullPattern = 'SSSBSBBSSBSBBSSSBSSBSSBSBSSBSSSBBSSBSBBSBSSBBBSBBSSSBBSBSSBSBSSBBSBSBBSBSBSSBSSBSSBSSBBBSBBSSBBBSBBSBSBSSSSBSSBBSBSSBBBSSBSSSSBBBBSSSBBSBBBSSBBBSBSBSSBBBBBSBBSBSSSBBSSSBBBBBSBBSSBBSSSBSBBSBSSSSBSSBBSBSSBBBSSBSSSSBBBBSSSSSSBSSSBBBSSSBBBSSBSBBBSSBSBBBBSBSSSSSSBBSS';
+
+    const patterns = [];
+    for (let i = 0; i <= fullPattern.length - 9; i++) {
+      patterns.push(fullPattern.substr(i, 9));
+    }
 
     let inputSequence = '';
     let history = [];
@@ -154,14 +151,11 @@
       let result = "No Match Found";
 
       for (let pattern of patterns) {
-        for (let i = 0; i <= pattern.length - 9; i++) {
-          if (pattern.substr(i, 8) === inputSequence) {
-            result = "Next: " + pattern[i + 8];
-            found = true;
-            break;
-          }
+        if (pattern.substr(0, 8) === inputSequence) {
+          result = "Next: " + pattern[8];
+          found = true;
+          break;
         }
-        if (found) break;
       }
 
       document.getElementById('result').innerText = "Result: " + result;
@@ -170,7 +164,6 @@
       if (inputSequence.length === 8) {
         history.unshift(`Input: ${inputSequence} → ${result}`);
         if (history.length > 10) history.pop();
-
         renderHistory();
       }
     }
