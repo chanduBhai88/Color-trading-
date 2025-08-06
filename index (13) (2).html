@@ -1,187 +1,301 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>RAJA GAMES - B/S Predictor</title>
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background-size: cover;
-      background-position: center;
-      height: 100vh;
-      color: white;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-start;
-      padding-top: 30px;
-    }
-
-    h1 {
-      background: rgba(0,0,0,0.6);
-      padding: 10px 20px;
-      border-radius: 10px;
-      margin-bottom: 20px;
-    }
-
-    #inputDisplay {
-      font-size: 24px;
-      margin: 10px;
-      padding: 10px 20px;
-      border: 2px solid white;
-      background: rgba(0,0,0,0.4);
-      border-radius: 8px;
-    }
-
-    .btn-container {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 15px;
-      margin-bottom: 20px;
-    }
-
-    button {
-      font-size: 20px;
-      padding: 10px 20px;
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
-      background-color: rgba(255, 255, 255, 0.9);
-      color: black;
-      font-weight: bold;
-    }
-
-    #result {
-      font-size: 26px;
-      background: rgba(0,0,0,0.6);
-      padding: 10px 25px;
-      border-radius: 10px;
-      margin-bottom: 15px;
-    }
-
-    #history {
-      font-size: 18px;
-      background: rgba(0,0,0,0.5);
-      padding: 10px;
-      border-radius: 8px;
-      width: 80%;
-      max-width: 600px;
-      margin-top: 10px;
-    }
-
-    select {
-      padding: 8px;
-      font-size: 16px;
-      border-radius: 8px;
-      margin-bottom: 15px;
-    }
-
-    .theme-label {
-      margin-top: 10px;
-      font-weight: bold;
-    }
-  </style>
-</head>
-<body id="body">
-
-  <h1>🔮 RAJA GAMES - B/S Predictor</h1>
-
-  <label class="theme-label">🎨 Choose Theme:</label>
-  <select onchange="changeTheme(this.value)">
-    <option value="theme1">Night Forest</option>
-    <option value="theme2">City Lights</option>
-    <option value="theme3">Gaming Neon</option>
-    <option value="theme4">Abstract Dark</option>
-    <option value="theme5">Ocean View</option>
-  </select>
-
-  <div id="inputDisplay">Input: </div>
-
-  <div class="btn-container">
-    <button onclick="addInput('B')">B</button>
-    <button onclick="addInput('S')">S</button>
-    <button onclick="getResult()">Result</button>
-    <button onclick="resetInput()">Clear</button>
-  </div>
-
-  <div id="result">Result: -</div>
-
-  <div id="history"><strong>Last 10 Results:</strong><br><ul id="resultList"></ul></div>
-
-  <script>
-    const body = document.getElementById('body');
-    const resultList = document.getElementById('resultList');
-
-    const themes = {
-      theme1: 'url("https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0")',
-      theme2: 'url("https://images.unsplash.com/photo-1504384308090-c894fdcc538d")',
-      theme3: 'url("https://images.unsplash.com/photo-1607083206173-0a6b497151c5")',
-      theme4: 'url("https://images.unsplash.com/photo-1526304640581-d334cdbbf45e")',
-      theme5: 'url("https://images.unsplash.com/photo-1507525428034-b723cf961d3e")'
-    };
-
-    function changeTheme(theme) {
-      body.style.backgroundImage = themes[theme];
-    }
-
-    // Set default theme
-    changeTheme('theme1');
-
-    const fullPattern = 'SSSBSBBSSBSBBSSSBSSBSSBSBSSBSSSBBSSBSBBSBSSBBBSBBSSSBBSBSSBSBSSBBSBSBBSBSBSSBSSBSSBSSBBBSBBSSBBBSBBSBSBSSSSBSSBBSBSSBBBSSBSSSSBBBBSSSBBSBBBSSBBBSBSBSSBBBBBSBBSBSSSBBSSSBBBBBSBBSSBBSSSBSBBSBSSSSBSSBBSBSSBBBSSBSSSSBBBBSSSSSSBSSSBBBSSSBBBSSBSBBBSSBSBBBBSBSSSSSSBBSS';
-
-    const patterns = [];
-    for (let i = 0; i <= fullPattern.length - 9; i++) {
-      patterns.push(fullPattern.substr(i, 9));
-    }
-
-    let inputSequence = '';
-    let history = [];
-
-    function addInput(letter) {
-      if (inputSequence.length < 8) {
-        inputSequence += letter;
-        document.getElementById('inputDisplay').innerText = 'Input: ' + inputSequence;
-      }
-    }
-
-    function getResult() {
-      let found = false;
-      let result = "No Match Found";
-
-      for (let pattern of patterns) {
-        if (pattern.substr(0, 8) === inputSequence) {
-          result = "Next: " + pattern[8];
-          found = true;
-          break;
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BS Sequence Analyzer</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            color: #fff;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-image: url('https://images.unsplash.com/photo-1519681393784-d120267933ba?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
+            background-size: cover;
+            background-blend-mode: overlay;
         }
-      }
 
-      document.getElementById('result').innerText = "Result: " + result;
+        .container {
+            background: rgba(26, 26, 46, 0.85);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            width: 90%;
+            max-width: 600px;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
 
-      // Add to history (latest on top)
-      if (inputSequence.length === 8) {
-        history.unshift(`Input: ${inputSequence} → ${result}`);
-        if (history.length > 10) history.pop();
-        renderHistory();
-      }
-    }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #e94560;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
 
-    function resetInput() {
-      inputSequence = '';
-      document.getElementById('inputDisplay').innerText = 'Input: ';
-      document.getElementById('result').innerText = 'Result: -';
-    }
+        .input-group {
+            margin-bottom: 20px;
+        }
 
-    function renderHistory() {
-      resultList.innerHTML = "";
-      history.forEach(item => {
-        const li = document.createElement('li');
-        li.textContent = item;
-        resultList.appendChild(li);
-      });
-    }
-  </script>
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #0f3460;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 2px solid #0f3460;
+            background: rgba(255, 255, 255, 0.9);
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 16px;
+        }
+
+        #analyzeBtn {
+            background: #e94560;
+            color: white;
+        }
+
+        #analyzeBtn:hover {
+            background: #ff6b81;
+            transform: translateY(-2px);
+        }
+
+        #resetBtn {
+            background: #0f3460;
+            color: white;
+        }
+
+        #resetBtn:hover {
+            background: #1a508b;
+            transform: translateY(-2px);
+        }
+
+        #themeBtn {
+            background: #533483;
+            color: white;
+        }
+
+        #themeBtn:hover {
+            background: #6a4c93;
+            transform: translateY(-2px);
+        }
+
+        .result-container {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            background: rgba(15, 52, 96, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .result-item {
+            margin-bottom: 10px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            display: none;
+        }
+
+        .result-item.show {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .memory {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            background: rgba(233, 69, 96, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .memory h3 {
+            margin-top: 0;
+            color: #e94560;
+        }
+
+        .memory-item {
+            padding: 8px;
+            margin-bottom: 5px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>BS Sequence Analyzer</h1>
+        
+        <div class="input-group">
+            <label for="sequenceInput">Enter 8-character BS Sequence:</label>
+            <input type="text" id="sequenceInput" maxlength="8" placeholder="Enter exactly 8 characters (B/S only)">
+        </div>
+        
+        <div class="button-group">
+            <button id="analyzeBtn">Analyze</button>
+            <button id="resetBtn">Reset</button>
+            <button id="themeBtn">Change Theme</button>
+        </div>
+        
+        <div class="result-container" id="resultContainer">
+            <div class="result-item" id="result1">Result 1: <span></span></div>
+            <div class="result-item" id="result2">Result 2: <span></span></div>
+            <div class="result-item" id="result3">Result 3: <span></span></div>
+            <div class="result-item" id="result4">Result 4: <span></span></div>
+            <div class="result-item" id="result5">Result 5: <span></span></div>
+            <div class="result-item" id="result6">Result 6: <span></span></div>
+            <div class="result-item" id="result7">Result 7: <span></span></div>
+            <div class="result-item" id="result8">Result 8: <span></span></div>
+            <div class="result-item" id="result9">Result 9: <span></span></div>
+            <div class="result-item" id="result10">Result 10: <span></span></div>
+        </div>
+        
+        <div class="memory">
+            <h3>Memory (Last 3 Results)</h3>
+            <div id="memoryList"></div>
+        </div>
+    </div>
+
+    <script>
+        // DOM elements
+        const sequenceInput = document.getElementById('sequenceInput');
+        const analyzeBtn = document.getElementById('analyzeBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const themeBtn = document.getElementById('themeBtn');
+        const resultContainer = document.getElementById('resultContainer');
+        const memoryList = document.getElementById('memoryList');
+        
+        // Memory storage
+        let memory = [];
+        let currentTheme = 0;
+        const themes = [
+            { bg: 'linear-gradient(135deg, #1a1a2e, #16213e)', color: '#fff' },
+            { bg: 'linear-gradient(135deg, #2c3e50, #4ca1af)', color: '#fff' },
+            { bg: 'linear-gradient(135deg, #614385, #516395)', color: '#fff' }
+        ];
+        
+        // Sample sequence for analysis
+        const fullSequence = 'SBBSBBBSBBBSBBSBBSBSBSSSSSSSSSBSBBSSSBBSBBSSBBBSSBSSSSSBBBBSSSBBSBBBSSBBBSBSBSSBBBBBSBBSBSSSBBSSSBBBBBSBBSSBBSSSBSBBSBSSSSBSSBBSBSSBBBSSBSSSSBBBBBSSSSSSBSSSBBBBSBSBBBSSBSBBSSBSBBBBSBSSSSSSBBSBSBSSBSBSBSBSBSBBSSSBBBBSBSBBSBBSSSBBSSBSBBBSBBBSBSBBSBSBBSSSBBSBSSSSB';
+        let sequencePosition = 0;
+        
+        // Analyze button click handler
+        analyzeBtn.addEventListener('click', () => {
+            const input = sequenceInput.value.trim().toUpperCase();
+            
+            // Validate input
+            if (input.length !== 8) {
+                alert('Please enter exactly 8 characters (B/S only)');
+                return;
+            }
+            
+            if (!/^[BS]+$/.test(input)) {
+                alert('Only B and S characters are allowed!');
+                return;
+            }
+            
+            // Get next 10 results from the full sequence
+            const results = [];
+            for (let i = 0; i < 10; i++) {
+                if (sequencePosition + i < fullSequence.length) {
+                    results.push(fullSequence[sequencePosition + i]);
+                } else {
+                    // Wrap around to beginning if we reach the end
+                    results.push(fullSequence[(sequencePosition + i) % fullSequence.length]);
+                }
+            }
+            
+            // Update sequence position for next time
+            sequencePosition = (sequencePosition + 10) % fullSequence.length;
+            
+            // Display results one by one
+            const resultItems = document.querySelectorAll('.result-item');
+            resultItems.forEach(item => item.classList.remove('show'));
+            
+            let delay = 0;
+            results.forEach((result, index) => {
+                setTimeout(() => {
+                    const item = resultItems[index];
+                    item.querySelector('span').textContent = result;
+                    item.classList.add('show');
+                    
+                    // Add to memory when showing the last result
+                    if (index === 9) {
+                        addToMemory(results.join(''));
+                    }
+                }, delay);
+                delay += 300; // 300ms delay between each result
+            });
+        });
+        
+        // Reset button click handler
+        resetBtn.addEventListener('click', () => {
+            sequenceInput.value = '';
+            document.querySelectorAll('.result-item').forEach(item => {
+                item.classList.remove('show');
+                item.querySelector('span').textContent = '';
+            });
+        });
+        
+        // Theme button click handler
+        themeBtn.addEventListener('click', () => {
+            currentTheme = (currentTheme + 1) % themes.length;
+            document.body.style.background = themes[currentTheme].bg;
+            document.body.style.color = themes[currentTheme].color;
+        });
+        
+        // Add results to memory
+        function addToMemory(result) {
+            memory.unshift(result);
+            if (memory.length > 3) {
+                memory.pop();
+            }
+            updateMemoryDisplay();
+        }
+        
+        // Update memory display
+        function updateMemoryDisplay() {
+            memoryList.innerHTML = '';
+            memory.forEach((item, index) => {
+                const div = document.createElement('div');
+                div.className = 'memory-item';
+                div.textContent = `${index + 1}. ${item}`;
+                memoryList.appendChild(div);
+            });
+        }
+        
+        // Initialize
+        updateMemoryDisplay();
+    </script>
 </body>
 </html>
