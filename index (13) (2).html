@@ -1,171 +1,194 @@
 <!DOCTYPE html>
-<html lang="hi">
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>RAJA GAMES - Predictor</title>
+  <meta charset="UTF-8">
+  <title>RAJA GAMES - B/S Predictor</title>
   <style>
     body {
+      margin: 0;
+      padding: 0;
       font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
-      color: #fff;
-      text-align: center;
-      padding: 20px;
+      background-size: cover;
+      background-position: center;
+      height: 100vh;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding-top: 30px;
     }
+
     h1 {
-      color: #ff69b4;
-      font-size: 32px;
-      text-shadow: 1px 1px 4px #000;
-    }
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(8, 50px);
-      gap: 10px;
-      justify-content: center;
-      margin: 20px 0;
-    }
-    .bs-btn {
-      background: #333;
-      color: #fff;
-      border: 2px solid #777;
-      padding: 10px;
-      font-size: 18px;
-      cursor: pointer;
-      border-radius: 8px;
-      transition: transform 0.2s;
-    }
-    .bs-btn:hover {
-      transform: scale(1.1);
-    }
-    .bs-btn.B {
-      background: #1976d2;
-    }
-    .bs-btn.S {
-      background: #d32f2f;
-    }
-    #result {
-      font-size: 24px;
-      margin-top: 20px;
-    }
-    .history {
-      margin-top: 30px;
-      text-align: left;
-      max-width: 500px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-    .history-item {
-      background: #222;
-      padding: 8px;
-      margin-bottom: 5px;
-      border-radius: 5px;
-      font-family: monospace;
-    }
-    button {
-      margin: 5px;
+      background: rgba(0,0,0,0.6);
       padding: 10px 20px;
-      font-size: 18px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+    }
+
+    #inputDisplay {
+      font-size: 24px;
+      margin: 10px;
+      padding: 10px 20px;
+      border: 2px solid white;
+      background: rgba(0,0,0,0.4);
+      border-radius: 8px;
+    }
+
+    .btn-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    button {
+      font-size: 20px;
+      padding: 10px 20px;
       border: none;
       border-radius: 10px;
       cursor: pointer;
-      background: #ff4081;
-      color: white;
-      transition: background 0.3s;
+      background-color: rgba(255, 255, 255, 0.9);
+      color: black;
+      font-weight: bold;
     }
-    button:hover {
-      background: #f50057;
+
+    #result {
+      font-size: 26px;
+      background: rgba(0,0,0,0.6);
+      padding: 10px 25px;
+      border-radius: 10px;
+      margin-bottom: 15px;
+    }
+
+    #history {
+      font-size: 18px;
+      background: rgba(0,0,0,0.5);
+      padding: 10px;
+      border-radius: 8px;
+      width: 80%;
+      max-width: 600px;
+      margin-top: 10px;
+    }
+
+    select {
+      padding: 8px;
+      font-size: 16px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+    }
+
+    .theme-label {
+      margin-top: 10px;
+      font-weight: bold;
     }
   </style>
 </head>
-<body>
+<body id="body">
 
-  <h1>❤️ RAJA GAMES Predictor</h1>
+  <h1>🔮 RAJA GAMES - B/S Predictor</h1>
 
-  <div class="grid" id="inputGrid"></div>
+  <label class="theme-label">🎨 Choose Theme:</label>
+  <select onchange="changeTheme(this.value)">
+    <option value="theme1">Night Forest</option>
+    <option value="theme2">City Lights</option>
+    <option value="theme3">Gaming Neon</option>
+    <option value="theme4">Abstract Dark</option>
+    <option value="theme5">Ocean View</option>
+  </select>
 
-  <button onclick="predictNext()">🔮 Predict Next</button>
-  <button onclick="clearSelection()">🧹 Clear</button>
+  <div id="inputDisplay">Input: </div>
 
-  <div id="result">अगला परिणाम: -</div>
-
-  <div class="history">
-    <h3>🧠 Last 10 Predictions:</h3>
-    <div id="historyList"></div>
+  <div class="btn-container">
+    <button onclick="addInput('B')">B</button>
+    <button onclick="addInput('S')">S</button>
+    <button onclick="getResult()">Result</button>
+    <button onclick="resetInput()">Clear</button>
   </div>
 
+  <div id="result">Result: -</div>
+
+  <div id="history"><strong>Last 10 Results:</strong><br><ul id="resultList"></ul></div>
+
   <script>
-    const patternSequence = [...'SBBSBBBSBBBSBBSBBSBSBSSSSSSSSSBSBBSSSBBSBBSSBBBSSBSSSSSBBBBSSSBBSBBBSSBBBSBSBSSBBBBBSBBSBSSSBBSSSBBBBBSBBSSBBSSSBSBBSBSSSSBSSBBSBSSBBBSSBSSSSBBBBBSSSSSSBSSSBBBBSBSBBBSSBSBBSSBSBBBBSBSSSSSSBBSBSBSSBSBSBSBSBSBBSSSBBBBSBSBBSBBSSSBBSSBSBBBSBBBSBSBBSBSBBSSSBBSBSSSSBBSBSBBSSBBBSBBSBSSBBSSSBSBSSBBSBBBSBBSSSBBSBSSBSBSSBBSBSBBSBSBSSB'];
+    const body = document.getElementById('body');
+    const resultList = document.getElementById('resultList');
 
-    let selected = Array(8).fill(null);
-    let predictionHistory = [];
+    const themes = {
+      theme1: 'url("https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0")',
+      theme2: 'url("https://images.unsplash.com/photo-1504384308090-c894fdcc538d")',
+      theme3: 'url("https://images.unsplash.com/photo-1607083206173-0a6b497151c5")',
+      theme4: 'url("https://images.unsplash.com/photo-1526304640581-d334cdbbf45e")',
+      theme5: 'url("https://images.unsplash.com/photo-1507525428034-b723cf961d3e")'
+    };
 
-    function initInputGrid() {
-      const grid = document.getElementById('inputGrid');
-      grid.innerHTML = '';
-      for (let i = 0; i < 8; i++) {
-        const btn = document.createElement('button');
-        btn.className = 'bs-btn';
-        btn.textContent = '-';
-        btn.dataset.index = i;
-        btn.onclick = () => toggle(btn);
-        grid.appendChild(btn);
+    function changeTheme(theme) {
+      body.style.backgroundImage = themes[theme];
+    }
+
+    // Set default theme
+    changeTheme('theme1');
+
+    const patterns = [
+      'SSBSBSBBSSBSBSSSBSBB','SSBSSSBSSSBSSBSSSBB','BSBBBSBBSBSBSSSBSSB',
+      'BSBSSSBSSSSBSBBBSBS','SSBSSBSBSSSBSSSBSSB','SBSSSBSSBBBSBBSBSSB',
+      'BSBSBSSSBSSSBSSSBBS','SBSSBBBSBSBSSSBSSSB','SBBSBSSSSBSSSSBSSSB',
+      'SSSBSSSBBSBBBSBSBSS','SSBSSSBSSSSSBSSSBSS','BSBSSBBBSBSSBSSSSSB',
+      'SSBBSSSBSSBBBSBSBBS','SSSBSSBSSBSBSBSSBSS','SSSSBBBSBSBBBSBSBBS',
+      'SSSSBBSSSBSSSSSBSSS','SSBBSSSBBSBBBSBSBBS','SSSBBSBSSBSBSBSSSSB',
+      'SBSSSBSSBBSSBBBSBBS','SBSSSBSSBBSSSSSSSSS','BBSS'
+    ];
+
+    let inputSequence = '';
+    let history = [];
+
+    function addInput(letter) {
+      if (inputSequence.length < 8) {
+        inputSequence += letter;
+        document.getElementById('inputDisplay').innerText = 'Input: ' + inputSequence;
       }
     }
 
-    function toggle(btn) {
-      const index = parseInt(btn.dataset.index);
-      if (!selected[index]) {
-        selected[index] = 'B';
-        btn.textContent = 'B';
-        btn.className = 'bs-btn B';
-      } else if (selected[index] === 'B') {
-        selected[index] = 'S';
-        btn.textContent = 'S';
-        btn.className = 'bs-btn S';
-      } else {
-        selected[index] = null;
-        btn.textContent = '-';
-        btn.className = 'bs-btn';
+    function getResult() {
+      let found = false;
+      let result = "No Match Found";
+
+      for (let pattern of patterns) {
+        for (let i = 0; i <= pattern.length - 9; i++) {
+          if (pattern.substr(i, 8) === inputSequence) {
+            result = "Next: " + pattern[i + 8];
+            found = true;
+            break;
+          }
+        }
+        if (found) break;
+      }
+
+      document.getElementById('result').innerText = "Result: " + result;
+
+      // Add to history (latest on top)
+      if (inputSequence.length === 8) {
+        history.unshift(`Input: ${inputSequence} → ${result}`);
+        if (history.length > 10) history.pop();
+
+        renderHistory();
       }
     }
 
-    function clearSelection() {
-      selected = Array(8).fill(null);
-      initInputGrid();
-      document.getElementById('result').innerText = 'अगला परिणाम: -';
+    function resetInput() {
+      inputSequence = '';
+      document.getElementById('inputDisplay').innerText = 'Input: ';
+      document.getElementById('result').innerText = 'Result: -';
     }
 
-    function predictNext() {
-      if (selected.includes(null)) {
-        alert("कृपया 8 इनपुट चुनें (B/S)");
-        return;
-      }
-
-      const inputStr = selected.join('');
-      const patternStr = patternSequence.join('');
-      const index = patternStr.indexOf(inputStr);
-
-      if (index !== -1 && index + 8 < patternSequence.length) {
-        const nextValue = patternSequence[index + 8];
-        showResult(nextValue);
-        addHistory(inputStr, nextValue);
-      } else {
-        document.getElementById('result').innerHTML = "🔍 <b>Result: No Match</b>";
-      }
+    function renderHistory() {
+      resultList.innerHTML = "";
+      history.forEach(item => {
+        const li = document.createElement('li');
+        li.textContent = item;
+        resultList.appendChild(li);
+      });
     }
-
-    function showResult(val) {
-      document.getElementById('result').innerHTML = `✅ अगला परिणाम: <b>${val}</b>`;
-    }
-
-    function addHistory(input, output) {
-      predictionHistory.unshift(`${input} → ${output}`);
-      if (predictionHistory.length > 10) predictionHistory.pop();
-      const historyDiv = document.getElementById('historyList');
-      historyDiv.innerHTML = predictionHistory.map(h => `<div class="history-item">${h}</div>`).join('');
-    }
-
-    window.onload = initInputGrid;
   </script>
 </body>
 </html>
