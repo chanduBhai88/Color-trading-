@@ -3,63 +3,61 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BS Sequence Generator</title>
+    <title>BS Click Generator</title>
     <style>
         body {
             font-family: 'Arial', sans-serif;
-            background: #1a1a2e;
+            background: #16213e;
             color: white;
             text-align: center;
             padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
         .container {
-            max-width: 600px;
-            margin: 0 auto;
-            background: rgba(0,0,0,0.3);
+            background: rgba(26, 26, 46, 0.8);
             padding: 30px;
             border-radius: 15px;
-            box-shadow: 0 0 20px rgba(233, 69, 96, 0.3);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            width: 90%;
+            max-width: 400px;
         }
         h1 {
             color: #e94560;
             margin-bottom: 30px;
         }
-        button {
+        #resultBox {
+            font-size: 80px;
+            height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(15, 52, 96, 0.5);
+            border-radius: 10px;
+            margin: 20px 0;
+            transition: all 0.3s;
+        }
+        #resultBox.show {
+            transform: scale(1.1);
+            background: rgba(233, 69, 96, 0.5);
+        }
+        #generateBtn {
             background: #e94560;
             color: white;
             border: none;
-            padding: 12px 25px;
+            padding: 15px 30px;
             font-size: 18px;
             border-radius: 50px;
             cursor: pointer;
             transition: all 0.3s;
+            width: 100%;
             margin-bottom: 30px;
         }
-        button:hover {
+        #generateBtn:hover {
             background: #ff6b81;
-            transform: scale(1.05);
-        }
-        .results {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-            margin-top: 20px;
-        }
-        .result-box {
-            background: rgba(15, 52, 96, 0.5);
-            padding: 15px;
-            border-radius: 8px;
-            font-size: 24px;
-            font-weight: bold;
-            min-height: 50px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s;
-        }
-        .result-box.show {
-            background: rgba(233, 69, 96, 0.5);
-            transform: scale(1.05);
+            transform: translateY(-3px);
         }
         .memory {
             margin-top: 30px;
@@ -68,34 +66,24 @@
             border-radius: 10px;
         }
         .memory-item {
-            padding: 8px;
-            margin: 5px 0;
+            padding: 10px;
+            margin: 8px 0;
             background: rgba(0,0,0,0.2);
             border-radius: 5px;
+            font-size: 18px;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>BS Sequence Generator</h1>
+        <h1>BS Click Generator</h1>
         
-        <button id="generateBtn">Generate 10 Results</button>
+        <button id="generateBtn">Click for Next Result</button>
         
-        <div class="results" id="resultsContainer">
-            <div class="result-box" id="result1"></div>
-            <div class="result-box" id="result2"></div>
-            <div class="result-box" id="result3"></div>
-            <div class="result-box" id="result4"></div>
-            <div class="result-box" id="result5"></div>
-            <div class="result-box" id="result6"></div>
-            <div class="result-box" id="result7"></div>
-            <div class="result-box" id="result8"></div>
-            <div class="result-box" id="result9"></div>
-            <div class="result-box" id="result10"></div>
-        </div>
+        <div id="resultBox"></div>
         
         <div class="memory">
-            <h3>Last 3 Generations</h3>
+            <h3>Last 3 Results</h3>
             <div id="memoryList"></div>
         </div>
     </div>
@@ -106,33 +94,25 @@
         let memory = [];
         
         document.getElementById('generateBtn').addEventListener('click', function() {
-            // Clear previous results
-            document.querySelectorAll('.result-box').forEach(box => {
-                box.classList.remove('show');
-                box.textContent = '';
-            });
+            const resultBox = document.getElementById('resultBox');
             
-            // Get next 10 characters
-            const results = [];
-            for (let i = 0; i < 10; i++) {
-                if (position >= fullSequence.length) position = 0;
-                results.push(fullSequence[position]);
-                position++;
-            }
+            // Reset animation
+            resultBox.classList.remove('show');
+            resultBox.textContent = '';
+            
+            // Get next character
+            if (position >= fullSequence.length) position = 0;
+            const result = fullSequence[position];
+            position++;
             
             // Display with animation
-            results.forEach((result, index) => {
-                setTimeout(() => {
-                    const box = document.getElementById(`result${index+1}`);
-                    box.textContent = result;
-                    box.classList.add('show');
-                    
-                    // Add to memory when last result is shown
-                    if (index === 9) {
-                        addToMemory(results.join(' '));
-                    }
-                }, index * 200);
-            });
+            setTimeout(() => {
+                resultBox.textContent = result;
+                resultBox.classList.add('show');
+                
+                // Add to memory
+                addToMemory(result);
+            }, 100);
         });
         
         function addToMemory(result) {
