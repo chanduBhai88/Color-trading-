@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Big/Small Predictor</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #222;
+        }
+        .input-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        button {
+            padding: 12px 25px;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        button:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+        #bigBtn {
+            background-color: #333;
+            color: white;
+        }
+        #smallBtn {
+            background-color: #333;
+            color: white;
+        }
+        #resultBtn {
+            background-color: #333;
+            color: white;
+            display: block;
+            margin: 0 auto;
+        }
+        #clearBtn {
+            background-color: #777;
+            color: white;
+        }
+        #inputsList {
+            margin: 25px 0;
+            font-size: 18px;
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 5px;
+            min-height: 60px;
+        }
+        #prediction {
+            font-size: 22px;
+            font-weight: bold;
+            margin: 25px 0;
+            min-height: 36px;
+            text-align: center;
+            padding: 15px;
+            background-color: #f0f0f0;
+            border-radius: 5px;
+        }
+        .hidden {
+            display: none;
+        }
+        .history {
+            margin-top: 30px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+        }
+        .history h2 {
+            margin-top: 0;
+            font-size: 18px;
+            color: #444;
+        }
+        .history-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .history-item {
+            padding: 5px 10px;
+            background-color: #e0e0e0;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Big/Small Predictor</h1>
+        
+        <div class="input-buttons">
+            <button id="bigBtn">BIG</button>
+            <button id="smallBtn">SMALL</button>
+            <button id="clearBtn">CLEAR</button>
+        </div>
+        
+        <div id="inputsList">Inputs will appear here...</div>
+        
+        <button id="resultBtn" class="hidden">GET PREDICTION</button>
+        
+        <div id="prediction"></div>
+
+        <div class="history">
+            <h2>Last 10 Results:</h2>
+            <div id="historyList" class="history-list">
+                No results yet
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const inputs = [];
+        const history = [];
+        const bigBtn = document.getElementById('bigBtn');
+        const smallBtn = document.getElementById('smallBtn');
+        const resultBtn = document.getElementById('resultBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const inputsList = document.getElementById('inputsList');
+        const predictionDiv = document.getElementById('prediction');
+        const historyList = document.getElementById('historyList');
+        
+        bigBtn.addEventListener('click', () => addInput('Big'));
+        smallBtn.addEventListener('click', () => addInput('Small'));
+        resultBtn.addEventListener('click', showPrediction);
+        clearBtn.addEventListener('click', clearInputs);
+
+        function addInput(value) {
+            inputs.push(value);
+            updateInputsDisplay();
+            if (inputs.length >= 5) {
+                resultBtn.classList.remove('hidden');
+            }
+        }
+        
+        function updateInputsDisplay() {
+            if (inputs.length === 0) {
+                inputsList.textContent = "Inputs will appear here...";
+            } else {
+                inputsList.textContent = 'Current inputs: ' + inputs.join(', ');
+            }
+        }
+
+        function showPrediction() {
+            if (inputs.length < 5) {
+                predictionDiv.textContent = "Please enter at least 5 inputs";
+                return;
+            }
+            
+            const lastFive = inputs.slice(-5);
+            const bigCount = lastFive.filter(x => x === 'Big').length;
+            const smallCount = lastFive.filter(x => x === 'Small').length;
+            
+            let prediction;
+            if (bigCount > smallCount) {
+                prediction = "Small (since there were more Bigs)";
+            } else if (smallCount > bigCount) {
+                prediction = "Big (since there were more Smalls)";
+            } else {
+                prediction = "Could be Big or Small (equal count)";
+            }
+            
+            // Add to history (keep only last 10)
+            history.push(prediction);
+            if (history.length > 10) {
+                history.shift();
+            }
+            
+            predictionDiv.innerHTML = "<strong>Prediction:</strong> " + prediction;
+            updateHistoryDisplay();
+        }
+
+        function updateHistoryDisplay() {
+            if (history.length === 0) {
+                historyList.innerHTML = "No results yet";
+                return;
+            }
+            
+            historyList.innerHTML = '';
+            history.forEach((item, index) => {
+                const div = document.createElement('div');
+                div.className = 'history-item';
+                div.textContent = `${index + 1}. ${item.split(' ')[0]}`;
+                if (item.includes('Big')) {
+                    div.style.backgroundColor = '#e0e0e0';
+                } else if (item.includes('Small')) {
+                    div.style.backgroundColor = '#d0d0d0';
+                }
+                historyList.appendChild(div);
+            });
+        }
+
+        function clearInputs() {
+            inputs.length = 0;
+            updateInputsDisplay();
+            predictionDiv.textContent = "";
+            resultBtn.classList.add('hidden');
+        }
+    </script>
+</body>
+</html>
