@@ -28,6 +28,10 @@
         #resultBtn {
             background-color: #1dd1a1;
         }
+        #clearBtn {
+            background-color: #576574;
+            color: white;
+        }
         #inputsList {
             margin: 20px 0;
             font-size: 18px;
@@ -49,6 +53,7 @@
     <div class="input-buttons">
         <button id="bigBtn">BIG</button>
         <button id="smallBtn">SMALL</button>
+        <button id="clearBtn">CLEAR</button>
     </div>
     
     <div id="inputsList">Inputs: </div>
@@ -62,18 +67,18 @@
         const bigBtn = document.getElementById('bigBtn');
         const smallBtn = document.getElementById('smallBtn');
         const resultBtn = document.getElementById('resultBtn');
+        const clearBtn = document.getElementById('clearBtn');
         const inputsList = document.getElementById('inputsList');
         const predictionDiv = document.getElementById('prediction');
         
-        // Button click handlers
         bigBtn.addEventListener('click', () => addInput('Big'));
         smallBtn.addEventListener('click', () => addInput('Small'));
         resultBtn.addEventListener('click', showPrediction);
-        
+        clearBtn.addEventListener('click', clearInputs);
+
         function addInput(value) {
             inputs.push(value);
             updateInputsDisplay();
-            
             if (inputs.length >= 5) {
                 resultBtn.classList.remove('hidden');
             }
@@ -82,19 +87,17 @@
         function updateInputsDisplay() {
             inputsList.textContent = 'Inputs: ' + inputs.join(', ');
         }
-        
+
         function showPrediction() {
             if (inputs.length < 5) {
                 predictionDiv.textContent = "Please enter at least 5 inputs";
                 return;
             }
             
-            // Simple prediction logic (modify as needed)
             const lastFive = inputs.slice(-5);
             const bigCount = lastFive.filter(x => x === 'Big').length;
             const smallCount = lastFive.filter(x => x === 'Small').length;
             
-            // Example prediction logic - you can replace with your algorithm
             let prediction;
             if (bigCount > smallCount) {
                 prediction = "Small (since there were more Bigs)";
@@ -105,6 +108,13 @@
             }
             
             predictionDiv.textContent = "Prediction: " + prediction;
+        }
+
+        function clearInputs() {
+            inputs.length = 0;
+            updateInputsDisplay();
+            predictionDiv.textContent = "";
+            resultBtn.classList.add('hidden');
         }
     </script>
 </body>
