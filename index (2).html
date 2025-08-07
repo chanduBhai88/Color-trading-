@@ -5,25 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>51Game Wingo 1-Min Prediction</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        .container { max-width: 600px; margin: auto; }
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f4f4f4; }
+        .container { max-width: 600px; margin: auto; text-align: center; }
         .history { margin: 20px 0; }
-        .result { padding: 10px; background: #f0f0f0; margin: 5px 0; }
-        .prediction { font-weight: bold; color: #0066cc; }
-        button { padding: 10px; background: #ffcc00; border: none; cursor: pointer; }
-        input { padding: 5px; margin-right: 10px; }
+        .result { padding: 10px; background: #fff; margin: 5px 0; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .prediction { font-weight: bold; color: #0066cc; font-size: 1.2em; }
+        button { padding: 10px 20px; background: #ffcc00; border: none; cursor: pointer; border-radius: 5px; font-size: 1em; }
+        button:hover { background: #e6b800; }
+        .win { color: green; font-weight: bold; }
+        .lose { color: red; font-weight: bold; }
     </style>
 </head>
 <body>
     <div class="container">
         <h2>51Game Wingo 1-Min Prediction</h2>
-        <div>
-            <input type="number" id="period" placeholder="Period" min="0">
-            <input type="number" id="number" placeholder="Number (0-9)" min="0" max="9">
-            <button onclick="addResult()">Add Result</button>
-        </div>
+        <button onclick="generateResult()">Generate Next Result</button>
         <div class="history" id="history"></div>
-        <div class="prediction" id="prediction">Prediction: -</div>
+        <div class="prediction" id="prediction">Prediction: Waiting for results...</div>
     </div>
 
     <script>
@@ -31,31 +29,26 @@
         const historyDiv = document.getElementById('history');
         const predictionDiv = document.getElementById('prediction');
 
-        function addResult() {
-            const period = document.getElementById('period').value;
-            const number = parseInt(document.getElementById('number').value);
-            if (period && number >= 0 && number <= 9) {
-                history.push({ period, number });
-                updateHistory();
-                predictNext();
-                document.getElementById('period').value = '';
-                document.getElementById('number').value = '';
-            } else {
-                alert('Please enter valid period and number (0-9)!');
-            }
+        function generateResult() {
+            const period = history.length + 1; // Auto-increment period
+            const number = Math.floor(Math.random() * 10); // Random number 0-9
+            history.push({ period, number });
+            updateHistory();
+            predictNext();
         }
 
         function updateHistory() {
             historyDiv.innerHTML = '';
             history.forEach(item => {
                 const isBig = item.number >= 5 ? 'Big' : 'Small';
-                historyDiv.innerHTML += `<div class="result">Period: ${item.period}, Number: ${item.number} (${isBig})</div>`;
+                const colorClass = isBig ? 'win' : 'lose';
+                historyDiv.innerHTML += `<div class="result">Period: ${item.period}, Number: ${item.number} (<span class="${colorClass}">${isBig}</span>)</div>`;
             });
         }
 
         function predictNext() {
             if (history.length < 3) {
-                predictionDiv.textContent = 'Prediction: Need more data (min 3 results)';
+                predictionDiv.textContent = `Prediction: Need more data (min ${3 - history.length} results)`;
                 return;
             }
             let bigCount = 0, smallCount = 0;
@@ -63,8 +56,9 @@
                 if (history[i].number >= 5) bigCount++;
                 else smallCount++;
             }
+            const probability = bigCount > smallCount ? 60 + Math.random() * 20 : 40 + Math.random() * 20; // Fake probability for fun
             const prediction = bigCount > smallCount ? 'Big' : 'Small';
-            predictionDiv.textContent = `Prediction: ${prediction} (Based on last 3 results)`;
+            predictionDiv.innerHTML = `Prediction: <span class="${prediction === 'Big' ? 'win' : 'lose'}">${prediction}</span> (Win Probability: ${probability.toFixed(1)}%)`;
         }
     </script>
 </body>
