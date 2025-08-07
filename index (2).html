@@ -1,64 +1,110 @@
 <!DOCTYPE html>
-<html lang="hi">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>51Game Wingo 1-Min Prediction</title>
+    <title>Big/Small Predictor</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 20px; background: #f4f4f4; }
-        .container { max-width: 600px; margin: auto; text-align: center; }
-        .history { margin: 20px 0; }
-        .result { padding: 10px; background: #fff; margin: 5px 0; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .prediction { font-weight: bold; color: #0066cc; font-size: 1.2em; }
-        button { padding: 10px 20px; background: #ffcc00; border: none; cursor: pointer; border-radius: 5px; font-size: 1em; }
-        button:hover { background: #e6b800; }
-        .win { color: green; font-weight: bold; }
-        .lose { color: red; font-weight: bold; }
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .input-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        #bigBtn {
+            background-color: #ff6b6b;
+        }
+        #smallBtn {
+            background-color: #48dbfb;
+        }
+        #resultBtn {
+            background-color: #1dd1a1;
+        }
+        #inputsList {
+            margin: 20px 0;
+            font-size: 18px;
+        }
+        #prediction {
+            font-size: 24px;
+            font-weight: bold;
+            margin-top: 20px;
+            min-height: 36px;
+        }
+        .hidden {
+            display: none;
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h2>51Game Wingo 1-Min Prediction</h2>
-        <button onclick="generateResult()">Generate Next Result</button>
-        <div class="history" id="history"></div>
-        <div class="prediction" id="prediction">Prediction: Waiting for results...</div>
+    <h1>Big/Small Predictor</h1>
+    
+    <div class="input-buttons">
+        <button id="bigBtn">BIG</button>
+        <button id="smallBtn">SMALL</button>
     </div>
+    
+    <div id="inputsList">Inputs: </div>
+    
+    <button id="resultBtn" class="hidden">GET RESULT</button>
+    
+    <div id="prediction"></div>
 
     <script>
-        let history = [];
-        const historyDiv = document.getElementById('history');
+        const inputs = [];
+        const bigBtn = document.getElementById('bigBtn');
+        const smallBtn = document.getElementById('smallBtn');
+        const resultBtn = document.getElementById('resultBtn');
+        const inputsList = document.getElementById('inputsList');
         const predictionDiv = document.getElementById('prediction');
-
-        function generateResult() {
-            const period = history.length + 1; // Auto-increment period
-            const number = Math.floor(Math.random() * 10); // Random number 0-9
-            history.push({ period, number });
-            updateHistory();
-            predictNext();
+        
+        // Button click handlers
+        bigBtn.addEventListener('click', () => addInput('Big'));
+        smallBtn.addEventListener('click', () => addInput('Small'));
+        resultBtn.addEventListener('click', showPrediction);
+        
+        function addInput(value) {
+            inputs.push(value);
+            updateInputsDisplay();
+            
+            if (inputs.length >= 5) {
+                resultBtn.classList.remove('hidden');
+            }
         }
-
-        function updateHistory() {
-            historyDiv.innerHTML = '';
-            history.forEach(item => {
-                const isBig = item.number >= 5 ? 'Big' : 'Small';
-                const colorClass = isBig ? 'win' : 'lose';
-                historyDiv.innerHTML += `<div class="result">Period: ${item.period}, Number: ${item.number} (<span class="${colorClass}">${isBig}</span>)</div>`;
-            });
+        
+        function updateInputsDisplay() {
+            inputsList.textContent = 'Inputs: ' + inputs.join(', ');
         }
-
-        function predictNext() {
-            if (history.length < 3) {
-                predictionDiv.textContent = `Prediction: Need more data (min ${3 - history.length} results)`;
+        
+        function showPrediction() {
+            if (inputs.length < 5) {
+                predictionDiv.textContent = "Please enter at least 5 inputs";
                 return;
             }
-            let bigCount = 0, smallCount = 0;
-            for (let i = history.length - 3; i < history.length; i++) {
-                if (history[i].number >= 5) bigCount++;
-                else smallCount++;
+            
+            // Simple prediction logic (modify as needed)
+            const lastFive = inputs.slice(-5);
+            const bigCount = lastFive.filter(x => x === 'Big').length;
+            const smallCount = lastFive.filter(x => x === 'Small').length;
+            
+            // Example prediction logic - you can replace with your algorithm
+            let prediction;
+            if (bigCount > smallCount) {
+                prediction = "Small (since there were more Bigs)";
+            } else if (smallCount > bigCount) {
+                prediction = "Big (since there were more Smalls)";
+            } else {
+                prediction = "Could be Big or Small (equal count)";
             }
-            const probability = bigCount > smallCount ? 60 + Math.random() * 20 : 40 + Math.random() * 20; // Fake probability for fun
-            const prediction = bigCount > smallCount ? 'Big' : 'Small';
-            predictionDiv.innerHTML = `Prediction: <span class="${prediction === 'Big' ? 'win' : 'lose'}">${prediction}</span> (Win Probability: ${probability.toFixed(1)}%)`;
+            
+            predictionDiv.textContent = "Prediction: " + prediction;
         }
     </script>
 </body>
