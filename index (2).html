@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>51Game Wingo 1-Min Prediction</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .container { max-width: 600px; margin: auto; }
+        .history { margin: 20px 0; }
+        .result { padding: 10px; background: #f0f0f0; margin: 5px 0; }
+        .prediction { font-weight: bold; color: #0066cc; }
+        button { padding: 10px; background: #ffcc00; border: none; cursor: pointer; }
+        input { padding: 5px; margin-right: 10px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>51Game Wingo 1-Min Prediction</h2>
+        <div>
+            <input type="number" id="period" placeholder="Period" min="0">
+            <input type="number" id="number" placeholder="Number (0-9)" min="0" max="9">
+            <button onclick="addResult()">Add Result</button>
+        </div>
+        <div class="history" id="history"></div>
+        <div class="prediction" id="prediction">Prediction: -</div>
+    </div>
+
+    <script>
+        let history = [];
+        const historyDiv = document.getElementById('history');
+        const predictionDiv = document.getElementById('prediction');
+
+        function addResult() {
+            const period = document.getElementById('period').value;
+            const number = parseInt(document.getElementById('number').value);
+            if (period && number >= 0 && number <= 9) {
+                history.push({ period, number });
+                updateHistory();
+                predictNext();
+                document.getElementById('period').value = '';
+                document.getElementById('number').value = '';
+            } else {
+                alert('Please enter valid period and number (0-9)!');
+            }
+        }
+
+        function updateHistory() {
+            historyDiv.innerHTML = '';
+            history.forEach(item => {
+                const isBig = item.number >= 5 ? 'Big' : 'Small';
+                historyDiv.innerHTML += `<div class="result">Period: ${item.period}, Number: ${item.number} (${isBig})</div>`;
+            });
+        }
+
+        function predictNext() {
+            if (history.length < 3) {
+                predictionDiv.textContent = 'Prediction: Need more data (min 3 results)';
+                return;
+            }
+            let bigCount = 0, smallCount = 0;
+            for (let i = history.length - 3; i < history.length; i++) {
+                if (history[i].number >= 5) bigCount++;
+                else smallCount++;
+            }
+            const prediction = bigCount > smallCount ? 'Big' : 'Small';
+            predictionDiv.textContent = `Prediction: ${prediction} (Based on last 3 results)`;
+        }
+    </script>
+</body>
+</html>
