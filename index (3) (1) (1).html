@@ -1,131 +1,262 @@
 <!DOCTYPE html>
-<html>
+<html lang="hi">
 <head>
-    <title>Auto Input Generator</title>
+    <meta charset="UTF-8">
+    <title>बिग/स्मॉल प्रिडिक्टर</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        .container { background: #f0f8ff; padding: 20px; border-radius: 10px; }
-        table { width: 100%; border-collapse: collapse; margin: 10px 0; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
-        th { background: #4CAF50; color: white; }
-        .clickable { cursor: pointer; }
-        .clickable:hover { background: #e6f7ff; }
-        .output { margin-top: 20px; padding: 10px; background: #e9e9e9; border-radius: 4px; }
+        :root {
+            --bg-color: white;
+            --text-color: black;
+            --button-color: #ddd;
+            --big-color: #ff6b6b;
+            --small-color: #48dbfb;
+            --result-color: #1dd1a1;
+            --clear-color: #576574;
+        }
+
+        [data-theme="dark"] {
+            --bg-color: black;
+            --text-color: white;
+            --button-color: #333;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .input-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        button {
+            padding: 12px 25px;
+            font-size: 18px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+        }
+
+        #bigBtn {
+            background-color: var(--big-color);
+            color: white;
+        }
+
+        #smallBtn {
+            background-color: var(--small-color);
+            color: black;
+        }
+
+        #resultBtn {
+            background-color: var(--result-color);
+            color: white;
+        }
+
+        #clearBtn {
+            background-color: var(--clear-color);
+            color: white;
+        }
+
+        #inputsList {
+            margin: 20px 0;
+            font-size: 18px;
+        }
+
+        #prediction {
+            font-size: 22px;
+            font-weight: bold;
+            margin-top: 20px;
+            min-height: 30px;
+        }
+
+        #memoryList {
+            margin-top: 30px;
+            font-size: 16px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        #themeToggle {
+            margin-top: 10px;
+            cursor: pointer;
+            padding: 8px 16px;
+            background-color: var(--button-color);
+            color: var(--text-color);
+            border-radius: 5px;
+        }
+        
+        #imageData {
+            width: 100%;
+            height: 150px;
+            margin-top: 20px;
+        }
     </style>
 </head>
-<body>
-    <div class="container">
-        <h2>10 रिजल्ट्स में से इनपुट बनाएं</h2>
-        <p><strong>निर्देश:</strong> पहले रिजल्ट के लिए किसी भी पीरियड पर क्लिक करें।</p>
-        
-        <table>
-            <tr>
-                <th>Period</th>
-                <th>Number</th>
-                <th>Big/Small</th>
-                <th>Color</th>
-            </tr>
-            <tr class="clickable" onclick="setFirstResult('20250806100010694', 5, 'BIG', 'Red')">
-                <td>20250806100010694</td>
-                <td>5</td>
-                <td>BIG</td>
-                <td style="color: red;">Red</td>
-            </tr>
-            <tr class="clickable" onclick="setFirstResult('20250806100010693', 0, 'SMALL', 'Green')">
-                <td>20250806100010693</td>
-                <td>0</td>
-                <td>SMALL</td>
-                <td style="color: green;">Green</td>
-            </tr>
-            <tr class="clickable" onclick="setFirstResult('20250806100010692', 1, 'SMALL', 'Red')">
-                <td>20250806100010692</td>
-                <td>1</td>
-                <td>SMALL</td>
-                <td style="color: red;">Red</td>
-            </tr>
-            <tr class="clickable" onclick="setFirstResult('20250806100010691', 3, 'SMALL', 'Red')">
-                <td>20250806100010691</td>
-                <td>3</td>
-                <td>SMALL</td>
-                <td style="color: red;">Red</td>
-            </tr>
-            <tr class="clickable" onclick="setFirstResult('20250806100010690', 8, 'BIG', 'Green')">
-                <td>20250806100010690</td>
-                <td>8</td>
-                <td>BIG</td>
-                <td style="color: green;">Green</td>
-            </tr>
-            <tr class="clickable" onclick="setFirstResult('20250806100010689', 2, 'SMALL', 'Green')">
-                <td>20250806100010689</td>
-                <td>2</td>
-                <td>SMALL</td>
-                <td style="color: green;">Green</td>
-            </tr>
-            <tr class="clickable" onclick="setFirstResult('20250806100010688', 3, 'SMALL', 'Red')">
-                <td>20250806100010688</td>
-                <td>3</td>
-                <td>SMALL</td>
-                <td style="color: red;">Red</td>
-            </tr>
-            <tr class="clickable" onclick="setFirstResult('20250806100010687', 9, 'BIG', 'Red')">
-                <td>20250806100010687</td>
-                <td>9</td>
-                <td>BIG</td>
-                <td style="color: red;">Red</td>
-            </tr>
-            <tr class="clickable" onclick="setFirstResult('20250806100010686', 6, 'BIG', 'Green')">
-                <td>20250806100010686</td>
-                <td>6</td>
-                <td>BIG</td>
-                <td style="color: green;">Green</td>
-            </tr>
-            <tr class="clickable" onclick="setFirstResult('20250806100010685', 7, 'SMALL', 'Red')">
-                <td>20250806100010685</td>
-                <td>7</td>
-                <td>SMALL</td>
-                <td style="color: red;">Red</td>
-            </tr>
-        </table>
-        
-        <div class="output" id="output" style="display: none;">
-            <h3>जनरेटेड इनपुट:</h3>
-            <p id="generatedInput"></p>
-        </div>
+<body data-theme="light">
+    <h1>बिग/स्मॉल प्रिडिक्टर</h1>
+
+    <div class="input-buttons">
+        <button id="bigBtn">बिग</button>
+        <button id="smallBtn">स्मॉल</button>
+        <button id="clearBtn">साफ करें</button>
     </div>
 
-    <script>
-        let allResults = [
-            { period: '20250806100010694', number: 5, bigSmall: 'BIG', color: 'Red' },
-            { period: '20250806100010693', number: 0, bigSmall: 'SMALL', color: 'Green' },
-            { period: '20250806100010692', number: 1, bigSmall: 'SMALL', color: 'Red' },
-            { period: '20250806100010691', number: 3, bigSmall: 'SMALL', color: 'Red' },
-            { period: '20250806100010690', number: 8, bigSmall: 'BIG', color: 'Green' },
-            { period: '20250806100010689', number: 2, bigSmall: 'SMALL', color: 'Green' },
-            { period: '20250806100010688', number: 3, bigSmall: 'SMALL', color: 'Red' },
-            { period: '20250806100010687', number: 9, bigSmall: 'BIG', color: 'Red' },
-            { period: '20250806100010686', number: 6, bigSmall: 'BIG', color: 'Green' },
-            { period: '20250806100010685', number: 7, bigSmall: 'SMALL', color: 'Red' }
-        ];
+    <textarea id="imageData" placeholder="यहाँ इमेज डेटा पेस्ट करें..."></textarea>
 
-        function setFirstResult(period, number, bigSmall, color) {
-            // 1. क्लिक किए गए रिजल्ट को "फर्स्ट रिजल्ट" मानें
-            const clickedIndex = allResults.findIndex(r => r.period === period);
+    <div id="inputsList">इनपुट्स: </div>
+
+    <button id="resultBtn" class="hidden">रिजल्ट पाएं</button>
+
+    <div id="prediction"></div>
+
+    <div id="memoryList"><strong>पिछले 10 प्रिडिक्शन:</strong><br><ul id="memoryOutput"></ul></div>
+
+    <button id="themeToggle">थीम बदलें</button>
+
+    <script>
+        const inputs = [];
+        const memory = [];
+        const maxMemory = 10;
+
+        const bigBtn = document.getElementById('bigBtn');
+        const smallBtn = document.getElementById('smallBtn');
+        const resultBtn = document.getElementById('resultBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const themeToggle = document.getElementById('themeToggle');
+        const inputsList = document.getElementById('inputsList');
+        const predictionDiv = document.getElementById('prediction');
+        const memoryOutput = document.getElementById('memoryOutput');
+        const body = document.body;
+        const imageDataInput = document.getElementById('imageData');
+
+        bigBtn.addEventListener('click', () => addInput('Big'));
+        smallBtn.addEventListener('click', () => addInput('Small'));
+        resultBtn.addEventListener('click', showPrediction);
+        clearBtn.addEventListener('click', clearInputs);
+        themeToggle.addEventListener('click', toggleTheme);
+        imageDataInput.addEventListener('change', processImageData);
+
+        function addInput(value) {
+            inputs.push(value);
+            updateInputsDisplay();
+            checkInputsForResult();
+        }
+
+        function processImageData() {
+            const data = imageDataInput.value;
+            if (!data) return;
             
-            // 2. दूसरा, तीसरा, चौथा BIG/SMALL लें
-            const second = allResults[clickedIndex + 1]?.bigSmall || 'N/A';
-            const third = allResults[clickedIndex + 2]?.bigSmall || 'N/A';
-            const fourth = allResults[clickedIndex + 3]?.bigSmall || 'N/A';
+            // इमेज डेटा से रिजल्ट्स निकालें
+            const lines = data.split('\n');
+            const results = [];
             
-            // 3. 9वें और 10वें रिजल्ट का लास्ट डिजिट
-            const ninthDigit = allResults[8].number.toString().slice(-1);
-            const tenthDigit = allResults[9].number.toString().slice(-1);
+            for (const line of lines) {
+                if (line.match(/^\d{17}\s+\d+\s+(Big|Small)/)) {
+                    const parts = line.trim().split(/\s+/);
+                    results.push({
+                        period: parts[0],
+                        number: parts[1],
+                        bigSmall: parts[2]
+                    });
+                }
+            }
             
-            // 4. फाइनल इनपुट बनाएं
-            const finalInput = `${second} ${third} ${fourth} ${ninthDigit}${tenthDigit}`;
+            if (results.length >= 10) {
+                // पहले रिजल्ट को छोड़कर 2,3,4 रिजल्ट लें
+                for (let i = 1; i <= 3; i++) {
+                    addInput(results[i].bigSmall);
+                }
+                
+                // 9वें और 10वें रिजल्ट के पीरियड के अंतिम अंक लें
+                const lastDigit9 = results[8].period.slice(-1);
+                const lastDigit10 = results[9].period.slice(-1);
+                
+                addInput(lastDigit9);
+                addInput(lastDigit10);
+            }
+        }
+
+        function updateInputsDisplay() {
+            inputsList.textContent = 'इनपुट्स: ' + inputs.join(', ');
+        }
+
+        function checkInputsForResult() {
+            if (inputs.length >= 5) {
+                resultBtn.classList.remove('hidden');
+            } else {
+                resultBtn.classList.add('hidden');
+            }
+        }
+
+        function showPrediction() {
+            if (inputs.length < 5) {
+                predictionDiv.textContent = "कृपया कम से कम 5 इनपुट दर्ज करें";
+                return;
+            }
+
+            // पहले 3 Big/Small इनपुट
+            const bigSmallInputs = inputs.slice(0, 3);
+            const bigCount = bigSmallInputs.filter(x => x === 'Big').length;
+            const smallCount = bigSmallInputs.filter(x => x === 'Small').length;
+
+            // अंतिम 2 नंबर इनपुट
+            const numberInputs = inputs.slice(3, 5);
+            const sum = numberInputs.reduce((a, b) => parseInt(a) + parseInt(b), 0);
             
-            // 5. आउटपुट दिखाएं
-            document.getElementById("generatedInput").textContent = finalInput;
-            document.getElementById("output").style.display = "block";
+            let prediction;
+            if (bigCount > smallCount) {
+                prediction = "स्मॉल (क्योंकि ज्यादा बिग थे)";
+            } else if (smallCount > bigCount) {
+                prediction = "बिग (क्योंकि ज्यादा स्मॉल थे)";
+            } else {
+                prediction = "बिग या स्मॉल हो सकता है (बराबर संख्या)";
+            }
+
+            // नंबर्स का योग भी जोड़ें
+            prediction += ` | नंबर्स का योग: ${sum}`;
+
+            predictionDiv.textContent = "प्रिडिक्शन: " + prediction;
+
+            // मेमोरी में जोड़ें
+            memory.unshift(prediction);
+            if (memory.length > maxMemory) {
+                memory.pop();
+            }
+            updateMemoryDisplay();
+        }
+
+        function updateMemoryDisplay() {
+            memoryOutput.innerHTML = '';
+            memory.forEach((item, index) => {
+                const li = document.createElement('li');
+                li.textContent = `${index + 1}. ${item}`;
+                memoryOutput.appendChild(li);
+            });
+        }
+
+        function clearInputs() {
+            inputs.length = 0;
+            updateInputsDisplay();
+            predictionDiv.textContent = "";
+            resultBtn.classList.add('hidden');
+            imageDataInput.value = "";
+        }
+
+        function toggleTheme() {
+            const currentTheme = body.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            body.setAttribute('data-theme', newTheme);
+            themeToggle.textContent = newTheme === 'light' ? "थीम बदलें" : "थीम बदलें";
         }
     </script>
 </body>
