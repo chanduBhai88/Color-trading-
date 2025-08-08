@@ -1,111 +1,90 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Color Game Input Generator</title>
+    <title>Auto Game Result Predictor</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            background-color: #f5f5f5;
-        }
-        .container {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-        }
-        h1 {
-            color: #333;
-        }
-        .input-section {
-            margin-bottom: 20px;
-        }
-        label {
-            display: block;
-            margin: 10px 0 5px;
-        }
-        input, select {
-            padding: 8px;
-            width: 100%;
-            margin-bottom: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-        }
-        button {
-            padding: 10px 15px;
-            background: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        button:hover {
-            background: #45a049;
-        }
-        .output {
-            margin-top: 20px;
-            padding: 10px;
-            background: #e9e9e9;
-            border-radius: 4px;
-        }
+        body { font-family: Arial; margin: 20px; }
+        .container { background: #f9f9f9; padding: 20px; border-radius: 10px; }
+        table { width: 100%; border-collapse: collapse; margin: 10px 0; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+        th { background: #4CAF50; color: white; }
+        button { padding: 10px; background: #4CAF50; color: white; border: none; cursor: pointer; }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Game Input Generator</h1>
+        <h2>पास्ट रिजल्ट (Last 5 Rounds):</h2>
+        <table>
+            <tr>
+                <th>Number</th>
+                <th>Big/Small</th>
+                <th>Color</th>
+            </tr>
+            <tr>
+                <td>8</td>
+                <td>Big</td>
+                <td style="color: green;">Green</td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td>Small</td>
+                <td style="color: green;">Green</td>
+            </tr>
+            <tr>
+                <td>3</td>
+                <td>Small</td>
+                <td style="color: red;">Red</td>
+            </tr>
+            <tr>
+                <td>9</td>
+                <td>Big</td>
+                <td style="color: red;">Red</td>
+            </tr>
+            <tr>
+                <td>6</td>
+                <td>Big</td>
+                <td style="color: green;">Green</td>
+            </tr>
+        </table>
+
+        <button onclick="predictNext()">अगला रिजल्ट प्रिडिक्ट करें</button>
         
-        <div class="input-section">
-            <h3>पहले 3 डिजिट (BIG/SMALL):</h3>
-            <label>रिजल्ट 1:</label>
-            <select id="result1">
-                <option value="BIG">BIG</option>
-                <option value="SMALL">SMALL</option>
-            </select>
-            
-            <label>रिजल्ट 2:</label>
-            <select id="result2">
-                <option value="BIG">BIG</option>
-                <option value="SMALL">SMALL</option>
-            </select>
-            
-            <label>रिजल्ट 3:</label>
-            <select id="result3">
-                <option value="BIG">BIG</option>
-                <option value="SMALL">SMALL</option>
-            </select>
-        </div>
-        
-        <div class="input-section">
-            <h3>अंतिम 2 डिजिट (लास्ट नंबर्स):</h3>
-            <label>नंबर 1 (0-9):</label>
-            <input type="number" id="num1" min="0" max="9" placeholder="6">
-            
-            <label>नंबर 2 (0-9):</label>
-            <input type="number" id="num2" min="0" max="9" placeholder="5">
-        </div>
-        
-        <button onclick="generateInput()">इनपुट जनरेट करें</button>
-        
-        <div class="output" id="output">
-            यहाँ आउटपुट दिखेगा...
-        </div>
+        <div id="prediction" style="margin-top: 20px; font-weight: bold;"></div>
     </div>
 
     <script>
-        function generateInput() {
-            // पहले 3 डिजिट (BIG/SMALL)
-            const r1 = document.getElementById("result1").value;
-            const r2 = document.getElementById("result2").value;
-            const r3 = document.getElementById("result3").value;
-            
-            // अंतिम 2 डिजिट (नंबर्स)
-            const n1 = document.getElementById("num1").value;
-            const n2 = document.getElementById("num2").value;
-            
-            // आउटपुट बनाएं
-            const output = `${r1} ${r2} ${r3} ${n1}${n2}`;
-            document.getElementById("output").innerHTML = 
-                `<strong>जनरेटेड इनपुट:</strong> ${output}`;
+        function predictNext() {
+            // पास्ट रिजल्ट्स का डेटा (आपके द्वारा दिया गया)
+            const pastResults = [
+                { number: 8, bigSmall: "Big", color: "Green" },
+                { number: 2, bigSmall: "Small", color: "Green" },
+                { number: 3, bigSmall: "Small", color: "Red" },
+                { number: 9, bigSmall: "Big", color: "Red" },
+                { number: 6, bigSmall: "Big", color: "Green" }
+            ];
+
+            // रैंडम प्रिडिक्शन (लॉजिक आपके नियमों के अनुसार)
+            const nextNumber = Math.floor(Math.random() * 10); // 0-9
+            let bigSmall = nextNumber >= 5 ? "Big" : "Small";
+            let color = (nextNumber % 2 === 0) ? "Green" : "Red";
+
+            // आउटपुट दिखाएं
+            document.getElementById("prediction").innerHTML = `
+                <p>प्रिडिक्टेड रिजल्ट:</p>
+                <table>
+                    <tr>
+                        <th>Number</th>
+                        <th>Big/Small</th>
+                        <th>Color</th>
+                    </tr>
+                    <tr>
+                        <td>${nextNumber}</td>
+                        <td>${bigSmall}</td>
+                        <td style="color: ${color.toLowerCase()};">${color}</td>
+                    </tr>
+                </table>
+                <p>Pattern: ${pastResults.map(r => r.bigSmall).join(", ")} → ${bigSmall}</p>
+            `;
         }
     </script>
 </body>
