@@ -1,266 +1,111 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>BDG Game Tracker (Big/Small)</title>
+    <title>Color Game Input Generator</title>
     <style>
-        :root {
-            --bg-dark: #0a0a0a;
-            --accent-green: #00ff88;
-            --accent-red: #ff0055;
-            --accent-violet: #aa00ff;
-        }
         body {
-            font-family: 'Arial', sans-serif;
-            background: var(--bg-dark);
-            color: white;
-            margin: 0;
-            padding: 20px;
-            text-align: center;
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
         }
         .container {
-            max-width: 600px;
-            margin: 0 auto;
-            background: #111;
-            border-radius: 10px;
+            background: white;
             padding: 20px;
-            box-shadow: 0 0 20px rgba(0, 255, 136, 0.1);
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
         }
         h1 {
-            color: var(--accent-green);
-            margin-bottom: 30px;
+            color: #333;
         }
-        .game-board {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
+        .input-section {
             margin-bottom: 20px;
         }
-        .box {
-            background: #222;
-            padding: 15px;
-            border-radius: 8px;
-            border: 1px solid #333;
+        label {
+            display: block;
+            margin: 10px 0 5px;
         }
-        .box h2 {
-            margin-top: 0;
-            font-size: 18px;
-        }
-        .big-box {
-            border-bottom: 3px solid var(--accent-violet);
-        }
-        .small-box {
-            border-bottom: 3px solid var(--accent-green);
-        }
-        .timer {
-            font-size: 24px;
-            margin: 20px 0;
-            color: var(--accent-green);
-        }
-        .history {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            margin: 20px 0;
-            flex-wrap: wrap;
-        }
-        .history-item {
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-        }
-        .red {
-            background: var(--accent-red);
-        }
-        .violet {
-            background: var(--accent-violet);
-        }
-        .green {
-            background: var(--accent-green);
-            color: black;
-        }
-        .prediction {
-            background: #333;
-            padding: 10px;
-            border-radius: 5px;
-            margin-top: 20px;
-            font-weight: bold;
-        }
-        .trend-up {
-            color: var(--accent-green);
-        }
-        .trend-down {
-            color: var(--accent-red);
+        input, select {
+            padding: 8px;
+            width: 100%;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
         }
         button {
-            background: var(--accent-green);
-            color: black;
+            padding: 10px 15px;
+            background: #4CAF50;
+            color: white;
             border: none;
-            padding: 10px 20px;
-            font-weight: bold;
-            border-radius: 5px;
+            border-radius: 4px;
             cursor: pointer;
-            margin: 5px;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        .output {
+            margin-top: 20px;
+            padding: 10px;
+            background: #e9e9e9;
+            border-radius: 4px;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🚀 BDG Game Tracker (Big/Small)</h1>
+        <h1>Game Input Generator</h1>
         
-        <div class="timer" id="timer">00:60</div>
-        
-        <div class="game-board">
-            <div class="box big-box">
-                <h2>BIG (Red/Violet)</h2>
-                <div id="big-count">0</div>
-                <div id="big-percent">0%</div>
-            </div>
-            <div class="box small-box">
-                <h2>SMALL (Green)</h2>
-                <div id="small-count">0</div>
-                <div id="small-percent">0%</div>
-            </div>
+        <div class="input-section">
+            <h3>पहले 3 डिजिट (BIG/SMALL):</h3>
+            <label>रिजल्ट 1:</label>
+            <select id="result1">
+                <option value="BIG">BIG</option>
+                <option value="SMALL">SMALL</option>
+            </select>
+            
+            <label>रिजल्ट 2:</label>
+            <select id="result2">
+                <option value="BIG">BIG</option>
+                <option value="SMALL">SMALL</option>
+            </select>
+            
+            <label>रिजल्ट 3:</label>
+            <select id="result3">
+                <option value="BIG">BIG</option>
+                <option value="SMALL">SMALL</option>
+            </select>
         </div>
         
-        <div class="prediction" id="prediction">
-            Game shuru hone ka intezaar...
+        <div class="input-section">
+            <h3>अंतिम 2 डिजिट (लास्ट नंबर्स):</h3>
+            <label>नंबर 1 (0-9):</label>
+            <input type="number" id="num1" min="0" max="9" placeholder="6">
+            
+            <label>नंबर 2 (0-9):</label>
+            <input type="number" id="num2" min="0" max="9" placeholder="5">
         </div>
         
-        <div class="history" id="history"></div>
+        <button onclick="generateInput()">इनपुट जनरेट करें</button>
         
-        <button onclick="startGame()">Start Game</button>
-        <button onclick="resetGame()">Reset</button>
+        <div class="output" id="output">
+            यहाँ आउटपुट दिखेगा...
+        </div>
     </div>
 
     <script>
-        // Game data
-        let results = [];
-        let timer;
-        let timeLeft = 60;
-        let gameRunning = false;
-        
-        // Color definitions
-        const colors = {
-            'RED': { class: 'red', type: 'BIG', number: randomNumber(50, 100) },
-            'VIOLET': { class: 'violet', type: 'BIG', number: randomNumber(50, 100) },
-            'GREEN': { class: 'green', type: 'SMALL', number: randomNumber(1, 49) }
-        };
-        
-        // Initialize game
-        function startGame() {
-            if (gameRunning) return;
+        function generateInput() {
+            // पहले 3 डिजिट (BIG/SMALL)
+            const r1 = document.getElementById("result1").value;
+            const r2 = document.getElementById("result2").value;
+            const r3 = document.getElementById("result3").value;
             
-            gameRunning = true;
-            timeLeft = 60;
-            updateTimer();
+            // अंतिम 2 डिजिट (नंबर्स)
+            const n1 = document.getElementById("num1").value;
+            const n2 = document.getElementById("num2").value;
             
-            // Auto-generate results every minute
-            timer = setInterval(() => {
-                generateResult();
-                timeLeft = 60;
-                updateTimer();
-            }, 60000);
-            
-            // First result immediately
-            generateResult();
-        }
-        
-        // Reset game
-        function resetGame() {
-            clearInterval(timer);
-            results = [];
-            updateDisplay();
-            gameRunning = false;
-            document.getElementById('prediction').textContent = 'Game reset. Start again!';
-            document.getElementById('timer').textContent = '00:60';
-        }
-        
-        // Generate random result
-        function generateResult() {
-            const colorKeys = Object.keys(colors);
-            const randomColor = colorKeys[Math.floor(Math.random() * colorKeys.length)];
-            
-            // Add to history (max 10)
-            if (results.length >= 10) results.shift();
-            results.push(randomColor);
-            
-            updateDisplay();
-            analyzeTrend();
-        }
-        
-        // Update timer display
-        function updateTimer() {
-            const timerElement = document.getElementById('timer');
-            const minutes = Math.floor(timeLeft / 60);
-            const seconds = timeLeft % 60;
-            timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-            
-            if (timeLeft > 0) {
-                timeLeft--;
-                setTimeout(updateTimer, 1000);
-            }
-        }
-        
-        // Update all displays
-        function updateDisplay() {
-            const historyElement = document.getElementById('history');
-            historyElement.innerHTML = '';
-            
-            let bigCount = 0;
-            let smallCount = 0;
-            
-            // Show history
-            results.forEach(color => {
-                const item = document.createElement('div');
-                item.className = `history-item ${colors[color].class}`;
-                item.textContent = color.charAt(0);
-                item.title = `${color} (${colors[color].number})`;
-                historyElement.appendChild(item);
-                
-                // Count types
-                if (colors[color].type === 'BIG') bigCount++;
-                else smallCount++;
-            });
-            
-            // Update counters
-            const total = results.length || 1;
-            document.getElementById('big-count').textContent = `${bigCount}`;
-            document.getElementById('small-count').textContent = `${smallCount}`;
-            document.getElementById('big-percent').textContent = `${Math.round((bigCount / total) * 100)}%`;
-            document.getElementById('small-percent').textContent = `${Math.round((smallCount / total) * 100)}%`;
-        }
-        
-        // Analyze trends and predict
-        function analyzeTrend() {
-            if (results.length < 3) return;
-            
-            const predictionElement = document.getElementById('prediction');
-            const last5 = results.slice(-5);
-            const bigInLast5 = last5.filter(color => colors[color].type === 'BIG').length;
-            
-            // Smart prediction logic
-            if (bigInLast5 >= 4) {
-                predictionElement.innerHTML = `<span class="trend-up">PREDICTION: BIG (${getRandomPrediction(60, 85)}% chance)</span>`;
-            } 
-            else if (bigInLast5 <= 1) {
-                predictionElement.innerHTML = `<span class="trend-down">PREDICTION: SMALL (${getRandomPrediction(60, 85)}% chance)</span>`;
-            }
-            else {
-                predictionElement.innerHTML = `PREDICTION: NEUTRAL (50% chance either)`;
-            }
-        }
-        
-        // Helper functions
-        function randomNumber(min, max) {
-            return Math.floor(Math.random() * (max - min + 1)) + min;
-        }
-        
-        function getRandomPrediction(min, max) {
-            return randomNumber(min, max);
+            // आउटपुट बनाएं
+            const output = `${r1} ${r2} ${r3} ${n1}${n2}`;
+            document.getElementById("output").innerHTML = 
+                `<strong>जनरेटेड इनपुट:</strong> ${output}`;
         }
     </script>
 </body>
