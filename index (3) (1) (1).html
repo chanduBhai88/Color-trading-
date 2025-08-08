@@ -99,11 +99,30 @@
             width: 100%;
             height: 150px;
             margin-top: 20px;
+            padding: 10px;
+            font-size: 16px;
+        }
+        
+        .instructions {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+            text-align: left;
         }
     </style>
 </head>
 <body data-theme="light">
     <h1>बिग/स्मॉल प्रिडिक्टर</h1>
+
+    <div class="instructions">
+        <h3>कैसे उपयोग करें:</h3>
+        <ol>
+            <li>इमेज से डेटा कॉपी करके नीचे दिए बॉक्स में पेस्ट करें</li>
+            <li>प्रोग्राम स्वचालित रूप से आवश्यक डेटा निकालेगा</li>
+            <li>जब 5 इनपुट हो जाएं, "रिजल्ट पाएं" बटन पर क्लिक करें</li>
+        </ol>
+    </div>
 
     <div class="input-buttons">
         <button id="bigBtn">बिग</button>
@@ -111,7 +130,7 @@
         <button id="clearBtn">साफ करें</button>
     </div>
 
-    <textarea id="imageData" placeholder="यहाँ इमेज डेटा पेस्ट करें..."></textarea>
+    <textarea id="imageData" placeholder="यहाँ इमेज डेटा पेस्ट करें (10 रिजल्ट्स की जानकारी)..."></textarea>
 
     <div id="inputsList">इनपुट्स: </div>
 
@@ -144,7 +163,7 @@
         resultBtn.addEventListener('click', showPrediction);
         clearBtn.addEventListener('click', clearInputs);
         themeToggle.addEventListener('click', toggleTheme);
-        imageDataInput.addEventListener('change', processImageData);
+        imageDataInput.addEventListener('input', processImageData);
 
         function addInput(value) {
             inputs.push(value);
@@ -156,12 +175,15 @@
             const data = imageDataInput.value;
             if (!data) return;
             
+            // पहले मौजूदा इनपुट्स को साफ करें
+            inputs.length = 0;
+            
             // इमेज डेटा से रिजल्ट्स निकालें
             const lines = data.split('\n');
             const results = [];
             
             for (const line of lines) {
-                if (line.match(/^\d{17}\s+\d+\s+(Big|Small)/)) {
+                if (line.match(/^\d{17}\s+\d+\s+(Big|Small)/i)) {
                     const parts = line.trim().split(/\s+/);
                     results.push({
                         period: parts[0],
@@ -172,15 +194,16 @@
             }
             
             if (results.length >= 10) {
-                // पहले रिजल्ट को छोड़कर 2,3,4 रिजल्ट लें
-                for (let i = 1; i <= 3; i++) {
-                    addInput(results[i].bigSmall);
-                }
+                // दूसरा, तीसरा और चौथा रिजल्ट (इंडेक्स 1, 2, 3)
+                addInput(results[1].bigSmall);
+                addInput(results[2].bigSmall);
+                addInput(results[3].bigSmall);
                 
-                // 9वें और 10वें रिजल्ट के पीरियड के अंतिम अंक लें
+                // 9वें और 10वें रिजल्ट के पीरियड के अंतिम अंक (इंडेक्स 8, 9)
                 const lastDigit9 = results[8].period.slice(-1);
                 const lastDigit10 = results[9].period.slice(-1);
                 
+                // नंबर्स को इनपुट में जोड़ें
                 addInput(lastDigit9);
                 addInput(lastDigit10);
             }
@@ -206,12 +229,12 @@
 
             // पहले 3 Big/Small इनपुट
             const bigSmallInputs = inputs.slice(0, 3);
-            const bigCount = bigSmallInputs.filter(x => x === 'Big').length;
-            const smallCount = bigSmallInputs.filter(x => x === 'Small').length;
+            const bigCount = bigSmallInputs.filter(x => x.toString().toLowerCase() === 'big').length;
+            const smallCount = bigSmallInputs.filter(x => x.toString().toLowerCase() === 'small').length;
 
             // अंतिम 2 नंबर इनपुट
-            const numberInputs = inputs.slice(3, 5);
-            const sum = numberInputs.reduce((a, b) => parseInt(a) + parseInt(b), 0);
+            const numberInputs = inputs.slice(3, 5).map(Number);
+            const sum = numberInputs.reduce((a, b) => a + b, 0);
             
             let prediction;
             if (bigCount > smallCount) {
@@ -256,7 +279,7 @@
             const currentTheme = body.getAttribute('data-theme');
             const newTheme = currentTheme === 'light' ? 'dark' : 'light';
             body.setAttribute('data-theme', newTheme);
-            themeToggle.textContent = newTheme === 'light' ? "थीम बदलें" : "थीम बदलें";
+            themeToggle.textContent = newTheme === 'light' ? "थीम बदलें (डार्क)" : "थीम बदलें (लाइट)";
         }
     </script>
 </body>
