@@ -1,51 +1,131 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>5-Input Generator</title>
+    <title>Auto Input Generator</title>
     <style>
-        body { font-family: Arial; margin: 20px; }
-        .container { background: #f0f0f0; padding: 20px; border-radius: 10px; }
-        input { padding: 8px; margin: 5px; width: 100px; }
-        button { padding: 10px; background: #4CAF50; color: white; border: none; cursor: pointer; }
-        .output { margin-top: 20px; font-weight: bold; }
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .container { background: #f0f8ff; padding: 20px; border-radius: 10px; }
+        table { width: 100%; border-collapse: collapse; margin: 10px 0; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+        th { background: #4CAF50; color: white; }
+        .clickable { cursor: pointer; }
+        .clickable:hover { background: #e6f7ff; }
+        .output { margin-top: 20px; padding: 10px; background: #e9e9e9; border-radius: 4px; }
     </style>
 </head>
 <body>
     <div class="container">
-        <h2>5-इनपुट जनरेटर</h2>
+        <h2>10 रिजल्ट्स में से इनपुट बनाएं</h2>
+        <p><strong>निर्देश:</strong> पहले रिजल्ट के लिए किसी भी पीरियड पर क्लिक करें।</p>
         
-        <!-- 3 BIG/SMALL इनपुट -->
-        <h3>3 BIG/SMALL डालें:</h3>
-        <input type="text" id="input1" placeholder="BIG/SMALL"><br>
-        <input type="text" id="input2" placeholder="BIG/SMALL"><br>
-        <input type="text" id="input3" placeholder="BIG/SMALL"><br>
+        <table>
+            <tr>
+                <th>Period</th>
+                <th>Number</th>
+                <th>Big/Small</th>
+                <th>Color</th>
+            </tr>
+            <tr class="clickable" onclick="setFirstResult('20250806100010694', 5, 'BIG', 'Red')">
+                <td>20250806100010694</td>
+                <td>5</td>
+                <td>BIG</td>
+                <td style="color: red;">Red</td>
+            </tr>
+            <tr class="clickable" onclick="setFirstResult('20250806100010693', 0, 'SMALL', 'Green')">
+                <td>20250806100010693</td>
+                <td>0</td>
+                <td>SMALL</td>
+                <td style="color: green;">Green</td>
+            </tr>
+            <tr class="clickable" onclick="setFirstResult('20250806100010692', 1, 'SMALL', 'Red')">
+                <td>20250806100010692</td>
+                <td>1</td>
+                <td>SMALL</td>
+                <td style="color: red;">Red</td>
+            </tr>
+            <tr class="clickable" onclick="setFirstResult('20250806100010691', 3, 'SMALL', 'Red')">
+                <td>20250806100010691</td>
+                <td>3</td>
+                <td>SMALL</td>
+                <td style="color: red;">Red</td>
+            </tr>
+            <tr class="clickable" onclick="setFirstResult('20250806100010690', 8, 'BIG', 'Green')">
+                <td>20250806100010690</td>
+                <td>8</td>
+                <td>BIG</td>
+                <td style="color: green;">Green</td>
+            </tr>
+            <tr class="clickable" onclick="setFirstResult('20250806100010689', 2, 'SMALL', 'Green')">
+                <td>20250806100010689</td>
+                <td>2</td>
+                <td>SMALL</td>
+                <td style="color: green;">Green</td>
+            </tr>
+            <tr class="clickable" onclick="setFirstResult('20250806100010688', 3, 'SMALL', 'Red')">
+                <td>20250806100010688</td>
+                <td>3</td>
+                <td>SMALL</td>
+                <td style="color: red;">Red</td>
+            </tr>
+            <tr class="clickable" onclick="setFirstResult('20250806100010687', 9, 'BIG', 'Red')">
+                <td>20250806100010687</td>
+                <td>9</td>
+                <td>BIG</td>
+                <td style="color: red;">Red</td>
+            </tr>
+            <tr class="clickable" onclick="setFirstResult('20250806100010686', 6, 'BIG', 'Green')">
+                <td>20250806100010686</td>
+                <td>6</td>
+                <td>BIG</td>
+                <td style="color: green;">Green</td>
+            </tr>
+            <tr class="clickable" onclick="setFirstResult('20250806100010685', 7, 'SMALL', 'Red')">
+                <td>20250806100010685</td>
+                <td>7</td>
+                <td>SMALL</td>
+                <td style="color: red;">Red</td>
+            </tr>
+        </table>
         
-        <!-- 2 नंबर इनपुट -->
-        <h3>2 नंबर्स डालें (0-9):</h3>
-        <input type="number" id="num1" placeholder="पहला नंबर"><br>
-        <input type="number" id="num2" placeholder="दूसरा नंबर"><br>
-        
-        <button onclick="generate()">इनपुट बनाएं</button>
-        
-        <div class="output" id="output"></div>
+        <div class="output" id="output" style="display: none;">
+            <h3>जनरेटेड इनपुट:</h3>
+            <p id="generatedInput"></p>
+        </div>
     </div>
 
     <script>
-        function generate() {
-            // 3 BIG/SMALL इनपुट
-            const i1 = document.getElementById("input1").value.toUpperCase();
-            const i2 = document.getElementById("input2").value.toUpperCase();
-            const i3 = document.getElementById("input3").value.toUpperCase();
+        let allResults = [
+            { period: '20250806100010694', number: 5, bigSmall: 'BIG', color: 'Red' },
+            { period: '20250806100010693', number: 0, bigSmall: 'SMALL', color: 'Green' },
+            { period: '20250806100010692', number: 1, bigSmall: 'SMALL', color: 'Red' },
+            { period: '20250806100010691', number: 3, bigSmall: 'SMALL', color: 'Red' },
+            { period: '20250806100010690', number: 8, bigSmall: 'BIG', color: 'Green' },
+            { period: '20250806100010689', number: 2, bigSmall: 'SMALL', color: 'Green' },
+            { period: '20250806100010688', number: 3, bigSmall: 'SMALL', color: 'Red' },
+            { period: '20250806100010687', number: 9, bigSmall: 'BIG', color: 'Red' },
+            { period: '20250806100010686', number: 6, bigSmall: 'BIG', color: 'Green' },
+            { period: '20250806100010685', number: 7, bigSmall: 'SMALL', color: 'Red' }
+        ];
+
+        function setFirstResult(period, number, bigSmall, color) {
+            // 1. क्लिक किए गए रिजल्ट को "फर्स्ट रिजल्ट" मानें
+            const clickedIndex = allResults.findIndex(r => r.period === period);
             
-            // 2 नंबर इनपुट
-            const n1 = document.getElementById("num1").value;
-            const n2 = document.getElementById("num2").value;
+            // 2. दूसरा, तीसरा, चौथा BIG/SMALL लें
+            const second = allResults[clickedIndex + 1]?.bigSmall || 'N/A';
+            const third = allResults[clickedIndex + 2]?.bigSmall || 'N/A';
+            const fourth = allResults[clickedIndex + 3]?.bigSmall || 'N/A';
             
-            // फाइनल इनपुट बनाएं
-            const finalInput = `${i1} ${i2} ${i3} ${n1}${n2}`;
-            document.getElementById("output").innerHTML = `
-                <strong>जनरेटेड इनपुट:</strong> ${finalInput}
-            `;
+            // 3. 9वें और 10वें रिजल्ट का लास्ट डिजिट
+            const ninthDigit = allResults[8].number.toString().slice(-1);
+            const tenthDigit = allResults[9].number.toString().slice(-1);
+            
+            // 4. फाइनल इनपुट बनाएं
+            const finalInput = `${second} ${third} ${fourth} ${ninthDigit}${tenthDigit}`;
+            
+            // 5. आउटपुट दिखाएं
+            document.getElementById("generatedInput").textContent = finalInput;
+            document.getElementById("output").style.display = "block";
         }
     </script>
 </body>
