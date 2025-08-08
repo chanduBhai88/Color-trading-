@@ -1,89 +1,60 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Auto Game Result Predictor</title>
+    <title>Game Input Generator</title>
     <style>
-        body { font-family: Arial; margin: 20px; }
-        .container { background: #f9f9f9; padding: 20px; border-radius: 10px; }
-        table { width: 100%; border-collapse: collapse; margin: 10px 0; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
-        th { background: #4CAF50; color: white; }
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .container { background: #f0f8ff; padding: 20px; border-radius: 10px; }
         button { padding: 10px; background: #4CAF50; color: white; border: none; cursor: pointer; }
+        .output { margin-top: 20px; font-weight: bold; color: #006400; }
     </style>
 </head>
 <body>
     <div class="container">
-        <h2>पास्ट रिजल्ट (Last 5 Rounds):</h2>
-        <table>
-            <tr>
-                <th>Number</th>
-                <th>Big/Small</th>
-                <th>Color</th>
-            </tr>
-            <tr>
-                <td>8</td>
-                <td>Big</td>
-                <td style="color: green;">Green</td>
-            </tr>
-            <tr>
-                <td>2</td>
-                <td>Small</td>
-                <td style="color: green;">Green</td>
-            </tr>
-            <tr>
-                <td>3</td>
-                <td>Small</td>
-                <td style="color: red;">Red</td>
-            </tr>
-            <tr>
-                <td>9</td>
-                <td>Big</td>
-                <td style="color: red;">Red</td>
-            </tr>
-            <tr>
-                <td>6</td>
-                <td>Big</td>
-                <td style="color: green;">Green</td>
-            </tr>
-        </table>
-
-        <button onclick="predictNext()">अगला रिजल्ट प्रिडिक्ट करें</button>
+        <h2>10 रिजल्ट्स से 5-डिजिट इनपुट बनाएं</h2>
         
-        <div id="prediction" style="margin-top: 20px; font-weight: bold;"></div>
+        <button onclick="generateInput()">इनपुट जनरेट करें</button>
+        
+        <div class="output" id="output">
+            यहाँ रिजल्ट आएगा...
+        </div>
     </div>
 
     <script>
-        function predictNext() {
-            // पास्ट रिजल्ट्स का डेटा (आपके द्वारा दिया गया)
+        function generateInput() {
+            // मान लें आपके 10 पिछले रिजल्ट्स (Big/Small और नंबर्स)
             const pastResults = [
-                { number: 8, bigSmall: "Big", color: "Green" },
-                { number: 2, bigSmall: "Small", color: "Green" },
-                { number: 3, bigSmall: "Small", color: "Red" },
-                { number: 9, bigSmall: "Big", color: "Red" },
-                { number: 6, bigSmall: "Big", color: "Green" }
+                { number: 5, bigSmall: "BIG" },    // 1st (छोड़ें)
+                { number: 0, bigSmall: "SMALL" },  // 2nd (पहला इनपुट)
+                { number: 1, bigSmall: "SMALL" },  // 3rd (दूसरा इनपुट)
+                { number: 3, bigSmall: "SMALL" },  // 4th (तीसरा इनपुट)
+                { number: 8, bigSmall: "BIG" },    // 5th (इग्नोर)
+                { number: 2, bigSmall: "SMALL" },  // 6th (इग्नोर)
+                { number: 3, bigSmall: "SMALL" },  // 7th (इग्नोर)
+                { number: 9, bigSmall: "BIG" },    // 8th (इग्नोर)
+                { number: 6, bigSmall: "BIG" },    // 9th (आखिरी डिजिट: 6)
+                { number: 5, bigSmall: "BIG" }     // 10th (आखिरी डिजिट: 5)
             ];
 
-            // रैंडम प्रिडिक्शन (लॉजिक आपके नियमों के अनुसार)
-            const nextNumber = Math.floor(Math.random() * 10); // 0-9
-            let bigSmall = nextNumber >= 5 ? "Big" : "Small";
-            let color = (nextNumber % 2 === 0) ? "Green" : "Red";
+            // 1. पहला रिजल्ट छोड़ें (index 0), अगले 3 लें
+            const firstThreeInputs = [
+                pastResults[1].bigSmall,  // दूसरा रिजल्ट
+                pastResults[2].bigSmall,  // तीसरा रिजल्ट
+                pastResults[3].bigSmall   // चौथा रिजल्ट
+            ];
+
+            // 2. सबसे नीचे वाले 2 रिजल्ट्स का आखिरी डिजिट
+            const lastDigit1 = pastResults[8].number.toString().slice(-1); // 9वाँ रिजल्ट
+            const lastDigit2 = pastResults[9].number.toString().slice(-1); // 10वाँ रिजल्ट
+
+            // 5-डिजिट इनपुट बनाएं
+            const finalInput = `${firstThreeInputs.join(" ")} ${lastDigit1}${lastDigit2}`;
 
             // आउटपुट दिखाएं
-            document.getElementById("prediction").innerHTML = `
-                <p>प्रिडिक्टेड रिजल्ट:</p>
-                <table>
-                    <tr>
-                        <th>Number</th>
-                        <th>Big/Small</th>
-                        <th>Color</th>
-                    </tr>
-                    <tr>
-                        <td>${nextNumber}</td>
-                        <td>${bigSmall}</td>
-                        <td style="color: ${color.toLowerCase()};">${color}</td>
-                    </tr>
-                </table>
-                <p>Pattern: ${pastResults.map(r => r.bigSmall).join(", ")} → ${bigSmall}</p>
+            document.getElementById("output").innerHTML = `
+                <strong>जनरेटेड इनपुट:</strong> ${finalInput}
+                <br><br>
+                <span style="color: #8b0000;">(फॉर्मेट: 3 BIG/SMALL + 2 डिजिट नंबर)</span>
             `;
         }
     </script>
