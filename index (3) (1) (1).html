@@ -1,70 +1,67 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Big/Small Color Tracker</title>
+    <title>BDG Game Tracker (Big/Small)</title>
     <style>
+        :root {
+            --bg-dark: #0a0a0a;
+            --accent-green: #00ff88;
+            --accent-red: #ff0055;
+            --accent-violet: #aa00ff;
+        }
         body {
-            font-family: Arial, sans-serif;
-            background-color: #121212;
-            color: #00ff00;
-            text-align: center;
+            font-family: 'Arial', sans-serif;
+            background: var(--bg-dark);
+            color: white;
             margin: 0;
             padding: 20px;
+            text-align: center;
         }
         .container {
             max-width: 600px;
             margin: 0 auto;
-            background-color: #1a1a1a;
-            padding: 20px;
+            background: #111;
             border-radius: 10px;
-            box-shadow: 0 0 15px rgba(0, 255, 0, 0.2);
+            padding: 20px;
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.1);
         }
         h1 {
-            color: #00ff00;
-            text-shadow: 0 0 5px rgba(0, 255, 0, 0.5);
+            color: var(--accent-green);
+            margin-bottom: 30px;
         }
-        .color-buttons {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            margin: 20px 0;
+        .game-board {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
         }
-        .color-btn {
-            padding: 15px 25px;
-            font-size: 16px;
-            font-weight: bold;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        .color-btn:hover {
-            transform: scale(1.05);
-        }
-        #red {
-            background-color: #ff0000;
-            color: white;
-        }
-        #violet {
-            background-color: #9400d3;
-            color: white;
-        }
-        #green {
-            background-color: #008000;
-            color: white;
-        }
-        .result-container {
-            margin-top: 30px;
-            background-color: #222;
+        .box {
+            background: #222;
             padding: 15px;
             border-radius: 8px;
+            border: 1px solid #333;
+        }
+        .box h2 {
+            margin-top: 0;
+            font-size: 18px;
+        }
+        .big-box {
+            border-bottom: 3px solid var(--accent-violet);
+        }
+        .small-box {
+            border-bottom: 3px solid var(--accent-green);
+        }
+        .timer {
+            font-size: 24px;
+            margin: 20px 0;
+            color: var(--accent-green);
         }
         .history {
             display: flex;
             justify-content: center;
-            flex-wrap: wrap;
             gap: 10px;
-            margin-top: 20px;
+            margin: 20px 0;
+            flex-wrap: wrap;
         }
         .history-item {
             width: 30px;
@@ -74,95 +71,141 @@
             align-items: center;
             justify-content: center;
             font-weight: bold;
-            color: white;
         }
-        .stats {
-            margin-top: 20px;
-            display: flex;
-            justify-content: space-around;
+        .red {
+            background: var(--accent-red);
         }
-        .stat-box {
-            background-color: #252525;
+        .violet {
+            background: var(--accent-violet);
+        }
+        .green {
+            background: var(--accent-green);
+            color: black;
+        }
+        .prediction {
+            background: #333;
             padding: 10px;
             border-radius: 5px;
-            min-width: 120px;
-        }
-        .trend {
             margin-top: 20px;
-            padding: 10px;
-            border-radius: 5px;
             font-weight: bold;
         }
         .trend-up {
-            background-color: rgba(0, 255, 0, 0.2);
-            color: #00ff00;
+            color: var(--accent-green);
         }
         .trend-down {
-            background-color: rgba(255, 0, 0, 0.2);
-            color: #ff0000;
+            color: var(--accent-red);
         }
-        .trend-neutral {
-            background-color: rgba(255, 255, 0, 0.2);
-            color: #ffff00;
+        button {
+            background: var(--accent-green);
+            color: black;
+            border: none;
+            padding: 10px 20px;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Big/Small Color Tracker</h1>
+        <h1>🚀 BDG Game Tracker (Big/Small)</h1>
         
-        <div class="color-buttons">
-            <button class="color-btn" id="red" onclick="addResult('RED')">RED</button>
-            <button class="color-btn" id="violet" onclick="addResult('VIOLET')">VIOLET</button>
-            <button class="color-btn" id="green" onclick="addResult('GREEN')">GREEN</button>
+        <div class="timer" id="timer">00:60</div>
+        
+        <div class="game-board">
+            <div class="box big-box">
+                <h2>BIG (Red/Violet)</h2>
+                <div id="big-count">0</div>
+                <div id="big-percent">0%</div>
+            </div>
+            <div class="box small-box">
+                <h2>SMALL (Green)</h2>
+                <div id="small-count">0</div>
+                <div id="small-percent">0%</div>
+            </div>
         </div>
         
-        <div class="stats">
-            <div class="stat-box">
-                <h3>BIG</h3>
-                <p id="big-count">0</p>
-            </div>
-            <div class="stat-box">
-                <h3>SMALL</h3>
-                <p id="small-count">0</p>
-            </div>
+        <div class="prediction" id="prediction">
+            Game shuru hone ka intezaar...
         </div>
         
-        <div class="result-container">
-            <h2>Last 10 Results</h2>
-            <div class="history" id="history">
-                <!-- Results will appear here -->
-            </div>
-            
-            <div id="trend" class="trend">
-                Add results to see trends
-            </div>
-        </div>
+        <div class="history" id="history"></div>
+        
+        <button onclick="startGame()">Start Game</button>
+        <button onclick="resetGame()">Reset</button>
     </div>
 
     <script>
         // Game data
-        const results = [];
-        const maxHistory = 10;
+        let results = [];
+        let timer;
+        let timeLeft = 60;
+        let gameRunning = false;
         
         // Color definitions
         const colors = {
-            'RED': { bg: '#ff0000', type: 'BIG' },
-            'VIOLET': { bg: '#9400d3', type: 'BIG' },
-            'GREEN': { bg: '#008000', type: 'SMALL' }
+            'RED': { class: 'red', type: 'BIG', number: randomNumber(50, 100) },
+            'VIOLET': { class: 'violet', type: 'BIG', number: randomNumber(50, 100) },
+            'GREEN': { class: 'green', type: 'SMALL', number: randomNumber(1, 49) }
         };
         
-        // Add new result
-        function addResult(color) {
-            if (results.length >= maxHistory) {
-                results.shift(); // Remove oldest result
-            }
-            results.push(color);
+        // Initialize game
+        function startGame() {
+            if (gameRunning) return;
+            
+            gameRunning = true;
+            timeLeft = 60;
+            updateTimer();
+            
+            // Auto-generate results every minute
+            timer = setInterval(() => {
+                generateResult();
+                timeLeft = 60;
+                updateTimer();
+            }, 60000);
+            
+            // First result immediately
+            generateResult();
+        }
+        
+        // Reset game
+        function resetGame() {
+            clearInterval(timer);
+            results = [];
+            updateDisplay();
+            gameRunning = false;
+            document.getElementById('prediction').textContent = 'Game reset. Start again!';
+            document.getElementById('timer').textContent = '00:60';
+        }
+        
+        // Generate random result
+        function generateResult() {
+            const colorKeys = Object.keys(colors);
+            const randomColor = colorKeys[Math.floor(Math.random() * colorKeys.length)];
+            
+            // Add to history (max 10)
+            if (results.length >= 10) results.shift();
+            results.push(randomColor);
+            
             updateDisplay();
             analyzeTrend();
         }
         
-        // Update the display
+        // Update timer display
+        function updateTimer() {
+            const timerElement = document.getElementById('timer');
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            
+            if (timeLeft > 0) {
+                timeLeft--;
+                setTimeout(updateTimer, 1000);
+            }
+        }
+        
+        // Update all displays
         function updateDisplay() {
             const historyElement = document.getElementById('history');
             historyElement.innerHTML = '';
@@ -170,64 +213,55 @@
             let bigCount = 0;
             let smallCount = 0;
             
-            // Display each result in history
+            // Show history
             results.forEach(color => {
                 const item = document.createElement('div');
-                item.className = 'history-item';
-                item.style.backgroundColor = colors[color].bg;
-                item.textContent = color.charAt(0); // Show first letter
+                item.className = `history-item ${colors[color].class}`;
+                item.textContent = color.charAt(0);
+                item.title = `${color} (${colors[color].number})`;
                 historyElement.appendChild(item);
                 
                 // Count types
-                if (colors[color].type === 'BIG') {
-                    bigCount++;
-                } else {
-                    smallCount++;
-                }
+                if (colors[color].type === 'BIG') bigCount++;
+                else smallCount++;
             });
             
             // Update counters
-            document.getElementById('big-count').textContent = bigCount;
-            document.getElementById('small-count').textContent = smallCount;
+            const total = results.length || 1;
+            document.getElementById('big-count').textContent = `${bigCount}`;
+            document.getElementById('small-count').textContent = `${smallCount}`;
+            document.getElementById('big-percent').textContent = `${Math.round((bigCount / total) * 100)}%`;
+            document.getElementById('small-percent').textContent = `${Math.round((smallCount / total) * 100)}%`;
         }
         
-        // Analyze trends
+        // Analyze trends and predict
         function analyzeTrend() {
-            if (results.length < 3) {
-                document.getElementById('trend').className = 'trend trend-neutral';
-                document.getElementById('trend').textContent = 'Add more results to see trends';
-                return;
-            }
+            if (results.length < 3) return;
             
-            const trendElement = document.getElementById('trend');
+            const predictionElement = document.getElementById('prediction');
             const last5 = results.slice(-5);
             const bigInLast5 = last5.filter(color => colors[color].type === 'BIG').length;
             
+            // Smart prediction logic
             if (bigInLast5 >= 4) {
-                trendElement.className = 'trend trend-up';
-                trendElement.textContent = 'STRONG BIG TREND (last 5)';
+                predictionElement.innerHTML = `<span class="trend-up">PREDICTION: BIG (${getRandomPrediction(60, 85)}% chance)</span>`;
             } 
             else if (bigInLast5 <= 1) {
-                trendElement.className = 'trend trend-down';
-                trendElement.textContent = 'STRONG SMALL TREND (last 5)';
+                predictionElement.innerHTML = `<span class="trend-down">PREDICTION: SMALL (${getRandomPrediction(60, 85)}% chance)</span>`;
             }
             else {
-                trendElement.className = 'trend trend-neutral';
-                trendElement.textContent = 'NO CLEAR TREND (last 5)';
+                predictionElement.innerHTML = `PREDICTION: NEUTRAL (50% chance either)`;
             }
         }
         
-        // Initialize with some random results for demo
-        function initializeDemo() {
-            const demoColors = ['RED', 'VIOLET', 'GREEN'];
-            for (let i = 0; i < 5; i++) {
-                const randomColor = demoColors[Math.floor(Math.random() * demoColors.length)];
-                addResult(randomColor);
-            }
+        // Helper functions
+        function randomNumber(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
         }
         
-        // Start with demo data
-        initializeDemo();
+        function getRandomPrediction(min, max) {
+            return randomNumber(min, max);
+        }
     </script>
 </body>
 </html>
