@@ -1,46 +1,233 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>कलर ट्रेडिंग (HTML/JS)</title>
+    <title>Big/Small Color Tracker</title>
     <style>
-        body { font-family: Arial; text-align: center; }
-        button { padding: 10px 20px; margin: 10px; font-size: 16px; }
-        #result { font-size: 20px; margin-top: 20px; }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #121212;
+            color: #00ff00;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #1a1a1a;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.2);
+        }
+        h1 {
+            color: #00ff00;
+            text-shadow: 0 0 5px rgba(0, 255, 0, 0.5);
+        }
+        .color-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 20px 0;
+        }
+        .color-btn {
+            padding: 15px 25px;
+            font-size: 16px;
+            font-weight: bold;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .color-btn:hover {
+            transform: scale(1.05);
+        }
+        #red {
+            background-color: #ff0000;
+            color: white;
+        }
+        #violet {
+            background-color: #9400d3;
+            color: white;
+        }
+        #green {
+            background-color: #008000;
+            color: white;
+        }
+        .result-container {
+            margin-top: 30px;
+            background-color: #222;
+            padding: 15px;
+            border-radius: 8px;
+        }
+        .history {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .history-item {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+        }
+        .stats {
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-around;
+        }
+        .stat-box {
+            background-color: #252525;
+            padding: 10px;
+            border-radius: 5px;
+            min-width: 120px;
+        }
+        .trend {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .trend-up {
+            background-color: rgba(0, 255, 0, 0.2);
+            color: #00ff00;
+        }
+        .trend-down {
+            background-color: rgba(255, 0, 0, 0.2);
+            color: #ff0000;
+        }
+        .trend-neutral {
+            background-color: rgba(255, 255, 0, 0.2);
+            color: #ffff00;
+        }
     </style>
 </head>
 <body>
-    <h1>कलर ट्रेडिंग गेम</h1>
-    <p>बैलेंस: ₹<span id="balance">1000</span></p>
-    
-    <button onclick="placeBet('RED')">🔴 RED</button>
-    <button onclick="placeBet('GREEN')">🟢 GREEN</button>
-    <button onclick="placeBet('BLUE')">🔵 BLUE</button>
-    
-    <div id="result"></div>
+    <div class="container">
+        <h1>Big/Small Color Tracker</h1>
+        
+        <div class="color-buttons">
+            <button class="color-btn" id="red" onclick="addResult('RED')">RED</button>
+            <button class="color-btn" id="violet" onclick="addResult('VIOLET')">VIOLET</button>
+            <button class="color-btn" id="green" onclick="addResult('GREEN')">GREEN</button>
+        </div>
+        
+        <div class="stats">
+            <div class="stat-box">
+                <h3>BIG</h3>
+                <p id="big-count">0</p>
+            </div>
+            <div class="stat-box">
+                <h3>SMALL</h3>
+                <p id="small-count">0</p>
+            </div>
+        </div>
+        
+        <div class="result-container">
+            <h2>Last 10 Results</h2>
+            <div class="history" id="history">
+                <!-- Results will appear here -->
+            </div>
+            
+            <div id="trend" class="trend">
+                Add results to see trends
+            </div>
+        </div>
+    </div>
 
     <script>
-        let balance = 1000;
-        const COLORS = ["RED", "GREEN", "BLUE"];
+        // Game data
+        const results = [];
+        const maxHistory = 10;
         
-        function placeBet(color) {
-            const betAmount = 50;
-            if (betAmount > balance) {
-                document.getElementById("result").innerText = "पैसे कम हैं!";
+        // Color definitions
+        const colors = {
+            'RED': { bg: '#ff0000', type: 'BIG' },
+            'VIOLET': { bg: '#9400d3', type: 'BIG' },
+            'GREEN': { bg: '#008000', type: 'SMALL' }
+        };
+        
+        // Add new result
+        function addResult(color) {
+            if (results.length >= maxHistory) {
+                results.shift(); // Remove oldest result
+            }
+            results.push(color);
+            updateDisplay();
+            analyzeTrend();
+        }
+        
+        // Update the display
+        function updateDisplay() {
+            const historyElement = document.getElementById('history');
+            historyElement.innerHTML = '';
+            
+            let bigCount = 0;
+            let smallCount = 0;
+            
+            // Display each result in history
+            results.forEach(color => {
+                const item = document.createElement('div');
+                item.className = 'history-item';
+                item.style.backgroundColor = colors[color].bg;
+                item.textContent = color.charAt(0); // Show first letter
+                historyElement.appendChild(item);
+                
+                // Count types
+                if (colors[color].type === 'BIG') {
+                    bigCount++;
+                } else {
+                    smallCount++;
+                }
+            });
+            
+            // Update counters
+            document.getElementById('big-count').textContent = bigCount;
+            document.getElementById('small-count').textContent = smallCount;
+        }
+        
+        // Analyze trends
+        function analyzeTrend() {
+            if (results.length < 3) {
+                document.getElementById('trend').className = 'trend trend-neutral';
+                document.getElementById('trend').textContent = 'Add more results to see trends';
                 return;
             }
             
-            const winningColor = COLORS[Math.floor(Math.random() * 3)];
-            document.getElementById("result").innerText = 
-                `रिजल्ट: ${winningColor === "RED" ? "🔴" : winningColor === "GREEN" ? "🟢" : "🔵"} ${winningColor}`;
+            const trendElement = document.getElementById('trend');
+            const last5 = results.slice(-5);
+            const bigInLast5 = last5.filter(color => colors[color].type === 'BIG').length;
             
-            if (color === winningColor) {
-                balance += betAmount * 2;
-            } else {
-                balance -= betAmount;
+            if (bigInLast5 >= 4) {
+                trendElement.className = 'trend trend-up';
+                trendElement.textContent = 'STRONG BIG TREND (last 5)';
+            } 
+            else if (bigInLast5 <= 1) {
+                trendElement.className = 'trend trend-down';
+                trendElement.textContent = 'STRONG SMALL TREND (last 5)';
             }
-            
-            document.getElementById("balance").innerText = balance;
+            else {
+                trendElement.className = 'trend trend-neutral';
+                trendElement.textContent = 'NO CLEAR TREND (last 5)';
+            }
         }
+        
+        // Initialize with some random results for demo
+        function initializeDemo() {
+            const demoColors = ['RED', 'VIOLET', 'GREEN'];
+            for (let i = 0; i < 5; i++) {
+                const randomColor = demoColors[Math.floor(Math.random() * demoColors.length)];
+                addResult(randomColor);
+            }
+        }
+        
+        // Start with demo data
+        initializeDemo();
     </script>
 </body>
 </html>
