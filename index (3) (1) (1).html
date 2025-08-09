@@ -3,160 +3,115 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>51Game - 6-Input System</title>
+    <title>6-Input Predictor</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            max-width: 500px;
+            max-width: 400px;
             margin: 0 auto;
-            padding: 15px;
-            background: #f5f5f5;
+            padding: 20px;
+            background: #f0f2f5;
         }
-        .game-board {
+        .container {
             background: white;
-            padding: 15px;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
-        .bet-option {
-            padding: 8px;
+        .btn {
+            padding: 10px 15px;
             margin: 5px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            text-align: center;
-            cursor: pointer;
-        }
-        .bet-option.selected {
-            background: #4CAF50;
-            color: white;
-        }
-        .result {
-            margin-top: 15px;
-            padding: 10px;
-            background: #e9f7ef;
-            border-radius: 5px;
-            display: none;
-        }
-        button {
-            padding: 8px 15px;
-            background: #4CAF50;
-            color: white;
             border: none;
             border-radius: 5px;
             cursor: pointer;
         }
-        .highlight {
-            background-color: yellow;
+        .big {
+            background: #4CAF50;
+            color: white;
+        }
+        .small {
+            background: #2196F3;
+            color: white;
+        }
+        .predict-btn {
+            background: #FF5722;
+            color: white;
+            font-weight: bold;
+            margin-top: 15px;
+        }
+        .history {
+            margin-top: 20px;
+            padding: 10px;
+            background: #f9f9f9;
+            border-radius: 5px;
         }
     </style>
 </head>
 <body>
-    <div class="game-board">
-        <h2>51GAME - 6-INPUT SYSTEM</h2>
+    <div class="container">
+        <h2>6-Input Predictor</h2>
         
-        <div style="display: flex; gap: 5px; margin-bottom: 15px;">
-            <div class="bet-option" onclick="selectBet('big')">BIG</div>
-            <div class="bet-option" onclick="selectBet('small')">SMALL</div>
+        <div>
+            <button class="btn big" onclick="addInput('Big')">Big</button>
+            <button class="btn small" onclick="addInput('Small')">Small</button>
         </div>
 
-        <button onclick="calculateResult()">GET RESULT</button>
-
-        <div class="result" id="result">
-            <h3>RESULT:</h3>
-            <p id="result-text"></p>
+        <div id="inputs" style="margin: 15px 0; min-height: 30px;">
+            <!-- Inputs will appear here -->
         </div>
 
-        <h3>Game History (Relevant Entries)</h3>
-        <table border="1" cellpadding="5" cellspacing="0" width="100%">
-            <tr>
-                <th>Period</th>
-                <th>Number</th>
-                <th>Big/Small</th>
-            </tr>
-            <tr>
-                <td>20250806100010694</td>
-                <td>5</td>
-                <td class="highlight">Big (1st Input)</td>
-            </tr>
-            <tr>
-                <td>20250806100010693</td>
-                <td>0</td>
-                <td class="highlight">Small (2nd Input)</td>
-            </tr>
-            <tr>
-                <td>20250806100010692</td>
-                <td>1</td>
-                <td class="highlight">Small (3rd Input)</td>
-            </tr>
-            <tr>
-                <td>20250806100010691</td>
-                <td>3</td>
-                <td class="highlight">Small (4th Input)</td>
-            </tr>
-            <tr>
-                <td>20250806100010687</td>
-                <td>9</td>
-                <td>Big (Last Digit: 7)</td>
-            </tr>
-            <tr>
-                <td>20250806100010686</td>
-                <td>6</td>
-                <td>Big (Last Digit: 6)</td>
-            </tr>
-        </table>
+        <button class="btn predict-btn" onclick="predict()">Predict Next</button>
+
+        <div class="history">
+            <h3>Last 5 Predictions:</h3>
+            <div id="predictions"></div>
+        </div>
     </div>
 
     <script>
-        // Selected inputs (as per your circled data)
-        const inputs = [
-            "Big",    // 1st input (from 20250806100010694)
-            "Small",  // 2nd input (from 20250806100010693)
-            "Small",  // 3rd input (from 20250806100010692)
-            "Small",  // 4th input (from 20250806100010691)
-            9,        // 5th input (from last digit of 20250806100010687 → 7)
-            10        // 6th input (from last digit of 20250806100010686 → 6)
-        ];
+        let currentInputs = [];
+        const predictionHistory = [];
 
-        let selectedBet = null;
-
-        function selectBet(bet) {
-            selectedBet = bet;
-            document.querySelectorAll('.bet-option').forEach(el => el.classList.remove('selected'));
-            event.target.classList.add('selected');
+        function addInput(type) {
+            if (currentInputs.length >= 6) {
+                alert("Already 6 inputs added!");
+                return;
+            }
+            currentInputs.push(type);
+            updateInputDisplay();
         }
 
-        function calculateResult() {
-            if (!selectedBet) {
-                alert("Please select BIG or SMALL");
+        function updateInputDisplay() {
+            const display = document.getElementById('inputs');
+            display.innerHTML = currentInputs.map((input, index) => 
+                `<span style="margin-right: 10px;">${index+1}. ${input}</span>`
+            ).join('');
+        }
+
+        function predict() {
+            if (currentInputs.length !== 6) {
+                alert("Please add exactly 6 inputs first!");
                 return;
             }
 
-            // Final result = First history entry (Big/Small)
-            const finalResult = inputs[0]; // "Big"
+            // Simple prediction logic (you can modify this)
+            const bigCount = currentInputs.filter(x => x === 'Big').length;
+            const smallCount = 6 - bigCount;
+            const prediction = bigCount > smallCount ? 'Big' : 'Small';
 
-            // Check win/lose
-            const isWin = finalResult === selectedBet;
+            // Add to history
+            predictionHistory.unshift(prediction);
+            if (predictionHistory.length > 5) {
+                predictionHistory.pop();
+            }
 
-            // Display result
-            const resultDiv = document.getElementById('result');
-            const resultText = document.getElementById('result-text');
-            
-            resultText.innerHTML = `
-                <strong>6 Inputs Used:</strong><br>
-                1. ${inputs[0]} (1st history entry)<br>
-                2. ${inputs[1]} (2nd history entry)<br>
-                3. ${inputs[2]} (3rd history entry)<br>
-                4. ${inputs[3]} (4th history entry)<br>
-                5. 9 (from last digit of 2nd last period)<br>
-                6. 10 (from last digit of last period)<br><br>
+            // Display
+            document.getElementById('predictions').innerHTML = 
+                predictionHistory.map(p => `<div>${p}</div>`).join('');
 
-                <strong>Final Result:</strong><br>
-                ${finalResult} (First entry decides result)<br>
-                Your Bet: ${selectedBet}<br>
-                <strong>${isWin ? "YOU WIN! 🎉" : "You lose. Try again!"}</strong>
-            `;
-            
-            resultDiv.style.display = "block";
+            alert(`Prediction: ${prediction}`);
+            currentInputs = [];
+            updateInputDisplay();
         }
     </script>
 </body>
