@@ -2,142 +2,111 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>B/S Number Predictor</title>
+<title>6 Input Big/Small Predictor</title>
 <style>
     body {
         font-family: Arial, sans-serif;
-        text-align: center;
-        background: linear-gradient(to right, #1f4037, #99f2c8);
+        background: linear-gradient(to right, #232526, #414345);
         color: white;
+        text-align: center;
         padding: 20px;
     }
     h1 {
         margin-bottom: 20px;
     }
-    .input-section {
-        margin-bottom: 20px;
+    .buttons {
+        margin: 10px 0;
     }
-    .bs-buttons button, .num-buttons button {
+    button {
         padding: 10px 20px;
+        font-size: 16px;
         margin: 5px;
-        font-size: 18px;
-        border: none;
-        border-radius: 5px;
         cursor: pointer;
-    }
-    .bs-buttons button {
-        background: #333;
-        color: white;
-    }
-    .num-buttons button {
-        background: #ff9800;
-        color: white;
-    }
-    .action-buttons button {
-        padding: 10px 20px;
-        margin: 10px;
-        font-size: 18px;
         border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        background: #2196f3;
-        color: white;
+        border-radius: 8px;
     }
-    .action-buttons button.clear {
-        background: #f44336;
-    }
+    .big { background-color: #3498db; color: white; }
+    .small { background-color: #e74c3c; color: white; }
+    .num { background-color: #2ecc71; color: white; }
+    .action { background-color: #f1c40f; color: black; }
     #inputDisplay {
-        font-size: 20px;
-        margin-bottom: 10px;
-        background: white;
-        color: black;
-        padding: 5px;
-        border-radius: 5px;
-        display: inline-block;
-        min-width: 120px;
+        font-size: 18px;
+        margin: 15px 0;
+        padding: 10px;
+        background: rgba(255,255,255,0.1);
+        border-radius: 6px;
     }
     #result {
-        font-size: 24px;
+        font-size: 22px;
         font-weight: bold;
-        margin-top: 15px;
+        margin-top: 20px;
     }
 </style>
 </head>
 <body>
 
-<h1>Big / Small Number Predictor</h1>
+<h1>6 Input Big/Small Predictor</h1>
 
-<div id="inputDisplay">_ _ _ _ _ _</div>
+<div id="inputDisplay">Your Input: </div>
 
-<div class="input-section">
-    <div class="bs-buttons">
-        <button onclick="addInput('B')">Big</button>
-        <button onclick="addInput('S')">Small</button>
-    </div>
-    <div class="num-buttons">
-        <button onclick="addInput('1')">1</button>
-        <button onclick="addInput('2')">2</button>
-        <button onclick="addInput('3')">3</button>
-        <button onclick="addInput('4')">4</button>
-        <button onclick="addInput('5')">5</button>
-    </div>
+<div class="buttons">
+    <button class="big" onclick="addInput('Big')">Big</button>
+    <button class="small" onclick="addInput('Small')">Small</button>
 </div>
 
-<div class="action-buttons">
-    <button onclick="showResult()">Result</button>
-    <button class="clear" onclick="clearInput()">Clear</button>
+<div class="buttons">
+    <button class="num" onclick="addInput(4)">4</button>
+    <button class="num" onclick="addInput(3)">3</button>
+</div>
+
+<div class="buttons">
+    <button class="action" onclick="checkResult()">Result</button>
+    <button class="action" onclick="clearInput()">Clear</button>
 </div>
 
 <div id="result"></div>
 
 <script>
-    let input = [];
+const patterns = [
+    { result: "Big",   input: ["Small","Big","Small","Small",4,3] },
+    { result: "Small", input: ["Big","Big","Big","Big",4,3] },
+    { result: "Small", input: ["Small","Small","Small","Big",4,3] },
+    { result: "Small", input: ["Big","Small","Big","Small",4,3] },
+    { result: "Big",   input: ["Small","Small","Small","Small",4,3] },
+    { result: "Small", input: ["Big","Big","Big","Small",4,3] }
+];
 
-    // 6 patterns (4 B/S + 2 number)
-    const patterns = [
-        ['B','S','B','S','S','4','3'], // First pattern result will be used
-        ['S','B','B','B','B','4','3'],
-        ['S','S','S','S','B','4','3'],
-        ['S','B','S','B','S','4','3'],
-        ['B','S','S','S','S','4','3'],
-        ['S','B','B','B','S','4','3']
-    ];
+let userInput = [];
 
-    const firstPatternResult = patterns[0].slice(4); // ["4","3"]
-
-    function addInput(value) {
-        if (input.length < 6) {
-            input.push(value);
-            updateDisplay();
-        }
-    }
-
-    function updateDisplay() {
-        document.getElementById("inputDisplay").innerText =
-            input.join(" ") + (input.length < 6 ? " _".repeat(6 - input.length) : "");
-    }
-
-    function clearInput() {
-        input = [];
-        document.getElementById("result").innerText = "";
+function addInput(value) {
+    if (userInput.length < 6) {
+        userInput.push(value);
         updateDisplay();
     }
+}
 
-    function showResult() {
-        if (input.length === 6) {
-            let match = patterns.some(p => p.join('') === input.join(''));
-            if (match) {
-                document.getElementById("result").innerText = "Result: " + firstPatternResult.join(" ");
-            } else {
-                document.getElementById("result").innerText = "No Match";
-            }
-        } else {
-            document.getElementById("result").innerText = "Please enter 6 inputs";
-        }
+function updateDisplay() {
+    document.getElementById("inputDisplay").innerText = "Your Input: " + userInput.join(" - ");
+}
+
+function checkResult() {
+    if (userInput.length !== 6) {
+        document.getElementById("result").innerText = "Please enter exactly 6 inputs!";
+        return;
     }
+    let match = patterns.find(p => JSON.stringify(p.input) === JSON.stringify(userInput));
+    if (match) {
+        document.getElementById("result").innerText = "Result: " + match.result;
+    } else {
+        document.getElementById("result").innerText = "No Match Found";
+    }
+}
 
+function clearInput() {
+    userInput = [];
     updateDisplay();
+    document.getElementById("result").innerText = "";
+}
 </script>
 
 </body>
