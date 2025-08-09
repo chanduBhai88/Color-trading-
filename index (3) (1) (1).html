@@ -3,166 +3,80 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>51Game - Big/Small Prediction</title>
+    <title>51Game - Big/Small</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            max-width: 600px;
+            max-width: 500px;
             margin: 0 auto;
-            padding: 20px;
-            background-color: #f5f5f5;
-        }
-        .header {
-            text-align: center;
-            margin-bottom: 20px;
+            padding: 15px;
+            background: #f5f5f5;
         }
         .game-board {
-            background-color: white;
-            border-radius: 10px;
-            padding: 20px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
-        .bet-options {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 20px;
-        }
         .bet-option {
-            padding: 10px;
+            padding: 8px;
+            margin: 5px;
             border: 1px solid #ddd;
             border-radius: 5px;
             text-align: center;
             cursor: pointer;
         }
         .bet-option.selected {
-            background-color: #4CAF50;
+            background: #4CAF50;
             color: white;
-        }
-        .history {
-            margin-top: 20px;
-        }
-        .history-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        .history-table th, .history-table td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: center;
-        }
-        .history-table th {
-            background-color: #f2f2f2;
-        }
-        .input-area {
-            margin-top: 20px;
-        }
-        .number-input {
-            width: 50px;
-            padding: 8px;
-            margin-right: 10px;
-        }
-        .submit-btn {
-            padding: 8px 15px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
         }
         .result {
-            margin-top: 20px;
+            margin-top: 15px;
             padding: 10px;
-            background-color: #e9f7ef;
+            background: #e9f7ef;
             border-radius: 5px;
             display: none;
+        }
+        button {
+            padding: 8px 15px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
         }
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1>51Game</h1>
-        <p>51gamem.com</p>
-    </div>
-
     <div class="game-board">
-        <h2>GAME</h2>
+        <h2>BIG/SMALL GAME</h2>
         
-        <div class="bet-options">
-            <div class="bet-option" onclick="selectBet('random')">Random</div>
-            <div class="bet-option" onclick="selectBet('x1')">X1</div>
-            <div class="bet-option" onclick="selectBet('x5')">X5</div>
-            <div class="bet-option" onclick="selectBet('x10')">X10</div>
-            <div class="bet-option" onclick="selectBet('x20')">X20</div>
-            <div class="bet-option" onclick="selectBet('x50')">X50</div>
-            <div class="bet-option" onclick="selectBet('x100')">X100</div>
+        <div style="display: flex; gap: 5px;">
+            <div class="bet-option" onclick="selectBet('big')">BIG</div>
+            <div class="bet-option" onclick="selectBet('small')">SMALL</div>
         </div>
 
-        <div class="bet-options">
-            <div class="bet-option" onclick="selectBetType('big')">Big</div>
-            <div class="bet-option" onclick="selectBetType('small')">Small</div>
-        </div>
-
-        <div class="history">
-            <h3>Game History</h3>
-            <table class="history-table">
-                <thead>
-                    <tr>
-                        <th>Period</th>
-                        <th>Number</th>
-                        <th>Big/Small</th>
-                    </tr>
-                </thead>
-                <tbody id="history-body">
-                    <!-- History will be populated here -->
-                </tbody>
-            </table>
-        </div>
-
-        <div class="input-area">
-            <h3>Enter 5 Numbers:</h3>
-            <p>1. First number (from first history result)</p>
-            <p>2. Second number (from second history result)</p>
-            <p>3. Third number (from third history result)</p>
-            <p>4. Fourth number (from fourth history result)</p>
-            <p>5. Two numbers (9 and 10) plus last digit of last period</p>
-            <button class="submit-btn" onclick="calculateResult()">Get Result</button>
-        </div>
+        <button onclick="calculateResult()">GET RESULT</button>
 
         <div class="result" id="result">
-            <h3>Result:</h3>
+            <h3>RESULT:</h3>
             <p id="result-text"></p>
         </div>
     </div>
 
     <script>
-        // Sample history data (most recent first)
+        // Sample history data (only what's needed)
         const historyData = [
-            { period: "20250806100010694", number: 5, type: "Big" },
-            { period: "20250806100010693", number: 0, type: "Small" },
-            { period: "20250806100010692", number: 1, type: "Small" },
-            { period: "20250806100010691", number: 3, type: "Small" },
-            { period: "20250806100010690", number: 8, type: "Big" },
-            { period: "20250806100010689", number: 2, type: "Small" },
-            { period: "20250806100010688", number: 3, type: "Small" },
-            { period: "20250806100010687", number: 9, type: "Big" },
-            { period: "20250806100010686", number: 6, type: "Big" },
-            { period: "20250806100010685", number: 7, type: "Small" }
+            { type: "Big" },    // 1st input (Big)
+            { type: "Small" },  // 2nd input (Small)
+            { type: "Small" },  // 3rd input (Small)
+            { type: "Small" },  // 4th input (Small)
         ];
 
-        // Populate history table
-        const historyBody = document.getElementById('history-body');
-        historyData.forEach(item => {
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${item.period}</td>
-                <td>${item.number}</td>
-                <td>${item.type}</td>
-            `;
-            historyBody.appendChild(row);
-        });
+        // Last period digit (example: if last period ends with 5)
+        const lastPeriodDigit = 5; // Change if needed
 
         let selectedBet = null;
-        let selectedBetType = null;
 
         function selectBet(bet) {
             selectedBet = bet;
@@ -170,58 +84,43 @@
             event.target.classList.add('selected');
         }
 
-        function selectBetType(type) {
-            selectedBetType = type;
-            document.querySelectorAll('.bet-options:nth-of-type(2) .bet-option').forEach(el => el.classList.remove('selected'));
-            event.target.classList.add('selected');
-        }
-
         function calculateResult() {
-            if (selectedBetType === null) {
-                alert("Please select Big or Small");
+            if (!selectedBet) {
+                alert("Please select BIG or SMALL");
                 return;
             }
 
-            // Get the required numbers:
-            // 1. First number from first history result
-            const num1 = historyData[0].number;
-            
-            // 2. Second number from second history result
-            const num2 = historyData[1].number;
-            
-            // 3. Third number from third history result
-            const num3 = historyData[2].number;
-            
-            // 4. Fourth number from fourth history result
-            const num4 = historyData[3].number;
-            
-            // 5. Two fixed numbers (9 and 10) plus last digit of last period
-            const lastPeriodDigit = parseInt(historyData[historyData.length - 1].period.slice(-1));
-            const num5 = 9 + 10 + lastPeriodDigit;
-            
-            // The result is simply the first history result
-            const resultNumber = historyData[0].number;
-            const resultType = historyData[0].type;
-            
-            // Check if user won
-            const isWin = resultType === selectedBetType;
-            
+            // 1. First 4 inputs (Big/Small from history)
+            const input1 = historyData[0].type;
+            const input2 = historyData[1].type;
+            const input3 = historyData[2].type;
+            const input4 = historyData[3].type;
+
+            // 2. 5th input = 9 + 10 + last digit of last period
+            const input5 = 9 + 10 + lastPeriodDigit;
+
+            // 3. Final result = First history entry (Big/Small)
+            const finalResult = historyData[0].type;
+
+            // Check win/lose
+            const isWin = finalResult === selectedBet;
+
             // Display result
             const resultDiv = document.getElementById('result');
             const resultText = document.getElementById('result-text');
             
             resultText.innerHTML = `
-                <strong>Calculation:</strong><br>
-                1. First history number: ${num1}<br>
-                2. Second history number: ${num2}<br>
-                3. Third history number: ${num3}<br>
-                4. Fourth history number: ${num4}<br>
-                5. 9 + 10 + last period digit (${lastPeriodDigit}) = ${num5}<br><br>
-                
+                <strong>Inputs:</strong><br>
+                1. ${input1}<br>
+                2. ${input2}<br>
+                3. ${input3}<br>
+                4. ${input4}<br>
+                5. 9 + 10 + ${lastPeriodDigit} = ${input5}<br><br>
+
                 <strong>Final Result:</strong><br>
-                Using first history result only: ${resultNumber} (${resultType})<br>
-                Your Bet: ${selectedBetType}<br>
-                <strong>${isWin ? "YOU WIN!" : "You didn't win this time."}</strong>
+                ${finalResult}<br>
+                Your Bet: ${selectedBet}<br>
+                <strong>${isWin ? "YOU WIN! 🎉" : "You lose. Try again!"}</strong>
             `;
             
             resultDiv.style.display = "block";
