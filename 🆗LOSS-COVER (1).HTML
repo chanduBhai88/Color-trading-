@@ -3,155 +3,168 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Big Small Color Predictor</title>
+    <title>Pattern Predictor</title>
     <style>
         body {
+            background-color: #ff3333; /* Red wallpaper */
             font-family: Arial, sans-serif;
-            background-color: #f5f5f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
             margin: 0;
-            padding: 20px;
+            color: white;
         }
         .container {
-            max-width: 800px;
-            margin: 0 auto;
-            background: white;
+            background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent black for contrast */
             padding: 20px;
             border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            text-align: center;
         }
         h1 {
-            color: #333;
-            text-align: center;
-        }
-        .game-board {
-            margin-top: 20px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
             margin-bottom: 20px;
         }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: center;
+        .input-group {
+            margin: 10px 0;
         }
-        th {
-            background-color: #f2f2f2;
+        select {
+            padding: 5px;
+            margin: 5px;
+            font-size: 16px;
         }
-        .big {
-            background-color: #ffcccc;
-        }
-        .small {
-            background-color: #ccffcc;
-        }
-        .red {
-            color: red;
-        }
-        .green {
-            color: green;
-        }
-        .violet {
-            color: violet;
-        }
-        .prediction {
-            margin-top: 20px;
-            padding: 15px;
-            background-color: #e6f7ff;
-            border-radius: 5px;
-            border-left: 5px solid #1890ff;
-        }
-        .btn {
-            background-color: #1890ff;
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 5px;
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
             cursor: pointer;
-            margin-top: 10px;
+            margin: 10px;
+            border: none;
+            border-radius: 5px;
         }
-        .btn:hover {
-            background-color: #40a9ff;
+        #resultBtn {
+            background-color: #cc0000; /* Red result button */
+            color: white;
+        }
+        #clearBtn {
+            background-color: #666;
+            color: white;
+        }
+        #result {
+            margin-top: 20px;
+            font-size: 20px;
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Big Small Color Predictor</h1>
-        
-        <div class="game-board">
-            <h2>Last 8 Inputs (5 Big/Small + 3 Colors)</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Period</th>
-                        <th>Number</th>
-                        <th>Big/Small</th>
-                        <th>Color</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>20250809100010357</td>
-                        <td>5</td>
-                        <td class="big">Big</td>
-                        <td class="red">Red</td>
-                    </tr>
-                    <tr>
-                        <td>20250809100010356</td>
-                        <td>4</td>
-                        <td class="small">Small</td>
-                        <td class="violet">Violet</td>
-                    </tr>
-                    <tr>
-                        <td>20250809100010355</td>
-                        <td>9</td>
-                        <td class="big">Big</td>
-                        <td class="red">Red</td>
-                    </tr>
-                    <tr>
-                        <td>20250809100010354</td>
-                        <td>6</td>
-                        <td class="big">Big</td>
-                        <td class="red">Red</td>
-                    </tr>
-                    <tr>
-                        <td>20250809100010353</td>
-                        <td>5</td>
-                        <td class="big">Big</td>
-                        <td class="green">Green</td>
-                    </tr>
-                    <tr>
-                        <td>20250809100010352</td>
-                        <td>6</td>
-                        <td class="big">Big</td>
-                        <td class="red">Red</td>
-                    </tr>
-                    <tr>
-                        <td>20250809100010351</td>
-                        <td>5</td>
-                        <td class="big">Big</td>
-                        <td class="violet">Violet</td>
-                    </tr>
-                    <tr>
-                        <td>20250809100010350</td>
-                        <td>0</td>
-                        <td class="small">Small</td>
-                        <td class="violet">Violet</td>
-                    </tr>
-                </tbody>
-            </table>
-            
-            <div class="prediction">
-                <h3>Prediction Analysis</h3>
-                <p><strong>Ignored Outliers:</strong> 6 (Big, Red) and 5 (Big, Violet)</p>
-                <p><strong>Big/Small Trend:</strong> 6/8 are Big → Expect Small soon</p>
-                <p><strong>Color Trend:</strong> 3/8 are Red → Next likely Non-Red</p>
-                <p><strong>Predicted 9th Result:</strong> <span class="small">Small</span></p>
-            </div>
-            
-            <button class="btn">Analyze New Data</button>
+        <h1>Pattern Predictor</h1>
+        <div class="input-group">
+            <label>Size 1:</label>
+            <select id="size1">
+                <option value="Big">Big</option>
+                <option value="Small">Small</option>
+            </select>
         </div>
+        <div class="input-group">
+            <label>Size 2:</label>
+            <select id="size2">
+                <option value="Big">Big</option>
+                <option value="Small">Small</option>
+            </select>
+        </div>
+        <div class="input-group">
+            <label>Size 3:</label>
+            <select id="size3">
+                <option value="Big">Big</option>
+                <option value="Small">Small</option>
+            </select>
+        </div>
+        <div class="input-group">
+            <label>Size 4:</label>
+            <select id="size4">
+                <option value="Big">Big</option>
+                <option value="Small">Small</option>
+            </select>
+        </div>
+        <div class="input-group">
+            <label>Size 5:</label>
+            <select id="size5">
+                <option value="Big">Big</option>
+                <option value="Small">Small</option>
+            </select>
+        </div>
+        <div class="input-group">
+            <label>Color 1:</label>
+            <select id="color1">
+                <option value="Green">Green</option>
+                <option value="Red">Red</option>
+                <option value="Violet">Violet</option>
+            </select>
+        </div>
+        <div class="input-group">
+            <label>Color 2:</label>
+            <select id="color2">
+                <option value="Green">Green</option>
+                <option value="Red">Red</option>
+                <option value="Violet">Violet</option>
+            </select>
+        </div>
+        <button id="resultBtn" onclick="predictResult()">Show Result</button>
+        <button id="clearBtn" onclick="clearInputs()">Clear</button>
+        <div id="result"></div>
     </div>
+
+    <script>
+        function predictResult() {
+            // Get input values
+            const size1 = document.getElementById('size1').value;
+            const size2 = document.getElementById('size2').value;
+            const size3 = document.getElementById('size3').value;
+            const size4 = document.getElementById('size4').value;
+            const size5 = document.getElementById('size5').value;
+            const color1 = document.getElementById('color1').value;
+            const color2 = document.getElementById('color2').value;
+
+            // Simple heuristic: Predict the result color based on the last two colors
+            // If both colors are the same, use that; otherwise, default to the second color or "Red"
+            let resultColor;
+            if (color1 === color2) {
+                resultColor = color1;
+            } else {
+                // Analyze patterns: If no clear rule, pick color2 or default to Red
+                const patterns = [
+                    { color1: 'Green', color2: 'Red', result: 'Red' },
+                    { color1: 'Green', color2: 'Red', result: 'Green' },
+                    { color1: 'Green', color2: 'Green', result: 'Red' },
+                    { color1: 'Red', color2: 'Violet', result: 'Violet' },
+                    { color1: 'Violet', color2: 'Red', result: 'Red' },
+                    { color1: 'Green', color2: 'Red', result: 'Red' },
+                    { color1: 'Green', color2: 'Red', result: 'Red' },
+                    { color1: 'Green', color2: 'Green', result: 'Green' },
+                    { color1: 'Red', color2: 'Red', result: 'Red' },
+                    { color1: 'Violet', color2: 'Red', result: 'Green' }
+                ];
+
+                // Find matching pattern for color1 and color2
+                const matchedPattern = patterns.find(p => p.color1 === color1 && p.color2 === color2);
+                resultColor = matchedPattern ? matchedPattern.result : color2; // Default to color2 if no match
+            }
+
+            // Display result
+            document.getElementById('result').innerText = `Predicted Color: ${resultColor}`;
+        }
+
+        function clearInputs() {
+            // Reset all dropdowns
+            document.getElementById('size1').value = 'Big';
+            document.getElementById('size2').value = 'Big';
+            document.getElementById('size3').value = 'Big';
+            document.getElementById('size4').value = 'Big';
+            document.getElementById('size5').value = 'Big';
+            document.getElementById('color1').value = 'Green';
+            document.getElementById('color2').value = 'Green';
+            document.getElementById('result').innerText = '';
+        }
+    </script>
 </body>
 </html>
