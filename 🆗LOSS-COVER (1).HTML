@@ -1,158 +1,157 @@
-RAJA THE BOSS:
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>Big/Small Predictor</title>
-<style>
-    body {
-        font-family: Arial, sans-serif;
-        text-align: center;
-        background-size: cover;
-        background-position: center;
-        color: white;
-    }
-    .container {
-        margin-top: 50px;
-        background: rgba(0,0,0,0.6);
-        padding: 20px;
-        border-radius: 10px;
-        display: inline-block;
-    }
-    .btn {
-        padding: 10px 20px;
-        margin: 5px;
-        font-size: 18px;
-        cursor: pointer;
-        border: none;
-        border-radius: 5px;
-        min-width: 50px;
-    }
-    .big { background: #007bff; }
-    .small { background: #ff5733; }
-    select {
-        padding: 10px;
-        font-size: 16px;
-        margin: 5px;
-    }
-    #resultBox {
-        margin-top: 20px;
-        font-size: 22px;
-        font-weight: bold;
-    }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Big Small Color Predictor</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .game-board {
+            margin-top: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .big {
+            background-color: #ffcccc;
+        }
+        .small {
+            background-color: #ccffcc;
+        }
+        .red {
+            color: red;
+        }
+        .green {
+            color: green;
+        }
+        .violet {
+            color: violet;
+        }
+        .prediction {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #e6f7ff;
+            border-radius: 5px;
+            border-left: 5px solid #1890ff;
+        }
+        .btn {
+            background-color: #1890ff;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .btn:hover {
+            background-color: #40a9ff;
+        }
+    </style>
 </head>
-<body id="body" style="background-image: url('https://i.ibb.co/ZgQ5z3W/hacker.jpg');">
-
-<div class="container">
-    <h1>Big/Small Predictor</h1>
-    
-    <!-- First B/S input -->
-    <div>
-        <label>First Input: </label>
-        <button id="firstBSBtn" class="btn big" onclick="toggleBS(this)">B</button>
+<body>
+    <div class="container">
+        <h1>Big Small Color Predictor</h1>
+        
+        <div class="game-board">
+            <h2>Last 8 Inputs (5 Big/Small + 3 Colors)</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Period</th>
+                        <th>Number</th>
+                        <th>Big/Small</th>
+                        <th>Color</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>20250809100010357</td>
+                        <td>5</td>
+                        <td class="big">Big</td>
+                        <td class="red">Red</td>
+                    </tr>
+                    <tr>
+                        <td>20250809100010356</td>
+                        <td>4</td>
+                        <td class="small">Small</td>
+                        <td class="violet">Violet</td>
+                    </tr>
+                    <tr>
+                        <td>20250809100010355</td>
+                        <td>9</td>
+                        <td class="big">Big</td>
+                        <td class="red">Red</td>
+                    </tr>
+                    <tr>
+                        <td>20250809100010354</td>
+                        <td>6</td>
+                        <td class="big">Big</td>
+                        <td class="red">Red</td>
+                    </tr>
+                    <tr>
+                        <td>20250809100010353</td>
+                        <td>5</td>
+                        <td class="big">Big</td>
+                        <td class="green">Green</td>
+                    </tr>
+                    <tr>
+                        <td>20250809100010352</td>
+                        <td>6</td>
+                        <td class="big">Big</td>
+                        <td class="red">Red</td>
+                    </tr>
+                    <tr>
+                        <td>20250809100010351</td>
+                        <td>5</td>
+                        <td class="big">Big</td>
+                        <td class="violet">Violet</td>
+                    </tr>
+                    <tr>
+                        <td>20250809100010350</td>
+                        <td>0</td>
+                        <td class="small">Small</td>
+                        <td class="violet">Violet</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div class="prediction">
+                <h3>Prediction Analysis</h3>
+                <p><strong>Ignored Outliers:</strong> 6 (Big, Red) and 5 (Big, Violet)</p>
+                <p><strong>Big/Small Trend:</strong> 6/8 are Big → Expect Small soon</p>
+                <p><strong>Color Trend:</strong> 3/8 are Red → Next likely Non-Red</p>
+                <p><strong>Predicted 9th Result:</strong> <span class="small">Small</span></p>
+            </div>
+            
+            <button class="btn">Analyze New Data</button>
+        </div>
     </div>
-
-    <!-- 4 B/S Buttons -->
-    <div id="bsButtons" style="margin-top:10px;">
-        <button class="btn big" onclick="toggleBS(this)">B</button>
-        <button class="btn big" onclick="toggleBS(this)">B</button>
-        <button class="btn big" onclick="toggleBS(this)">B</button>
-        <button class="btn big" onclick="toggleBS(this)">B</button>
-    </div>
-    
-    <!-- 2 Color Selectors -->
-    <div>
-        <select id="color1">
-            <option value="R">Red</option>
-            <option value="G">Green</option>
-            <option value="V">Violet</option>
-        </select>
-        <select id="color2">
-            <option value="R">Red</option>
-            <option value="G">Green</option>
-            <option value="V">Violet</option>
-        </select>
-    </div>
-    
-    <!-- Buttons -->
-    <div>
-        <button class="btn" onclick="checkPattern()">Result</button>
-        <button class="btn" onclick="clearInputs()">Clear</button>
-        <button class="btn" onclick="switchTheme()">Switch Theme</button>
-    </div>
-    
-    <div id="resultBox">Result will appear here</div>
-</div>
-
-<script>
-let hackerBg = "https://i.ibb.co/ZgQ5z3W/hacker.jpg";
-let cobraBg = "https://i.ibb.co/smB1w6B/cobra.jpg";
-let isHacker = true;
-
-// Patterns with 5 B/S (first input + 4 buttons) and 2 colors
-let patterns = [
-    // Sample patterns (replace with your full 27 patterns)
-    { bs: ["B","S","S","S","S"], colors: ["R","R"], result: "B" },
-    { bs: ["B","B","B","B","B"], colors: ["R","G"], result: "S" },
-    { bs: ["S","S","S","B","S"], colors: ["G","R"], result: "B" },
-    { bs: ["B","S","B","S","S"], colors: ["V","V"], result: "S" },
-    { bs: ["S","S","S","S","S"], colors: ["R","R"], result: "B" },
-    { bs: ["B","B","B","S","B"], colors: ["R","R"], result: "S" },
-    { bs: ["B","S","B","B","S"], colors: ["R","R"], result: "S" },
-    { bs: ["S","B","S","B","B"], colors: ["G","G"], result: "B" },
-    { bs: ["S","B","B","B","S"], colors: ["R","R"], result: "S" },
-    { bs: ["S","S","B","S","B"], colors: ["R","G"], result: "B" },
-    // Add your new patterns here (use your 27 patterns accordingly)
-];
-
-function toggleBS(btn) {
-    if (btn.textContent === "B") {
-        btn.textContent = "S";
-        btn.className = "btn small";
-    } else {
-        btn.textContent = "B";
-        btn.className = "btn big";
-    }
-}
-
-function clearInputs() {
-    document.getElementById("firstBSBtn").textContent = "B";
-    document.getElementById("firstBSBtn").className = "btn big";
-    
-    document.querySelectorAll("#bsButtons button").forEach(btn => {
-        btn.textContent = "B";
-        btn.className = "btn big";
-    });
-    document.getElementById("color1").value = "R";
-    document.getElementById("color2").value = "R";
-    document.getElementById("resultBox").textContent = "Result will appear here";
-}
-
-function switchTheme() {
-    document.getElementById("body").style.backgroundImage = isHacker ? url('${cobraBg}') : url('${hackerBg}');
-    isHacker = !isHacker;
-}
-
-function checkPattern() {
-    let firstBS = document.getElementById("firstBSBtn").textContent;
-    let bsButtons = Array.from(document.querySelectorAll("#bsButtons button")).map(b => b.textContent);
-    let bsInput = [firstBS, ...bsButtons];  // Total 5 inputs
-
-    let color1 = document.getElementById("color1").value;
-    let color2 = document.getElementById("color2").value;
-    
-    let match = patterns.find(p => 
-        JSON.stringify(p.bs) === JSON.stringify(bsInput) &&
-        p.colors[0] === color1 && p.colors[1] === color2
-    );
-    
-    if (match) {
-        document.getElementById("resultBox").textContent = "Result: " + match.result;
-    } else {
-        document.getElementById("resultBox").textContent = "Result: No Match";
-    }
-}
-</script>
-
 </body>
 </html>
