@@ -3,115 +3,118 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>6-Input Predictor</title>
+    <title>51Game Predictor</title>
     <style>
         body {
             font-family: Arial, sans-serif;
+            background: #111;
+            color: white;
             max-width: 400px;
-            margin: 0 auto;
-            padding: 20px;
-            background: #f0f2f5;
+            margin: 20px auto;
+            padding: 15px;
         }
-        .container {
-            background: white;
+        .game-container {
+            background: #222;
             padding: 20px;
             border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .input-display {
+            background: #333;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 18px;
         }
         .btn {
-            padding: 10px 15px;
-            margin: 5px;
+            padding: 12px;
+            margin: 8px 0;
             border: none;
-            border-radius: 5px;
-            cursor: pointer;
+            border-radius: 8px;
+            font-weight: bold;
+            width: 100%;
         }
-        .big {
+        .btn-big {
             background: #4CAF50;
             color: white;
         }
-        .small {
+        .btn-small {
             background: #2196F3;
             color: white;
         }
-        .predict-btn {
+        .btn-predict {
             background: #FF5722;
             color: white;
-            font-weight: bold;
-            margin-top: 15px;
-        }
-        .history {
             margin-top: 20px;
-            padding: 10px;
-            background: #f9f9f9;
-            border-radius: 5px;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            background: #333;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 18px;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h2>6-Input Predictor</h2>
+    <div class="game-container">
+        <h2 style="text-align: center;">51Game Predictor</h2>
         
-        <div>
-            <button class="btn big" onclick="addInput('Big')">Big</button>
-            <button class="btn small" onclick="addInput('Small')">Small</button>
-        </div>
-
-        <div id="inputs" style="margin: 15px 0; min-height: 30px;">
+        <div class="input-display" id="currentInputs">
             <!-- Inputs will appear here -->
         </div>
 
-        <button class="btn predict-btn" onclick="predict()">Predict Next</button>
+        <button class="btn btn-small" onclick="addInput('Small')">Small</button>
+        <button class="btn btn-big" onclick="addInput('Big')">Big</button>
+        
+        <button class="btn btn-predict" onclick="predict()">Predict</button>
 
-        <div class="history">
-            <h3>Last 5 Predictions:</h3>
-            <div id="predictions"></div>
+        <div class="result" id="result">
+            Enter 3 Big/Small inputs
         </div>
     </div>
 
     <script>
-        let currentInputs = [];
-        const predictionHistory = [];
+        // Current inputs
+        let inputs = [];
+        
+        // From your image data (last 3 period numbers' last digits)
+        const periodDigits = [6, 9, 1]; // From: ...686(6), ...687(9), ...685(1)
 
         function addInput(type) {
-            if (currentInputs.length >= 6) {
-                alert("Already 6 inputs added!");
-                return;
-            }
-            currentInputs.push(type);
-            updateInputDisplay();
+            if (inputs.length >= 3) return;
+            inputs.push(type);
+            updateDisplay();
         }
 
-        function updateInputDisplay() {
-            const display = document.getElementById('inputs');
-            display.innerHTML = currentInputs.map((input, index) => 
-                `<span style="margin-right: 10px;">${index+1}. ${input}</span>`
-            ).join('');
+        function updateDisplay() {
+            const display = document.getElementById('currentInputs');
+            display.innerHTML = inputs.length > 0 ? 
+                inputs.join(' • ') : 
+                'Add 3 Big/Small inputs';
         }
 
         function predict() {
-            if (currentInputs.length !== 6) {
-                alert("Please add exactly 6 inputs first!");
+            if (inputs.length !== 3) {
+                alert("Please enter exactly 3 Big/Small inputs!");
                 return;
             }
 
-            // Simple prediction logic (you can modify this)
-            const bigCount = currentInputs.filter(x => x === 'Big').length;
-            const smallCount = 6 - bigCount;
-            const prediction = bigCount > smallCount ? 'Big' : 'Small';
-
-            // Add to history
-            predictionHistory.unshift(prediction);
-            if (predictionHistory.length > 5) {
-                predictionHistory.pop();
-            }
-
-            // Display
-            document.getElementById('predictions').innerHTML = 
-                predictionHistory.map(p => `<div>${p}</div>`).join('');
-
-            alert(`Prediction: ${prediction}`);
-            currentInputs = [];
-            updateInputDisplay();
+            // Combine with period digits (6,9,1 from your image)
+            const combined = [...inputs, ...periodDigits];
+            
+            // Simple prediction (you can modify this)
+            const bigCount = inputs.filter(x => x === 'Big').length;
+            const prediction = bigCount >= 2 ? 'Big' : 'Small';
+            
+            document.getElementById('result').innerHTML = `
+                <strong>Prediction:</strong> ${prediction}<br>
+                <small>Using: ${inputs.join(' + ')} and period digits (${periodDigits.join(',')})</small>
+            `;
+            
+            inputs = [];
+            updateDisplay();
         }
     </script>
 </body>
