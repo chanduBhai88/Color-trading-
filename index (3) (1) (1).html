@@ -1,162 +1,144 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>RAJA GAMES - 6 Input Pattern Match</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>B/S Number Predictor</title>
 <style>
-  :root{
-    --bg: #0f172a;
-    --card:#0b1220;
-    --text:#e6eef8;
-    --accent:#ffd166;
-    --muted:#9aa7bf;
-    --glass: rgba(255,255,255,0.04);
-  }
-  [data-theme="light"]{
-    --bg:#f3f7fb; --card:#ffffff; --text:#0b1220; --accent:#0066ff; --muted:#616b76; --glass: rgba(0,0,0,0.04);
-  }
-  html,body{height:100%; margin:0; font-family:Inter, system-ui, Arial;}
-  body{
-    background-image: url('https://images.unsplash.com/photo-1503264116251-35a269479413?q=80&w=1600&auto=format&fit=crop');
-    background-size: cover;
-    background-position:center;
-    color:var(--text);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    padding:20px;
-  }
-  .app{
-    width:100%;
-    max-width:720px;
-    background: linear-gradient(180deg, rgba(0,0,0,0.45), rgba(0,0,0,0.25));
-    border-radius:12px;
-    padding:20px;
-    box-shadow: 0 6px 30px rgba(2,6,23,0.6);
-    backdrop-filter: blur(6px);
-  }
-  header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
-  header h1{margin:0;font-size:1.25rem}
-  .controls{display:flex;gap:8px;align-items:center}
-  .btn{
-    background:var(--card);
-    color:var(--text);
-    border:1px solid rgba(255,255,255,0.04);
-    padding:8px 12px;border-radius:8px;cursor:pointer;font-weight:600;
-  }
-  .btn.secondary{background:transparent;border:1px solid rgba(255,255,255,0.08);padding:6px 10px}
-  .card{background:var(--glass); padding:14px;border-radius:10px;margin-bottom:12px}
-  .input-row{display:flex;gap:8px;justify-content:center;margin:10px 0}
-  .cell{
-    width:56px;height:56px;border-radius:8px;display:flex;align-items:center;justify-content:center;
-    background:rgba(255,255,255,0.03);border:2px dashed rgba(255,255,255,0.03);cursor:pointer;
-    font-weight:700;font-size:18px;color:var(--text);
-    user-select:none;
-  }
-  .cell.B{background:rgba(0,128,0,0.2);border-color:rgba(0,128,0,0.4)}
-  .cell.S{background:rgba(128,0,128,0.2);border-color:rgba(128,0,128,0.4)}
-  .result-box{padding:12px;border-radius:8px;background:rgba(255,255,255,0.05); text-align:center}
-  @media (max-width:600px){.cell{width:48px;height:48px}}
+    body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+        background: linear-gradient(to right, #1f4037, #99f2c8);
+        color: white;
+        padding: 20px;
+    }
+    h1 {
+        margin-bottom: 20px;
+    }
+    .input-section {
+        margin-bottom: 20px;
+    }
+    .bs-buttons button, .num-buttons button {
+        padding: 10px 20px;
+        margin: 5px;
+        font-size: 18px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+    .bs-buttons button {
+        background: #333;
+        color: white;
+    }
+    .num-buttons button {
+        background: #ff9800;
+        color: white;
+    }
+    .action-buttons button {
+        padding: 10px 20px;
+        margin: 10px;
+        font-size: 18px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        background: #2196f3;
+        color: white;
+    }
+    .action-buttons button.clear {
+        background: #f44336;
+    }
+    #inputDisplay {
+        font-size: 20px;
+        margin-bottom: 10px;
+        background: white;
+        color: black;
+        padding: 5px;
+        border-radius: 5px;
+        display: inline-block;
+        min-width: 120px;
+    }
+    #result {
+        font-size: 24px;
+        font-weight: bold;
+        margin-top: 15px;
+    }
 </style>
 </head>
-<body data-theme="dark">
-<div class="app">
-  <header>
-    <h1>RAJA GAMES — 6 Input Match</h1>
-    <div class="controls">
-      <button id="themeToggle" class="btn secondary">Theme</button>
-    </div>
-  </header>
+<body>
 
-  <div class="card">
-    <strong>Click to set input (4 B/S + 2 Numbers)</strong>
-    <div class="input-row" id="inputRow">
-      <div class="cell" data-index="0"></div>
-      <div class="cell" data-index="1"></div>
-      <div class="cell" data-index="2"></div>
-      <div class="cell" data-index="3"></div>
-      <div class="cell" data-index="4"></div>
-      <div class="cell" data-index="5"></div>
+<h1>Big / Small Number Predictor</h1>
+
+<div id="inputDisplay">_ _ _ _ _ _</div>
+
+<div class="input-section">
+    <div class="bs-buttons">
+        <button onclick="addInput('B')">Big</button>
+        <button onclick="addInput('S')">Small</button>
     </div>
-    <div style="display:flex;gap:10px;justify-content:center;margin-top:10px">
-      <button id="resultBtn" class="btn">Result</button>
-      <button id="clearBtn" class="btn secondary">Clear</button>
+    <div class="num-buttons">
+        <button onclick="addInput('1')">1</button>
+        <button onclick="addInput('2')">2</button>
+        <button onclick="addInput('3')">3</button>
+        <button onclick="addInput('4')">4</button>
+        <button onclick="addInput('5')">5</button>
     </div>
-    <div id="resultBox" class="result-box" style="margin-top:10px;color:var(--muted)">
-      Result will appear here
-    </div>
-  </div>
 </div>
 
+<div class="action-buttons">
+    <button onclick="showResult()">Result</button>
+    <button class="clear" onclick="clearInput()">Clear</button>
+</div>
+
+<div id="result"></div>
+
 <script>
-(function(){
-  // Patterns: 4 B/S + 2 Numbers
-  const patterns = [
-    ['B','S','B','S','S','4','3'],
-    ['S','B','B','B','B','4','3'],
-    ['S','S','S','S','B','4','3'],
-    ['S','B','S','B','S','4','3'],
-    ['B','S','S','S','S','4','3'],
-    ['S','B','B','B','S','4','3']
-  ];
+    let input = [];
 
-  const state = ["","","","","",""];
-  const cells = document.querySelectorAll('.cell');
-  const resultBox = document.getElementById('resultBox');
+    // 6 patterns (4 B/S + 2 number)
+    const patterns = [
+        ['B','S','B','S','S','4','3'], // First pattern result will be used
+        ['S','B','B','B','B','4','3'],
+        ['S','S','S','S','B','4','3'],
+        ['S','B','S','B','S','4','3'],
+        ['B','S','S','S','S','4','3'],
+        ['S','B','B','B','S','4','3']
+    ];
 
-  // Cycle values: Empty -> B -> S -> 0 -> 1 -> ... -> 9 -> Empty
-  const cycle = ["","B","S","0","1","2","3","4","5","6","7","8","9"];
-  cells.forEach((cell,i)=>{
-    cell.addEventListener('click',()=>{
-      let idx = cycle.indexOf(state[i]);
-      idx = (idx+1) % cycle.length;
-      state[i] = cycle[idx];
-      renderCells();
-    });
-  });
+    const firstPatternResult = patterns[0].slice(4); // ["4","3"]
 
-  function renderCells(){
-    cells.forEach((c,i)=>{
-      c.textContent = state[i];
-      c.classList.remove('B','S');
-      if(state[i]==="B") c.classList.add('B');
-      if(state[i]==="S") c.classList.add('S');
-    });
-  }
-
-  document.getElementById('clearBtn').addEventListener('click',()=>{
-    for(let i=0;i<6;i++) state[i] = "";
-    renderCells();
-    resultBox.innerHTML = '<span style="color:var(--muted)">Cleared.</span>';
-  });
-
-  document.getElementById('resultBtn').addEventListener('click',()=>{
-    if(state.includes("")){
-      resultBox.innerHTML = '<span style="color:var(--muted)">Please fill all 6 inputs.</span>';
-      return;
+    function addInput(value) {
+        if (input.length < 6) {
+            input.push(value);
+            updateDisplay();
+        }
     }
-    let matchIndex = -1;
-    for(let i=0;i<patterns.length;i++){
-      if(patterns[i].join(",") === state.join(",")){
-        matchIndex = i;
-        break;
-      }
-    }
-    if(matchIndex === -1){
-      resultBox.innerHTML = '<span style="color:orange">Result No Match</span>';
-    } else {
-      resultBox.innerHTML = `<strong>Matched Pattern #${matchIndex+1}</strong><br>${patterns[matchIndex].join(" ")}`;
-    }
-  });
 
-  document.getElementById('themeToggle').addEventListener('click',()=>{
-    document.body.setAttribute('data-theme',
-      document.body.getAttribute('data-theme')==="light"?"dark":"light");
-  });
+    function updateDisplay() {
+        document.getElementById("inputDisplay").innerText =
+            input.join(" ") + (input.length < 6 ? " _".repeat(6 - input.length) : "");
+    }
 
-  renderCells();
-})();
+    function clearInput() {
+        input = [];
+        document.getElementById("result").innerText = "";
+        updateDisplay();
+    }
+
+    function showResult() {
+        if (input.length === 6) {
+            let match = patterns.some(p => p.join('') === input.join(''));
+            if (match) {
+                document.getElementById("result").innerText = "Result: " + firstPatternResult.join(" ");
+            } else {
+                document.getElementById("result").innerText = "No Match";
+            }
+        } else {
+            document.getElementById("result").innerText = "Please enter 6 inputs";
+        }
+    }
+
+    updateDisplay();
 </script>
+
 </body>
 </html>
