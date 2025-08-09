@@ -119,13 +119,13 @@
         </div>
 
         <div class="input-area">
-            <h3>Enter 5 Numbers (0-9):</h3>
-            <input type="number" min="0" max="9" class="number-input" id="num1">
-            <input type="number" min="0" max="9" class="number-input" id="num2">
-            <input type="number" min="0" max="9" class="number-input" id="num3">
-            <input type="number" min="0" max="9" class="number-input" id="num4">
-            <input type="number" min="0" max="9" class="number-input" id="num5">
-            <button class="submit-btn" onclick="calculateResult()">Submit</button>
+            <h3>Enter 5 Numbers:</h3>
+            <p>1. First number (from first history result)</p>
+            <p>2. Second number (from second history result)</p>
+            <p>3. Third number (from third history result)</p>
+            <p>4. Fourth number (from fourth history result)</p>
+            <p>5. Two numbers (9 and 10) plus last digit of last period</p>
+            <button class="submit-btn" onclick="calculateResult()">Get Result</button>
         </div>
 
         <div class="result" id="result">
@@ -135,7 +135,7 @@
     </div>
 
     <script>
-        // Sample history data
+        // Sample history data (most recent first)
         const historyData = [
             { period: "20250806100010694", number: 5, type: "Big" },
             { period: "20250806100010693", number: 0, type: "Small" },
@@ -177,30 +177,31 @@
         }
 
         function calculateResult() {
-            const num1 = parseInt(document.getElementById('num1').value);
-            const num2 = parseInt(document.getElementById('num2').value);
-            const num3 = parseInt(document.getElementById('num3').value);
-            const num4 = parseInt(document.getElementById('num4').value);
-            const num5 = parseInt(document.getElementById('num5').value);
-
-            if (isNaN(num1) || isNaN(num2) || isNaN(num3) || isNaN(num4) || isNaN(num5)) {
-                alert("Please enter all 5 numbers (0-9)");
-                return;
-            }
-
             if (selectedBetType === null) {
                 alert("Please select Big or Small");
                 return;
             }
 
-            // Get the last digit of the most recent period number
-            const lastPeriodDigit = parseInt(historyData[0].period.slice(-1));
+            // Get the required numbers:
+            // 1. First number from first history result
+            const num1 = historyData[0].number;
             
-            // Calculate sum of inputs
-            const sum = num1 + num2 + num3 + num4 + num5;
+            // 2. Second number from second history result
+            const num2 = historyData[1].number;
             
-            // Determine if the result is Big or Small based on last digit
-            const resultType = lastPeriodDigit >= 5 ? "Big" : "Small";
+            // 3. Third number from third history result
+            const num3 = historyData[2].number;
+            
+            // 4. Fourth number from fourth history result
+            const num4 = historyData[3].number;
+            
+            // 5. Two fixed numbers (9 and 10) plus last digit of last period
+            const lastPeriodDigit = parseInt(historyData[historyData.length - 1].period.slice(-1));
+            const num5 = 9 + 10 + lastPeriodDigit;
+            
+            // The result is simply the first history result
+            const resultNumber = historyData[0].number;
+            const resultType = historyData[0].type;
             
             // Check if user won
             const isWin = resultType === selectedBetType;
@@ -210,9 +211,15 @@
             const resultText = document.getElementById('result-text');
             
             resultText.innerHTML = `
-                Last Period Digit: ${lastPeriodDigit}<br>
-                Sum of Your Numbers: ${sum}<br>
-                Result: ${resultType}<br>
+                <strong>Calculation:</strong><br>
+                1. First history number: ${num1}<br>
+                2. Second history number: ${num2}<br>
+                3. Third history number: ${num3}<br>
+                4. Fourth history number: ${num4}<br>
+                5. 9 + 10 + last period digit (${lastPeriodDigit}) = ${num5}<br><br>
+                
+                <strong>Final Result:</strong><br>
+                Using first history result only: ${resultNumber} (${resultType})<br>
                 Your Bet: ${selectedBetType}<br>
                 <strong>${isWin ? "YOU WIN!" : "You didn't win this time."}</strong>
             `;
