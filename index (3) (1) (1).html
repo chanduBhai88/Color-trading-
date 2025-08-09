@@ -2,52 +2,58 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>RAJA GAMES - B/S Predictor</title>
+<title>RAJA GAMES - Predictor</title>
 <style>
     body {
         font-family: Arial, sans-serif;
         text-align: center;
-        background: url('https://picsum.photos/1920/1080?blur=5') no-repeat center center fixed;
-        background-size: cover;
+        background: linear-gradient(to right, #232526, #414345);
         color: white;
-        padding: 20px;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
     }
     h1 {
-        margin-bottom: 10px;
-        text-shadow: 2px 2px 4px #000;
+        margin-bottom: 20px;
     }
-    .input-buttons {
-        margin: 20px 0;
+    .buttons {
+        margin: 10px 0;
     }
-    .input-buttons button {
-        padding: 15px 25px;
+    button {
+        padding: 10px 20px;
         font-size: 18px;
         margin: 5px;
         border: none;
         border-radius: 8px;
         cursor: pointer;
     }
-    .btn-b {
-        background-color: black;
+    .bs-btn {
+        background: #ff9800;
         color: white;
     }
-    .btn-s {
-        background-color: white;
-        color: black;
-    }
-    .btn-result, .btn-clear {
-        background-color: #ff9800;
+    .num-btn {
+        background: #2196f3;
         color: white;
-        font-weight: bold;
     }
-    .display {
+    .control-btn {
+        background: #4caf50;
+        color: white;
+    }
+    .clear-btn {
+        background: #f44336;
+    }
+    #inputDisplay {
         font-size: 22px;
-        margin-top: 15px;
-        text-shadow: 2px 2px 4px #000;
+        margin: 15px 0;
+        padding: 10px;
+        background: rgba(255,255,255,0.1);
+        border-radius: 8px;
     }
-    .history {
+    #result {
+        font-size: 26px;
         margin-top: 20px;
-        font-size: 18px;
+        font-weight: bold;
     }
 </style>
 </head>
@@ -55,87 +61,80 @@
 
 <h1>RAJA GAMES - Predictor</h1>
 
-<div class="input-buttons">
-    <button class="btn-b" onclick="addInput('B')">BIG</button>
-    <button class="btn-s" onclick="addInput('S')">SMALL</button>
+<div id="inputDisplay">Input: </div>
+
+<div class="buttons">
+    <button class="bs-btn" onclick="addInput('B')">BIG</button>
+    <button class="bs-btn" onclick="addInput('S')">SMALL</button>
 </div>
 
-<div class="display" id="currentInput">Input: </div>
-
-<div class="input-buttons">
-    <button class="btn-result" onclick="showResult()">RESULT</button>
-    <button class="btn-clear" onclick="clearInput()">CLEAR</button>
+<div class="buttons">
+    <button class="num-btn" onclick="addInput(0)">0</button>
+    <button class="num-btn" onclick="addInput(1)">1</button>
+    <button class="num-btn" onclick="addInput(2)">2</button>
+    <button class="num-btn" onclick="addInput(3)">3</button>
+    <button class="num-btn" onclick="addInput(4)">4</button>
+    <button class="num-btn" onclick="addInput(5)">5</button>
+    <button class="num-btn" onclick="addInput(6)">6</button>
+    <button class="num-btn" onclick="addInput(7)">7</button>
+    <button class="num-btn" onclick="addInput(8)">8</button>
+    <button class="num-btn" onclick="addInput(9)">9</button>
 </div>
 
-<div class="display" id="prediction">Prediction: </div>
-
-<div class="history">
-    <h3>Last 10 Results</h3>
-    <div id="historyList"></div>
+<div class="buttons">
+    <button class="control-btn" onclick="showResult()">Show Result</button>
+    <button class="clear-btn" onclick="clearInput()">Clear</button>
 </div>
+
+<div id="result"></div>
 
 <script>
-const patternsDatabase = [
-    // Example: ["Pattern sequence of 8 B/S", "First result"]
-    [["S","S","B","S","S","4","3"], "S"], // Pattern 14 example
-    [["B","B","B","S","B","4","3"], "B"], // Pattern 15 example
-    [["B","S","S","B","S","4","3"], "B"], // Pattern 16
-    [["B","B","B","S","S","4","3"], "B"], // Pattern 17
-    [["B","S","S","S","S","5","4"], "B"], // Pattern 18
-    [["B","B","S","S","S","5","4"], "B"], // Pattern 19
-    [["B","B","B","S","B","5","4"], "B"], // Pattern 20
-    [["B","S","B","S","B","5","4"], "B"], // Pattern 21
-    [["B","S","B","S","S","5","4"], "B"], // Pattern 22
-    [["S","S","S","S","S","5","4"], "S"], // Pattern 23
-    [["S","B","S","S","S","5","4"], "S"], // Pattern 24
-    [["S","B","B","S","B","5","4"], "S"], // Pattern 25
-    [["B","B","B","S","B","5","4"], "B"], // Pattern 26
-    [["S","S","S","B","B","5","4"], "S"], // Pattern 27
-    [["B","B","S","S","B","5","4"], "B"], // Pattern 28
-    [["S","S","B","S","B","5","4"], "S"], // Pattern 29
-    [["B","S","B","S","S","5","4"], "B"], // Pattern 30
-    [["S","S","S","B","S","5","4"], "S"], // Pattern 31
-    [["B","S","S","S","B","5","4"], "B"], // Pattern 32
-    [["B","S","B","B","S","5","4"], "B"], // Pattern 33
-    [["S","S","S","S","S","5","4"], "S"], // Pattern 34
-];
+    const patternsDatabase = [
+        ['B','S','B','S',4,3,'B'],
+        ['S','B','B','B',4,3,'S'],
+        ['S','S','S','S',4,3,'B'],
+        ['S','B','S','B',4,3,'S'],
+        ['B','S','S','S',4,3,'B'],
+        ['S','B','B','B',4,3,'S'],
+        // बाकी आपके 34 पैटर्न इसी तरह यहाँ डालेंगे
+    ];
 
-let currentInput = [];
-let history = [];
+    let userInput = [];
 
-function addInput(value) {
-    if (currentInput.length < 8) {
-        currentInput.push(value);
-        document.getElementById("currentInput").innerText = "Input: " + currentInput.join(" ");
-    }
-}
-
-function clearInput() {
-    currentInput = [];
-    document.getElementById("currentInput").innerText = "Input: ";
-    document.getElementById("prediction").innerText = "Prediction: ";
-}
-
-function showResult() {
-    if (currentInput.length !== 8) {
-        alert("Please enter exactly 8 inputs!");
-        return;
+    function addInput(value) {
+        if (userInput.length < 6) {
+            userInput.push(value);
+            document.getElementById('inputDisplay').innerText = "Input: " + userInput.join(' ');
+        }
     }
 
-    let match = patternsDatabase.find(pattern => 
-        JSON.stringify(pattern[0].slice(0, 8)) === JSON.stringify(currentInput)
-    );
+    function showResult() {
+        if (userInput.length !== 6) {
+            document.getElementById('result').innerText = "Please enter 4 B/S and 2 numbers.";
+            return;
+        }
 
-    if (match) {
-        let result = match[1];
-        document.getElementById("prediction").innerText = "Prediction: " + result;
-        history.unshift(result);
-        if (history.length > 10) history.pop();
-        document.getElementById("historyList").innerText = history.join(" → ");
-    } else {
-        document.getElementById("prediction").innerText = "Prediction: No Match";
+        let match = patternsDatabase.find(pat => 
+            pat[0] === userInput[0] &&
+            pat[1] === userInput[1] &&
+            pat[2] === userInput[2] &&
+            pat[3] === userInput[3] &&
+            pat[4] === userInput[4] &&
+            pat[5] === userInput[5]
+        );
+
+        if (match) {
+            document.getElementById('result').innerText = "Result: " + match[6];
+        } else {
+            document.getElementById('result').innerText = "No Match";
+        }
     }
-}
+
+    function clearInput() {
+        userInput = [];
+        document.getElementById('inputDisplay').innerText = "Input: ";
+        document.getElementById('result').innerText = "";
+    }
 </script>
 
 </body>
