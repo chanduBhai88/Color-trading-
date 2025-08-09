@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>RAJA GAMES - 6-Click Predictor</title>
+<title>RAJA GAMES - 6 Input Pattern Match</title>
 <style>
   :root{
     --bg: #0f172a;
@@ -18,7 +18,7 @@
   }
   html,body{height:100%; margin:0; font-family:Inter, system-ui, Arial;}
   body{
-    background-image: url('https://images.unsplash.com/photo-1503264116251-35a269479413?q=80&w=1600&auto=format&fit=crop&ixlib=rb-4.0.3&s='); /* nice wallpaper */
+    background-image: url('https://images.unsplash.com/photo-1503264116251-35a269479413?q=80&w=1600&auto=format&fit=crop');
     background-size: cover;
     background-position:center;
     color:var(--text);
@@ -46,8 +46,7 @@
     padding:8px 12px;border-radius:8px;cursor:pointer;font-weight:600;
   }
   .btn.secondary{background:transparent;border:1px solid rgba(255,255,255,0.08);padding:6px 10px}
-  .main{display:grid;grid-template-columns: 1fr 320px; gap:18px;align-items:start;}
-  .card{background:var(--glass); padding:14px;border-radius:10px}
+  .card{background:var(--glass); padding:14px;border-radius:10px;margin-bottom:12px}
   .input-row{display:flex;gap:8px;justify-content:center;margin:10px 0}
   .cell{
     width:56px;height:56px;border-radius:8px;display:flex;align-items:center;justify-content:center;
@@ -55,291 +54,108 @@
     font-weight:700;font-size:18px;color:var(--text);
     user-select:none;
   }
-  .cell.B{background:linear-gradient(180deg, rgba(0,128,0,0.18), rgba(0,128,0,0.08)); border-style:solid; border-color: rgba(0,128,0,0.22)}
-  .cell.S{background:linear-gradient(180deg, rgba(128,0,128,0.16), rgba(128,0,128,0.06)); border-style:solid; border-color: rgba(128,0,128,0.22)}
-  .small{font-size:13px;color:var(--muted);margin-top:6px;text-align:center}
-  .result-box{padding:12px;border-radius:8px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); text-align:center}
-  .history{max-height:260px;overflow:auto;margin-top:10px;padding:6px;gap:6px;display:flex;flex-direction:column}
-  .history-item{display:flex;justify-content:space-between;padding:8px;border-radius:8px;background:rgba(0,0,0,0.18)}
-  footer{margin-top:12px;text-align:center;color:var(--muted);font-size:13px}
-  @media (max-width:820px){ .main{grid-template-columns:1fr; } .cell{width:48px;height:48px}}
+  .cell.B{background:rgba(0,128,0,0.2);border-color:rgba(0,128,0,0.4)}
+  .cell.S{background:rgba(128,0,128,0.2);border-color:rgba(128,0,128,0.4)}
+  .result-box{padding:12px;border-radius:8px;background:rgba(255,255,255,0.05); text-align:center}
+  @media (max-width:600px){.cell{width:48px;height:48px}}
 </style>
 </head>
 <body data-theme="dark">
-  <div class="app" role="application">
-    <header>
-      <h1>RAJA GAMES — 6-Click Predictor</h1>
-      <div class="controls">
-        <button id="themeToggle" class="btn secondary">Toggle Theme</button>
-      </div>
-    </header>
-
-    <div class="main">
-      <!-- LEFT: input / actions -->
-      <div>
-        <div class="card">
-          <div style="display:flex;justify-content:space-between;align-items:center">
-            <div>
-              <strong>Input (click each box to toggle Empty → B → S)</strong>
-              <div class="small">Use exactly 6 cells. The app will match the <em>last 5</em> values vs patterns.</div>
-            </div>
-            <div>
-              <button id="clearBtn" class="btn secondary">Clear</button>
-            </div>
-          </div>
-
-          <div class="input-row" id="inputRow" style="margin-top:12px">
-            <!-- 6 cells -->
-            <div class="cell" data-index="0"></div>
-            <div class="cell" data-index="1"></div>
-            <div class="cell" data-index="2"></div>
-            <div class="cell" data-index="3"></div>
-            <div class="cell" data-index="4"></div>
-            <div class="cell" data-index="5"></div>
-          </div>
-
-          <div style="display:flex;gap:10px;justify-content:center;margin-top:12px">
-            <button id="resultBtn" class="btn">Result</button>
-            <button id="quickFillB" class="btn secondary">Fill B</button>
-            <button id="quickFillS" class="btn secondary">Fill S</button>
-          </div>
-
-          <div style="margin-top:12px" id="statusArea">
-            <div class="result-box" id="resultBox">
-              <div style="font-size:14px;color:var(--muted)">Result will appear here after pressing <strong>Result</strong></div>
-            </div>
-          </div>
-        </div>
-
-        <div class="card" style="margin-top:12px">
-          <strong>Instructions</strong>
-          <div class="small" style="margin-top:8px">
-            • Click each box to set B or S (or clear).<br>
-            • Press <strong>Result</strong> to check against the built-in patterns (last 5 inputs).<br>
-            • If a pattern matches, you'll see the matched pattern #, counts and a simple prediction (majority).<br>
-            • Last 10 results are saved in your browser.
-          </div>
-        </div>
-      </div>
-
-      <!-- RIGHT: patterns & history -->
-      <div>
-        <div class="card">
-          <strong>Patterns Database (5-length patterns)</strong>
-          <div class="small" style="margin-top:8px">These patterns come from your input list — matching compares the user's <em>last 5</em> cells.</div>
-
-          <div style="margin-top:12px;display:grid;gap:8px">
-            <div><strong>#1</strong> — B S B S S</div>
-            <div><strong>#2</strong> — S B B B B</div>
-            <div><strong>#3</strong> — S S S S B</div>
-            <div><strong>#4</strong> — S B S B S</div>
-            <div><strong>#5</strong> — B S S S S</div>
-            <div><strong>#6</strong> — S B B B S</div>
-          </div>
-        </div>
-
-        <div class="card" style="margin-top:12px">
-          <strong>Last 10 Results (history)</strong>
-          <div class="history" id="historyList">
-            <!-- history items here -->
-          </div>
-          <div style="margin-top:8px;display:flex;gap:8px;justify-content:flex-end">
-            <button id="clearHistory" class="btn secondary">Clear History</button>
-          </div>
-        </div>
-      </div>
+<div class="app">
+  <header>
+    <h1>RAJA GAMES — 6 Input Match</h1>
+    <div class="controls">
+      <button id="themeToggle" class="btn secondary">Theme</button>
     </div>
+  </header>
 
-    <footer>Built for RAJA GAMES • Click input • Matches last 5 values vs 6 stored patterns</footer>
+  <div class="card">
+    <strong>Click to set input (4 B/S + 2 Numbers)</strong>
+    <div class="input-row" id="inputRow">
+      <div class="cell" data-index="0"></div>
+      <div class="cell" data-index="1"></div>
+      <div class="cell" data-index="2"></div>
+      <div class="cell" data-index="3"></div>
+      <div class="cell" data-index="4"></div>
+      <div class="cell" data-index="5"></div>
+    </div>
+    <div style="display:flex;gap:10px;justify-content:center;margin-top:10px">
+      <button id="resultBtn" class="btn">Result</button>
+      <button id="clearBtn" class="btn secondary">Clear</button>
+    </div>
+    <div id="resultBox" class="result-box" style="margin-top:10px;color:var(--muted)">
+      Result will appear here
+    </div>
   </div>
+</div>
 
 <script>
 (function(){
-  // --- Patterns (5-length) based on your message ---
+  // Patterns: 4 B/S + 2 Numbers
   const patterns = [
-    ['B','S','B','S','S'], // #1
-    ['S','B','B','B','B'], // #2
-    ['S','S','S','S','B'], // #3
-    ['S','B','S','B','S'], // #4
-    ['B','S','S','S','S'], // #5
-    ['S','B','B','B','S']  // #6
+    ['B','S','B','S','S','4','3'],
+    ['S','B','B','B','B','4','3'],
+    ['S','S','S','S','B','4','3'],
+    ['S','B','S','B','S','4','3'],
+    ['B','S','S','S','S','4','3'],
+    ['S','B','B','B','S','4','3']
   ];
 
-  // DOM refs
-  const cells = Array.from(document.querySelectorAll('.cell'));
-  const resultBtn = document.getElementById('resultBtn');
-  const clearBtn = document.getElementById('clearBtn');
+  const state = ["","","","","",""];
+  const cells = document.querySelectorAll('.cell');
   const resultBox = document.getElementById('resultBox');
-  const quickB = document.getElementById('quickFillB');
-  const quickS = document.getElementById('quickFillS');
-  const historyList = document.getElementById('historyList');
-  const clearHistoryBtn = document.getElementById('clearHistory');
-  const themeToggle = document.getElementById('themeToggle');
 
-  // state: each cell value is '', 'B' or 'S'
-  const state = ['', '', '', '', '', ''];
-
-  // initialize cells UI
-  function renderCells(){
-    cells.forEach((c,i)=>{
-      c.classList.remove('B','S');
-      c.textContent = state[i] || '';
-      if(state[i] === 'B') c.classList.add('B');
-      if(state[i] === 'S') c.classList.add('S');
-    });
-  }
-
-  // cycle a cell Empty -> B -> S -> Empty
-  cells.forEach((c,i)=>{
-    c.addEventListener('click', ()=>{
-      const cur = state[i];
-      if(cur === '') state[i] = 'B';
-      else if(cur === 'B') state[i] = 'S';
-      else state[i] = '';
+  // Cycle values: Empty -> B -> S -> 0 -> 1 -> ... -> 9 -> Empty
+  const cycle = ["","B","S","0","1","2","3","4","5","6","7","8","9"];
+  cells.forEach((cell,i)=>{
+    cell.addEventListener('click',()=>{
+      let idx = cycle.indexOf(state[i]);
+      idx = (idx+1) % cycle.length;
+      state[i] = cycle[idx];
       renderCells();
     });
   });
 
-  // quick fill
-  quickB.addEventListener('click', ()=> {
-    for(let i=0;i<6;i++) state[i] = 'B';
-    renderCells();
-  });
-  quickS.addEventListener('click', ()=> {
-    for(let i=0;i<6;i++) state[i] = 'S';
-    renderCells();
-  });
-
-  // clear
-  clearBtn.addEventListener('click', ()=>{
-    for(let i=0;i<6;i++) state[i] = '';
-    renderCells();
-    setResultMessage('<div style="color:var(--muted)">Cleared input.</div>');
-  });
-
-  // result logic
-  resultBtn.addEventListener('click', ()=>{
-    // collect last 5 values (require at least 5 filled)
-    const filled = state.filter(v=>v==='B' || v==='S').length;
-    if(filled < 5){
-      setResultMessage('<div style="color:var(--muted)">Please set at least 5 cells before checking result.</div>');
-      return;
-    }
-    // build last5: take rightmost 5 non-empty positions in order of positions (we use last 5 indices)
-    // Simpler: use last 5 cells by index: indexes 1..5 (if all 6 present), otherwise use last 5 filled from left to right.
-    let last5 = [];
-    if(state[5] !== ''){ // if 6th cell set, take indices 1..5 as last5 (i.e., state[1]..state[5])
-      last5 = state.slice(1,6).map(x=>x||'');
-    } else {
-      // find last 5 non-empty in order of their positions
-      const nonEmpty = state.map((v,i)=>({v,i})).filter(x=>x.v==='B'||x.v==='S');
-      const take = nonEmpty.slice(-5).map(x=>x.v);
-      // if some of the last5 are missing (shouldn't happen because we checked filled>=5), we still proceed
-      last5 = take;
-    }
-
-    // If any empty among last5 -> cannot match
-    if(last5.length < 5 || last5.some(x=>x!== 'B' && x!=='S')){
-      setResultMessage('<div style="color:var(--muted)">Please ensure the last 5 positions are set (no empty).</div>');
-      return;
-    }
-
-    // search patterns for exact match
-    const matchedIndex = patterns.findIndex(p => p.join(',') === last5.join(','));
-    if(matchedIndex === -1){
-      // No exact match
-      saveToHistory({ input: state.slice(), matched: null, last5: last5, predicted: null, note: 'No Match' });
-      setResultMessage('<div style="font-weight:700;color:#ffd166">Result No Match</div>');
-      return;
-    }
-
-    // matched
-    const matchedPattern = patterns[matchedIndex];
-    const bCount = matchedPattern.filter(x=>x==='B').length;
-    const sCount = matchedPattern.filter(x=>x==='S').length;
-    let predicted = null;
-    if(bCount > sCount) predicted = 'B';
-    else if(sCount > bCount) predicted = 'S';
-    else predicted = null; // tie
-
-    // build UI message
-    const html = `
-      <div style="font-size:15px;margin-bottom:6px">Matched Pattern <strong>#${matchedIndex+1}</strong></div>
-      <div style="font-weight:700;font-size:18px">${matchedPattern.join(' ')}</div>
-      <div style="margin-top:8px">Counts — B: <strong>${bCount}</strong> | S: <strong>${sCount}</strong></div>
-      <div style="margin-top:8px;font-size:16px">
-        Prediction: <strong>${predicted ? (predicted==='B' ? 'Big (B)' : 'Small (S)') : 'No majority'}</strong>
-      </div>
-    `;
-    saveToHistory({ input: state.slice(), matched: matchedIndex+1, last5, predicted: predicted || 'No majority' });
-    setResultMessage(html);
-  });
-
-  // result area helper
-  function setResultMessage(html){
-    resultBox.innerHTML = html;
-  }
-
-  // History (localStorage)
-  const HISTORY_KEY = 'raja_games_history_v1';
-  function loadHistory(){
-    try{
-      const raw = localStorage.getItem(HISTORY_KEY);
-      return raw ? JSON.parse(raw) : [];
-    } catch(e){ return []; }
-  }
-  function saveToHistory(entry){
-    const h = loadHistory();
-    // normalize stored info
-    const rec = {
-      ts: (new Date()).toISOString(),
-      input: entry.input.map(x=>x||'-').join(' '),
-      last5: entry.last5 ? entry.last5.join(' ') : '',
-      matched: entry.matched,
-      predicted: entry.predicted || entry.note || null
-    };
-    h.unshift(rec);
-    while(h.length > 10) h.pop();
-    localStorage.setItem(HISTORY_KEY, JSON.stringify(h));
-    renderHistory();
-  }
-  function clearHistory(){
-    localStorage.removeItem(HISTORY_KEY);
-    renderHistory();
-    setResultMessage('<div style="color:var(--muted)">History cleared.</div>');
-  }
-  function renderHistory(){
-    const h = loadHistory();
-    historyList.innerHTML = '';
-    if(h.length === 0){
-      historyList.innerHTML = '<div class="small" style="color:var(--muted)">No history yet.</div>';
-      return;
-    }
-    h.forEach(item=>{
-      const div = document.createElement('div');
-      div.className = 'history-item';
-      div.innerHTML = `<div style="font-size:13px">${item.input}<div class="small" style="margin-top:4px;color:var(--muted)">last5: ${item.last5}</div></div>
-                       <div style="text-align:right">
-                         <div style="font-weight:700">${item.matched ? 'Pattern #' + item.matched : 'No match'}</div>
-                         <div class="small" style="margin-top:6px">${item.predicted}</div>
-                       </div>`;
-      historyList.appendChild(div);
+  function renderCells(){
+    cells.forEach((c,i)=>{
+      c.textContent = state[i];
+      c.classList.remove('B','S');
+      if(state[i]==="B") c.classList.add('B');
+      if(state[i]==="S") c.classList.add('S');
     });
   }
 
-  clearHistoryBtn.addEventListener('click', clearHistory);
-
-  // theme toggle
-  themeToggle.addEventListener('click', ()=>{
-    const root = document.body;
-    const now = root.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
-    root.setAttribute('data-theme', now);
+  document.getElementById('clearBtn').addEventListener('click',()=>{
+    for(let i=0;i<6;i++) state[i] = "";
+    renderCells();
+    resultBox.innerHTML = '<span style="color:var(--muted)">Cleared.</span>';
   });
 
-  // init
+  document.getElementById('resultBtn').addEventListener('click',()=>{
+    if(state.includes("")){
+      resultBox.innerHTML = '<span style="color:var(--muted)">Please fill all 6 inputs.</span>';
+      return;
+    }
+    let matchIndex = -1;
+    for(let i=0;i<patterns.length;i++){
+      if(patterns[i].join(",") === state.join(",")){
+        matchIndex = i;
+        break;
+      }
+    }
+    if(matchIndex === -1){
+      resultBox.innerHTML = '<span style="color:orange">Result No Match</span>';
+    } else {
+      resultBox.innerHTML = `<strong>Matched Pattern #${matchIndex+1}</strong><br>${patterns[matchIndex].join(" ")}`;
+    }
+  });
+
+  document.getElementById('themeToggle').addEventListener('click',()=>{
+    document.body.setAttribute('data-theme',
+      document.body.getAttribute('data-theme')==="light"?"dark":"light");
+  });
+
   renderCells();
-  renderHistory();
-  setResultMessage('<div style="color:var(--muted)">Ready — click the boxes to set B/S then press Result.</div>');
 })();
 </script>
 </body>
