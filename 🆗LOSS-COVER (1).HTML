@@ -7,125 +7,115 @@
     body {
         font-family: Arial, sans-serif;
         text-align: center;
-        margin: 0;
+        color: white;
         background-size: cover;
         background-position: center;
-        color: white;
-    }
-    h1 {
-        background: rgba(0, 0, 0, 0.6);
-        padding: 10px;
-        margin: 0;
+        transition: background-image 0.5s ease-in-out;
     }
     .buttons {
         margin: 20px;
     }
-    .btn {
-        padding: 15px 25px;
+    button {
+        font-size: 20px;
+        padding: 10px 20px;
         margin: 5px;
-        font-size: 18px;
         cursor: pointer;
         border: none;
         border-radius: 8px;
     }
-    .big { background-color: #007bff; color: white; }
-    .small { background-color: #ff9800; color: white; }
-    .red { background-color: red; color: white; }
-    .green { background-color: green; color: white; }
-    .violet { background-color: purple; color: white; }
+    .bs-btn { background-color: black; color: white; }
+    .color-btn { background-color: white; color: black; }
     .result {
         font-size: 24px;
-        font-weight: bold;
         margin-top: 20px;
-        padding: 10px;
-        background: rgba(0,0,0,0.6);
-        display: inline-block;
-    }
-    .theme-btn {
-        background: yellow;
-        color: black;
         font-weight: bold;
+    }
+    .theme-toggle {
+        position: fixed;
+        top: 10px;
+        right: 10px;
+        background: rgba(0,0,0,0.5);
+        color: white;
+        padding: 8px 12px;
+        border-radius: 5px;
     }
 </style>
 </head>
 <body>
 
 <h1>Big/Small Predictor</h1>
-
-<div class="buttons" id="bs-buttons">
-    <button class="btn big" onclick="addInput('B')">B</button>
-    <button class="btn small" onclick="addInput('S')">S</button>
-</div>
-
-<div class="buttons" id="color-buttons">
-    <button class="btn red" onclick="addInput('R')">R</button>
-    <button class="btn green" onclick="addInput('G')">G</button>
-    <button class="btn violet" onclick="addInput('V')">V</button>
-</div>
-
 <div class="buttons">
-    <button class="btn theme-btn" onclick="toggleTheme()">Toggle Theme</button>
-    <button class="btn" onclick="checkPattern()">Get Result</button>
-    <button class="btn" onclick="clearInput()">Clear</button>
+    <button class="bs-btn" onclick="addInput('B')">B</button>
+    <button class="bs-btn" onclick="addInput('S')">S</button>
+    <button class="color-btn" onclick="addInput('R')">R</button>
+    <button class="color-btn" onclick="addInput('G')">G</button>
+    <button class="color-btn" onclick="addInput('V')">V</button>
+    <button onclick="clearInput()">Clear</button>
+    <button onclick="checkResult()">Result</button>
 </div>
 
-<div class="result" id="result">Your Result Here</div>
+<div id="inputDisplay"></div>
+<div class="result" id="resultDisplay"></div>
+<button class="theme-toggle" onclick="toggleTheme()">Toggle Theme</button>
 
 <script>
-let inputSequence = [];
-let theme = 0;
-
-// Patterns: each pattern has 5 B/S + 2 colors
-let patterns = [
-    ["B","S","B","S","S","R","R"],
-    ["S","B","B","B","B","R","G"],
-    ["S","S","S","S","B","G","R"],
-    ["S","B","S","B","S","V","V"],
-    ["B","S","S","S","S","R","R"],
-    ["S","B","B","B","S","R","R"],
-    ["B","B","S","B","B","R","R"],
-    ["B","B","S","S","B","G","G"],
-    ["S","S","B","B","B","R","R"],
-    ["B","S","S","B","S","R","G"]
+const patterns = [
+    ['B','B','S','S','S','R','R'],
+    ['S','S','B','B','B','R','G'],
+    ['S','S','S','B','S','G','R'],
+    ['S','B','S','B','S','V','V'],
+    ['B','S','S','S','S','R','R'],
+    ['S','B','B','B','S','R','R'],
+    ['B','B','S','B','B','R','R'],
+    ['B','B','S','S','B','G','G'],
+    ['S','S','B','B','B','R','R'],
+    ['B','S','S','B','S','R','G']
 ];
 
-function addInput(val) {
-    if (inputSequence.length < 6) { // 4 B/S + 2 Colors
-        inputSequence.push(val);
-    }
-}
+let inputSequence = [];
+let hackerTheme = true;
+document.body.style.backgroundImage = "url('https://wallpapercave.com/wp/wp2461985.jpg')";
 
-function checkPattern() {
-    if (inputSequence.length !== 6) {
-        document.getElementById("result").innerText = "Please enter 4 B/S and 2 Colors";
-        return;
-    }
-    let match = patterns.find(p => 
-        p[0] === p[0] && // dummy for readability
-        p.slice(0,4).join("") === inputSequence.slice(0,4).join("") &&
-        p.slice(5,7).join("") === inputSequence.slice(4,6).join("")
-    );
-    if (match) {
-        document.getElementById("result").innerText = "Result: " + match[0];
-    } else {
-        document.getElementById("result").innerText = "Result No Match";
+function addInput(val) {
+    if (inputSequence.length < 6) {
+        inputSequence.push(val);
+        updateDisplay();
     }
 }
 
 function clearInput() {
     inputSequence = [];
-    document.getElementById("result").innerText = "Your Result Here";
+    updateDisplay();
+    document.getElementById("resultDisplay").textContent = "";
+}
+
+function updateDisplay() {
+    document.getElementById("inputDisplay").textContent = inputSequence.join(" ");
+}
+
+function checkResult() {
+    if (inputSequence.length !== 6) {
+        document.getElementById("resultDisplay").textContent = "Enter 4 B/S + 2 Colors";
+        return;
+    }
+    let match = patterns.find(p => 
+        p.slice(1).join('') === inputSequence.join('')
+    );
+    if (match) {
+        document.getElementById("resultDisplay").textContent = "Result: " + match[0];
+    } else {
+        document.getElementById("resultDisplay").textContent = "Result No Match";
+    }
 }
 
 function toggleTheme() {
-    theme = 1 - theme;
-    if (theme === 0) {
-        document.body.style.backgroundImage = "url('https://wallpaperaccess.com/full/219956.jpg')"; // hacker
+    hackerTheme = !hackerTheme;
+    if (hackerTheme) {
+        document.body.style.backgroundImage = "url('https://wallpapercave.com/wp/wp2461985.jpg')"; // Hacker
     } else {
-        document.body.style.backgroundImage = "url('https://wallpaperaccess.com/full/1567666.jpg')"; // cobra
+        document.body.style.backgroundImage = "url('https://wallpapercave.com/wp/wp2365736.jpg')"; // Cobra
     }
 }
-toggleTheme(); // set default
 </script>
 
 </body>
