@@ -1,125 +1,141 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <title>Big/Small Predictor with Themes</title>
-  <style>
+<title>Big/Small Predictor</title>
+<style>
     body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      color: #fff;
-      background-size: cover;
-      background-position: center;
-      transition: background-image 0.5s ease;
+        font-family: Arial, sans-serif;
+        text-align: center;
+        background-size: cover;
+        background-position: center;
+        color: white;
     }
-    h1 { text-align: center; margin: 20px 0; }
-    .buttons { text-align: center; margin: 20px; }
-    button {
-      padding: 12px 20px;
-      margin: 5px;
-      font-size: 18px;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
+    .container {
+        margin-top: 50px;
+        background: rgba(0,0,0,0.6);
+        padding: 20px;
+        border-radius: 10px;
+        display: inline-block;
     }
-    .bs-btn { background: #06b6d4; color: #000; }
-    .color-btn { background: #10b981; color: #000; }
-    #inputDisplay {
-      font-size: 20px;
-      margin: 15px auto;
-      padding: 8px;
-      width: fit-content;
-      background: rgba(0,0,0,0.5);
-      border-radius: 6px;
+    .btn {
+        padding: 10px 20px;
+        margin: 5px;
+        font-size: 18px;
+        cursor: pointer;
+        border: none;
+        border-radius: 5px;
     }
-    #result {
-      font-size: 24px;
-      font-weight: bold;
-      margin-top: 20px;
-      text-align: center;
+    .big { background: #007bff; }
+    .small { background: #ff5733; }
+    select {
+        padding: 10px;
+        font-size: 16px;
+        margin: 5px;
     }
-    .theme-btn {
-      display: block;
-      margin: 20px auto;
-      padding: 10px 16px;
-      background: gold;
-      color: #000;
-      font-weight: bold;
+    #resultBox {
+        margin-top: 20px;
+        font-size: 22px;
+        font-weight: bold;
     }
-  </style>
+</style>
 </head>
-<body>
+<body id="body" style="background-image: url('https://i.ibb.co/ZgQ5z3W/hacker.jpg');">
 
-<h1>Big / Small Predictor</h1>
-
-<div class="buttons">
-  <button class="bs-btn" onclick="addInput('B')">B</button>
-  <button class="bs-btn" onclick="addInput('S')">S</button>
-  <button class="color-btn" onclick="addInput('R')">R</button>
-  <button class="color-btn" onclick="addInput('G')">G</button>
-  <button class="color-btn" onclick="addInput('V')">V</button>
+<div class="container">
+    <h1>Big/Small Predictor</h1>
+    
+    <!-- 4 B/S Buttons -->
+    <div id="bsButtons">
+        <button class="btn big" onclick="toggleBS(this)">B</button>
+        <button class="btn big" onclick="toggleBS(this)">B</button>
+        <button class="btn big" onclick="toggleBS(this)">B</button>
+        <button class="btn big" onclick="toggleBS(this)">B</button>
+    </div>
+    
+    <!-- 2 Color Selectors -->
+    <div>
+        <select id="color1">
+            <option value="R">Red</option>
+            <option value="G">Green</option>
+            <option value="V">Violet</option>
+        </select>
+        <select id="color2">
+            <option value="R">Red</option>
+            <option value="G">Green</option>
+            <option value="V">Violet</option>
+        </select>
+    </div>
+    
+    <!-- Buttons -->
+    <div>
+        <button class="btn" onclick="checkPattern()">Result</button>
+        <button class="btn" onclick="clearInputs()">Clear</button>
+        <button class="btn" onclick="switchTheme()">Switch Theme</button>
+    </div>
+    
+    <div id="resultBox">Result will appear here</div>
 </div>
-
-<div id="inputDisplay">Input: </div>
-
-<div class="buttons">
-  <button onclick="checkPattern()">Get Result</button>
-  <button onclick="clearInput()">Clear</button>
-</div>
-
-<div id="result"></div>
-<button class="theme-btn" onclick="toggleTheme()">Toggle Theme</button>
 
 <script>
-  // Wallpaper URLs
-  const hackerBG = "url('https://images.unsplash.com/photo-...matrix-style-example?w=1920')";
-  const cobraBG   = "url('https://images.unsplash.com/photo-...cobra-head-example?w=1920')";
+let hackerBg = "https://i.ibb.co/ZgQ5z3W/hacker.jpg";
+let cobraBg = "https://i.ibb.co/smB1w6B/cobra.jpg";
+let isHacker = true;
 
-  let useHacker = true;
-  document.body.style.backgroundImage = hackerBG;
+// Your 10 patterns (skipping first B/S of each)
+let patterns = [
+    { bs: ["S","B","S","S"], colors: ["R","R"], result: "B" },
+    { bs: ["B","B","B","B"], colors: ["R","G"], result: "S" },
+    { bs: ["S","S","S","B"], colors: ["G","R"], result: "B" },
+    { bs: ["B","S","B","S"], colors: ["V","V"], result: "S" },
+    { bs: ["S","S","S","S"], colors: ["R","R"], result: "B" },
+    { bs: ["B","B","B","S"], colors: ["R","R"], result: "S" },
+    { bs: ["B","S","B","B"], colors: ["R","R"], result: "S" },
+    { bs: ["S","B","S","B"], colors: ["G","G"], result: "B" },
+    { bs: ["S","B","B","B"], colors: ["R","R"], result: "S" },
+    { bs: ["S","S","B","S"], colors: ["R","G"], result: "B" }
+];
 
-  // Patterns: first = result, next 4 = B/S input, then 2 colors
-  const patterns = [
-    { result: 'B', pattern: ['S','B','S','S','R','R'] },
-    { result: 'S', pattern: ['B','B','B','B','R','G'] },
-    { result: 'S', pattern: ['S','S','S','B','G','R'] },
-    { result: 'S', pattern: ['B','S','B','S','V','V'] },
-    { result: 'B', pattern: ['S','S','S','S','R','R'] },
-    { result: 'S', pattern: ['B','B','B','S','R','R'] },
-    { result: 'B', pattern: ['B','S','B','B','R','R'] },
-    { result: 'B', pattern: ['B','S','S','B','G','G'] },
-    { result: 'S', pattern: ['S','B','B','B','R','R'] },
-    { result: 'B', pattern: ['S','S','B','S','R','G'] }
-  ];
-
-  let userInput = [];
-
-  function addInput(val) {
-    if (userInput.length < 6) {
-      userInput.push(val);
-      document.getElementById("inputDisplay").innerText = "Input: " + userInput.join(" ");
+function toggleBS(btn) {
+    if (btn.textContent === "B") {
+        btn.textContent = "S";
+        btn.className = "btn small";
+    } else {
+        btn.textContent = "B";
+        btn.className = "btn big";
     }
-  }
+}
 
-  function clearInput() {
-    userInput = [];
-    document.getElementById("inputDisplay").innerText = "Input: ";
-    document.getElementById("result").innerText = "";
-  }
+function clearInputs() {
+    document.querySelectorAll("#bsButtons button").forEach(btn => {
+        btn.textContent = "B";
+        btn.className = "btn big";
+    });
+    document.getElementById("color1").value = "R";
+    document.getElementById("color2").value = "R";
+    document.getElementById("resultBox").textContent = "Result will appear here";
+}
 
-  function checkPattern() {
-    if (userInput.length !== 6) {
-      document.getElementById("result").innerText = "Enter 4 B/S + 2 Colors!";
-      return;
+function switchTheme() {
+    document.getElementById("body").style.backgroundImage = isHacker ? `url('${cobraBg}')` : `url('${hackerBg}')`;
+    isHacker = !isHacker;
+}
+
+function checkPattern() {
+    let bsInput = Array.from(document.querySelectorAll("#bsButtons button")).map(b => b.textContent);
+    let color1 = document.getElementById("color1").value;
+    let color2 = document.getElementById("color2").value;
+    
+    let match = patterns.find(p => 
+        JSON.stringify(p.bs) === JSON.stringify(bsInput) &&
+        p.colors[0] === color1 && p.colors[1] === color2
+    );
+    
+    if (match) {
+        document.getElementById("resultBox").textContent = "Result: " + match.result;
+    } else {
+        document.getElementById("resultBox").textContent = "Result: No Match";
     }
-    let match = patterns.find(p => p.pattern.join('') === userInput.join(''));
-    document.getElementById("result").innerText = match ? `Result: ${match.result}` : "Result No Match";
-  }
-
-  function toggleTheme() {
-    useHacker = !useHacker;
-    document.body.style.backgroundImage = useHacker ? hackerBG : cobraBG;
-  }
+}
 </script>
 
 </body>
