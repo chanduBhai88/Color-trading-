@@ -1,141 +1,222 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>RAJA GAMES - Predictor</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>RajaGame Predictor — 4 B/S + 2 numbers</title>
 <style>
-    body {
-        font-family: Arial, sans-serif;
-        text-align: center;
-        background: linear-gradient(to right, #232526, #414345);
-        color: white;
-        min-height: 100vh;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-    }
-    h1 {
-        margin-bottom: 20px;
-    }
-    .buttons {
-        margin: 10px 0;
-    }
-    button {
-        padding: 10px 20px;
-        font-size: 18px;
-        margin: 5px;
-        border: none;
-        border-radius: 8px;
-        cursor: pointer;
-    }
-    .bs-btn {
-        background: #ff9800;
-        color: white;
-    }
-    .num-btn {
-        background: #2196f3;
-        color: white;
-    }
-    .control-btn {
-        background: #4caf50;
-        color: white;
-    }
-    .clear-btn {
-        background: #f44336;
-    }
-    #inputDisplay {
-        font-size: 22px;
-        margin: 15px 0;
-        padding: 10px;
-        background: rgba(255,255,255,0.1);
-        border-radius: 8px;
-    }
-    #result {
-        font-size: 26px;
-        margin-top: 20px;
-        font-weight: bold;
-    }
+  :root{ --card:#0b0b0b; --panel:#111; --muted:#9aa7bf; --accent:#00d1b2; --red:#ff6b6b; --glass: rgba(255,255,255,0.03); }
+  html,body{height:100%;margin:0;font-family:Inter,system-ui,Arial;background:linear-gradient(180deg,#070707,#1b1b1b);}
+  .wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+  .card{
+    width:100%;max-width:520px;background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+    border-radius:14px;padding:22px;box-shadow:0 8px 40px rgba(0,0,0,0.6);backdrop-filter: blur(6px);
+    color:#f6f7fb;
+    background-image: url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1400&q=60');
+    background-size:cover;background-position:center;
+  }
+  .overlay{background:linear-gradient(180deg, rgba(0,0,0,0.6), rgba(0,0,0,0.6)); padding:18px;border-radius:12px;}
+  h1{margin:0 0 8px 0;font-size:20px;letter-spacing:0.2px}
+  .row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin:12px 0}
+  .bs-cell{
+    width:84px;height:46px;border-radius:8px;display:flex;align-items:center;justify-content:center;
+    cursor:pointer;background:rgba(255,255,255,0.06);font-weight:700;font-size:16px;color:#fff;border:2px solid rgba(255,255,255,0.04);
+    user-select:none;
+  }
+  .bs-cell.B{background:linear-gradient(180deg, rgba(0,200,120,0.18), rgba(0,200,120,0.06)); color:#002b14; border-color:rgba(0,200,120,0.35)}
+  .bs-cell.S{background:linear-gradient(180deg, rgba(120,80,200,0.16), rgba(120,80,200,0.05)); color:#2b002b; border-color:rgba(120,80,200,0.28)}
+  .num-select{height:46px;border-radius:8px;border:0;padding:8px 10px;font-size:16px;background:rgba(0,0,0,0.4);color:#fff}
+  .controls{display:flex;gap:12px;justify-content:center;margin-top:12px}
+  .btn{
+    padding:12px 22px;border-radius:10px;border:0;font-weight:700;cursor:pointer;font-size:15px;
+    background:linear-gradient(90deg,#10b981,#06b6d4);color:#002b2b;
+    box-shadow:0 6px 18px rgba(6,78,59,0.25);
+  }
+  .btn.clear{background:linear-gradient(90deg,#ef4444,#f97316);color:#fff;box-shadow:none}
+  .result-box{margin-top:14px;padding:12px;border-radius:8px;background:rgba(0,0,0,0.45);font-weight:700;font-size:16px}
+  .history{margin-top:14px;background:rgba(0,0,0,0.45);padding:10px;border-radius:8px;text-align:left;max-height:140px;overflow:auto}
+  .history-item{padding:6px;border-bottom:1px dashed rgba(255,255,255,0.03);font-size:14px}
+  .muted{color:var(--muted);font-weight:600;font-size:13px;margin-top:4px}
+  @media (max-width:480px){
+    .bs-cell{width:68px;font-size:15px}
+    .num-select{width:68px}
+  }
 </style>
 </head>
 <body>
+  <div class="wrap">
+    <div class="card">
+      <div class="overlay">
+        <h1>RajaGame Predictor</h1>
+        <div class="muted">Enter exactly <strong>4</strong> Big/Small (click) then <strong>2</strong> numbers (0–9). Press <em>Predict</em>.</div>
 
-<h1>RAJA GAMES - Predictor</h1>
+        <!-- B/S inputs (4) -->
+        <div class="row" id="bsRow">
+          <div class="bs-cell" data-index="0"></div>
+          <div class="bs-cell" data-index="1"></div>
+          <div class="bs-cell" data-index="2"></div>
+          <div class="bs-cell" data-index="3"></div>
+        </div>
 
-<div id="inputDisplay">Input: </div>
+        <!-- number selects (2) -->
+        <div class="row">
+          <select id="num1" class="num-select" aria-label="number 1"></select>
+          <select id="num2" class="num-select" aria-label="number 2"></select>
+        </div>
 
-<div class="buttons">
-    <button class="bs-btn" onclick="addInput('B')">BIG</button>
-    <button class="bs-btn" onclick="addInput('S')">SMALL</button>
-</div>
+        <!-- buttons -->
+        <div class="controls">
+          <button class="btn" id="predictBtn">🔮 Predict</button>
+          <button class="btn clear" id="clearBtn">Clear</button>
+        </div>
 
-<div class="buttons">
-    <button class="num-btn" onclick="addInput(0)">0</button>
-    <button class="num-btn" onclick="addInput(1)">1</button>
-    <button class="num-btn" onclick="addInput(2)">2</button>
-    <button class="num-btn" onclick="addInput(3)">3</button>
-    <button class="num-btn" onclick="addInput(4)">4</button>
-    <button class="num-btn" onclick="addInput(5)">5</button>
-    <button class="num-btn" onclick="addInput(6)">6</button>
-    <button class="num-btn" onclick="addInput(7)">7</button>
-    <button class="num-btn" onclick="addInput(8)">8</button>
-    <button class="num-btn" onclick="addInput(9)">9</button>
-</div>
+        <!-- result -->
+        <div class="result-box" id="resultBox">Result will appear here after Predict.</div>
 
-<div class="buttons">
-    <button class="control-btn" onclick="showResult()">Show Result</button>
-    <button class="clear-btn" onclick="clearInput()">Clear</button>
-</div>
-
-<div id="result"></div>
+        <!-- history -->
+        <div class="history" id="historyBox">
+          <strong>Last 10 Results</strong>
+          <div id="historyList"></div>
+        </div>
+      </div>
+    </div>
+  </div>
 
 <script>
-    const patternsDatabase = [
-        ['B','S','B','S',4,3,'B'],
-        ['S','B','B','B',4,3,'S'],
-        ['S','S','S','S',4,3,'B'],
-        ['S','B','S','B',4,3,'S'],
-        ['B','S','S','S',4,3,'B'],
-        ['S','B','B','B',4,3,'S'],
-        // बाकी आपके 34 पैटर्न इसी तरह यहाँ डालेंगे
-    ];
+/*
+  Patterns: each entry { inputs: ['B'|'S', ... 4 items], nums: [num1,num2], result: 'B'|'S' }
+  These patterns are added in the same order you provided (1..34).
+  If you want a change for any pattern i (1-based), tell me "fix pattern i: ..." and I'll update.
+*/
+const patterns = [
+  { inputs:['S','B','S','S'], nums:[4,3], result:'B'}, // 1
+  { inputs:['B','B','B','B'], nums:[4,3], result:'S'}, // 2
+  { inputs:['S','S','S','B'], nums:[4,3], result:'S'}, // 3
+  { inputs:['B','S','B','S'], nums:[4,3], result:'S'}, // 4
+  { inputs:['S','S','S','S'], nums:[4,3], result:'B'}, // 5
+  { inputs:['B','B','B','S'], nums:[4,3], result:'S'}, // 6
+  { inputs:['B','S','B','B'], nums:[4,3], result:'B'}, // 7
+  { inputs:['B','S','S','B'], nums:[4,3], result:'B'}, // 8
+  { inputs:['S','B','B','B'], nums:[4,3], result:'S'}, // 9 (first 9)
+  { inputs:['S','S','B','S'], nums:[4,3], result:'B'}, // 9 (second 9 in messages)
+  { inputs:['B','B','B','B'], nums:[4,3], result:'B'}, // 10
+  { inputs:['B','B','B','B'], nums:[4,3], result:'S'}, // 11 (duplicate inputs but user provided)
+  { inputs:['S','S','S','B'], nums:[4,3], result:'S'}, // 12
+  { inputs:['B','B','B','S'], nums:[4,3], result:'B'}, // 13
+  { inputs:['S','B','S','S'], nums:[4,3], result:'S'}, // 14
+  { inputs:['B','B','S','B'], nums:[4,3], result:'B'}, // 15
+  { inputs:['S','S','B','S'], nums:[4,3], result:'B'}, // 16
+  { inputs:['B','B','S','S'], nums:[4,3], result:'B'}, // 17
+  { inputs:['S','S','S','S'], nums:[5,4], result:'B'}, // 18
+  { inputs:['B','S','S','S'], nums:[5,4], result:'B'}, // 19
+  { inputs:['B','B','B','S'], nums:[5,4], result:'B'}, // 20
+  { inputs:['S','B','S','B'], nums:[5,4], result:'B'}, // 21
+  { inputs:['S','B','S','S'], nums:[5,4], result:'B'}, // 22
+  { inputs:['S','S','S','S'], nums:[5,4], result:'S'}, // 23
+  { inputs:['B','S','S','S'], nums:[5,4], result:'S'}, // 24
+  { inputs:['B','B','S','B'], nums:[5,4], result:'S'}, // 25
+  { inputs:['B','B','S','B'], nums:[5,4], result:'B'}, // 26
+  { inputs:['S','S','S','B'], nums:[5,4], result:'S'}, // 27
+  { inputs:['B','S','S','B'], nums:[5,4], result:'B'}, // 28
+  { inputs:['S','S','B','S'], nums:[5,4], result:'S'}, // 29
+  { inputs:['S','B','S','S'], nums:[5,4], result:'B'}, // 30
+  { inputs:['S','S','S','B'], nums:[5,4], result:'S'}, // 31
+  { inputs:['S','S','S','B'], nums:[5,4], result:'B'}, // 32
+  { inputs:['S','B','B','S'], nums:[5,4], result:'B'}, // 33
+  { inputs:['S','S','S','S'], nums:[5,4], result:'S'}  // 34
+];
 
-    let userInput = [];
+// --- UI elements ---
+const bsCells = Array.from(document.querySelectorAll('.bs-cell'));
+const num1 = document.getElementById('num1');
+const num2 = document.getElementById('num2');
+const predictBtn = document.getElementById('predictBtn');
+const clearBtn = document.getElementById('clearBtn');
+const resultBox = document.getElementById('resultBox');
+const historyList = document.getElementById('historyList');
 
-    function addInput(value) {
-        if (userInput.length < 6) {
-            userInput.push(value);
-            document.getElementById('inputDisplay').innerText = "Input: " + userInput.join(' ');
-        }
-    }
+let bsState = ['','','','']; // 'B' or 'S'
+let hist = JSON.parse(localStorage.getItem('raja_hist_v1')||'[]');
 
-    function showResult() {
-        if (userInput.length !== 6) {
-            document.getElementById('result').innerText = "Please enter 4 B/S and 2 numbers.";
-            return;
-        }
+// fill number selects
+for(let i=0;i<=9;i++){
+  const o1 = document.createElement('option'); o1.value = i; o1.text = i; num1.appendChild(o1);
+  const o2 = document.createElement('option'); o2.value = i; o2.text = i; num2.appendChild(o2);
+}
+num1.selectedIndex = 4; num2.selectedIndex = 3; // default 4,3 as many patterns use that
 
-        let match = patternsDatabase.find(pat => 
-            pat[0] === userInput[0] &&
-            pat[1] === userInput[1] &&
-            pat[2] === userInput[2] &&
-            pat[3] === userInput[3] &&
-            pat[4] === userInput[4] &&
-            pat[5] === userInput[5]
-        );
+// render bs cells
+function renderBS(){
+  bsCells.forEach((el,i)=>{
+    el.classList.remove('B','S');
+    el.textContent = bsState[i] || '';
+    if(bsState[i]==='B') el.classList.add('B');
+    if(bsState[i]==='S') el.classList.add('S');
+  });
+}
+bsCells.forEach((el,i)=>{
+  el.addEventListener('click',()=>{
+    // cycle: '' -> B -> S -> ''
+    if(bsState[i]==='') bsState[i]='B';
+    else if(bsState[i]==='B') bsState[i]='S';
+    else bsState[i]='';
+    renderBS();
+  });
+});
 
-        if (match) {
-            document.getElementById('result').innerText = "Result: " + match[6];
-        } else {
-            document.getElementById('result').innerText = "No Match";
-        }
-    }
+// load history
+function renderHistory(){
+  historyList.innerHTML = hist.length? hist.map(h=>`<div class="history-item">${h.ts} — ${h.input} → <strong>${h.resultText}</strong></div>`).join('') : '<div class="history-item" style="opacity:.7">No history yet</div>';
+}
+renderHistory();
 
-    function clearInput() {
-        userInput = [];
-        document.getElementById('inputDisplay').innerText = "Input: ";
-        document.getElementById('result').innerText = "";
-    }
+// matching function: search top-to-bottom, return first matched pattern or null
+function findMatch(user){
+  for(let i=0;i<patterns.length;i++){
+    const p = patterns[i];
+    // compare seq
+    const matchBS = p.inputs.every((v,idx)=> v === user.inputs[idx]);
+    const matchNum = (p.nums[0]===user.nums[0] && p.nums[1]===user.nums[1]);
+    if(matchBS && matchNum) return { idx:i+1, pattern:p };
+  }
+  return null;
+}
+
+// Predict button
+predictBtn.addEventListener('click',()=>{
+  // validate
+  if(bsState.some(x=> x!== 'B' && x!=='S')){
+    resultBox.innerHTML = '<span style="color:var(--muted);">Please set all 4 Big/Small (click each cell).</span>'; return;
+  }
+  const a = bsState.slice(); // ['B'|'S'...]
+  const n1 = Number(num1.value), n2 = Number(num2.value);
+
+  const user = { inputs: a, nums: [n1,n2] };
+  const m = findMatch(user);
+  if(m){
+    const res = m.pattern.result;
+    const resText = res === 'B' ? 'BIG' : 'SMALL';
+    resultBox.innerHTML = `<span style="color:#fff">Matched pattern #${m.idx} — <strong style="color:${res==='B'?'#ffd166':'#7be4ff'}">${resText}</strong></span>`;
+    // save history
+    hist.unshift({ ts:new Date().toLocaleString(), input: `${a.join(' ')} ${n1}${n2}`, resultText: resText, patternIndex: m.idx});
+    if(hist.length>10) hist.pop();
+    localStorage.setItem('raja_hist_v1', JSON.stringify(hist));
+    renderHistory();
+  } else {
+    resultBox.innerHTML = `<span style="color: #ffb86b">Result No Match</span>`;
+  }
+});
+
+// Clear
+clearBtn.addEventListener('click', ()=>{
+  bsState = ['','','',''];
+  renderBS();
+  num1.selectedIndex = 4; num2.selectedIndex = 3;
+  resultBox.innerHTML = 'Result will appear here after Predict.';
+});
+
+// initial render
+renderBS();
 </script>
-
 </body>
 </html>
