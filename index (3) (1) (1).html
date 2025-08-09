@@ -2,74 +2,96 @@
 <html>
 <head>
     <title>RajaGame Predictor</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Roboto', sans-serif;
+            background: #f0f2f5;
+            margin: 0;
+            padding: 15px;
+            color: #333;
+        }
+        .app-container {
             max-width: 350px;
             margin: 0 auto;
-            padding: 15px;
-            background: #f5f5f5;
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
         .header {
-            text-align: center;
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 20px;
-            color: #2c3e50;
-        }
-        .pattern-display {
-            background: white;
+            background: #6c5ce7;
+            color: white;
             padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 15px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            text-align: center;
+            font-size: 22px;
+            font-weight: bold;
         }
-        .prediction-btn {
-            background: #27ae60;
+        .pattern-box {
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+        }
+        .pattern-item {
+            padding: 8px 0;
+            font-size: 18px;
+            text-align: center;
+        }
+        .predict-btn {
+            background: #00b894;
             color: white;
             border: none;
-            padding: 12px 0;
+            padding: 15px;
             width: 100%;
-            border-radius: 5px;
             font-size: 18px;
-            margin: 10px 0;
             cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
         }
         .history {
-            background: white;
             padding: 15px;
-            border-radius: 10px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
         .history-title {
-            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 16px;
+            color: #636e72;
             margin-bottom: 10px;
         }
     </style>
 </head>
 <body>
-    <div class="header">RajaGame Predictor</div>
-    
-    <div class="pattern-display">
-        Small<br>
-        Big<br>
-        Big<br>
-        Big<br>
-        Small<br>
-        Big
-    </div>
+    <div class="app-container">
+        <div class="header">RajaGame Predictor</div>
+        
+        <div class="pattern-box">
+            <div class="pattern-item">Small</div>
+            <div class="pattern-item">Big</div>
+            <div class="pattern-item">Big</div>
+            <div class="pattern-item">Big</div>
+            <div class="pattern-item">Small</div>
+            <div class="pattern-item">Big</div>
+        </div>
 
-    <button class="prediction-btn">📞 Predict Next</button>
+        <button class="predict-btn">
+            📞 Predict Next
+        </button>
 
-    <div class="history">
-        <div class="history-title">📞 Last 5 Predictions:</div>
-        <!-- Prediction history would appear here -->
+        <div class="history">
+            <div class="history-title">
+                📞 Last 5 Predictions:
+            </div>
+            <!-- Prediction history will appear here -->
+        </div>
     </div>
 
     <script>
         // Add your prediction logic here
-        document.querySelector('.prediction-btn').addEventListener('click', function() {
-            alert('Prediction functionality would go here');
+        document.querySelector('.predict-btn').addEventListener('click', function() {
+            // Your prediction algorithm goes here
+            alert('Prediction in progress...');
         });
     </script>
 </body>
