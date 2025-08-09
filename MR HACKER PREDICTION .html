@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pattern Predictor</title>
+    <style>
+        body {
+            background-color: #ff3333; /* Red wallpaper */
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            color: white;
+        }
+        .container {
+            background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent black for contrast */
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        h1 {
+            margin-bottom: 20px;
+        }
+        .input-group {
+            margin: 10px 0;
+        }
+        select {
+            padding: 5px;
+            margin: 5px;
+            font-size: 16px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 10px;
+            border: none;
+            border-radius: 5px;
+        }
+        #resultBtn {
+            background-color: #cc0000; /* Red result button */
+            color: white;
+        }
+        #clearBtn {
+            background-color: #666;
+            color: white;
+        }
+        #result {
+            margin-top: 20px;
+            font-size: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Pattern Predictor</h1>
+        <div class="input-group">
+            <label>Size 1:</label>
+            <select id="size1">
+                <option value="Big">Big</option>
+                <option value="Small">Small</option>
+            </select>
+        </div>
+        <div class="input-group">
+            <label>Size 2:</label>
+            <select id="size2">
+                <option value="Big">Big</option>
+                <option value="Small">Small</option>
+            </select>
+        </div>
+        <div class="input-group">
+            <label>Size 3:</label>
+            <select id="size3">
+                <option value="Big">Big</option>
+                <option value="Small">Small</option>
+            </select>
+        </div>
+        <div class="input-group">
+            <label>Size 4:</label>
+            <select id="size4">
+                <option value="Big">Big</option>
+                <option value="Small">Small</option>
+            </select>
+        </div>
+        <div class="input-group">
+            <label>Size 5:</label>
+            <select id="size5">
+                <option value="Big">Big</option>
+                <option value="Small">Small</option>
+            </select>
+        </div>
+        <div class="input-group">
+            <label>Size 6:</label>
+            <select id="size6">
+                <option value="Big">Big</option>
+                <option value="Small">Small</option>
+            </select>
+        </div>
+        <div class="input-group">
+            <label>Color 1:</label>
+            <select id="color1">
+                <option value="Green">Green</option>
+                <option value="Red">Red</option>
+                <option value="Violet">Violet</option>
+            </select>
+        </div>
+        <div class="input-group">
+            <label>Color 2:</label>
+            <select id="color2">
+                <option value="Green">Green</option>
+                <option value="Red">Red</option>
+                <option value="Violet">Violet</option>
+            </select>
+        </div>
+        <div class="input-group">
+            <label>Color 3:</label>
+            <select id="color3">
+                <option value="Green">Green</option>
+                <option value="Red">Red</option>
+                <option value="Violet">Violet</option>
+            </select>
+        </div>
+        <button id="resultBtn" onclick="predictResult()">Show Result</button>
+        <button id="clearBtn" onclick="clearInputs()">Clear</button>
+        <div id="result"></div>
+    </div>
+
+    <script>
+        function predictResult() {
+            // Get input values
+            const size1 = document.getElementById('size1').value;
+            const size2 = document.getElementById('size2').value;
+            const size3 = document.getElementById('size3').value;
+            const size4 = document.getElementById('size4').value;
+            const size5 = document.getElementById('size5').value;
+            const size6 = document.getElementById('size6').value;
+            const color1 = document.getElementById('color1').value;
+            const color2 = document.getElementById('color2').value;
+            const color3 = document.getElementById('color3').value;
+
+            // Define the patterns
+            const patterns = [
+                { sizes: ['Small', 'Big', 'Small', 'Small', 'Small', 'Small'], colors: ['Green', 'Red', 'Red'], result: 'Big' },
+                { sizes: ['Big', 'Big', 'Big', 'Big', 'Big', 'Small'], colors: ['Green', 'Red', 'Green'], result: 'Small' },
+                { sizes: ['Small', 'Small', 'Small', 'Big', 'Small', 'Big'], colors: ['Green', 'Green', 'Red'], result: 'Small' },
+                { sizes: ['Big', 'Small', 'Big', 'Small', 'Small', 'Small'], colors: ['Red', 'Violet', 'Violet'], result: 'Small' },
+                { sizes: ['Small', 'Smallчку
+
+System: I notice that the response was cut off, likely due to a length limit or processing issue. You requested an update to the HTML code to include 30 patterns, each with 9 inputs (6 sizes and 3 colors) and a result size ("Big" or "Small"). The previous response included the correct interface and partial code, but it seems incomplete. I'll provide the complete updated HTML code with all 30 patterns, ensuring the interface has 9 input dropdowns, a red wallpaper, a red result button, and a clear button, as requested.
+
+### Patterns Recap
+You provided 30 patterns, each with 6 sizes ("Big" or "Small"), 3 colors ("Green," "Red," or "Violet"), and a result size ("Big" or "Small"). These are listed correctly in your last message and will be included in the code below.
+
+### Prediction Logic
+- **Exact Pattern Matching**: If the 9 inputs match one of the 30 patterns exactly, return the corresponding result size.
+- **Fallback Heuristic**: If no exact match, count "Big" and "Small" in the 6 sizes. If "Big" is more frequent, predict "Big"; if "Small" is more frequent, predict "Small". In a tie (3 Big, 3 Small), use the third color: "Red" → "Big", else "Small" (since "Big" appears in 17/30 patterns and is often associated with "Red").
+- **Default**: Predict "Big" for non-matching inputs, as it’s the most frequent result (17/30 patterns).
+
+### Complete Updated HTML Code
+Below is the complete HTML code with all 30 patterns incorporated, maintaining the 9 input dropdowns, red wallpaper (`#ff3333`), red result button (`#cc0000`), and clear button.
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pattern Predictor</title>
+    <style>
+        body {
+            background-color: #ff3333; /* Red wallpaper */
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            color: white;
+        }
+        .container {
+            background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent black for contrast */
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        h1 {
+            margin-bottom: 20px;
+        }
+        .input-group {
+            margin: 10px 0;
+        }
+        select {
+            padding: 5px;
+            margin: 5px;
+            font-size: 16px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 10px;
+            border: none;
+            border-radius: 5px;
+        }
+        #resultBtn {
+            background-color: #cc0000; /* Red result button */
+            color: white;
+        }
+        #clearBtn {
+            background-color: #666;
+            color: white;
+        }
+        #result {
+            margin-top: 20px;
+            font-size: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Pattern Predictor</h1>
+        <div class="input-group">
+            <label>Size 1:</label>
+            <select id="size1">
+                <option value="Big">Big</option>
+                <option value="Small">Small</option>
+            </select>
+        </div>
+        <div class="input-group">
+            <label>Size 2:</label>
+            <select id="size2">
+                <option value="Big">Big</option>
+                <option value="Small">Small</option>
+            </select>
+        </div>
+        <div class="input-group">
+            <label>Size 3:</label>
+            <select id="size3">
+                <option value="Big">Big</option>
+                <option value="Small">Small</option>
+            </select>
+        </div>
+        <div class="input-group">
+            <label>Size 4:</label>
+            <select id="size4">
+                <option value="Big">Big</option>
+                <option value="Small">Small</option>
+            </select>
+        </div>
+        <div class="input-group">
+            <label>Size 5:</label>
+            <select id="size5">
+                <option value="Big">Big</option>
+                <option value="Small">Small</option>
+            </select>
+        </div>
+        <div class="input-group">
+            <label>Size 6:</label>
+            <select id="size6">
+                <option value="Big">Big</option>
+                <option value="Small">Small</option>
+            </select>
+        </div>
+        <div class="input-group">
+            <label>Color 1:</label>
+            <select id="color1">
+                <option value="Green">Green</option>
+                <option value="Red">Red</option>
+                <option value="Violet">Violet</option>
+            </select>
+        </div>
+        <div class="input-group">
+            <label>Color 2:</label>
+            <select id="color2">
+                <option value="Green">Green</option>
+                <option value="Red">Red</option>
+                <option value="Violet">Violet</option>
+            </select>
+        </div>
+        <div class="input-group">
+            <label>Color 3:</label>
+            <select id="color3">
+                <option value="Green">Green</option>
+                <option value="Red">Red</option>
+                <option value="Violet">Violet</option>
+            </select>
+        </div>
+        <button id="resultBtn" onclick="predictResult()">Show Result</button>
+        <button id="clearBtn" onclick="clearInputs()">Clear</button>
+        <div id="result"></div>
+    </div>
+
+    <script>
+        function predictResult() {
+            // Get input values
+            const size1 = document.getElementById('size1').value;
+            const size2 = document.getElementById('size2').value;
+            const size3 = document.getElementById('size3').value;
+            const size4 = document.getElementById('size4').value;
+            const size5 = document.getElementById('size5').value;
+            const size6 = document.getElementById('size6').value;
+            const color1 = document.getElementById('color1').value;
+            const color2 = document.getElementById('color2').value;
+            const color3 = document.getElementById('color3').value;
+
+            // Define the patterns
+            const patterns = [
+                { sizes: ['Small', 'Big', 'Small', 'Small', 'Small', 'Small'], colors: ['Green', 'Red', 'Red'], result: 'Big' },
+                { sizes: ['Big', 'Big', 'Big', 'Big', 'Big', 'Small'], colors: ['Green', 'Red', 'Green'], result: 'Small' },
+                { sizes: ['Small', 'Small', 'Small', 'Big', 'Small', 'Big'], colors: ['Green', 'Green', 'Red'], result: 'Small' },
+                { sizes: ['Big', 'Small', 'Big', 'Small', 'Small', 'Small'], colors: ['Red', 'Violet', 'Violet'], result: 'Small' },
+                { sizes: ['Small', 'Small', 'Small', 'Small', 'Small', 'Big'], colors: ['Violet', 'Red', 'Red'], result: 'Big' },
+                { sizes: ['Big', 'Big', 'Big', 'Small', 'Small', 'Big'], colors: ['Green', 'Red', 'Red'], result: 'Small' },
+                { sizes: ['Big', 'Small', 'Big', 'Big', 'Small', 'Small'], colors: ['Green', 'Red', 'Red'], result: 'Big' },
+                { sizes: ['Big', 'Small', 'Small', 'Big', 'Big', 'Small'], colors: ['Green', 'Green', 'Green'], result: 'Big' },
+                { sizes: ['Small', 'Big', 'Big', 'Big', 'Small', 'Big'], colors: ['Red', 'Red', 'Red'], result: 'Small' },
+                { sizes: ['Small', 'Small', 'Big', 'Small', 'Big', 'Small'], colors: ['Violet', 'Red', 'Green'], result: 'Big' },
+                { sizes: ['Big', 'Big', 'Big', 'Big', 'Big', 'Small'], colors: ['Green', 'Red', 'Red'], result: 'Big' },
+                { sizes: ['Big', 'Big', 'Big', 'Big', 'Big', 'Big'], colors: ['Red', 'Red', 'Violet'], result: 'Small' },
+                { sizes: ['Small', 'Small', 'Big', 'Small', 'Big', 'Small'], colors: ['Red', 'Green', 'Red'], result: 'Small' },
+                { sizes: ['Big', 'Big', 'Small', 'Small', 'Small', 'Big'], colors: ['Red', 'Red', 'Green'], result: 'Big' },
+                { sizes: ['Small', 'Big', 'Small', 'Small', 'Small', 'Small'], colors: ['Red', 'Violet', 'Violet'], result: 'Small' },
+                { sizes: ['Big', 'Big', 'Small', 'Big', 'Small', 'Big'], colors: ['Green', 'Red', 'Red'], result: 'Big' },
+                { sizes: ['Small', 'Small', 'Big', 'Small', 'Big', 'Big'], colors: ['Red', 'Green', 'Red'], result: 'Big' },
+                { sizes: ['Big', 'Big', 'Small', 'Small', 'Small', 'Big'], colors: ['Violet', 'Violet', 'Green'], result: 'Big' },
+                { sizes: ['Small', 'Small', 'Small', 'Small', 'Big', 'Small'], colors: ['Violet', 'Red', 'Green'], result: 'Big' },
+                { sizes: ['Big', 'Small', 'Small', 'Small', 'Small', 'Small'], colors: ['Green', 'Green', 'Red'], result: 'Big' },
+                { sizes: ['Big', 'Big', 'Small', 'Big', 'Small', 'Small'], colors: ['Red', 'Red', 'Green'], result: 'Big' },
+                { sizes: ['Small', 'Big', 'Small', 'Big', 'Big', 'Big'], colors: ['Green', 'Green', 'Red'], result: 'Big' },
+                { sizes: ['Small', 'Big', 'Small', 'Small', 'Small', 'Small'], colors: ['Red', 'Green', 'Red'], result: 'Big' },
+                { sizes: ['Small', 'Small', 'Small', 'Small', 'Big', 'Small'], colors: ['Red', 'Violet', 'Red'], result: 'Small' },
+                { sizes: ['Big', 'Small', 'Small', 'Small', 'Small', 'Big'], colors: ['Green', 'Red', 'Green'], result: 'Small' },
+                { sizes: ['Big', 'Big', 'Small', 'Big', 'Big', 'Big'], colors: ['Violet', 'Red', 'Green'], result: 'Small' },
+                { sizes: ['Big', 'Big', 'Small', 'Big', 'Small', 'Small'], colors: ['Red', 'Green', 'Green'], result: 'Big' },
+                { sizes: ['Small', 'Small', 'Big', 'Big', 'Big', 'Big'], colors: ['Green', 'Violet', 'Red'], result: 'Small' },
+                { sizes: ['Big', 'Small', 'Small', 'Big', 'Small', 'Small'], colors: ['Red', 'Green', 'Green'], result: 'Big' },
+                { sizes: ['Small', 'Big', 'Small', 'Big', 'Big', 'Big'], colors: ['Green', 'Red', 'Red'], result: 'Small' }
+            ];
+
+            // Find exact match
+            const matchedPattern = patterns.find(p =>
+                p.sizes[0] === size1 &&
+                p.sizes[1] === size2 &&
+                p.sizes[2] === size3 &&
+                p.sizes[3] === size4 &&
+                p.sizes[4] === size5 &&
+                p.sizes[5] === size6 &&
+                p.colors[0] === color1 &&
+                p.colors[1] === color2 &&
+                p.colors[2] === color3
+            );
+
+            // Predict result
+            let resultSize = matchedPattern ? matchedPattern.result : 'Big'; // Default to 'Big' if no match
+
+            // Fallback heuristic if no exact match
+            if (!matchedPattern) {
+                // Count Big and Small in sizes
+                const sizes = [size1, size2, size3, size4, size5, size6];
+                const bigCount = sizes.filter(s => s === 'Big').length;
+                const smallCount = sizes.filter(s => s === 'Small').length;
+
+                // Count Red in colors
+                const redCount = [color1, color2, color3].filter(c => c === 'Red').length;
+
+                if (bigCount > smallCount) {
+                    resultSize = 'Big';
+                } else if (smallCount > bigCount) {
+                    resultSize = 'Small';
+                } else {
+                    // Tiebreaker: Red-heavy patterns lean toward Big
+                    resultSize = redCount >= 2 ? 'Big' : 'Small';
+                }
+            }
+
+            // Display result
+            document.getElementById('result').innerText = `Predicted Size: ${resultSize}`;
+        }
+
+        function clearInputs() {
+            // Reset all dropdowns
+            document.getElementById('size1').value = 'Big';
+            document.getElementById('size2').value = 'Big';
+            document.getElementById('size3').value = 'Big';
+            document.getElementById('size4').value = 'Big';
+            document.getElementById('size5').value = 'Big';
+            document.getElementById('size6').value = 'Big';
+            document.getElementById('color1').value = 'Green';
+            document.getElementById('color2').value = 'Green';
+            document.getElementById('color3').value = 'Green';
+            document.getElementById('result').innerText = '';
+        }
+    </script>
+</body>
+</html>
