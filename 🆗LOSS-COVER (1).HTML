@@ -134,45 +134,52 @@
             const color2 = document.getElementById('color2').value;
             const color3 = document.getElementById('color3').value;
 
-            // Count Big and Small in the size inputs
-            const sizes = [size1, size2, size3, size4, size5];
-            const bigCount = sizes.filter(size => size === 'Big').length;
-            const smallCount = sizes.filter(size => size === 'Small').length;
+            // Define the patterns
+            const patterns = [
+                { sizes: ['Big', 'Small', 'Big', 'Small', 'Small'], colors: ['Green', 'Red', 'Red'], result: 'Big' },
+                { sizes: ['Small', 'Big', 'Big', 'Big', 'Big'], colors: ['Green', 'Red', 'Green'], result: 'Big' },
+                { sizes: ['Small', 'Small', 'Small', 'Small', 'Big'], colors: ['Green', 'Green', 'Red'], result: 'Small' },
+                { sizes: ['Small', 'Big', 'Small', 'Big', 'Small'], colors: ['Red', 'Violet', 'Violet'], result: 'Big' },
+                { sizes: ['Big', 'Small', 'Small', 'Small', 'Small'], colors: ['Violet', 'Red', 'Red'], result: 'Big' },
+                { sizes: ['Small', 'Big', 'Big', 'Big', 'Small'], colors: ['Green', 'Red', 'Red'], result: 'Big' },
+                { sizes: ['Big', 'Big', 'Small', 'Big', 'Big'], colors: ['Green', 'Red', 'Red'], result: 'Small' },
+                { sizes: ['Big', 'Big', 'Small', 'Small', 'Big'], colors: ['Green', 'Green', 'Green'], result: 'Big' },
+                { sizes: ['Small', 'Small', 'Big', 'Big', 'Big'], colors: ['Red', 'Red', 'Red'], result: 'Small' },
+                { sizes: ['Big', 'Small', 'Small', 'Big', 'Small'], colors: ['Violet', 'Red', 'Green'], result: 'Big' }
+            ];
 
-            // Heuristic: Predict based on majority size
-            let resultSize;
-            if (bigCount > smallCount) {
-                resultSize = 'Big';
-            } else if (smallCount > bigCount) {
-                resultSize = 'Small';
-            } else {
-                // Tiebreaker: Use color3 to decide (based on patterns)
-                const patterns = [
-                    { sizes: ['Big', 'Small', 'Big', 'Small', 'Small'], colors: ['Green', 'Red', 'Red'], result: 'Big' },
-                    { sizes: ['Small', 'Big', 'Big', 'Big', 'Big'], colors: ['Green', 'Red', 'Green'], result: 'Big' },
-                    { sizes: ['Small', 'Small', 'Small', 'Small', 'Big'], colors: ['Green', 'Green', 'Red'], result: 'Small' },
-                    { sizes: ['Small', 'Big', 'Small', 'Big', 'Small'], colors: ['Red', 'Violet', 'Violet'], result: 'Big' },
-                    { sizes: ['Big', 'Small', 'Small', 'Small', 'Small'], colors: ['Violet', 'Red', 'Red'], result: 'Big' },
-                    { sizes: ['Small', 'Big', 'Big', 'Big', 'Small'], colors: ['Green', 'Red', 'Red'], result: 'Big' },
-                    { sizes: ['Big', 'Big', 'Small', 'Big', 'Big'], colors: ['Green', 'Red', 'Red'], result: 'Small' },
-                    { sizes: ['Big', 'Big', 'Small', 'Small', 'Big'], colors: ['Green', 'Green', 'Green'], result: 'Big' },
-                    { sizes: ['Small', 'Small', 'Big', 'Big', 'Big'], colors: ['Red', 'Red', 'Red'], result: 'Small' },
-                    { sizes: ['Big', 'Small', 'Small', 'Big', 'Small'], colors: ['Violet', 'Red', 'Green'], result: 'Big' }
-                ];
+            // Find exact match
+            const matchedPattern = patterns.find(p =>
+                p.sizes[0] === size1 &&
+                p.sizes[1] === size2 &&
+                p.sizes[2] === size3 &&
+                p.sizes[3] === size4 &&
+                p.sizes[4] === size5 &&
+                p.colors[0] === color1 &&
+                p.colors[1] === color2 &&
+                p.colors[2] === color3
+            );
 
-                // Find matching pattern (if any)
-                const matchedPattern = patterns.find(p =>
-                    p.sizes[0] === size1 &&
-                    p.sizes[1] === size2 &&
-                    p.sizes[2] === size3 &&
-                    p.sizes[3] === size4 &&
-                    p.sizes[4] === size5 &&
-                    p.colors[0] === color1 &&
-                    p.colors[1] === color2 &&
-                    p.colors[2] === color3
-                );
+            // Predict result
+            let resultSize = matchedPattern ? matchedPattern.result : 'Big'; // Default to 'Big' if no match
 
-                resultSize = matchedPattern ? matchedPattern.result : (color3 === 'Red' ? 'Big' : 'Small'); // Default to Big if Red, else Small
+            // If no exact match, try partial matching based on sizes and colors
+            if (!matchedPattern) {
+                // Count Big and Small in sizes
+                const sizes = [size1, size2, size3, size4, size5];
+                const bigCount = sizes.filter(s => s === 'Big').length;
+                const smallCount = sizes.filter(s => s === 'Small').length;
+
+                // Check color patterns for tiebreaker
+                const redCount = [color1, color2, color3].filter(c => c === 'Red').length;
+                if (bigCount > smallCount) {
+                    resultSize = 'Big';
+                } else if (smallCount > bigCount) {
+                    resultSize = 'Small';
+                } else {
+                    // If sizes are tied, use color pattern (Red-heavy patterns often result in Big)
+                    resultSize = redCount >= 2 ? 'Big' : 'Small';
+                }
             }
 
             // Display result
