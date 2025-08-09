@@ -109,6 +109,14 @@
                 <option value="Violet">Violet</option>
             </select>
         </div>
+        <div class="input-group">
+            <label>Color 3:</label>
+            <select id="color3">
+                <option value="Green">Green</option>
+                <option value="Red">Red</option>
+                <option value="Violet">Violet</option>
+            </select>
+        </div>
         <button id="resultBtn" onclick="predictResult()">Show Result</button>
         <button id="clearBtn" onclick="clearInputs()">Clear</button>
         <div id="result"></div>
@@ -124,34 +132,51 @@
             const size5 = document.getElementById('size5').value;
             const color1 = document.getElementById('color1').value;
             const color2 = document.getElementById('color2').value;
+            const color3 = document.getElementById('color3').value;
 
-            // Simple heuristic: Predict the result color based on the last two colors
-            // If both colors are the same, use that; otherwise, default to the second color or "Red"
-            let resultColor;
-            if (color1 === color2) {
-                resultColor = color1;
+            // Count Big and Small in the size inputs
+            const sizes = [size1, size2, size3, size4, size5];
+            const bigCount = sizes.filter(size => size === 'Big').length;
+            const smallCount = sizes.filter(size => size === 'Small').length;
+
+            // Heuristic: Predict based on majority size
+            let resultSize;
+            if (bigCount > smallCount) {
+                resultSize = 'Big';
+            } else if (smallCount > bigCount) {
+                resultSize = 'Small';
             } else {
-                // Analyze patterns: If no clear rule, pick color2 or default to Red
+                // Tiebreaker: Use color3 to decide (based on patterns)
                 const patterns = [
-                    { color1: 'Green', color2: 'Red', result: 'Red' },
-                    { color1: 'Green', color2: 'Red', result: 'Green' },
-                    { color1: 'Green', color2: 'Green', result: 'Red' },
-                    { color1: 'Red', color2: 'Violet', result: 'Violet' },
-                    { color1: 'Violet', color2: 'Red', result: 'Red' },
-                    { color1: 'Green', color2: 'Red', result: 'Red' },
-                    { color1: 'Green', color2: 'Red', result: 'Red' },
-                    { color1: 'Green', color2: 'Green', result: 'Green' },
-                    { color1: 'Red', color2: 'Red', result: 'Red' },
-                    { color1: 'Violet', color2: 'Red', result: 'Green' }
+                    { sizes: ['Big', 'Small', 'Big', 'Small', 'Small'], colors: ['Green', 'Red', 'Red'], result: 'Big' },
+                    { sizes: ['Small', 'Big', 'Big', 'Big', 'Big'], colors: ['Green', 'Red', 'Green'], result: 'Big' },
+                    { sizes: ['Small', 'Small', 'Small', 'Small', 'Big'], colors: ['Green', 'Green', 'Red'], result: 'Small' },
+                    { sizes: ['Small', 'Big', 'Small', 'Big', 'Small'], colors: ['Red', 'Violet', 'Violet'], result: 'Big' },
+                    { sizes: ['Big', 'Small', 'Small', 'Small', 'Small'], colors: ['Violet', 'Red', 'Red'], result: 'Big' },
+                    { sizes: ['Small', 'Big', 'Big', 'Big', 'Small'], colors: ['Green', 'Red', 'Red'], result: 'Big' },
+                    { sizes: ['Big', 'Big', 'Small', 'Big', 'Big'], colors: ['Green', 'Red', 'Red'], result: 'Small' },
+                    { sizes: ['Big', 'Big', 'Small', 'Small', 'Big'], colors: ['Green', 'Green', 'Green'], result: 'Big' },
+                    { sizes: ['Small', 'Small', 'Big', 'Big', 'Big'], colors: ['Red', 'Red', 'Red'], result: 'Small' },
+                    { sizes: ['Big', 'Small', 'Small', 'Big', 'Small'], colors: ['Violet', 'Red', 'Green'], result: 'Big' }
                 ];
 
-                // Find matching pattern for color1 and color2
-                const matchedPattern = patterns.find(p => p.color1 === color1 && p.color2 === color2);
-                resultColor = matchedPattern ? matchedPattern.result : color2; // Default to color2 if no match
+                // Find matching pattern (if any)
+                const matchedPattern = patterns.find(p =>
+                    p.sizes[0] === size1 &&
+                    p.sizes[1] === size2 &&
+                    p.sizes[2] === size3 &&
+                    p.sizes[3] === size4 &&
+                    p.sizes[4] === size5 &&
+                    p.colors[0] === color1 &&
+                    p.colors[1] === color2 &&
+                    p.colors[2] === color3
+                );
+
+                resultSize = matchedPattern ? matchedPattern.result : (color3 === 'Red' ? 'Big' : 'Small'); // Default to Big if Red, else Small
             }
 
             // Display result
-            document.getElementById('result').innerText = `Predicted Color: ${resultColor}`;
+            document.getElementById('result').innerText = `Predicted Size: ${resultSize}`;
         }
 
         function clearInputs() {
@@ -163,6 +188,7 @@
             document.getElementById('size5').value = 'Big';
             document.getElementById('color1').value = 'Green';
             document.getElementById('color2').value = 'Green';
+            document.getElementById('color3').value = 'Green';
             document.getElementById('result').innerText = '';
         }
     </script>
