@@ -1,120 +1,106 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>51Game Predictor</title>
+    <title>Big/Small Pattern Game</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            background: #111;
-            color: white;
-            max-width: 400px;
-            margin: 20px auto;
-            padding: 15px;
-        }
-        .game-container {
-            background: #222;
+            max-width: 500px;
+            margin: 0 auto;
             padding: 20px;
-            border-radius: 10px;
         }
-        .input-display {
-            background: #333;
-            padding: 15px;
-            margin: 15px 0;
-            border-radius: 8px;
-            text-align: center;
-            font-size: 18px;
+        .input-group {
+            margin-bottom: 15px;
         }
-        .btn {
-            padding: 12px;
-            margin: 8px 0;
-            border: none;
-            border-radius: 8px;
-            font-weight: bold;
+        input {
+            padding: 8px;
+            margin: 5px 0;
             width: 100%;
+            box-sizing: border-box;
         }
-        .btn-big {
+        button {
+            padding: 10px 15px;
+            margin-right: 10px;
             background: #4CAF50;
             color: white;
+            border: none;
+            cursor: pointer;
         }
-        .btn-small {
-            background: #2196F3;
-            color: white;
-        }
-        .btn-predict {
-            background: #FF5722;
-            color: white;
-            margin-top: 20px;
-        }
-        .result {
+        #result {
             margin-top: 20px;
             padding: 15px;
-            background: #333;
-            border-radius: 8px;
-            text-align: center;
-            font-size: 18px;
+            border: 1px solid #ddd;
+            background: #f9f9f9;
         }
     </style>
 </head>
 <body>
-    <div class="game-container">
-        <h2 style="text-align: center;">51Game Predictor</h2>
-        
-        <div class="input-display" id="currentInputs">
-            <!-- Inputs will appear here -->
-        </div>
-
-        <button class="btn btn-small" onclick="addInput('Small')">Small</button>
-        <button class="btn btn-big" onclick="addInput('Big')">Big</button>
-        
-        <button class="btn btn-predict" onclick="predict()">Predict</button>
-
-        <div class="result" id="result">
-            Enter 3 Big/Small inputs
-        </div>
+    <h2>Big/Small Pattern Game</h2>
+    
+    <div class="input-group">
+        <h3>Enter 3 Big/Small Values:</h3>
+        <input type="text" id="bs1" placeholder="Enter BIG or SMALL">
+        <input type="text" id="bs2" placeholder="Enter BIG or SMALL">
+        <input type="text" id="bs3" placeholder="Enter BIG or SMALL">
     </div>
 
+    <div class="input-group">
+        <h3>Enter 2 Numbers:</h3>
+        <input type="number" id="num1" placeholder="First number">
+        <input type="number" id="num2" placeholder="Second number">
+    </div>
+
+    <div>
+        <button onclick="checkResult()">Check Result</button>
+        <button onclick="clearInputs()" style="background:#f44336;">Clear</button>
+    </div>
+
+    <div id="result"></div>
+
     <script>
-        // Current inputs
-        let inputs = [];
-        
-        // From your image data (last 3 period numbers' last digits)
-        const periodDigits = [6, 9, 1]; // From: ...686(6), ...687(9), ...685(1)
+        function checkResult() {
+            // Get Big/Small inputs
+            const bsValues = [
+                document.getElementById('bs1').value.toUpperCase(),
+                document.getElementById('bs2').value.toUpperCase(),
+                document.getElementById('bs3').value.toUpperCase()
+            ];
+            
+            // Get numbers
+            const num1 = document.getElementById('num1').value;
+            const num2 = document.getElementById('num2').value;
 
-        function addInput(type) {
-            if (inputs.length >= 3) return;
-            inputs.push(type);
-            updateDisplay();
-        }
-
-        function updateDisplay() {
-            const display = document.getElementById('currentInputs');
-            display.innerHTML = inputs.length > 0 ? 
-                inputs.join(' • ') : 
-                'Add 3 Big/Small inputs';
-        }
-
-        function predict() {
-            if (inputs.length !== 3) {
-                alert("Please enter exactly 3 Big/Small inputs!");
+            // Validate inputs
+            if (bsValues.includes("") || !num1 || !num2) {
+                document.getElementById('result').innerHTML = 
+                    "<b>Error:</b> Please fill all 5 fields (3 BIG/SMALL + 2 numbers)!";
                 return;
             }
 
-            // Combine with period digits (6,9,1 from your image)
-            const combined = [...inputs, ...periodDigits];
-            
-            // Simple prediction (you can modify this)
-            const bigCount = inputs.filter(x => x === 'Big').length;
-            const prediction = bigCount >= 2 ? 'Big' : 'Small';
-            
+            // Check valid BIG/SMALL entries
+            const validEntries = bsValues.every(val => val === "BIG" || val === "SMALL");
+            if (!validEntries) {
+                document.getElementById('result').innerHTML = 
+                    "<b>Error:</b> Please only enter BIG or SMALL for first 3 fields!";
+                return;
+            }
+
+            // If all valid, show success
             document.getElementById('result').innerHTML = `
-                <strong>Prediction:</strong> ${prediction}<br>
-                <small>Using: ${inputs.join(' + ')} and period digits (${periodDigits.join(',')})</small>
+                <b>Success!</b><br>
+                Your pattern: ${bsValues.join(", ")}<br>
+                Your numbers: ${num1}, ${num2}<br><br>
+                <i>(Pattern matching logic can be added here)</i>
             `;
-            
-            inputs = [];
-            updateDisplay();
+        }
+
+        function clearInputs() {
+            document.getElementById('bs1').value = "";
+            document.getElementById('bs2').value = "";
+            document.getElementById('bs3').value = "";
+            document.getElementById('num1').value = "";
+            document.getElementById('num2').value = "";
+            document.getElementById('result').innerHTML = "";
         }
     </script>
 </body>
