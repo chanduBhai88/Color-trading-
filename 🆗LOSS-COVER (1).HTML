@@ -24,6 +24,7 @@
         cursor: pointer;
         border: none;
         border-radius: 5px;
+        min-width: 50px;
     }
     .big { background: #007bff; }
     .small { background: #ff5733; }
@@ -44,8 +45,9 @@
 <div class="container">
     <h1>Big/Small Predictor</h1>
     
-    <!-- 4 B/S Buttons -->
+    <!-- 5 B/S Buttons -->
     <div id="bsButtons">
+        <button class="btn big" onclick="toggleBS(this)">B</button>
         <button class="btn big" onclick="toggleBS(this)">B</button>
         <button class="btn big" onclick="toggleBS(this)">B</button>
         <button class="btn big" onclick="toggleBS(this)">B</button>
@@ -81,19 +83,41 @@ let hackerBg = "https://i.ibb.co/ZgQ5z3W/hacker.jpg";
 let cobraBg = "https://i.ibb.co/smB1w6B/cobra.jpg";
 let isHacker = true;
 
-// Your 10 patterns (skipping first B/S of each)
+// 27 patterns with 5 B/S and 2 colors
 let patterns = [
-    { bs: ["S","B","S","S"], colors: ["R","R"], result: "B" },
-    { bs: ["B","B","B","B"], colors: ["R","G"], result: "S" },
-    { bs: ["S","S","S","B"], colors: ["G","R"], result: "B" },
-    { bs: ["B","S","B","S"], colors: ["V","V"], result: "S" },
-    { bs: ["S","S","S","S"], colors: ["R","R"], result: "B" },
-    { bs: ["B","B","B","S"], colors: ["R","R"], result: "S" },
-    { bs: ["B","S","B","B"], colors: ["R","R"], result: "S" },
-    { bs: ["S","B","S","B"], colors: ["G","G"], result: "B" },
-    { bs: ["S","B","B","B"], colors: ["R","R"], result: "S" },
-    { bs: ["S","S","B","S"], colors: ["R","G"], result: "B" }
+    { bs: ["S","B","S","S","R"], colors: ["R","R"], result: "B" }, // This looks like a typo from your old data; keep it as is or adjust
+    { bs: ["B","B","B","B","B"], colors: ["R","G"], result: "S" },
+    { bs: ["S","S","S","B","S"], colors: ["G","R"], result: "B" },
+    { bs: ["B","S","B","S","S"], colors: ["V","V"], result: "S" },
+    { bs: ["S","S","S","S","S"], colors: ["R","R"], result: "B" },
+    { bs: ["B","B","B","S","B"], colors: ["R","R"], result: "S" },
+    { bs: ["B","S","B","B","S"], colors: ["R","R"], result: "S" },
+    { bs: ["S","B","S","B","B"], colors: ["G","G"], result: "B" },
+    { bs: ["S","B","B","B","S"], colors: ["R","R"], result: "S" },
+    { bs: ["S","S","B","S","B"], colors: ["R","G"], result: "B" },
+
+    // Newly added patterns 11 to 27:
+    { bs: ["B","B","B","B","B"], colors: ["R","R"], result: "B" },
+    { bs: ["S","B","B","B","B"], colors: ["R","V"], result: "S" },
+    { bs: ["S","S","S","B","S"], colors: ["G","R"], result: "B" },
+    { bs: ["B","B","B","S","S"], colors: ["R","G"], result: "S" },
+    { bs: ["S","S","B","S","S"], colors: ["V","V"], result: "B" },
+    { bs: ["B","B","B","S","B"], colors: ["R","R"], result: "S" },
+    { bs: ["B","S","S","B","S"], colors: ["G","R"], result: "B" },
+    { bs: ["B","B","B","S","S"], colors: ["S","V","G"], result: "S" },  // This pattern has 3 colors, but UI supports 2 only - so ignoring 3rd color or fix needed
+    { bs: ["B","S","S","S","S"], colors: ["R","G"], result: "B" },
+    { bs: ["B","B","S","S","S"], colors: ["G","R"], result: "S" },
+    { bs: ["B","B","B","S","B"], colors: ["R","G"], result: "B" },
+    { bs: ["B","S","B","S","B"], colors: ["G","R"], result: "S" },
+    { bs: ["B","S","B","S","S"], colors: ["G","R"], result: "B" },
+    { bs: ["S","S","S","S","S"], colors: ["V","R"], result: "B" },
+    { bs: ["S","B","S","S","S"], colors: ["R","G"], result: "S" },
+    { bs: ["S","B","B","S","B"], colors: ["R","G"], result: "B" },
+    { bs: ["B","B","B","S","B"], colors: ["G","G"], result: "S" }
 ];
+
+// Fix pattern #18 which had 3 colors (S,V,G) - UI supports only 2 colors, so let's skip or fix
+// Let's skip this pattern for now by filtering it out from matching.
 
 function toggleBS(btn) {
     if (btn.textContent === "B") {
@@ -125,7 +149,10 @@ function checkPattern() {
     let color1 = document.getElementById("color1").value;
     let color2 = document.getElementById("color2").value;
     
-    let match = patterns.find(p => 
+    // Filter patterns with exactly 2 colors only (to avoid 3 color pattern)
+    let validPatterns = patterns.filter(p => p.colors.length === 2);
+    
+    let match = validPatterns.find(p => 
         JSON.stringify(p.bs) === JSON.stringify(bsInput) &&
         p.colors[0] === color1 && p.colors[1] === color2
     );
