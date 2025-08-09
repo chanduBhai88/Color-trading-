@@ -2,111 +2,138 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>6 Input Big/Small Predictor</title>
+<title>RAJA GAMES - Predictor</title>
 <style>
     body {
         font-family: Arial, sans-serif;
-        background: linear-gradient(to right, #232526, #414345);
-        color: white;
         text-align: center;
+        background: url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e') no-repeat center center/cover;
+        color: white;
         padding: 20px;
     }
-    h1 {
-        margin-bottom: 20px;
-    }
-    .buttons {
-        margin: 10px 0;
+    .btn-group {
+        margin: 10px;
     }
     button {
         padding: 10px 20px;
-        font-size: 16px;
+        font-size: 18px;
         margin: 5px;
         cursor: pointer;
-        border: none;
         border-radius: 8px;
+        border: none;
     }
-    .big { background-color: #3498db; color: white; }
-    .small { background-color: #e74c3c; color: white; }
-    .num { background-color: #2ecc71; color: white; }
-    .action { background-color: #f1c40f; color: black; }
+    .big { background-color: #ff4444; color: white; }
+    .small { background-color: #448aff; color: white; }
+    .num { background-color: #ffbb33; }
     #inputDisplay {
-        font-size: 18px;
-        margin: 15px 0;
-        padding: 10px;
-        background: rgba(255,255,255,0.1);
-        border-radius: 6px;
+        margin-top: 20px;
+        font-size: 22px;
     }
     #result {
-        font-size: 22px;
-        font-weight: bold;
         margin-top: 20px;
+        font-size: 26px;
+        font-weight: bold;
+    }
+    #history {
+        margin-top: 30px;
+        text-align: left;
+        max-width: 300px;
+        margin-left: auto;
+        margin-right: auto;
+        background: rgba(0,0,0,0.5);
+        padding: 10px;
+        border-radius: 8px;
     }
 </style>
 </head>
 <body>
 
-<h1>6 Input Big/Small Predictor</h1>
+<h1>RAJA GAMES - Predictor</h1>
+
+<div class="btn-group">
+    <button class="big" onclick="addInput('B')">BIG</button>
+    <button class="small" onclick="addInput('S')">SMALL</button>
+</div>
+
+<div class="btn-group">
+    <button class="num" onclick="addInput('0')">0</button>
+    <button class="num" onclick="addInput('1')">1</button>
+    <button class="num" onclick="addInput('2')">2</button>
+    <button class="num" onclick="addInput('3')">3</button>
+    <button class="num" onclick="addInput('4')">4</button>
+    <button class="num" onclick="addInput('5')">5</button>
+    <button class="num" onclick="addInput('6')">6</button>
+    <button class="num" onclick="addInput('7')">7</button>
+    <button class="num" onclick="addInput('8')">8</button>
+    <button class="num" onclick="addInput('9')">9</button>
+</div>
 
 <div id="inputDisplay">Your Input: </div>
 
-<div class="buttons">
-    <button class="big" onclick="addInput('Big')">Big</button>
-    <button class="small" onclick="addInput('Small')">Small</button>
-</div>
-
-<div class="buttons">
-    <button class="num" onclick="addInput(4)">4</button>
-    <button class="num" onclick="addInput(3)">3</button>
-</div>
-
-<div class="buttons">
-    <button class="action" onclick="checkResult()">Result</button>
-    <button class="action" onclick="clearInput()">Clear</button>
+<div class="btn-group">
+    <button onclick="checkPattern()">RESULT</button>
+    <button onclick="clearInput()">CLEAR</button>
 </div>
 
 <div id="result"></div>
 
+<div id="history">
+    <h3>Last 10 Results</h3>
+    <ul id="historyList"></ul>
+</div>
+
 <script>
-const patterns = [
-    { result: "Big",   input: ["Small","Big","Small","Small",4,3] },
-    { result: "Small", input: ["Big","Big","Big","Big",4,3] },
-    { result: "Small", input: ["Small","Small","Small","Big",4,3] },
-    { result: "Small", input: ["Big","Small","Big","Small",4,3] },
-    { result: "Big",   input: ["Small","Small","Small","Small",4,3] },
-    { result: "Small", input: ["Big","Big","Big","Small",4,3] }
-];
+    let userInput = [];
+    let history = [];
 
-let userInput = [];
+    const patternsDatabase = [
+        // Format: [B/S..., number, number, nextResult]
+        [['B','B','S','B','B',4,3,'B'], ['B','B','S','S','B',4,3,'B'], 
+         ['S','S','B','B','B',4,3,'S'], ['B','S','S','B','S',4,3,'B'], 
+         ['B','B','B','B','B',4,3,'B'], ['S','B','B','B','B',4,3,'S'], 
+         ['S','S','S','B','S',4,3,'B'], ['B','B','B','S','S',4,3,'B'],
+         ['S','S','B','S','S',4,3,'S'], ['B','B','B','S','B',4,3,'B'],
+         ['B','S','S','B','S',4,3,'S'], ['B','B','B','S','S',4,3,'B'],
+         ['B','S','S','S','S',5,4,'B'], ['B','B','S','S','S',5,4,'S'],
+         ['B','B','B','S','B',5,4,'B'], ['B','S','B','S','B',5,4,'S'],
+         ['B','S','B','S','S',5,4,'B'], ['S','S','S','S','S',5,4,'S'],
+         ['S','B','S','S','S',5,4,'B'], ['S','B','B','S','B',5,4,'S'],
+         ['B','B','B','S','B',5,4,'B'], ['S','S','S','B','B',5,4,'S'],
+         ['B','B','S','S','B',5,4,'B'], ['S','S','B','S','B',5,4,'S'],
+         ['B','S','B','S','S',5,4,'B'], ['S','S','S','B','S',5,4,'S'],
+         ['B','S','S','S','B',5,4,'B'], ['B','S','B','B','S',5,4,'S'],
+         ['S','S','S','S','S',5,4,'S']]
+    ].flat();
 
-function addInput(value) {
-    if (userInput.length < 6) {
-        userInput.push(value);
-        updateDisplay();
+    function addInput(val) {
+        if (userInput.length < 7) {
+            userInput.push(isNaN(val) ? val : Number(val));
+            document.getElementById('inputDisplay').innerText = "Your Input: " + userInput.join(' ');
+        }
     }
-}
 
-function updateDisplay() {
-    document.getElementById("inputDisplay").innerText = "Your Input: " + userInput.join(" - ");
-}
-
-function checkResult() {
-    if (userInput.length !== 6) {
-        document.getElementById("result").innerText = "Please enter exactly 6 inputs!";
-        return;
+    function clearInput() {
+        userInput = [];
+        document.getElementById('inputDisplay').innerText = "Your Input: ";
+        document.getElementById('result').innerText = "";
     }
-    let match = patterns.find(p => JSON.stringify(p.input) === JSON.stringify(userInput));
-    if (match) {
-        document.getElementById("result").innerText = "Result: " + match.result;
-    } else {
-        document.getElementById("result").innerText = "No Match Found";
-    }
-}
 
-function clearInput() {
-    userInput = [];
-    updateDisplay();
-    document.getElementById("result").innerText = "";
-}
+    function checkPattern() {
+        let match = patternsDatabase.find(p => JSON.stringify(p.slice(0,7)) === JSON.stringify(userInput));
+        if (match) {
+            let next = match[7];
+            document.getElementById('result').innerText = "Next: " + (next === 'B' ? 'BIG' : 'SMALL');
+            history.unshift((next === 'B' ? 'BIG' : 'SMALL'));
+            if (history.length > 10) history.pop();
+            renderHistory();
+        } else {
+            document.getElementById('result').innerText = "Result No Match";
+        }
+    }
+
+    function renderHistory() {
+        document.getElementById('historyList').innerHTML = history.map(h => `<li>${h}</li>`).join('');
+    }
 </script>
 
 </body>
