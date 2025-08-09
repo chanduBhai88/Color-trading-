@@ -87,13 +87,6 @@
             </select>
         </div>
         <div class="input-group">
-            <label>Size 5:</label>
-            <select id="size5">
-                <option value="Big">Big</option>
-                <option value="Small">Small</option>
-            </select>
-        </div>
-        <div class="input-group">
             <label>Color 1:</label>
             <select id="color1">
                 <option value="Green">Green</option>
@@ -129,23 +122,24 @@
             const size2 = document.getElementById('size2').value;
             const size3 = document.getElementById('size3').value;
             const size4 = document.getElementById('size4').value;
-            const size5 = document.getElementById('size5').value;
             const color1 = document.getElementById('color1').value;
             const color2 = document.getElementById('color2').value;
             const color3 = document.getElementById('color3').value;
 
             // Define the patterns
             const patterns = [
-                { sizes: ['Big', 'Small', 'Big', 'Small', 'Small'], colors: ['Green', 'Red', 'Red'], result: 'Big' },
-                { sizes: ['Small', 'Big', 'Big', 'Big', 'Big'], colors: ['Green', 'Red', 'Green'], result: 'Big' },
-                { sizes: ['Small', 'Small', 'Small', 'Small', 'Big'], colors: ['Green', 'Green', 'Red'], result: 'Small' },
-                { sizes: ['Small', 'Big', 'Small', 'Big', 'Small'], colors: ['Red', 'Violet', 'Violet'], result: 'Big' },
-                { sizes: ['Big', 'Small', 'Small', 'Small', 'Small'], colors: ['Violet', 'Red', 'Red'], result: 'Big' },
-                { sizes: ['Small', 'Big', 'Big', 'Big', 'Small'], colors: ['Green', 'Red', 'Red'], result: 'Big' },
-                { sizes: ['Big', 'Big', 'Small', 'Big', 'Big'], colors: ['Green', 'Red', 'Red'], result: 'Small' },
-                { sizes: ['Big', 'Big', 'Small', 'Small', 'Big'], colors: ['Green', 'Green', 'Green'], result: 'Big' },
-                { sizes: ['Small', 'Small', 'Big', 'Big', 'Big'], colors: ['Red', 'Red', 'Red'], result: 'Small' },
-                { sizes: ['Big', 'Small', 'Small', 'Big', 'Small'], colors: ['Violet', 'Red', 'Green'], result: 'Big' }
+                { sizes: ['Small', 'Big', 'Small', 'Small'], colors: ['Green', 'Red', 'Red'], result: 'Big' },
+                { sizes: ['Small', 'Big', 'Big', 'Big'], colors: ['Green', 'Red', 'Green'], result: 'Big' },
+                { sizes: ['Small', 'Small', 'Small', 'Big'], colors: ['Green',
+
+ 'Green', 'Red'], result: 'Small' },
+                { sizes: ['Small', 'Big', 'Small', 'Big'], colors: ['Red', 'Violet', 'Violet'], result: 'Big' },
+                { sizes: ['Big', 'Small', 'Small', 'Small'], colors: ['Violet', 'Red', 'Red'], result: 'Big' },
+                { sizes: ['Small', 'Big', 'Big', 'Small'], colors: ['Green', 'Red', 'Red'], result: 'Big' },
+                { sizes: ['Big', 'Big', 'Small', 'Big'], colors: ['Green', 'Red', 'Red'], result: 'Small' },
+                { sizes: ['Big', 'Big', 'Small', 'Small'], colors: ['Green', 'Green', 'Green'], result: 'Big' },
+                { sizes: ['Small', 'Small', 'Big', 'Big'], colors: ['Red', 'Red', 'Red'], result: 'Small' },
+                { sizes: ['Big', 'Small', 'Small', 'Big'], colors: ['Violet', 'Red', 'Green'], result: 'Big' }
             ];
 
             // Find exact match
@@ -154,7 +148,6 @@
                 p.sizes[1] === size2 &&
                 p.sizes[2] === size3 &&
                 p.sizes[3] === size4 &&
-                p.sizes[4] === size5 &&
                 p.colors[0] === color1 &&
                 p.colors[1] === color2 &&
                 p.colors[2] === color3
@@ -163,21 +156,22 @@
             // Predict result
             let resultSize = matchedPattern ? matchedPattern.result : 'Big'; // Default to 'Big' if no match
 
-            // If no exact match, try partial matching based on sizes and colors
+            // Fallback heuristic if no exact match
             if (!matchedPattern) {
                 // Count Big and Small in sizes
-                const sizes = [size1, size2, size3, size4, size5];
+                const sizes = [size1, size2, size3, size4];
                 const bigCount = sizes.filter(s => s === 'Big').length;
                 const smallCount = sizes.filter(s => s === 'Small').length;
 
-                // Check color patterns for tiebreaker
+                // Count Red in colors
                 const redCount = [color1, color2, color3].filter(c => c === 'Red').length;
+
                 if (bigCount > smallCount) {
                     resultSize = 'Big';
                 } else if (smallCount > bigCount) {
                     resultSize = 'Small';
                 } else {
-                    // If sizes are tied, use color pattern (Red-heavy patterns often result in Big)
+                    // Tiebreaker: Red-heavy patterns lean toward Big
                     resultSize = redCount >= 2 ? 'Big' : 'Small';
                 }
             }
@@ -192,7 +186,6 @@
             document.getElementById('size2').value = 'Big';
             document.getElementById('size3').value = 'Big';
             document.getElementById('size4').value = 'Big';
-            document.getElementById('size5').value = 'Big';
             document.getElementById('color1').value = 'Green';
             document.getElementById('color2').value = 'Green';
             document.getElementById('color3').value = 'Green';
