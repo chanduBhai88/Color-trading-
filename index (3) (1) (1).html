@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>51Game - Big/Small</title>
+    <title>51Game - 6-Input System</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -45,13 +45,16 @@
             border-radius: 5px;
             cursor: pointer;
         }
+        .highlight {
+            background-color: yellow;
+        }
     </style>
 </head>
 <body>
     <div class="game-board">
-        <h2>BIG/SMALL GAME</h2>
+        <h2>51GAME - 6-INPUT SYSTEM</h2>
         
-        <div style="display: flex; gap: 5px;">
+        <div style="display: flex; gap: 5px; margin-bottom: 15px;">
             <div class="bet-option" onclick="selectBet('big')">BIG</div>
             <div class="bet-option" onclick="selectBet('small')">SMALL</div>
         </div>
@@ -62,19 +65,57 @@
             <h3>RESULT:</h3>
             <p id="result-text"></p>
         </div>
+
+        <h3>Game History (Relevant Entries)</h3>
+        <table border="1" cellpadding="5" cellspacing="0" width="100%">
+            <tr>
+                <th>Period</th>
+                <th>Number</th>
+                <th>Big/Small</th>
+            </tr>
+            <tr>
+                <td>20250806100010694</td>
+                <td>5</td>
+                <td class="highlight">Big (1st Input)</td>
+            </tr>
+            <tr>
+                <td>20250806100010693</td>
+                <td>0</td>
+                <td class="highlight">Small (2nd Input)</td>
+            </tr>
+            <tr>
+                <td>20250806100010692</td>
+                <td>1</td>
+                <td class="highlight">Small (3rd Input)</td>
+            </tr>
+            <tr>
+                <td>20250806100010691</td>
+                <td>3</td>
+                <td class="highlight">Small (4th Input)</td>
+            </tr>
+            <tr>
+                <td>20250806100010687</td>
+                <td>9</td>
+                <td>Big (Last Digit: 7)</td>
+            </tr>
+            <tr>
+                <td>20250806100010686</td>
+                <td>6</td>
+                <td>Big (Last Digit: 6)</td>
+            </tr>
+        </table>
     </div>
 
     <script>
-        // Sample history data (only what's needed)
-        const historyData = [
-            { type: "Big" },    // 1st input (Big)
-            { type: "Small" },  // 2nd input (Small)
-            { type: "Small" },  // 3rd input (Small)
-            { type: "Small" },  // 4th input (Small)
+        // Selected inputs (as per your circled data)
+        const inputs = [
+            "Big",    // 1st input (from 20250806100010694)
+            "Small",  // 2nd input (from 20250806100010693)
+            "Small",  // 3rd input (from 20250806100010692)
+            "Small",  // 4th input (from 20250806100010691)
+            9,        // 5th input (from last digit of 20250806100010687 → 7)
+            10        // 6th input (from last digit of 20250806100010686 → 6)
         ];
-
-        // Last period digit (example: if last period ends with 5)
-        const lastPeriodDigit = 5; // Change if needed
 
         let selectedBet = null;
 
@@ -90,17 +131,8 @@
                 return;
             }
 
-            // 1. First 4 inputs (Big/Small from history)
-            const input1 = historyData[0].type;
-            const input2 = historyData[1].type;
-            const input3 = historyData[2].type;
-            const input4 = historyData[3].type;
-
-            // 2. 5th input = 9 + 10 + last digit of last period
-            const input5 = 9 + 10 + lastPeriodDigit;
-
-            // 3. Final result = First history entry (Big/Small)
-            const finalResult = historyData[0].type;
+            // Final result = First history entry (Big/Small)
+            const finalResult = inputs[0]; // "Big"
 
             // Check win/lose
             const isWin = finalResult === selectedBet;
@@ -110,15 +142,16 @@
             const resultText = document.getElementById('result-text');
             
             resultText.innerHTML = `
-                <strong>Inputs:</strong><br>
-                1. ${input1}<br>
-                2. ${input2}<br>
-                3. ${input3}<br>
-                4. ${input4}<br>
-                5. 9 + 10 + ${lastPeriodDigit} = ${input5}<br><br>
+                <strong>6 Inputs Used:</strong><br>
+                1. ${inputs[0]} (1st history entry)<br>
+                2. ${inputs[1]} (2nd history entry)<br>
+                3. ${inputs[2]} (3rd history entry)<br>
+                4. ${inputs[3]} (4th history entry)<br>
+                5. 9 (from last digit of 2nd last period)<br>
+                6. 10 (from last digit of last period)<br><br>
 
                 <strong>Final Result:</strong><br>
-                ${finalResult}<br>
+                ${finalResult} (First entry decides result)<br>
                 Your Bet: ${selectedBet}<br>
                 <strong>${isWin ? "YOU WIN! 🎉" : "You lose. Try again!"}</strong>
             `;
