@@ -2,47 +2,52 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>RAJA GAMES - Predictor</title>
+<title>RAJA GAMES - B/S Predictor</title>
 <style>
     body {
         font-family: Arial, sans-serif;
         text-align: center;
-        background: url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e') no-repeat center center/cover;
+        background: url('https://picsum.photos/1920/1080?blur=5') no-repeat center center fixed;
+        background-size: cover;
         color: white;
         padding: 20px;
     }
-    .btn-group {
-        margin: 10px;
+    h1 {
+        margin-bottom: 10px;
+        text-shadow: 2px 2px 4px #000;
     }
-    button {
-        padding: 10px 20px;
+    .input-buttons {
+        margin: 20px 0;
+    }
+    .input-buttons button {
+        padding: 15px 25px;
         font-size: 18px;
         margin: 5px;
-        cursor: pointer;
-        border-radius: 8px;
         border: none;
+        border-radius: 8px;
+        cursor: pointer;
     }
-    .big { background-color: #ff4444; color: white; }
-    .small { background-color: #448aff; color: white; }
-    .num { background-color: #ffbb33; }
-    #inputDisplay {
-        margin-top: 20px;
-        font-size: 22px;
+    .btn-b {
+        background-color: black;
+        color: white;
     }
-    #result {
-        margin-top: 20px;
-        font-size: 26px;
+    .btn-s {
+        background-color: white;
+        color: black;
+    }
+    .btn-result, .btn-clear {
+        background-color: #ff9800;
+        color: white;
         font-weight: bold;
     }
-    #history {
-        margin-top: 30px;
-        text-align: left;
-        max-width: 300px;
-        margin-left: auto;
-        margin-right: auto;
-        background: rgba(0,0,0,0.5);
-        padding: 10px;
-        border-radius: 8px;
+    .display {
+        font-size: 22px;
+        margin-top: 15px;
+        text-shadow: 2px 2px 4px #000;
+    }
+    .history {
+        margin-top: 20px;
+        font-size: 18px;
     }
 </style>
 </head>
@@ -50,90 +55,87 @@
 
 <h1>RAJA GAMES - Predictor</h1>
 
-<div class="btn-group">
-    <button class="big" onclick="addInput('B')">BIG</button>
-    <button class="small" onclick="addInput('S')">SMALL</button>
+<div class="input-buttons">
+    <button class="btn-b" onclick="addInput('B')">BIG</button>
+    <button class="btn-s" onclick="addInput('S')">SMALL</button>
 </div>
 
-<div class="btn-group">
-    <button class="num" onclick="addInput('0')">0</button>
-    <button class="num" onclick="addInput('1')">1</button>
-    <button class="num" onclick="addInput('2')">2</button>
-    <button class="num" onclick="addInput('3')">3</button>
-    <button class="num" onclick="addInput('4')">4</button>
-    <button class="num" onclick="addInput('5')">5</button>
-    <button class="num" onclick="addInput('6')">6</button>
-    <button class="num" onclick="addInput('7')">7</button>
-    <button class="num" onclick="addInput('8')">8</button>
-    <button class="num" onclick="addInput('9')">9</button>
+<div class="display" id="currentInput">Input: </div>
+
+<div class="input-buttons">
+    <button class="btn-result" onclick="showResult()">RESULT</button>
+    <button class="btn-clear" onclick="clearInput()">CLEAR</button>
 </div>
 
-<div id="inputDisplay">Your Input: </div>
+<div class="display" id="prediction">Prediction: </div>
 
-<div class="btn-group">
-    <button onclick="checkPattern()">RESULT</button>
-    <button onclick="clearInput()">CLEAR</button>
-</div>
-
-<div id="result"></div>
-
-<div id="history">
+<div class="history">
     <h3>Last 10 Results</h3>
-    <ul id="historyList"></ul>
+    <div id="historyList"></div>
 </div>
 
 <script>
-    let userInput = [];
-    let history = [];
+const patternsDatabase = [
+    // Example: ["Pattern sequence of 8 B/S", "First result"]
+    [["S","S","B","S","S","4","3"], "S"], // Pattern 14 example
+    [["B","B","B","S","B","4","3"], "B"], // Pattern 15 example
+    [["B","S","S","B","S","4","3"], "B"], // Pattern 16
+    [["B","B","B","S","S","4","3"], "B"], // Pattern 17
+    [["B","S","S","S","S","5","4"], "B"], // Pattern 18
+    [["B","B","S","S","S","5","4"], "B"], // Pattern 19
+    [["B","B","B","S","B","5","4"], "B"], // Pattern 20
+    [["B","S","B","S","B","5","4"], "B"], // Pattern 21
+    [["B","S","B","S","S","5","4"], "B"], // Pattern 22
+    [["S","S","S","S","S","5","4"], "S"], // Pattern 23
+    [["S","B","S","S","S","5","4"], "S"], // Pattern 24
+    [["S","B","B","S","B","5","4"], "S"], // Pattern 25
+    [["B","B","B","S","B","5","4"], "B"], // Pattern 26
+    [["S","S","S","B","B","5","4"], "S"], // Pattern 27
+    [["B","B","S","S","B","5","4"], "B"], // Pattern 28
+    [["S","S","B","S","B","5","4"], "S"], // Pattern 29
+    [["B","S","B","S","S","5","4"], "B"], // Pattern 30
+    [["S","S","S","B","S","5","4"], "S"], // Pattern 31
+    [["B","S","S","S","B","5","4"], "B"], // Pattern 32
+    [["B","S","B","B","S","5","4"], "B"], // Pattern 33
+    [["S","S","S","S","S","5","4"], "S"], // Pattern 34
+];
 
-    const patternsDatabase = [
-        // Format: [B/S..., number, number, nextResult]
-        [['B','B','S','B','B',4,3,'B'], ['B','B','S','S','B',4,3,'B'], 
-         ['S','S','B','B','B',4,3,'S'], ['B','S','S','B','S',4,3,'B'], 
-         ['B','B','B','B','B',4,3,'B'], ['S','B','B','B','B',4,3,'S'], 
-         ['S','S','S','B','S',4,3,'B'], ['B','B','B','S','S',4,3,'B'],
-         ['S','S','B','S','S',4,3,'S'], ['B','B','B','S','B',4,3,'B'],
-         ['B','S','S','B','S',4,3,'S'], ['B','B','B','S','S',4,3,'B'],
-         ['B','S','S','S','S',5,4,'B'], ['B','B','S','S','S',5,4,'S'],
-         ['B','B','B','S','B',5,4,'B'], ['B','S','B','S','B',5,4,'S'],
-         ['B','S','B','S','S',5,4,'B'], ['S','S','S','S','S',5,4,'S'],
-         ['S','B','S','S','S',5,4,'B'], ['S','B','B','S','B',5,4,'S'],
-         ['B','B','B','S','B',5,4,'B'], ['S','S','S','B','B',5,4,'S'],
-         ['B','B','S','S','B',5,4,'B'], ['S','S','B','S','B',5,4,'S'],
-         ['B','S','B','S','S',5,4,'B'], ['S','S','S','B','S',5,4,'S'],
-         ['B','S','S','S','B',5,4,'B'], ['B','S','B','B','S',5,4,'S'],
-         ['S','S','S','S','S',5,4,'S']]
-    ].flat();
+let currentInput = [];
+let history = [];
 
-    function addInput(val) {
-        if (userInput.length < 7) {
-            userInput.push(isNaN(val) ? val : Number(val));
-            document.getElementById('inputDisplay').innerText = "Your Input: " + userInput.join(' ');
-        }
+function addInput(value) {
+    if (currentInput.length < 8) {
+        currentInput.push(value);
+        document.getElementById("currentInput").innerText = "Input: " + currentInput.join(" ");
+    }
+}
+
+function clearInput() {
+    currentInput = [];
+    document.getElementById("currentInput").innerText = "Input: ";
+    document.getElementById("prediction").innerText = "Prediction: ";
+}
+
+function showResult() {
+    if (currentInput.length !== 8) {
+        alert("Please enter exactly 8 inputs!");
+        return;
     }
 
-    function clearInput() {
-        userInput = [];
-        document.getElementById('inputDisplay').innerText = "Your Input: ";
-        document.getElementById('result').innerText = "";
-    }
+    let match = patternsDatabase.find(pattern => 
+        JSON.stringify(pattern[0].slice(0, 8)) === JSON.stringify(currentInput)
+    );
 
-    function checkPattern() {
-        let match = patternsDatabase.find(p => JSON.stringify(p.slice(0,7)) === JSON.stringify(userInput));
-        if (match) {
-            let next = match[7];
-            document.getElementById('result').innerText = "Next: " + (next === 'B' ? 'BIG' : 'SMALL');
-            history.unshift((next === 'B' ? 'BIG' : 'SMALL'));
-            if (history.length > 10) history.pop();
-            renderHistory();
-        } else {
-            document.getElementById('result').innerText = "Result No Match";
-        }
+    if (match) {
+        let result = match[1];
+        document.getElementById("prediction").innerText = "Prediction: " + result;
+        history.unshift(result);
+        if (history.length > 10) history.pop();
+        document.getElementById("historyList").innerText = history.join(" → ");
+    } else {
+        document.getElementById("prediction").innerText = "Prediction: No Match";
     }
-
-    function renderHistory() {
-        document.getElementById('historyList').innerHTML = history.map(h => `<li>${h}</li>`).join('');
-    }
+}
 </script>
 
 </body>
