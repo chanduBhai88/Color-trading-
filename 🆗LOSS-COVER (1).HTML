@@ -3,110 +3,91 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>RajaGame Predictor — B/S + Colors</title>
+<title>RajaGame Predictor</title>
 <style>
-  :root{ --card:#0b0b0b; --panel:#111; --muted:#9aa7bf; --accent:#00d1b2; --red:#ff6b6b; --glass: rgba(255,255,255,0.03); }
-  html,body{height:100%;margin:0;font-family:Inter,system-ui,Arial;background:linear-gradient(180deg,#070707,#1b1b1b);}
-  .wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
-  .card{
-    width:100%;max-width:520px;background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
-    border-radius:14px;padding:22px;box-shadow:0 8px 40px rgba(0,0,0,0.6);backdrop-filter: blur(6px);
-    color:#f6f7fb;
-    background-image: url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1400&q=60');
-    background-size:cover;background-position:center;
-  }
-  .overlay{background:linear-gradient(180deg, rgba(0,0,0,0.6), rgba(0,0,0,0.6)); padding:18px;border-radius:12px;}
-  h1{margin:0 0 8px 0;font-size:20px;letter-spacing:0.2px}
+  :root{ --muted:#9aa7bf; }
+  html,body{height:100%;margin:0;font-family:Arial, sans-serif;color:#fff;background-size:cover;background-position:center;transition:background-image 0.5s ease;}
+  .wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(0,0,0,0.5);}
+  .card{width:100%;max-width:520px;background:rgba(0,0,0,0.6);border-radius:14px;padding:22px;box-shadow:0 8px 40px rgba(0,0,0,0.6);}
+  h1{margin:0 0 8px;font-size:20px}
+  .muted{color:var(--muted);font-size:13px;margin-bottom:8px}
   .row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin:12px 0}
-  .bs-cell{
-    width:84px;height:46px;border-radius:8px;display:flex;align-items:center;justify-content:center;
-    cursor:pointer;background:rgba(255,255,255,0.06);font-weight:700;font-size:16px;color:#fff;border:2px solid rgba(255,255,255,0.04);
-    user-select:none;
-  }
-  .bs-cell.B{background:linear-gradient(180deg, rgba(0,200,120,0.18), rgba(0,200,120,0.06)); color:#002b14; border-color:rgba(0,200,120,0.35)}
-  .bs-cell.S{background:linear-gradient(180deg, rgba(120,80,200,0.16), rgba(120,80,200,0.05)); color:#2b002b; border-color:rgba(120,80,200,0.28)}
+  .bs-cell{width:70px;height:46px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;background:rgba(255,255,255,0.06);font-weight:700;font-size:16px;border:2px solid rgba(255,255,255,0.04);user-select:none}
+  .bs-cell.B{background:rgba(0,200,120,0.18);color:#00ffae;}
+  .bs-cell.S{background:rgba(120,80,200,0.16);color:#caaaff;}
   .color-select{height:46px;border-radius:8px;border:0;padding:8px 10px;font-size:16px;background:rgba(0,0,0,0.4);color:#fff}
-  .controls{display:flex;gap:12px;justify-content:center;margin-top:12px}
-  .btn{
-    padding:12px 22px;border-radius:10px;border:0;font-weight:700;cursor:pointer;font-size:15px;
-    background:linear-gradient(90deg,#10b981,#06b6d4);color:#002b2b;
-    box-shadow:0 6px 18px rgba(6,78,59,0.25);
-  }
-  .btn.clear{background:linear-gradient(90deg,#ef4444,#f97316);color:#fff;box-shadow:none}
-  .result-box{margin-top:14px;padding:12px;border-radius:8px;background:rgba(0,0,0,0.45);font-weight:700;font-size:16px}
-  .history{margin-top:14px;background:rgba(0,0,0,0.45);padding:10px;border-radius:8px;text-align:left;max-height:140px;overflow:auto}
-  .history-item{padding:6px;border-bottom:1px dashed rgba(255,255,255,0.03);font-size:14px}
-  .muted{color:var(--muted);font-weight:600;font-size:13px;margin-top:4px}
-  @media (max-width:480px){
-    .bs-cell{width:68px;font-size:15px}
-    .color-select{width:68px}
-  }
+  .controls{display:flex;gap:12px;justify-content:center;margin-top:12px;flex-wrap:wrap}
+  .btn{padding:12px 22px;border-radius:10px;border:0;font-weight:700;cursor:pointer;font-size:15px;background:linear-gradient(90deg,#10b981,#06b6d4);color:#fff}
+  .btn.clear{background:linear-gradient(90deg,#ef4444,#f97316);}
+  .btn.theme{background:linear-gradient(90deg,#3b82f6,#8b5cf6);}
+  .result-box{margin-top:14px;padding:12px;border-radius:8px;background:rgba(0,0,0,0.45);font-weight:700;font-size:20px;text-align:center}
 </style>
 </head>
 <body>
-  <div class="wrap">
-    <div class="card">
-      <div class="overlay">
-        <h1>RajaGame Predictor</h1>
-        <div class="muted">Enter exactly <strong>4</strong> Big/Small (click) then <strong>2</strong> colors (Red/Green/Violet). Press <em>Predict</em>.</div>
 
-        <!-- B/S inputs (4) -->
-        <div class="row" id="bsRow">
-          <div class="bs-cell" data-index="0"></div>
-          <div class="bs-cell" data-index="1"></div>
-          <div class="bs-cell" data-index="2"></div>
-          <div class="bs-cell" data-index="3"></div>
-        </div>
+<div class="wrap">
+  <div class="card">
+    <h1>RajaGame Predictor</h1>
+    <div class="muted">Enter exactly 4 Big/Small and 2 Colors (Red, Green, Violet)</div>
 
-        <!-- color selects (2) -->
-        <div class="row">
-          <select id="color1" class="color-select" aria-label="color 1"></select>
-          <select id="color2" class="color-select" aria-label="color 2"></select>
-        </div>
-
-        <!-- buttons -->
-        <div class="controls">
-          <button class="btn" id="predictBtn">🔮 Predict</button>
-          <button class="btn clear" id="clearBtn">Clear</button>
-        </div>
-
-        <!-- result -->
-        <div class="result-box" id="resultBox">Result will appear here after Predict.</div>
-
-        <!-- history -->
-        <div class="history" id="historyBox">
-          <strong>Last 10 Results</strong>
-          <div id="historyList"></div>
-        </div>
-      </div>
+    <!-- B/S inputs -->
+    <div class="row" id="bsRow">
+      <div class="bs-cell" data-index="0"></div>
+      <div class="bs-cell" data-index="1"></div>
+      <div class="bs-cell" data-index="2"></div>
+      <div class="bs-cell" data-index="3"></div>
     </div>
+
+    <!-- color selects -->
+    <div class="row">
+      <select id="color1" class="color-select"></select>
+      <select id="color2" class="color-select"></select>
+    </div>
+
+    <!-- buttons -->
+    <div class="controls">
+      <button class="btn" id="predictBtn">🔮 Predict</button>
+      <button class="btn clear" id="clearBtn">Clear</button>
+      <button class="btn theme" id="themeBtn">Switch Theme</button>
+    </div>
+
+    <!-- result -->
+    <div class="result-box" id="resultBox">Result will appear here</div>
   </div>
+</div>
 
 <script>
+// Two background themes
+const hackerBg = "url('https://images.unsplash.com/photo-1591696331186-c3b479a7a4d6?auto=format&fit=crop&w=1400&q=60')";
+const cobraBg = "url('https://images.unsplash.com/photo-1601047879810-6edba07d2b65?auto=format&fit=crop&w=1400&q=60')";
+let currentTheme = 0; // 0 = hacker, 1 = cobra
+document.body.style.backgroundImage = hackerBg;
+
 // Patterns: 4 B/S + 2 Colors
 const patterns = [
-  { inputs:['B','S','B','S'], colors:['R','R'], result:'?' }, // 1
-  { inputs:['S','B','B','B'], colors:['R','G'], result:'?' }, // 2
-  { inputs:['S','S','S','S'], colors:['G','R'], result:'?' }, // 3
-  { inputs:['S','B','S','B'], colors:['V','V'], result:'?' }, // 4
-  { inputs:['B','S','S','S'], colors:['R','R'], result:'?' }, // 5
-  { inputs:['S','B','B','B'], colors:['R','R'], result:'?' }, // 6
-  { inputs:['B','B','S','B'], colors:['R','R'], result:'?' }, // 7
-  { inputs:['B','B','S','S'], colors:['G','G'], result:'?' }, // 8
-  { inputs:['S','S','B','B'], colors:['R','R'], result:'?' }, // 9
-  { inputs:['B','S','S','B'], colors:['R','G'], result:'?' }  // 10
+  { inputs:['B','S','B','S'], colors:['R','R'] }, // 1
+  { inputs:['S','B','B','B'], colors:['R','G'] }, // 2
+  { inputs:['S','S','S','S'], colors:['G','R'] }, // 3
+  { inputs:['S','B','S','B'], colors:['V','V'] }, // 4
+  { inputs:['B','S','S','S'], colors:['R','R'] }, // 5
+  { inputs:['S','B','B','B'], colors:['R','R'] }, // 6
+  { inputs:['B','B','S','B'], colors:['R','R'] }, // 7
+  { inputs:['B','B','S','S'], colors:['G','G'] }, // 8
+  { inputs:['S','S','B','B'], colors:['R','R'] }, // 9
+  { inputs:['B','S','S','B'], colors:['R','G'] }  // 10
 ];
+
+const fixedResult = 'B'; // Always show only B or S
 
 const bsCells = Array.from(document.querySelectorAll('.bs-cell'));
 const color1 = document.getElementById('color1');
 const color2 = document.getElementById('color2');
 const predictBtn = document.getElementById('predictBtn');
 const clearBtn = document.getElementById('clearBtn');
+const themeBtn = document.getElementById('themeBtn');
 const resultBox = document.getElementById('resultBox');
-const historyList = document.getElementById('historyList');
 
 let bsState = ['','','',''];
-let hist = JSON.parse(localStorage.getItem('raja_hist_v2')||'[]');
 
 // Fill color selects
 ['R','G','V'].forEach(c=>{
@@ -114,7 +95,6 @@ let hist = JSON.parse(localStorage.getItem('raja_hist_v2')||'[]');
   const o1 = document.createElement('option'); o1.value = c; o1.text = name; color1.appendChild(o1);
   const o2 = document.createElement('option'); o2.value = c; o2.text = name; color2.appendChild(o2);
 });
-color1.selectedIndex = 0; color2.selectedIndex = 0;
 
 function renderBS(){
   bsCells.forEach((el,i)=>{
@@ -133,48 +113,38 @@ bsCells.forEach((el,i)=>{
   });
 });
 
-function renderHistory(){
-  historyList.innerHTML = hist.length? hist.map(h=>`<div class="history-item">${h.ts} — ${h.input} → <strong>${h.resultText}</strong></div>`).join('') : '<div class="history-item" style="opacity:.7">No history yet</div>';
-}
-renderHistory();
-
 function findMatch(user){
-  for(let i=0;i<patterns.length;i++){
-    const p = patterns[i];
+  return patterns.some(p=>{
     const matchBS = p.inputs.every((v,idx)=> v === user.inputs[idx]);
     const matchColor = (p.colors[0]===user.colors[0] && p.colors[1]===user.colors[1]);
-    if(matchBS && matchColor) return { idx:i+1, pattern:p };
-  }
-  return null;
+    return matchBS && matchColor;
+  });
 }
 
 predictBtn.addEventListener('click',()=>{
   if(bsState.some(x=> x!=='B' && x!=='S')){
-    resultBox.innerHTML = '<span style="color:var(--muted);">Please set all 4 Big/Small (click each cell).</span>'; return;
+    resultBox.textContent = 'Please set all 4 Big/Small cells.';
+    return;
   }
-  const a = bsState.slice();
-  const c1 = color1.value, c2 = color2.value;
-
-  const user = { inputs: a, colors: [c1,c2] };
-  const m = findMatch(user);
-  if(m){
-    const res = m.pattern.result;
-    const resText = res==='B'?'BIG':res==='S'?'SMALL':'?';
-    resultBox.innerHTML = `<span style="color:#fff">Matched pattern #${m.idx} — <strong>${res==='B'?'BIG':res==='S'?'SMALL':'No Result Set'}</strong></span>`;
-    hist.unshift({ ts:new Date().toLocaleString(), input: `${a.join(' ')} ${c1}/${c2}`, resultText: resText, patternIndex: m.idx});
-    if(hist.length>10) hist.pop();
-    localStorage.setItem('raja_hist_v2', JSON.stringify(hist));
-    renderHistory();
+  const user = { inputs: bsState.slice(), colors: [color1.value, color2.value] };
+  if(findMatch(user)){
+    resultBox.textContent = `Result: ${fixedResult}`;
   } else {
-    resultBox.innerHTML = `<span style="color: #ffb86b">Result No Match</span>`;
+    resultBox.textContent = 'Result No Match';
   }
 });
 
 clearBtn.addEventListener('click', ()=>{
   bsState = ['','','',''];
   renderBS();
-  color1.selectedIndex = 0; color2.selectedIndex = 0;
-  resultBox.innerHTML = 'Result will appear here after Predict.';
+  color1.selectedIndex = 0;
+  color2.selectedIndex = 0;
+  resultBox.textContent = 'Result will appear here';
+});
+
+themeBtn.addEventListener('click', ()=>{
+  currentTheme = 1 - currentTheme;
+  document.body.style.backgroundImage = currentTheme ? cobraBg : hackerBg;
 });
 
 renderBS();
