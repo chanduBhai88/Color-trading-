@@ -1,285 +1,223 @@
 <!DOCTYPE html>
-<html lang="hi">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>बिग/स्मॉल प्रिडिक्टर</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>51Game - Big/Small Prediction</title>
     <style>
-        :root {
-            --bg-color: white;
-            --text-color: black;
-            --button-color: #ddd;
-            --big-color: #ff6b6b;
-            --small-color: #48dbfb;
-            --result-color: #1dd1a1;
-            --clear-color: #576574;
-        }
-
-        [data-theme="dark"] {
-            --bg-color: black;
-            --text-color: white;
-            --button-color: #333;
-        }
-
         body {
             font-family: Arial, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            margin: 0;
+            max-width: 600px;
+            margin: 0 auto;
             padding: 20px;
-            text-align: center;
-            transition: background-color 0.3s, color 0.3s;
+            background-color: #f5f5f5;
         }
-
-        .input-buttons {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
+        .header {
+            text-align: center;
             margin-bottom: 20px;
         }
-
-        button {
-            padding: 12px 25px;
-            font-size: 18px;
-            cursor: pointer;
-            border: none;
+        .game-board {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .bet-options {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        .bet-option {
+            padding: 10px;
+            border: 1px solid #ddd;
             border-radius: 5px;
+            text-align: center;
+            cursor: pointer;
         }
-
-        #bigBtn {
-            background-color: var(--big-color);
+        .bet-option.selected {
+            background-color: #4CAF50;
             color: white;
         }
-
-        #smallBtn {
-            background-color: var(--small-color);
-            color: black;
-        }
-
-        #resultBtn {
-            background-color: var(--result-color);
-            color: white;
-        }
-
-        #clearBtn {
-            background-color: var(--clear-color);
-            color: white;
-        }
-
-        #inputsList {
-            margin: 20px 0;
-            font-size: 18px;
-        }
-
-        #prediction {
-            font-size: 22px;
-            font-weight: bold;
+        .history {
             margin-top: 20px;
-            min-height: 30px;
         }
-
-        #memoryList {
-            margin-top: 30px;
-            font-size: 16px;
-        }
-
-        .hidden {
-            display: none;
-        }
-
-        #themeToggle {
-            margin-top: 10px;
-            cursor: pointer;
-            padding: 8px 16px;
-            background-color: var(--button-color);
-            color: var(--text-color);
-            border-radius: 5px;
-        }
-        
-        #imageData {
+        .history-table {
             width: 100%;
-            height: 150px;
+            border-collapse: collapse;
+        }
+        .history-table th, .history-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+        .history-table th {
+            background-color: #f2f2f2;
+        }
+        .input-area {
+            margin-top: 20px;
+        }
+        .number-input {
+            width: 50px;
+            padding: 8px;
+            margin-right: 10px;
+        }
+        .submit-btn {
+            padding: 8px 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .result {
             margin-top: 20px;
             padding: 10px;
-            font-size: 16px;
-        }
-        
-        .instructions {
-            background-color: #f8f9fa;
-            padding: 15px;
+            background-color: #e9f7ef;
             border-radius: 5px;
-            margin: 20px 0;
-            text-align: left;
+            display: none;
         }
     </style>
 </head>
-<body data-theme="light">
-    <h1>बिग/स्मॉल प्रिडिक्टर</h1>
-
-    <div class="instructions">
-        <h3>कैसे उपयोग करें:</h3>
-        <ol>
-            <li>इमेज से डेटा कॉपी करके नीचे दिए बॉक्स में पेस्ट करें</li>
-            <li>प्रोग्राम स्वचालित रूप से आवश्यक डेटा निकालेगा</li>
-            <li>जब 5 इनपुट हो जाएं, "रिजल्ट पाएं" बटन पर क्लिक करें</li>
-        </ol>
+<body>
+    <div class="header">
+        <h1>51Game</h1>
+        <p>51gamem.com</p>
     </div>
 
-    <div class="input-buttons">
-        <button id="bigBtn">बिग</button>
-        <button id="smallBtn">स्मॉल</button>
-        <button id="clearBtn">साफ करें</button>
+    <div class="game-board">
+        <h2>GAME</h2>
+        
+        <div class="bet-options">
+            <div class="bet-option" onclick="selectBet('random')">Random</div>
+            <div class="bet-option" onclick="selectBet('x1')">X1</div>
+            <div class="bet-option" onclick="selectBet('x5')">X5</div>
+            <div class="bet-option" onclick="selectBet('x10')">X10</div>
+            <div class="bet-option" onclick="selectBet('x20')">X20</div>
+            <div class="bet-option" onclick="selectBet('x50')">X50</div>
+            <div class="bet-option" onclick="selectBet('x100')">X100</div>
+        </div>
+
+        <div class="bet-options">
+            <div class="bet-option" onclick="selectBetType('big')">Big</div>
+            <div class="bet-option" onclick="selectBetType('small')">Small</div>
+        </div>
+
+        <div class="history">
+            <h3>Game History</h3>
+            <table class="history-table">
+                <thead>
+                    <tr>
+                        <th>Period</th>
+                        <th>Number</th>
+                        <th>Big/Small</th>
+                    </tr>
+                </thead>
+                <tbody id="history-body">
+                    <!-- History will be populated here -->
+                </tbody>
+            </table>
+        </div>
+
+        <div class="input-area">
+            <h3>Enter 5 Numbers (0-9):</h3>
+            <input type="number" min="0" max="9" class="number-input" id="num1">
+            <input type="number" min="0" max="9" class="number-input" id="num2">
+            <input type="number" min="0" max="9" class="number-input" id="num3">
+            <input type="number" min="0" max="9" class="number-input" id="num4">
+            <input type="number" min="0" max="9" class="number-input" id="num5">
+            <button class="submit-btn" onclick="calculateResult()">Submit</button>
+        </div>
+
+        <div class="result" id="result">
+            <h3>Result:</h3>
+            <p id="result-text"></p>
+        </div>
     </div>
-
-    <textarea id="imageData" placeholder="यहाँ इमेज डेटा पेस्ट करें (10 रिजल्ट्स की जानकारी)..."></textarea>
-
-    <div id="inputsList">इनपुट्स: </div>
-
-    <button id="resultBtn" class="hidden">रिजल्ट पाएं</button>
-
-    <div id="prediction"></div>
-
-    <div id="memoryList"><strong>पिछले 10 प्रिडिक्शन:</strong><br><ul id="memoryOutput"></ul></div>
-
-    <button id="themeToggle">थीम बदलें</button>
 
     <script>
-        const inputs = [];
-        const memory = [];
-        const maxMemory = 10;
+        // Sample history data
+        const historyData = [
+            { period: "20250806100010694", number: 5, type: "Big" },
+            { period: "20250806100010693", number: 0, type: "Small" },
+            { period: "20250806100010692", number: 1, type: "Small" },
+            { period: "20250806100010691", number: 3, type: "Small" },
+            { period: "20250806100010690", number: 8, type: "Big" },
+            { period: "20250806100010689", number: 2, type: "Small" },
+            { period: "20250806100010688", number: 3, type: "Small" },
+            { period: "20250806100010687", number: 9, type: "Big" },
+            { period: "20250806100010686", number: 6, type: "Big" },
+            { period: "20250806100010685", number: 7, type: "Small" }
+        ];
 
-        const bigBtn = document.getElementById('bigBtn');
-        const smallBtn = document.getElementById('smallBtn');
-        const resultBtn = document.getElementById('resultBtn');
-        const clearBtn = document.getElementById('clearBtn');
-        const themeToggle = document.getElementById('themeToggle');
-        const inputsList = document.getElementById('inputsList');
-        const predictionDiv = document.getElementById('prediction');
-        const memoryOutput = document.getElementById('memoryOutput');
-        const body = document.body;
-        const imageDataInput = document.getElementById('imageData');
+        // Populate history table
+        const historyBody = document.getElementById('history-body');
+        historyData.forEach(item => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${item.period}</td>
+                <td>${item.number}</td>
+                <td>${item.type}</td>
+            `;
+            historyBody.appendChild(row);
+        });
 
-        bigBtn.addEventListener('click', () => addInput('Big'));
-        smallBtn.addEventListener('click', () => addInput('Small'));
-        resultBtn.addEventListener('click', showPrediction);
-        clearBtn.addEventListener('click', clearInputs);
-        themeToggle.addEventListener('click', toggleTheme);
-        imageDataInput.addEventListener('input', processImageData);
+        let selectedBet = null;
+        let selectedBetType = null;
 
-        function addInput(value) {
-            inputs.push(value);
-            updateInputsDisplay();
-            checkInputsForResult();
+        function selectBet(bet) {
+            selectedBet = bet;
+            document.querySelectorAll('.bet-option').forEach(el => el.classList.remove('selected'));
+            event.target.classList.add('selected');
         }
 
-        function processImageData() {
-            const data = imageDataInput.value;
-            if (!data) return;
-            
-            // पहले मौजूदा इनपुट्स को साफ करें
-            inputs.length = 0;
-            
-            // इमेज डेटा से रिजल्ट्स निकालें
-            const lines = data.split('\n');
-            const results = [];
-            
-            for (const line of lines) {
-                if (line.match(/^\d{17}\s+\d+\s+(Big|Small)/i)) {
-                    const parts = line.trim().split(/\s+/);
-                    results.push({
-                        period: parts[0],
-                        number: parts[1],
-                        bigSmall: parts[2]
-                    });
-                }
-            }
-            
-            if (results.length >= 10) {
-                // दूसरा, तीसरा और चौथा रिजल्ट (इंडेक्स 1, 2, 3)
-                addInput(results[1].bigSmall);
-                addInput(results[2].bigSmall);
-                addInput(results[3].bigSmall);
-                
-                // 9वें और 10वें रिजल्ट के पीरियड के अंतिम अंक (इंडेक्स 8, 9)
-                const lastDigit9 = results[8].period.slice(-1);
-                const lastDigit10 = results[9].period.slice(-1);
-                
-                // नंबर्स को इनपुट में जोड़ें
-                addInput(lastDigit9);
-                addInput(lastDigit10);
-            }
+        function selectBetType(type) {
+            selectedBetType = type;
+            document.querySelectorAll('.bet-options:nth-of-type(2) .bet-option').forEach(el => el.classList.remove('selected'));
+            event.target.classList.add('selected');
         }
 
-        function updateInputsDisplay() {
-            inputsList.textContent = 'इनपुट्स: ' + inputs.join(', ');
-        }
+        function calculateResult() {
+            const num1 = parseInt(document.getElementById('num1').value);
+            const num2 = parseInt(document.getElementById('num2').value);
+            const num3 = parseInt(document.getElementById('num3').value);
+            const num4 = parseInt(document.getElementById('num4').value);
+            const num5 = parseInt(document.getElementById('num5').value);
 
-        function checkInputsForResult() {
-            if (inputs.length >= 5) {
-                resultBtn.classList.remove('hidden');
-            } else {
-                resultBtn.classList.add('hidden');
-            }
-        }
-
-        function showPrediction() {
-            if (inputs.length < 5) {
-                predictionDiv.textContent = "कृपया कम से कम 5 इनपुट दर्ज करें";
+            if (isNaN(num1) || isNaN(num2) || isNaN(num3) || isNaN(num4) || isNaN(num5)) {
+                alert("Please enter all 5 numbers (0-9)");
                 return;
             }
 
-            // पहले 3 Big/Small इनपुट
-            const bigSmallInputs = inputs.slice(0, 3);
-            const bigCount = bigSmallInputs.filter(x => x.toString().toLowerCase() === 'big').length;
-            const smallCount = bigSmallInputs.filter(x => x.toString().toLowerCase() === 'small').length;
+            if (selectedBetType === null) {
+                alert("Please select Big or Small");
+                return;
+            }
 
-            // अंतिम 2 नंबर इनपुट
-            const numberInputs = inputs.slice(3, 5).map(Number);
-            const sum = numberInputs.reduce((a, b) => a + b, 0);
+            // Get the last digit of the most recent period number
+            const lastPeriodDigit = parseInt(historyData[0].period.slice(-1));
             
-            let prediction;
-            if (bigCount > smallCount) {
-                prediction = "स्मॉल (क्योंकि ज्यादा बिग थे)";
-            } else if (smallCount > bigCount) {
-                prediction = "बिग (क्योंकि ज्यादा स्मॉल थे)";
-            } else {
-                prediction = "बिग या स्मॉल हो सकता है (बराबर संख्या)";
-            }
-
-            // नंबर्स का योग भी जोड़ें
-            prediction += ` | नंबर्स का योग: ${sum}`;
-
-            predictionDiv.textContent = "प्रिडिक्शन: " + prediction;
-
-            // मेमोरी में जोड़ें
-            memory.unshift(prediction);
-            if (memory.length > maxMemory) {
-                memory.pop();
-            }
-            updateMemoryDisplay();
-        }
-
-        function updateMemoryDisplay() {
-            memoryOutput.innerHTML = '';
-            memory.forEach((item, index) => {
-                const li = document.createElement('li');
-                li.textContent = `${index + 1}. ${item}`;
-                memoryOutput.appendChild(li);
-            });
-        }
-
-        function clearInputs() {
-            inputs.length = 0;
-            updateInputsDisplay();
-            predictionDiv.textContent = "";
-            resultBtn.classList.add('hidden');
-            imageDataInput.value = "";
-        }
-
-        function toggleTheme() {
-            const currentTheme = body.getAttribute('data-theme');
-            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
-            body.setAttribute('data-theme', newTheme);
-            themeToggle.textContent = newTheme === 'light' ? "थीम बदलें (डार्क)" : "थीम बदलें (लाइट)";
+            // Calculate sum of inputs
+            const sum = num1 + num2 + num3 + num4 + num5;
+            
+            // Determine if the result is Big or Small based on last digit
+            const resultType = lastPeriodDigit >= 5 ? "Big" : "Small";
+            
+            // Check if user won
+            const isWin = resultType === selectedBetType;
+            
+            // Display result
+            const resultDiv = document.getElementById('result');
+            const resultText = document.getElementById('result-text');
+            
+            resultText.innerHTML = `
+                Last Period Digit: ${lastPeriodDigit}<br>
+                Sum of Your Numbers: ${sum}<br>
+                Result: ${resultType}<br>
+                Your Bet: ${selectedBetType}<br>
+                <strong>${isWin ? "YOU WIN!" : "You didn't win this time."}</strong>
+            `;
+            
+            resultDiv.style.display = "block";
         }
     </script>
 </body>
