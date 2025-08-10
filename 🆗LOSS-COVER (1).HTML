@@ -102,6 +102,7 @@
 
         function predictResult() {
             const input1 = parseInt(document.getElementById('input1').value);
+            const input2 = parseInt(document.getElementById('input2').value);
             const resultDiv = document.getElementById('result');
 
             // Check if input1 is a valid number
@@ -114,11 +115,12 @@
             const matchingEntry = patternData.find(entry => entry.input === input1);
 
             if (matchingEntry) {
-                // Input found, show the result with "Matched"
+                // Input found, show the actual result with "Matched"
                 resultDiv.textContent = `Result: ${matchingEntry.result} (Matched)`;
             } else {
-                // Input not found
-                resultDiv.textContent = `Result: Unknown (Match nahi ho raha hai - Ye input data mein nahi hai)`;
+                // Input not in data, use a default rule: >= 25 is "big", < 25 is "small"
+                const predictedResult = input1 >= 25 ? 'big' : 'small';
+                resultDiv.textContent = `Result: ${predictedResult} (Match nahi ho raha hai - Ye input data mein nahi hai)`;
             }
         }
 
