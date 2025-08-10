@@ -1,133 +1,209 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="hi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hacker Pattern Predictor</title>
+    <title>RajaGames प्रेडिक्शन टूल</title>
     <style>
         body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f5f5f5;
             margin: 0;
-            padding: 0;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: url('https://i.imgur.com/7X9y6hZ.gif') no-repeat center center fixed;
-            background-size: cover;
-            font-family: 'Courier New', Courier, monospace;
-            color: #0f0;
-            text-shadow: 0 0 10px #0f0;
+            padding: 20px;
+            color: #333;
         }
         .container {
-            background: rgba(0, 0, 0, 0.8);
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
             padding: 20px;
             border-radius: 10px;
-            box-shadow: 0 0 20px #0f0;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #e63946;
             text-align: center;
         }
-        input[type="number"] {
+        .input-section {
+            margin-bottom: 20px;
+        }
+        textarea {
+            width: 100%;
+            height: 100px;
             padding: 10px;
-            margin: 10px;
-            border: 2px solid #0f0;
-            background: #111;
-            color: #0f0;
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 16px;
-            width: 100px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
         }
         button {
-            padding: 10px 20px;
-            margin: 10px;
+            background-color: #e63946;
+            color: white;
             border: none;
-            background: #0f0;
-            color: #000;
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 16px;
-            cursor: pointer;
+            padding: 10px 20px;
             border-radius: 5px;
-            transition: background 0.3s;
+            cursor: pointer;
+            font-size: 16px;
         }
         button:hover {
-            background: #0a0;
+            background-color: #c1121f;
         }
-        #result {
+        .results {
             margin-top: 20px;
-            font-size: 24px;
-            text-transform: uppercase;
-            animation: glow 1s ease-in-out infinite alternate;
         }
-        @keyframes glow {
-            from {
-                text-shadow: 0 0 10px #0f0, 0 0 20px #0f0;
-            }
-            to {
-                text-shadow: 0 0 20px #0f0, 0 0 30px #00ff00;
-            }
+        .number-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .number {
+            width: 40px;
+            height: 40px;
+            background-color: #e63946;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            font-weight: bold;
+        }
+        .probability {
+            margin-top: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+        th {
+            background-color: #f2f2f2;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Hacker Pattern Predictor</h1>
-        <div>
-            <input type="number" id="input1" placeholder="Input 1" min="0">
-            <input type="number" id="input2" placeholder="Input 2" min="0">
+        <h1>RajaGames नंबर प्रेडिक्शन</h1>
+        
+        <div class="input-section">
+            <h3>डेटा इनपुट (नंबर्स पेस्ट करें):</h3>
+            <textarea id="numberInput" placeholder="① ① ② ③ ④ ⑤ ⑥ ⑦ ⑧ ⑨
+① ① ② ③ ④ ⑤ ⑥ ⑦ ⑧ ⑩
+① ① ② ③ ④ ⑤ ⑥ ⑦ ⑧ ⑪"></textarea>
+            <button onclick="analyzeNumbers()">विश्लेषण करें</button>
         </div>
-        <div>
-            <button onclick="predictResult()">Result</button>
-            <button onclick="clearInputs()">Clear</button>
+        
+        <div class="results" id="results">
+            <!-- यहां रिजल्ट्स दिखाई देंगे -->
         </div>
-        <div id="result"></div>
     </div>
 
     <script>
-        // Pattern data
-        const patternData = [
-            { input: 37, result: 'small' },
-            { input: 36, result: 'big' },
-            { input: 29, result: 'big' },
-            { input: 26, result: 'small' },
-            { input: 21, result: 'small' },
-            { input: 14, result: 'big' },
-            { input: 20, result: 'big' },
-            { input: 30, result: 'big' },
-            { input: 38, result: 'small' },
-            { input: 32, result: 'big' },
-            { input: 34, result: 'big' },
-            { input: 26, result: 'small' },
-            { input: 25, result: 'small' },
-            { input: 24, result: 'big' },
-            { input: 35, result: 'big' }
-        ];
-
-        function predictResult() {
-            const input1 = parseInt(document.getElementById('input1').value);
-            const input2 = parseInt(document.getElementById('input2').value);
-            const resultDiv = document.getElementById('result');
-
-            // Check if input1 is a valid number
-            if (isNaN(input1)) {
-                resultDiv.textContent = 'Yaar, Input 1 mein valid number daal do!';
+        function analyzeNumbers() {
+            // इनपुट डेटा प्राप्त करें
+            const inputText = document.getElementById('numberInput').value;
+            
+            // नंबर्स को अरे में बदलें (① → 1, ② → 2, ...)
+            const numberMap = {
+                '①': 1, '②': 2, '③': 3, '④': 4, '⑤': 5,
+                '⑥': 6, '⑦': 7, '⑧': 8, '⑨': 9, '⑩': 10,
+                '⑪': 11, '⑫': 12, '⑬': 13, '⑭': 14, '⑮': 15,
+                '⑯': 16, '⑰': 17, '⑱': 18, '⑲': 19, '⑳': 20
+            };
+            
+            // सभी नंबर्स को एक अरे में स्टोर करें
+            let allNumbers = [];
+            const lines = inputText.split('\n');
+            
+            lines.forEach(line => {
+                const chars = line.trim().split(/\s+/);
+                chars.forEach(char => {
+                    if (numberMap[char]) {
+                        allNumbers.push(numberMap[char]);
+                    }
+                });
+            });
+            
+            // अगर कोई डेटा नहीं है तो रिटर्न
+            if (allNumbers.length === 0) {
+                document.getElementById('results').innerHTML = 
+                    '<p style="color: red;">कृपया वैध नंबर्स इनपुट करें!</p>';
                 return;
             }
-
-            // Find matching input in pattern data
-            const matchingEntry = patternData.find(entry => entry.input === input1);
-
-            if (matchingEntry) {
-                // Input found, show the actual result with "Matched"
-                resultDiv.textContent = `Result: ${matchingEntry.result} (Matched)`;
-            } else {
-                // Input not in data, use a default rule: >= 25 is "big", < 25 is "small"
-                const predictedResult = input1 >= 25 ? 'big' : 'small';
-                resultDiv.textContent = `Result: ${predictedResult} (Match nahi ho raha hai - Ye input data mein nahi hai)`;
-            }
-        }
-
-        function clearInputs() {
-            document.getElementById('input1').value = '';
-            document.getElementById('input2').value = '';
-            document.getElementById('result').textContent = '';
+            
+            // फ्रीक्वेंसी एनालिसिस
+            const frequency = {};
+            allNumbers.forEach(num => {
+                frequency[num] = (frequency[num] || 0) + 1;
+            });
+            
+            // प्रोबेबिलिटी कैलकुलेट करें
+            const total = allNumbers.length;
+            const probability = {};
+            Object.keys(frequency).forEach(num => {
+                probability[num] = ((frequency[num] / total) * 100).toFixed(2) + '%';
+            });
+            
+            // हॉट नंबर्स (सबसे ज्यादा आने वाले)
+            const hotNumbers = Object.keys(frequency)
+                .sort((a, b) => frequency[b] - frequency[a])
+                .slice(0, 5);
+            
+            // कोल्ड नंबर्स (सबसे कम आने वाले)
+            const coldNumbers = Object.keys(frequency)
+                .sort((a, b) => frequency[a] - frequency[b])
+                .slice(0, 5);
+            
+            // रिजल्ट्स HTML जेनरेट करें
+            let resultsHTML = `
+                <h3>विश्लेषण परिणाम:</h3>
+                <p>कुल नंबर्स: ${total}</p>
+                
+                <h4>हॉट नंबर्स (सबसे ज्यादा आए):</h4>
+                <div class="number-grid">
+                    ${hotNumbers.map(num => `<div class="number">${num}</div>`).join('')}
+                </div>
+                
+                <h4>कोल्ड नंबर्स (सबसे कम आए):</h4>
+                <div class="number-grid">
+                    ${coldNumbers.map(num => `<div class="number">${num}</div>`).join('')}
+                </div>
+                
+                <div class="probability">
+                    <h4>नंबर प्रोबेबिलिटी:</h4>
+                    <table>
+                        <tr>
+                            <th>नंबर</th>
+                            <th>कितनी बार आया</th>
+                            <th>प्रोबेबिलिटी</th>
+                        </tr>
+            `;
+            
+            // टेबल में सभी नंबर्स दिखाएं
+            Object.keys(frequency).sort((a, b) => a - b).forEach(num => {
+                resultsHTML += `
+                    <tr>
+                        <td>${num}</td>
+                        <td>${frequency[num]}</td>
+                        <td>${probability[num]}</td>
+                    </tr>
+                `;
+            });
+            
+            resultsHTML += `
+                    </table>
+                </div>
+                
+                <h4>अगले राउंड के लिए सुझाव:</h4>
+                <p>सबसे संभावित नंबर्स: ${hotNumbers.join(', ')}</p>
+                <p>कम संभावित नंबर्स: ${coldNumbers.join(', ')}</p>
+            `;
+            
+            // रिजल्ट्स दिखाएं
+            document.getElementById('results').innerHTML = resultsHTML;
         }
     </script>
 </body>
