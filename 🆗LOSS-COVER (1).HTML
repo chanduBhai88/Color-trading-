@@ -1,209 +1,250 @@
 <!DOCTYPE html>
-<html lang="hi">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RajaGames प्रेडिक्शन टूल</title>
+    <title>Big/Small Predictor</title>
     <style>
         body {
-            font-family: 'Arial', sans-serif;
-            background-color: #f5f5f5;
-            margin: 0;
+            font-family: Arial, sans-serif;
+            text-align: center;
             padding: 20px;
-            color: #333;
+            background-color: #f0f0f0;
         }
         .container {
             max-width: 800px;
             margin: 0 auto;
-            background: white;
+            background-color: #fff;
             padding: 20px;
-            border-radius: 10px;
+            border-radius: 8px;
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
         }
-        h1 {
-            color: #e63946;
-            text-align: center;
+        .section {
+            margin: 20px 0;
         }
-        .input-section {
-            margin-bottom: 20px;
-        }
-        textarea {
-            width: 100%;
-            height: 100px;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-        }
-        button {
-            background-color: #e63946;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
+        .buttons button {
+            margin: 5px;
+            padding: 10px 15px;
             font-size: 16px;
-        }
-        button:hover {
-            background-color: #c1121f;
-        }
-        .results {
-            margin-top: 20px;
-        }
-        .number-grid {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-top: 10px;
-        }
-        .number {
-            width: 40px;
-            height: 40px;
-            background-color: #e63946;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            background-color: #007bff;
             color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            font-weight: bold;
         }
-        .probability {
+        .buttons button:hover {
+            background-color: #0056b3;
+        }
+        .buttons button.selected {
+            background-color: #28a745;
+        }
+        #predictButton, #clearButton {
+            padding: 10px 20px;
+            font-size: 18px;
+            margin: 10px;
+        }
+        #result {
             margin-top: 20px;
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
         }
-        table {
-            width: 100%;
-            border-collapse: collapse;
+        #currentInput {
             margin-top: 10px;
-        }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: center;
-        }
-        th {
-            background-color: #f2f2f2;
+            font-size: 18px;
+            color: #555;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>RajaGames नंबर प्रेडिक्शन</h1>
+        <h1>Big/Small Predictor</h1>
         
-        <div class="input-section">
-            <h3>डेटा इनपुट (नंबर्स पेस्ट करें):</h3>
-            <textarea id="numberInput" placeholder="① ① ② ③ ④ ⑤ ⑥ ⑦ ⑧ ⑨
-① ① ② ③ ④ ⑤ ⑥ ⑦ ⑧ ⑩
-① ① ② ③ ④ ⑤ ⑥ ⑦ ⑧ ⑪"></textarea>
-            <button onclick="analyzeNumbers()">विश्लेषण करें</button>
+        <div class="section">
+            <h3>Select First Number</h3>
+            <div class="buttons" id="firstNumberButtons">
+                <button onclick="selectFirstNumber(0)">0</button>
+                <button onclick="selectFirstNumber(1)">1</button>
+                <button onclick="selectFirstNumber(2)">2</button>
+                <button onclick="selectFirstNumber(3)">3</button>
+                <button onclick="selectFirstNumber(4)">4</button>
+                <button onclick="selectFirstNumber(5)">5</button>
+                <button onclick="selectFirstNumber(6)">6</button>
+                <button onclick="selectFirstNumber(7)">7</button>
+                <button onclick="selectFirstNumber(8)">8</button>
+                <button onclick="selectFirstNumber(9)">9</button>
+            </div>
         </div>
-        
-        <div class="results" id="results">
-            <!-- यहां रिजल्ट्स दिखाई देंगे -->
+
+        <div class="section">
+            <h3>Select Second Number</h3>
+            <div class="buttons" id="secondNumberButtons">
+                <button onclick="selectSecondNumber(0)">0</button>
+                <button onclick="selectSecondNumber(1)">1</button>
+                <button onclick="selectSecondNumber(2)">2</button>
+                <button onclick="selectSecondNumber(3)">3</button>
+                <button onclick="selectSecondNumber(4)">4</button>
+                <button onclick="selectSecondNumber(5)">5</button>
+                <button onclick="selectSecondNumber(6)">6</button>
+                <button onclick="selectSecondNumber(7)">7</button>
+                <button onclick="selectSecondNumber(8)">8</button>
+                <button onclick="selectSecondNumber(9)">9</button>
+            </div>
         </div>
+
+        <div class="section">
+            <h3>Select Sequence (4 Elements)</h3>
+            <div class="section">
+                <h4>Element 1</h4>
+                <div class="buttons" id="seq1Buttons">
+                    <button onclick="selectSequence(1, 'Big')">Big</button>
+                    <button onclick="selectSequence(1, 'Small')">Small</button>
+                </div>
+            </div>
+            <div class="section">
+                <h4>Element 2</h4>
+                <div class="buttons" id="seq2Buttons">
+                    <button onclick="selectSequence(2, 'Big')">Big</button>
+                    <button onclick="selectSequence(2, 'Small')">Small</button>
+                </div>
+            </div>
+            <div class="section">
+                <h4>Element 3</h4>
+                <div class="buttons" id="seq3Buttons">
+                    <button onclick="selectSequence(3, 'Big')">Big</button>
+                    <button onclick="selectSequence(3, 'Small')">Small</button>
+                </div>
+            </div>
+            <div class="section">
+                <h4>Element 4</h4>
+                <div class="buttons" id="seq4Buttons">
+                    <button onclick="selectSequence(4, 'Big')">Big</button>
+                    <button onclick="selectSequence(4, 'Small')">Small</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <button id="predictButton" onclick="predict()">Predict</button>
+            <button id="clearButton" onclick="clearInputs()">Clear</button>
+        </div>
+
+        <div id="currentInput"></div>
+        <div id="result"></div>
     </div>
 
     <script>
-        function analyzeNumbers() {
-            // इनपुट डेटा प्राप्त करें
-            const inputText = document.getElementById('numberInput').value;
-            
-            // नंबर्स को अरे में बदलें (① → 1, ② → 2, ...)
-            const numberMap = {
-                '①': 1, '②': 2, '③': 3, '④': 4, '⑤': 5,
-                '⑥': 6, '⑦': 7, '⑧': 8, '⑨': 9, '⑩': 10,
-                '⑪': 11, '⑫': 12, '⑬': 13, '⑭': 14, '⑮': 15,
-                '⑯': 16, '⑰': 17, '⑱': 18, '⑲': 19, '⑳': 20
-            };
-            
-            // सभी नंबर्स को एक अरे में स्टोर करें
-            let allNumbers = [];
-            const lines = inputText.split('\n');
-            
-            lines.forEach(line => {
-                const chars = line.trim().split(/\s+/);
-                chars.forEach(char => {
-                    if (numberMap[char]) {
-                        allNumbers.push(numberMap[char]);
-                    }
-                });
+        // Store patterns
+        const patterns = [
+            { numbers: [6, 7], sequence: ["Small", "Small", "Big", "Big"], result: "Small" },
+            { numbers: [7, 8], sequence: ["Small", "Big", "Big", "Big"], result: "Small" },
+            { numbers: [8, 9], sequence: ["Big", "Small", "Small", "Small"], result: "Big" },
+            { numbers: [0, 9], sequence: ["Small", "Small", "Big", "Big"], result: "Big" },
+            { numbers: [1, 0], sequence: ["Big", "Big", "Small", "Small"], result: "Small" },
+            { numbers: [2, 1], sequence: ["Small", "Big", "Big", "Small"], result: "Small" },
+            { numbers: [3, 2], sequence: ["Small", "Small", "Big", "Big"], result: "Small" },
+            { numbers: [4, 3], sequence: ["Small", "Small", "Small", "Big"], result: "Big" },
+            { numbers: [5, 4], sequence: ["Big", "Small", "Small", "Small"], result: "Small" },
+            { numbers: [6, 5], sequence: ["Small", "Big", "Small", "Small"], result: "Small" },
+            { numbers: [7, 6], sequence: ["Small", "Big", "Small", "Small"], result: "Small" },
+            { numbers: [8, 7], sequence: ["Small", "Small", "Big", "Small"], result: "Small" },
+            { numbers: [9, 8], sequence: ["Small", "Small", "Small", "Big"], result: "Big" },
+            { numbers: [0, 9], sequence: ["Big", "Small", "Small", "Small"], result: "Big" },
+            { numbers: [1, 0], sequence: ["Big", "Big", "Small", "Small"], result: "Small" },
+            { numbers: [2, 1], sequence: ["Small", "Big", "Big", "Small"], result: "Big" },
+            { numbers: [3, 2], sequence: ["Big", "Small", "Big", "Big"], result: "Big" },
+            { numbers: [4, 3], sequence: ["Big", "Big", "Small", "Big"], result: "Small" },
+            { numbers: [5, 4], sequence: ["Small", "Big", "Big", "Small"], result: "Small" },
+            { numbers: [6, 5], sequence: ["Small", "Small", "Big", "Big"], result: "Big" },
+            { numbers: [7, 6], sequence: ["Big", "Small", "Small", "Big"], result: "Small" },
+            { numbers: [8, 7], sequence: ["Small", "Big", "Small", "Small"], result: "Small" }
+        ];
+
+        // Store current selections
+        let firstNumber = null;
+        let secondNumber = null;
+        let sequence = [null, null, null, null];
+
+        // Function to update button styles
+        function updateButtonStyles(buttonGroupId, selectedValue) {
+            const buttons = document.querySelectorAll(`#${buttonGroupId} button`);
+            buttons.forEach(button => {
+                button.classList.remove('selected');
+                if (button.textContent == selectedValue) {
+                    button.classList.add('selected');
+                }
             });
-            
-            // अगर कोई डेटा नहीं है तो रिटर्न
-            if (allNumbers.length === 0) {
-                document.getElementById('results').innerHTML = 
-                    '<p style="color: red;">कृपया वैध नंबर्स इनपुट करें!</p>';
+        }
+
+        // Select first number
+        function selectFirstNumber(num) {
+            firstNumber = num;
+            updateButtonStyles('firstNumberButtons', num);
+            updateCurrentInput();
+        }
+
+        // Select second number
+        function selectSecondNumber(num) {
+            secondNumber = num;
+            updateButtonStyles('secondNumberButtons', num);
+            updateCurrentInput();
+        }
+
+        // Select sequence element
+        function selectSequence(index, value) {
+            sequence[index - 1] = value;
+            updateButtonStyles(`seq${index}Buttons`, value);
+            updateCurrentInput();
+        }
+
+        // Update current input display
+        function updateCurrentInput() {
+            const inputDisplay = document.getElementById('currentInput');
+            const num1 = firstNumber !== null ? firstNumber : '-';
+            const num2 = secondNumber !== null ? secondNumber : '-';
+            const seq = sequence.map(s => s !== null ? s : '-').join(', ');
+            inputDisplay.textContent = `Current Input: Numbers: [${num1}, ${num2}], Sequence: [${seq}]`;
+        }
+
+        // Predict result
+        function predict() {
+            const resultDisplay = document.getElementById('result');
+            // Check if all inputs are selected
+            if (firstNumber === null || secondNumber === null || sequence.includes(null)) {
+                resultDisplay.textContent = 'Please select all inputs!';
                 return;
             }
-            
-            // फ्रीक्वेंसी एनालिसिस
-            const frequency = {};
-            allNumbers.forEach(num => {
-                frequency[num] = (frequency[num] || 0) + 1;
+
+            // Find matching pattern
+            const inputSequence = sequence.slice(); // Copy sequence
+            let result = 'Unknown';
+            for (let pattern of patterns) {
+                if (pattern.numbers[0] === firstNumber &&
+                    pattern.numbers[1] === secondNumber &&
+                    pattern.sequence.join(',') === inputSequence.join(',')) {
+                    result = pattern.result;
+                    break;
+                }
+            }
+
+            resultDisplay.textContent = `Predicted Result: ${result}`;
+        }
+
+        // Clear inputs
+        function clearInputs() {
+            firstNumber = null;
+            secondNumber = null;
+            sequence = [null, null, null, null];
+
+            // Reset button styles
+            ['firstNumberButtons', 'secondNumberButtons', 'seq1Buttons', 'seq2Buttons', 'seq3Buttons', 'seq4Buttons'].forEach(id => {
+                const buttons = document.querySelectorAll(`#${id} button`);
+                buttons.forEach(button => button.classList.remove('selected'));
             });
-            
-            // प्रोबेबिलिटी कैलकुलेट करें
-            const total = allNumbers.length;
-            const probability = {};
-            Object.keys(frequency).forEach(num => {
-                probability[num] = ((frequency[num] / total) * 100).toFixed(2) + '%';
-            });
-            
-            // हॉट नंबर्स (सबसे ज्यादा आने वाले)
-            const hotNumbers = Object.keys(frequency)
-                .sort((a, b) => frequency[b] - frequency[a])
-                .slice(0, 5);
-            
-            // कोल्ड नंबर्स (सबसे कम आने वाले)
-            const coldNumbers = Object.keys(frequency)
-                .sort((a, b) => frequency[a] - frequency[b])
-                .slice(0, 5);
-            
-            // रिजल्ट्स HTML जेनरेट करें
-            let resultsHTML = `
-                <h3>विश्लेषण परिणाम:</h3>
-                <p>कुल नंबर्स: ${total}</p>
-                
-                <h4>हॉट नंबर्स (सबसे ज्यादा आए):</h4>
-                <div class="number-grid">
-                    ${hotNumbers.map(num => `<div class="number">${num}</div>`).join('')}
-                </div>
-                
-                <h4>कोल्ड नंबर्स (सबसे कम आए):</h4>
-                <div class="number-grid">
-                    ${coldNumbers.map(num => `<div class="number">${num}</div>`).join('')}
-                </div>
-                
-                <div class="probability">
-                    <h4>नंबर प्रोबेबिलिटी:</h4>
-                    <table>
-                        <tr>
-                            <th>नंबर</th>
-                            <th>कितनी बार आया</th>
-                            <th>प्रोबेबिलिटी</th>
-                        </tr>
-            `;
-            
-            // टेबल में सभी नंबर्स दिखाएं
-            Object.keys(frequency).sort((a, b) => a - b).forEach(num => {
-                resultsHTML += `
-                    <tr>
-                        <td>${num}</td>
-                        <td>${frequency[num]}</td>
-                        <td>${probability[num]}</td>
-                    </tr>
-                `;
-            });
-            
-            resultsHTML += `
-                    </table>
-                </div>
-                
-                <h4>अगले राउंड के लिए सुझाव:</h4>
-                <p>सबसे संभावित नंबर्स: ${hotNumbers.join(', ')}</p>
-                <p>कम संभावित नंबर्स: ${coldNumbers.join(', ')}</p>
-            `;
-            
-            // रिजल्ट्स दिखाएं
-            document.getElementById('results').innerHTML = resultsHTML;
+
+            // Clear displays
+            document.getElementById('currentInput').textContent = '';
+            document.getElementById('result').textContent = '';
         }
     </script>
 </body>
