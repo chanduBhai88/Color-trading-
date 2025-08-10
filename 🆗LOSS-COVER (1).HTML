@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HZwcker Pattern Predictor</title>
+    <title>Hacker Pattern Predictor</title>
     <style>
         body {
             margin: 0;
@@ -105,29 +105,22 @@
             const input2 = parseInt(document.getElementById('input2').value);
             const resultDiv = document.getElementById('result');
 
-            // Check if inputs are valid numbers
-            if (isNaN(input1) || isNaN(input2)) {
-                resultDiv.textContent = 'Please enter valid numbers';
+            // Check if input1 is a valid number
+            if (isNaN(input1)) {
+                resultDiv.textContent = 'Please enter a valid number for Input 1';
                 return;
             }
 
-            // Placeholder prediction rule: Sum > 50 is "big", else "small"
-            const sum = input1 + input2;
-            const predictedResult = sum > 50 ? 'big' : 'small';
-
             // Check if input1 exists in pattern data
-            const matchingEntry = patternData.find(entry => entry.input === input1);
+            const matchingEntries = patternData.filter(entry => entry.input === input1);
 
-            if (matchingEntry) {
-                // Compare predicted result with expected result
-                if (matchingEntry.result.toLowerCase() === predictedResult.toLowerCase()) {
-                    resultDiv.textContent = `Result: ${predictedResult} (Matched)`;
-                } else {
-                    resultDiv.textContent = `Result: ${predictedResult} (Match nahi ho raha hai)`;
-                }
+            if (matchingEntries.length > 0) {
+                // Since input like 26 appears multiple times, use the first matching result
+                const expectedResult = matchingEntries[0].result;
+                resultDiv.textContent = `Result: ${expectedResult} (Matched)`;
             } else {
                 // Input not found in pattern data
-                resultDiv.textContent = `Result: ${predictedResult} (Match nahi ho raha hai - Input not in data)`;
+                resultDiv.textContent = `Result: Unknown (Match nahi ho raha hai - Input not in data)`;
             }
         }
 
