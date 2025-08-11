@@ -217,6 +217,13 @@
             line-height: 1.5;
         }
         
+        .input-hint {
+            color: #ffcc00;
+            font-size: 1.1rem;
+            margin-top: -10px;
+            margin-bottom: 20px;
+        }
+        
         @media (max-width: 600px) {
             .container {
                 padding: 15px;
@@ -248,7 +255,7 @@
 <body>
     <div class="container">
         <h1>B/S PATTERN MEMORY TEST</h1>
-        <div class="subtitle">Test your memory with sequence recall exercises</div>
+        <div class="subtitle">Enhanced version - spaces in input automatically removed</div>
         
         <div class="pattern-display" id="patternDisplay">
             Get ready for the first pattern...
@@ -260,7 +267,8 @@
         
         <div class="input-section">
             <div class="input-label">Enter the pattern you remember (10 characters):</div>
-            <input type="text" id="userInput" maxlength="10" placeholder="Enter B/S characters" disabled>
+            <div class="input-hint">Spaces will be automatically removed during validation</div>
+            <input type="text" id="userInput" maxlength="15" placeholder="Enter B/S characters" disabled>
         </div>
         
         <div class="buttons">
@@ -280,6 +288,7 @@
             <ol>
                 <li>A 10-character pattern of 'B' and 'S' will appear for 5 seconds</li>
                 <li>Memorize the pattern and enter it in the input field</li>
+                <li><strong>Note:</strong> You can enter with or without spaces</li>
                 <li>Click "Check Result" to verify your input</li>
                 <li>If correct, click "Right" to get the next pattern</li>
                 <li>If incorrect, click "Wrong" to get the next pattern</li>
@@ -354,7 +363,8 @@
             
             // Check user input against current pattern
             function checkResult() {
-                const userPattern = userInput.value.toUpperCase();
+                // Remove spaces and convert to uppercase
+                const userPattern = userInput.value.toUpperCase().replace(/\s/g, '');
                 
                 // Validate input
                 if (userPattern.length !== 10) {
@@ -412,7 +422,8 @@
             });
             
             userInput.addEventListener('input', function() {
-                this.value = this.value.toUpperCase().replace(/[^BS]/g, '');
+                // Allow spaces but show them as entered
+                this.value = this.value.toUpperCase().replace(/[^BS\s]/g, '');
             });
             
             // Start the exercise
