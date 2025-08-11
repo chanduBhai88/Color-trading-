@@ -1,182 +1,95 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KWG Big/Small Pattern Checker</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #121212;
-            color: white;
-            background-image: url('https://images.unsplash.com/photo-1560672657-a0431178403f?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
-            background-size: cover;
-            text-align: center;
-            padding: 20px;
-        }
-        .container {
-            background-color: rgba(0, 0, 0, 0.7);
-            border-radius: 10px;
-            padding: 20px;
-            max-width: 600px;
-            margin: 0 auto;
-        }
-        h1 {
-            color: #ffcc00;
-        }
-        .input-grid {
-            display: grid;
-            grid-template-columns: repeat(6, 1fr);
-            gap: 10px;
-            margin: 20px 0;
-        }
-        .input-btn {
-            padding: 10px;
-            border: none;
-            border-radius: 5px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-        .big {
-            background-color: #ff4444;
-            color: white;
-        }
-        .small {
-            background-color: #44aaff;
-            color: white;
-        }
-        #result {
-            font-size: 24px;
-            margin: 20px 0;
-            min-height: 40px;
-        }
-        .match {
-            color: #00ff00;
-        }
-        .no-match {
-            color: #ff0000;
-        }
-        #clear-btn {
-            padding: 10px 20px;
-            background-color: #ffcc00;
-            border: none;
-            border-radius: 5px;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 10px;
-        }
-        .history {
-            margin-top: 20px;
-            text-align: left;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>KWG Big/Small Pattern Checker</h1>
-        
-        <div class="input-grid">
-            <button class="input-btn big" onclick="addInput('Big')">Big</button>
-            <button class="input-btn small" onclick="addInput('Small')">Small</button>
-            <button class="input-btn big" onclick="addInput('Big')">Big</button>
-            <button class="input-btn small" onclick="addInput('Small')">Small</button>
-            <button class="input-btn big" onclick="addInput('Big')">Big</button>
-            <button class="input-btn small" onclick="addInput('Small')">Small</button>
-        </div>
-        
-        <div>
-            <h3>Your Input:</h3>
-            <div id="current-input"></div>
-        </div>
-        
-        <div id="result"></div>
-        
-        <button id="clear-btn" onclick="clearInput()">Clear</button>
-        
-        <div class="history">
-            <h3>Pattern Rules:</h3>
-            <p>1. Big,Small,Small,Small,Small,Big → Big</p>
-            <p>2. Big,Small,Small,Small,Big,Big → Big</p>
-            <p>3. Small,Big,Big,Big,Big,Big → Small</p>
-            <p>4. Small,Big,Big,Big,Small,Small → Small</p>
-            <p>5. Big,Big,Small,Small,Small,Small → Small</p>
-            <p>6. Big,Small,Small,Big,Big,Small → Big</p>
-            <p>7. Small,Small,Big,Big,Small,Small → Small</p>
-            <p>8. Small,Small,Small,Small,Big,Big → Big</p>
-            <p>9. Big,Big,Small,Big,Big,Big → Small</p>
-            <p>10. Big,Small,Big,Small,Small,Big → Big</p>
-            <p>11. Big,Big,Small,Big,Small,Small → Big</p>
-            <p>12. Small,Small,Big,Small,Big,Small → Small</p>
-            <p>13. Big,Small,Small,Small,Big,Small → Big</p>
-            <p>14. Small,Big,Big,Big,Big,Big → Small</p>
-            <p>15. Small,Big,Small,Small,Small,Big → Small</p>
-            <p>16. Big,Big,Small,Small,Small,Small → Big</p>
-            <p>17. Small,Small,Big,Big,Small,Small → Small</p>
-            <p>18. Big,Big,Big,Small,Big,Small → Small</p>
-            <p>19. Small,Small,Small,Big,Small,Small → Small</p>
-            <p>20. Big,Big,Small,Big,Big,Small → Big</p>
-        </div>
-    </div>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const fullPattern = "BSBBSBSSSBSBSBBBSSBSBBBSSBBSSBBSBBSSSSSBSSS SSSSSSSSSBBSSBBSSSBSSB SBBBSBBBBSSBSSBBBBSBSSBBSBBBSSBBSSSSBBSBSSBSSSBBBSSBBSSBSBBBSSBBSSSSBSSBSSBSSBBSSSSBBSBBSBBSSBSSSBSBBSSSBBSBSBSBBSSSBBSBSBSBSSBBSBSSBBSSSSBBSSBSSBSBBSSBBBBBSSSBSSBBSSBSSBBSSSSBBSBBSBBSSBBBSSSBSSSBSBBSSSSBSBBSSSBBSBSSBBSSSBBSSBSSSBBSBBSSSSBBSBBBRSSBSBBBSBSBBSSBBBSBBSBBSSBSBBBBSBBRBBSSSBSSSBBBSSBSSSRSSBSSSSBSSBBSSBSBSSSBBSBSBB";
+    const cleanPattern = fullPattern.replace(/ /g, '').replace(/R/g, 'B');
 
-    <script>
-        let userInput = [];
-        
-        function addInput(value) {
-            if (userInput.length < 6) {
-                userInput.push(value);
-                updateDisplay();
-                
-                if (userInput.length === 6) {
-                    checkPattern();
-                }
+    const chunks = [];
+    for (let i = 0; i < cleanPattern.length; i += 10) {
+        chunks.push(cleanPattern.substring(i, i + 10));
+    }
+
+    const patternDisplay = document.getElementById('patternDisplay');
+    const userInput = document.getElementById('userInput');
+    const resultBtn = document.getElementById('resultBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    const feedbackMessage = document.getElementById('feedbackMessage');
+    const countdownEl = document.getElementById('countdown');
+
+    let currentChunkIndex = 0;
+    let timer;
+    let secondsLeft = 5;
+
+    function init() {
+        showPattern();
+    }
+
+    function showPattern() {
+        patternDisplay.textContent = chunks[currentChunkIndex];
+        feedbackMessage.textContent = "";
+        userInput.value = "";
+        userInput.disabled = true;
+        resultBtn.disabled = true;
+
+        secondsLeft = 5;
+        countdownEl.textContent = secondsLeft;
+
+        clearInterval(timer);
+        timer = setInterval(() => {
+            secondsLeft--;
+            countdownEl.textContent = secondsLeft;
+
+            if (secondsLeft <= 0) {
+                clearInterval(timer);
+                patternDisplay.textContent = "⏱️ Time's up! Enter what you remember";
+                userInput.disabled = false;
+                resultBtn.disabled = false;
+                userInput.focus();
             }
+        }, 1000);
+    }
+
+    function checkResult() {
+        const userPattern = userInput.value.toUpperCase().replace(/\s/g, '');
+        if (userPattern.length !== 10) {
+            feedbackMessage.textContent = "Please enter exactly 10 characters!";
+            feedbackMessage.className = "incorrect";
+            return;
         }
-        
-        function updateDisplay() {
-            document.getElementById('current-input').textContent = userInput.join(', ');
+        if (!/^[BS]+$/.test(userPattern)) {
+            feedbackMessage.textContent = "Only 'B' and 'S' are allowed!";
+            feedbackMessage.className = "incorrect";
+            return;
         }
-        
-        function checkPattern() {
-            const inputString = userInput.join(',');
-            let result = "";
-            
-            // Define all patterns
-            const patterns = {
-                "Big,Small,Small,Small,Small,Big": "Big",
-                "Big,Small,Small,Small,Big,Big": "Big",
-                "Small,Big,Big,Big,Big,Big": "Small",
-                "Small,Big,Big,Big,Small,Small": "Small",
-                "Big,Big,Small,Small,Small,Small": "Small",
-                "Big,Small,Small,Big,Big,Small": "Big",
-                "Small,Small,Big,Big,Small,Small": "Small",
-                "Small,Small,Small,Small,Big,Big": "Big",
-                "Big,Big,Small,Big,Big,Big": "Small",
-                "Big,Small,Big,Small,Small,Big": "Big",
-                "Big,Big,Small,Big,Small,Small": "Big",
-                "Small,Small,Big,Small,Big,Small": "Small",
-                "Big,Small,Small,Small,Big,Small": "Big",
-                "Small,Big,Big,Big,Big,Big": "Small",
-                "Small,Big,Small,Small,Small,Big": "Small",
-                "Big,Big,Small,Small,Small,Small": "Big",
-                "Small,Small,Big,Big,Small,Small": "Small",
-                "Big,Big,Big,Small,Big,Small": "Small",
-                "Small,Small,Small,Big,Small,Small": "Small",
-                "Big,Big,Small,Big,Big,Small": "Big"
-            };
-            
-            if (patterns.hasOwnProperty(inputString)) {
-                result = patterns[inputString];
-                document.getElementById('result').innerHTML = `Result: <span class="match">${result}</span>`;
-            } else {
-                document.getElementById('result').innerHTML = `<span class="no-match">Result match nahin ho raha hai</span>`;
-            }
+
+        const currentPattern = chunks[currentChunkIndex];
+        const isCorrect = userPattern === currentPattern;
+
+        if (isCorrect) {
+            feedbackMessage.textContent = "✅ Correct! Well done!";
+            feedbackMessage.className = "correct";
+        } else {
+            feedbackMessage.textContent = `❌ Incorrect! The pattern was: ${currentPattern}`;
+            feedbackMessage.className = "incorrect";
         }
-        
-        function clearInput() {
-            userInput = [];
-            document.getElementById('current-input').textContent = "";
-            document.getElementById('result').textContent = "";
-        }
-    </script>
-</body>
-</html>
+
+        resultBtn.disabled = true;
+        setTimeout(nextPattern, 2000); // 2 sec baad next pattern
+    }
+
+    function nextPattern() {
+        currentChunkIndex = (currentChunkIndex + 1) % chunks.length;
+        showPattern();
+    }
+
+    resultBtn.addEventListener('click', checkResult);
+    clearBtn.addEventListener('click', () => {
+        userInput.value = "";
+        userInput.focus();
+    });
+    userInput.addEventListener('input', function () {
+        this.value = this.value.toUpperCase().replace(/[^BS\s]/g, '');
+    });
+
+    init();
+});
+</script>
