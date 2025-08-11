@@ -1,310 +1,340 @@
 <!doctype html>
 <html lang="hi">
 <head>
-  <meta charset="utf-8" />
-  <title>Big/Small Predictor - RAJA GAMES</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <style>
-    /* Simple clean styling + wallpaper-like background */
-    body {
-      margin: 0;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: "Segoe UI", Roboto, Arial, sans-serif;
-      background: linear-gradient(135deg,#0f172a 0%, #0b3d91 50%, #06283d 100%);
-      color: #fff;
-    }
-    .card {
-      width: 940px;
-      max-width: 96%;
-      background: rgba(255,255,255,0.06);
-      border-radius: 14px;
-      box-shadow: 0 10px 30px rgba(2,6,23,0.7);
-      padding: 20px;
-      backdrop-filter: blur(6px);
-    }
-    h1 { margin: 0 0 8px 0; font-size: 20px; letter-spacing: .6px; }
-    .top-row { display:flex; gap:12px; align-items:center; justify-content:space-between; }
-    .slots { display:flex; gap:8px; margin:14px 0 10px; flex-wrap:wrap; }
-    .slot {
-      width:52px; height:52px; border-radius:8px;
-      background:rgba(255,255,255,0.03); display:flex;align-items:center;justify-content:center;
-      font-weight:700; font-size:20px; cursor:default; border:2px solid rgba(255,255,255,0.04);
-    }
-    .controls { display:flex; gap:10px; align-items:center; margin-bottom:12px; flex-wrap:wrap; }
-    .btn {
-      padding:10px 14px; border-radius:8px; cursor:pointer; font-weight:600;
-      background:linear-gradient(180deg,rgba(255,255,255,0.06), rgba(255,255,255,0.02));
-      border:1px solid rgba(255,255,255,0.08); color:#fff;
-    }
-    .btn:active { transform: translateY(1px); }
-    .btn.big { padding:12px 18px; font-size:14px; }
-    .btn.b { background:linear-gradient(180deg,#08306b,#0b58a0); }
-    .btn.s { background:linear-gradient(180deg,#4b2b00,#7a4b0d); }
-    .result-box {
-      margin-top:10px; padding:14px; border-radius:10px; background:rgba(0,0,0,0.25);
-      font-size:18px; font-weight:700;
-    }
-    .history {
-      margin-top:12px; display:flex; gap:6px; flex-wrap:wrap;
-      max-width:100%;
-    }
-    .hist-item {
-      background:rgba(255,255,255,0.03); padding:6px 8px; border-radius:6px; font-size:13px;
-      border:1px solid rgba(255,255,255,0.03);
-    }
-    .footer { margin-top:14px; font-size:13px; opacity:0.9; color: #e6eef8; display:flex; justify-content:space-between; align-items:center; }
-    .small-note { font-size:12px; opacity:0.85; }
-  </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>RAJA GAMES — Big/Small Predictor (Image → DB → Predict)</title>
+<style>
+  :root{--bg1:#071029;--bg2:#0b3d91;--card:rgba(255,255,255,0.04)}
+  body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;font-family:Inter,Segoe UI,Roboto,Arial;background:linear-gradient(135deg,var(--bg1),var(--bg2));color:#fff;padding:18px}
+  .wrap{width:980px;max-width:100%;background:var(--card);border-radius:14px;padding:14px;box-shadow:0 8px 30px rgba(2,6,23,0.6);backdrop-filter:blur(6px)}
+  h1{margin:0 0 6px;font-size:18px}
+  .top{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+  .controls-row{display:flex;gap:8px;align-items:center;margin:12px 0;flex-wrap:wrap}
+  .btn{padding:8px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:rgba(255,255,255,0.03);color:#fff;font-weight:700;cursor:pointer}
+  .btn:active{transform:translateY(1px)}
+  .btn.big{padding:12px 16px;font-size:15px}
+  .btn.b{background:linear-gradient(180deg,#08306b,#0b58a0)}
+  .btn.s{background:linear-gradient(180deg,#4b2b00,#7a4b0d)}
+  .slots{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+  .slot{width:54px;height:54px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:20px;background:rgba(255,255,255,0.02);border:2px solid rgba(255,255,255,0.03);user-select:none}
+  .slot.filled{box-shadow:0 6px 18px rgba(0,0,0,0.4);transform:translateY(-2px)}
+  .slot.missing{border-color:#cc3b3b}
+  .result-box{margin-top:10px;padding:12px;border-radius:10px;background:rgba(0,0,0,0.25);font-weight:800;font-size:18px}
+  .history{margin-top:12px;display:flex;gap:8px;flex-wrap:wrap}
+  .hist-item{background:rgba(255,255,255,0.03);padding:8px;border-radius:8px;font-weight:700;font-size:13px;border:1px solid rgba(255,255,255,0.03)}
+  .uploader{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  textarea{width:100%;height:120px;margin-top:8px;border-radius:8px;padding:8px;background:rgba(0,0,0,0.35);color:#e8f0ff;border:1px solid rgba(255,255,255,0.04);resize:vertical;font-family:monospace}
+  .small{font-size:13px;color:#dfefff;opacity:0.95}
+  .row{display:flex;gap:8px;align-items:center}
+  @media (max-width:640px){ .slot{width:44px;height:44px;font-size:18px} .btn.big{padding:10px 12px} }
+</style>
 </head>
 <body>
-  <div class="card">
-    <div class="top-row">
+  <div class="wrap">
+    <div class="top">
       <div>
-        <h1>RAJA GAMES - Big/Small Predictor</h1>
-        <div class="small-note">10-digit input (click B or S). Get Result → Right/Wrong feedback → next result auto.</div>
+        <h1>RAJA GAMES — Big/Small Predictor</h1>
+        <div class="small">Upload image → extract continuous B/S → app generates database (10→next) automatically.</div>
       </div>
-      <div>
-        <button id="clearAll" class="btn">Clear</button>
+      <div class="row">
+        <button id="clearAll" class="btn">Clear Inputs</button>
       </div>
     </div>
 
-    <!-- 10 click-only input slots -->
-    <div class="slots" id="slotsContainer" aria-hidden="false">
-      <!-- generated by JS -->
+    <!-- Image uploader & extract -->
+    <div style="margin-top:12px" class="uploader">
+      <input id="fileInput" type="file" accept="image/*" />
+      <button id="extractBtn" class="btn">Extract B/S from Image</button>
+      <div class="small" style="margin-left:6px">or paste an image of patterns</div>
     </div>
+    <div style="margin-top:8px" class="small">Extracted sequence (will appear below). If OCR misses, try a clearer photo or crop tightly.</div>
 
-    <!-- Buttons for entering B or S (click only) -->
-    <div class="controls">
+    <textarea id="extractedText" placeholder="Extracted continuous B/S sequence will appear here..." readonly></textarea>
+
+    <div style="margin-top:8px" class="small">Generated database (10-input + next) — shown so you can verify / copy. Each line = first10 + next (11 chars).</div>
+    <textarea id="generatedDB" placeholder="Generated DB appears here after extraction..." readonly></textarea>
+
+    <!-- Input slots -->
+    <div class="slots" id="slotsContainer"></div>
+
+    <!-- input buttons -->
+    <div class="controls-row">
       <button id="btnB" class="btn b big">B</button>
       <button id="btnS" class="btn s big">S</button>
-
-      <button id="getResult" class="btn big" style="margin-left:10px;">Get Result</button>
-
-      <!-- Right/Wrong hidden until result shown -->
-      <button id="btnRight" class="btn" style="display:none; background:linear-gradient(180deg,#0f7a2b,#1fa42c);">Right</button>
-      <button id="btnWrong" class="btn" style="display:none; background:linear-gradient(180deg,#7a0f0f,#b31a1a);">Wrong</button>
-
+      <button id="getResult" class="btn big">Get Result</button>
+      <button id="btnRight" class="btn" style="display:none;background:linear-gradient(180deg,#0f7a2b,#1fa42c)">Right</button>
+      <button id="btnWrong" class="btn" style="display:none;background:linear-gradient(180deg,#7a0f0f,#b31a1a)">Wrong</button>
       <div style="flex:1"></div>
-      <div style="opacity:0.95; font-weight:600;">Last 10 predictions:</div>
+      <div class="small">Last 10 predictions:</div>
     </div>
 
-    <div id="resultBox" class="result-box">Result: <span id="resultText">—</span></div>
+    <div class="result-box">Result: <span id="resultText">—</span></div>
 
-    <div class="history" id="historyContainer" aria-live="polite">
-      <!-- recent predictions -->
-    </div>
+    <div class="history" id="historyContainer"></div>
 
-    <div class="footer">
-      <div>Database patterns must be pasted into the code (see comments).</div>
-      <div>Made for you, Chandu ✅</div>
+    <div style="margin-top:12px">
+      <div class="small">If you want to permanently hardcode the DB: copy the lines from the "Generated database" textarea and paste as strings into code's <code>database</code> array.</div>
     </div>
   </div>
 
-  <script>
-    /*******************************************************************
-     * IMPORTANT:
-     * Replace the contents of `database` exactly with your full patterns.
-     * Each entry must be a string where:
-     *  - first 10 characters are the input pattern (B or S)
-     *  - 11th character is the expected next/result (B or S)
-     *
-     * Example:
-     *   "BSSBBSBBBSB"  --> first10: "BSSBBSBBBS", next: "B"
-     *
-     * If your original data is only lines of 10-digit sequences and you have
-     * a separate mapping for next results, convert them into this format.
-     *
-     * DO NOT skip any pattern — paste all patterns here so matches won't miss.
-     *******************************************************************/
-    const database = [
-      // ----- << PUT YOUR ENTIRE PATTERN LIST HERE >> -----
-      // Example placeholders (REMOVE or REPLACE with your real patterns):
-      "BSSBBSBBBSB",
-      "SSBBSSBBSBS",
-      "BBSSSBSSSBB"
-      // ---------------------------------------------------
-    ];
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@4.0.2/dist/tesseract.min.js"></script>
+<script>
+/*
+  How this works:
+  1) Upload an image and press "Extract B/S from Image".
+     - Tesseract OCR runs in the browser and we keep only letters B/S (case-insensitive).
+  2) The page forms a continuous sequence like "BBSBSSBBS...".
+  3) From that sequence we generate database lines: for each i -> entry = seq[i..i+9] + seq[i+10].
+     (i goes from 0 to seq.length - 11).
+  4) The rest of the app uses that generated DB at runtime for matching and auto-next on Right/Wrong.
+*/
 
-    // App state
-    const INPUT_LENGTH = 10;
-    let slots = []; // array of '' or 'B'/'S'
-    let last10 = []; // memory of last 10 predictions { input, predicted, feedback }
-    let dbIndexForAutoNext = 0; // pointer to cycle through database for automatic next
+// ---------- Config ----------
+const INPUT_LENGTH = 10; // fixed
+let database = [];        // will be runtime-populated from extracted image
+let slots = [];
+let last10 = [];
+let dbAutoIndex = -1;     // pointer used when auto-advancing after Right/Wrong
 
-    // DOM refs
-    const slotsContainer = document.getElementById('slotsContainer');
-    const btnB = document.getElementById('btnB');
-    const btnS = document.getElementById('btnS');
-    const getResult = document.getElementById('getResult');
-    const resultText = document.getElementById('resultText');
-    const resultBox = document.getElementById('resultBox');
-    const btnRight = document.getElementById('btnRight');
-    const btnWrong = document.getElementById('btnWrong');
-    const historyContainer = document.getElementById('historyContainer');
-    const clearAll = document.getElementById('clearAll');
+// DOM
+const fileInput = document.getElementById('fileInput');
+const extractBtn = document.getElementById('extractBtn');
+const extractedText = document.getElementById('extractedText');
+const generatedDB = document.getElementById('generatedDB');
 
-    // initialize slots
-    function initSlots(){
-      slots = Array(INPUT_LENGTH).fill('');
-      renderSlots();
-    }
+const slotsContainer = document.getElementById('slotsContainer');
+const btnB = document.getElementById('btnB');
+const btnS = document.getElementById('btnS');
+const getResult = document.getElementById('getResult');
+const btnRight = document.getElementById('btnRight');
+const btnWrong = document.getElementById('btnWrong');
+const resultText = document.getElementById('resultText');
+const historyContainer = document.getElementById('historyContainer');
+const clearAll = document.getElementById('clearAll');
 
-    function renderSlots(){
-      slotsContainer.innerHTML = '';
-      for(let i=0;i<INPUT_LENGTH;i++){
-        const d = document.createElement('div');
-        d.className = 'slot';
-        d.dataset.index = i;
-        d.textContent = slots[i] || '-';
-        // clicking a slot will remove last value from that slot (allow easy correction)
-        d.addEventListener('click', ()=> {
-          if(slots[i]) {
-            slots[i] = '';
-            renderSlots();
-          }
-        });
-        slotsContainer.appendChild(d);
-      }
-    }
-
-    // click handlers for B/S
-    function fillNext(val){
-      for(let i=0;i<INPUT_LENGTH;i++){
-        if(!slots[i]){
-          slots[i] = val;
-          renderSlots();
-          return;
-        }
-      }
-      // all filled, ignore
-    }
-
-    btnB.addEventListener('click', ()=> fillNext('B'));
-    btnS.addEventListener('click', ()=> fillNext('S'));
-    clearAll.addEventListener('click', ()=> {
-      initSlots();
-      hideFeedbackButtons();
-      setResultText('—');
-    });
-
-    // returns {found:boolean, predicted:string}
-    function checkDatabaseForMatch(inputStr){
-      // strict full-match on first 10 characters
-      for(const entry of database){
-        if(typeof entry !== 'string') continue;
-        if(entry.length < INPUT_LENGTH+1) continue; // invalid entry
-        const key = entry.slice(0, INPUT_LENGTH);
-        const next = entry.charAt(INPUT_LENGTH);
-        if(key === inputStr){
-          return { found:true, predicted: next };
-        }
-      }
-      return { found:false, predicted:null };
-    }
-
-    function setResultText(txt){
-      resultText.textContent = txt;
-    }
-
-    function showFeedbackButtons(){
-      btnRight.style.display = 'inline-block';
-      btnWrong.style.display = 'inline-block';
-    }
-    function hideFeedbackButtons(){
-      btnRight.style.display = 'none';
-      btnWrong.style.display = 'none';
-    }
-
-    // store in last10 array and update UI
-    function pushToHistory(input, predicted, feedback){
-      const item = { input, predicted, feedback, time: new Date().toLocaleTimeString() };
-      last10.unshift(item);
-      if(last10.length > 10) last10.pop();
-      renderHistory();
-    }
-    function renderHistory(){
-      historyContainer.innerHTML = '';
-      for(const it of last10){
-        const el = document.createElement('div');
-        el.className = 'hist-item';
-        el.textContent = `${it.input} → ${it.predicted} (${it.feedback})`;
-        historyContainer.appendChild(el);
-      }
-    }
-
-    // when user presses Get Result
-    getResult.addEventListener('click', ()=> {
-      const inputStr = slots.join('');
-      if(inputStr.length !== INPUT_LENGTH || inputStr.includes('') ){
-        alert('Kripya pehle 10 inputs fill karein (B ya S) — click se.');
-        return;
-      }
-      const res = checkDatabaseForMatch(inputStr);
-      if(res.found){
-        setResultText(res.predicted);
-      } else {
-        setResultText('Result No Match');
-      }
-      showFeedbackButtons();
-    });
-
-    // After feedback clicked (Right or Wrong) -> record and automatically show next result
-    function handleFeedback(isRight){
-      const inputStr = slots.join('');
-      const predicted = resultText.textContent || '—';
-      const feedback = isRight ? 'Right' : 'Wrong';
-
-      pushToHistory(inputStr, predicted, feedback);
-
-      // prepare next: cycle to next database entry and auto-fill its first 10 then compute its result
-      if(database.length > 0){
-        dbIndexForAutoNext = (dbIndexForAutoNext + 1) % database.length;
-        const nextEntry = database[dbIndexForAutoNext];
-        if(typeof nextEntry === 'string' && nextEntry.length >= INPUT_LENGTH+1){
-          const nextInput = nextEntry.slice(0, INPUT_LENGTH).split('');
-          // fill slots with that nextInput
-          slots = nextInput.slice(); // copy
-          renderSlots();
-          // automatically compute result
-          const nextPred = nextEntry.charAt(INPUT_LENGTH);
-          setResultText(nextPred);
-          // show feedback buttons remain visible
-          showFeedbackButtons();
-          return;
-        }
-      }
-
-      // if DB empty or invalid -> just clear inputs and hide feedback
-      initSlots();
-      hideFeedbackButtons();
-      setResultText('—');
-    }
-
-    btnRight.addEventListener('click', ()=> handleFeedback(true));
-    btnWrong.addEventListener('click', ()=> handleFeedback(false));
-
-    // init on load
-    initSlots();
-    renderHistory();
-
-    // Accessibility: allow keyboard B/S for quick testing (optional)
-    document.addEventListener('keydown', (e)=>{
-      if(e.key.toLowerCase() === 'b') fillNext('B');
-      if(e.key.toLowerCase() === 's') fillNext('S');
-      if(e.key === 'Enter') getResult.click();
-      if(e.key === 'Backspace') { // remove last filled
-        for(let i=INPUT_LENGTH-1;i>=0;i--){
-          if(slots[i]) { slots[i] = ''; break; }
-        }
+// ---------- UI helpers ----------
+function initSlots(){
+  slots = Array(INPUT_LENGTH).fill('');
+  renderSlots();
+}
+function renderSlots(){
+  slotsContainer.innerHTML = '';
+  for(let i=0;i<INPUT_LENGTH;i++){
+    const el = document.createElement('div');
+    el.className = 'slot' + (slots[i] ? ' filled' : '');
+    el.dataset.index = i;
+    el.textContent = slots[i] || '-';
+    el.addEventListener('click', ()=> {
+      // allow removing value by clicking a filled slot
+      if(slots[i]){
+        slots[i] = '';
         renderSlots();
       }
     });
+    slotsContainer.appendChild(el);
+  }
+}
+function setResult(txt){
+  resultText.textContent = txt;
+}
+function showFeedbackBtns(){ btnRight.style.display='inline-block'; btnWrong.style.display='inline-block'; }
+function hideFeedbackBtns(){ btnRight.style.display='none'; btnWrong.style.display='none'; }
+function pushHistory(input, predicted, feedback){
+  last10.unshift({input,predicted,feedback,time:new Date().toLocaleTimeString()});
+  if(last10.length>10) last10.pop();
+  renderHistory();
+}
+function renderHistory(){
+  historyContainer.innerHTML = '';
+  for(const it of last10){
+    const el = document.createElement('div');
+    el.className = 'hist-item';
+    el.textContent = `${it.input} → ${it.predicted} (${it.feedback})`;
+    historyContainer.appendChild(el);
+  }
+}
 
-    // Helpful console message
-    console.log('RAJA GAMES Predictor ready. Paste your full database patterns into the "database" array in the code.');
-  </script>
+// ---------- DB generation from continuous sequence ----------
+function generateDatabaseFromSequence(seq){
+  const arr = [];
+  // ensure uppercase and only B/S characters
+  seq = seq.toUpperCase().replace(/[^BS]/g,'');
+  for(let i=0;i + INPUT_LENGTH < seq.length; i++){
+    const key = seq.substring(i, i+INPUT_LENGTH);
+    const next = seq.charAt(i+INPUT_LENGTH);
+    if(key.length===INPUT_LENGTH && (next==='B' || next==='S')){
+      arr.push(key + next); // store 11-char string
+    }
+  }
+  return arr;
+}
+
+// ---------- OCR (Tesseract in browser) ----------
+async function runOCROnFile(file){
+  extractedText.value = 'OCR running — please wait... (may take a few seconds)';
+  generatedDB.value = '';
+  database = [];
+  try{
+    const { data: { text } } = await Tesseract.recognize(file, 'eng', { logger: m => {
+      // optional: console.log(m)
+    }});
+    // keep only letters B or S (case-insensitive)
+    const seq = (text || '').replace(/\s+/g,'').replace(/[^A-Za-z]/g,'').split('').filter(ch => /[BSbs]/.test(ch)).map(c => c.toUpperCase()).join('');
+    if(!seq || seq.length < INPUT_LENGTH+1){
+      extractedText.value = seq || '';
+      generatedDB.value = 'Error: extracted too short. Try clearer/cropped image.';
+      alert('OCR result too short. Try a clearer photo or crop tightly to only B/S characters.');
+      return;
+    }
+    extractedText.value = seq;
+    database = generateDatabaseFromSequence(seq);
+    if(database.length === 0){
+      generatedDB.value = 'No valid 10→next patterns found (sequence too short).';
+      alert('No patterns found. Make sure image contains continuous B/S characters.');
+      return;
+    }
+    generatedDB.value = database.join('\n');
+    // reset app state
+    dbAutoIndex = -1;
+    initSlots();
+    hideFeedbackBtns();
+    setResult('—');
+    alert('Extraction successful — database generated with ' + database.length + ' entries.');
+  }catch(err){
+    console.error(err);
+    extractedText.value = '';
+    generatedDB.value = 'OCR failed — see console.';
+    alert('OCR failed. Try a different image or reload page.');
+  }
+}
+
+// ---------- Matching & behavior ----------
+function findMatch(inputStr){
+  // strict full-match search in database; return first matched next char
+  if(!inputStr || inputStr.length !== INPUT_LENGTH) return {found:false, predicted:null};
+  for(let i=0;i<database.length;i++){
+    const entry = database[i];
+    if(typeof entry !== 'string' || entry.length < INPUT_LENGTH+1) continue;
+    const key = entry.slice(0, INPUT_LENGTH);
+    const next = entry.charAt(INPUT_LENGTH);
+    if(key === inputStr){
+      return { found:true, predicted: next, indexInDB:i };
+    }
+  }
+  return { found:false, predicted:null, indexInDB:-1};
+}
+
+function markMissingSlots(){
+  const els = slotsContainer.querySelectorAll('.slot');
+  for(let i=0;i<els.length;i++){
+    const el = els[i];
+    if(!slots[i]) el.classList.add('missing'); else el.classList.remove('missing');
+  }
+}
+
+function clearMissingMarks(){
+  const els = slotsContainer.querySelectorAll('.slot');
+  els.forEach(el => el.classList.remove('missing'));
+}
+
+// Get Result click
+getResult.addEventListener('click', ()=>{
+  clearMissingMarks();
+  const inputStr = slots.join('');
+  // check for blanks
+  if(inputStr.length !== INPUT_LENGTH || inputStr.includes('')){
+    // highlight missing
+    markMissingSlots();
+    alert('Kripya pehle 10 inputs fill karein (B ya S) — touch se. Missing slots highlighted red.');
+    return;
+  }
+  if(database.length === 0){
+    alert('Database empty — pehle image se Extract B/S karo.');
+    return;
+  }
+  const res = findMatch(inputStr);
+  if(res.found){
+    setResult(res.predicted);
+    // set dbAutoIndex to the found index so subsequent Right/Wrong auto-advance can use next entries
+    dbAutoIndex = res.indexInDB;
+  } else {
+    setResult('Result No Match');
+    dbAutoIndex = -1;
+  }
+  showFeedbackBtns();
+});
+
+// Right/Wrong behavior -> record feedback, auto-advance to next DB entry (in order)
+function handleFeedback(isRight){
+  const inputStr = slots.join('') || '-';
+  const predicted = resultText.textContent || '-';
+  const feedback = isRight ? 'Right' : 'Wrong';
+  pushHistory(inputStr, predicted, feedback);
+
+  // auto-advance: if dbAutoIndex valid, move to next index in DB (circular). Else move +1 from 0.
+  if(database.length > 0){
+    dbAutoIndex = (dbAutoIndex + 1) % database.length;
+    const nextEntry = database[dbAutoIndex];
+    // fill slots with nextEntry's first 10
+    if(nextEntry && nextEntry.length >= INPUT_LENGTH+1){
+      const nextInput = nextEntry.slice(0, INPUT_LENGTH).split('');
+      slots = nextInput.slice();
+      renderSlots();
+      // set predicted result
+      const nextPred = nextEntry.charAt(INPUT_LENGTH);
+      setResult(nextPred);
+      showFeedbackBtns();
+      return;
+    }
+  }
+  // fallback: clear
+  initSlots();
+  hideFeedbackBtns();
+  setResult('—');
+}
+
+btnRight.addEventListener('click', ()=> handleFeedback(true));
+btnWrong.addEventListener('click', ()=> handleFeedback(false));
+
+// B/S click fill next empty
+function fillNext(val){
+  for(let i=0;i<INPUT_LENGTH;i++){
+    if(!slots[i]){
+      slots[i] = val;
+      renderSlots();
+      return;
+    }
+  }
+  // all filled -> ignore
+}
+btnB.addEventListener('click', ()=> fillNext('B'));
+btnS.addEventListener('click', ()=> fillNext('S'));
+clearAll.addEventListener('click', ()=> {
+  initSlots();
+  hideFeedbackBtns();
+  setResult('—');
+  clearMissingMarks();
+});
+
+// keyboard shortcuts (developer convenience)
+document.addEventListener('keydown',(e)=>{
+  if(e.key.toLowerCase() === 'b') fillNext('B');
+  if(e.key.toLowerCase() === 's') fillNext('S');
+  if(e.key === 'Enter') getResult.click();
+  if(e.key === 'Backspace'){ for(let i=INPUT_LENGTH-1;i>=0;i--){ if(slots[i]){ slots[i]=''; renderSlots(); break; } } }
+});
+
+// Initialize UI
+initSlots();
+renderHistory();
+
+// ---------- Events ----------
+extractBtn.addEventListener('click', async ()=>{
+  const f = fileInput.files && fileInput.files[0];
+  if(!f){ alert('Kripya image select karo pahle.'); return; }
+  await runOCROnFile(f);
+});
+</script>
 </body>
 </html>
