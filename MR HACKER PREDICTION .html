@@ -1,224 +1,423 @@
-<!doctype html>
-<html lang="hi">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>RAJA GAMES — Big/Small Predictor</title>
-<style>
-  :root{--bg1:#071029;--bg2:#0b3d91;--card:rgba(255,255,255,0.04)}
-  body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;font-family:Inter,Segoe UI,Roboto,Arial;background:linear-gradient(135deg,var(--bg1),var(--bg2));color:#fff;padding:18px}
-  .wrap{width:980px;max-width:100%;background:var(--card);border-radius:14px;padding:14px;box-shadow:0 8px 30px rgba(2,6,23,0.6);backdrop-filter:blur(6px)}
-  h1{margin:0 0 6px;font-size:18px}
-  .controls-row{display:flex;gap:8px;align-items:center;margin:12px 0;flex-wrap:wrap}
-  .btn{padding:8px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:rgba(255,255,255,0.03);color:#fff;font-weight:700;cursor:pointer}
-  .btn:active{transform:translateY(1px)}
-  .btn.big{padding:12px 16px;font-size:15px}
-  .btn.b{background:linear-gradient(180deg,#08306b,#0b58a0)}
-  .btn.s{background:linear-gradient(180deg,#4b2b00,#7a4b0d)}
-  .slots{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
-  .slot{width:54px;height:54px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:20px;background:rgba(255,255,255,0.02);border:2px solid rgba(255,255,255,0.03);user-select:none}
-  .slot.filled{box-shadow:0 6px 18px rgba(0,0,0,0.4);transform:translateY(-2px)}
-  .slot.missing{border-color:#cc3b3b}
-  .result-box{margin-top:10px;padding:12px;border-radius:10px;background:rgba(0,0,0,0.25);font-weight:800;font-size:18px}
-  textarea{width:100%;height:120px;margin-top:8px;border-radius:8px;padding:8px;background:rgba(0,0,0,0.35);color:#e8f0ff;border:1px solid rgba(255,255,255,0.04);resize:vertical;font-family:monospace}
-  .small{font-size:13px;color:#dfefff;opacity:0.95}
-  .row{display:flex;gap:8px;align-items:center}
-  @media (max-width:640px){ .slot{width:44px;height:44px;font-size:18px} .btn.big{padding:10px 12px} }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>B/S Pattern Memory Exercise</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+            color: white;
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 2.8rem;
+            margin-bottom: 5px;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+            background: linear-gradient(to right, #4facfe, #00f2fe);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            margin-bottom: 25px;
+            color: #bbb;
+        }
+        
+        .pattern-display {
+            font-size: 3rem;
+            letter-spacing: 8px;
+            margin: 30px 0;
+            padding: 25px;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 15px;
+            border: 2px solid #00f2fe;
+            min-height: 140px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-shadow: 0 0 10px rgba(0, 242, 254, 0.7);
+        }
+        
+        .timer {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            color: #4facfe;
+            font-weight: bold;
+        }
+        
+        .input-section {
+            margin: 25px 0;
+        }
+        
+        .input-label {
+            display: block;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+            color: #4facfe;
+        }
+        
+        #userInput {
+            width: 100%;
+            max-width: 500px;
+            padding: 18px;
+            font-size: 1.8rem;
+            text-align: center;
+            text-transform: uppercase;
+            border: 3px solid #4facfe;
+            border-radius: 12px;
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            letter-spacing: 5px;
+            margin-bottom: 25px;
+        }
+        
+        .buttons {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin: 25px 0;
+        }
+        
+        button {
+            padding: 15px 30px;
+            font-size: 1.3rem;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            min-width: 160px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        #resultBtn {
+            background: linear-gradient(to right, #4facfe, #00f2fe);
+            color: black;
+        }
+        
+        #resultBtn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 242, 254, 0.4);
+        }
+        
+        #resultBtn:disabled {
+            background: #555;
+            transform: none;
+            box-shadow: none;
+            cursor: not-allowed;
+        }
+        
+        #rightBtn {
+            background: linear-gradient(to right, #00b09b, #96c93d);
+            color: black;
+        }
+        
+        #wrongBtn {
+            background: linear-gradient(to right, #ff416c, #ff4b2b);
+            color: white;
+        }
+        
+        #clearBtn {
+            background: linear-gradient(to right, #8e2de2, #4a00e0);
+            color: white;
+        }
+        
+        #rightBtn:hover, #wrongBtn:hover, #clearBtn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(255, 255, 255, 0.2);
+        }
+        
+        #rightBtn:disabled, #wrongBtn:disabled {
+            background: #555;
+            transform: none;
+            box-shadow: none;
+            cursor: not-allowed;
+        }
+        
+        .feedback-section {
+            margin-top: 30px;
+            padding: 20px;
+            border-radius: 15px;
+            background: rgba(0, 0, 0, 0.4);
+            border: 2px solid #8e2de2;
+        }
+        
+        .feedback-title {
+            font-size: 1.4rem;
+            margin-bottom: 15px;
+            color: #4facfe;
+        }
+        
+        #feedbackMessage {
+            font-size: 1.6rem;
+            font-weight: bold;
+            min-height: 40px;
+            padding: 10px;
+        }
+        
+        .correct {
+            color: #96c93d;
+            text-shadow: 0 0 10px rgba(150, 201, 61, 0.7);
+        }
+        
+        .incorrect {
+            color: #ff4b2b;
+            text-shadow: 0 0 10px rgba(255, 75, 43, 0.7);
+        }
+        
+        .instructions {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 25px;
+            border: 2px solid #00f2fe;
+            text-align: left;
+        }
+        
+        .instructions h3 {
+            color: #4facfe;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .instructions ol {
+            padding-left: 20px;
+            margin-bottom: 15px;
+        }
+        
+        .instructions li {
+            margin-bottom: 10px;
+            line-height: 1.5;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                padding: 15px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .pattern-display {
+                font-size: 2rem;
+                padding: 15px;
+                min-height: 110px;
+            }
+            
+            button {
+                min-width: 140px;
+                padding: 12px 20px;
+                font-size: 1.1rem;
+            }
+            
+            #userInput {
+                font-size: 1.4rem;
+                padding: 15px;
+            }
+        }
+    </style>
 </head>
 <body>
-  <div class="wrap">
-    <h1>RAJA GAMES — Big/Small Predictor</h1>
-    <div class="small">Upload image → extract continuous B/S → app generates database (10→next) automatically.</div>
-
-    <div style="margin-top:12px" class="row">
-      <input id="fileInput" type="file" accept="image/*" />
-      <button id="extractBtn" class="btn">Extract B/S from Image</button>
-      <button id="clearAll" class="btn">Clear Inputs</button>
+    <div class="container">
+        <h1>B/S PATTERN MEMORY TEST</h1>
+        <div class="subtitle">Test your memory with sequence recall exercises</div>
+        
+        <div class="pattern-display" id="patternDisplay">
+            Get ready for the first pattern...
+        </div>
+        
+        <div class="timer" id="timer">
+            Pattern will be shown for: <span id="countdown">5</span> seconds
+        </div>
+        
+        <div class="input-section">
+            <div class="input-label">Enter the pattern you remember (10 characters):</div>
+            <input type="text" id="userInput" maxlength="10" placeholder="Enter B/S characters" disabled>
+        </div>
+        
+        <div class="buttons">
+            <button id="resultBtn" disabled>Check Result</button>
+            <button id="rightBtn" disabled>Right ✓</button>
+            <button id="wrongBtn" disabled>Wrong ✗</button>
+            <button id="clearBtn">Clear Input</button>
+        </div>
+        
+        <div class="feedback-section">
+            <div class="feedback-title">Feedback:</div>
+            <div id="feedbackMessage"></div>
+        </div>
+        
+        <div class="instructions">
+            <h3>How to Use This Exercise</h3>
+            <ol>
+                <li>A 10-character pattern of 'B' and 'S' will appear for 5 seconds</li>
+                <li>Memorize the pattern and enter it in the input field</li>
+                <li>Click "Check Result" to verify your input</li>
+                <li>If correct, click "Right" to get the next pattern</li>
+                <li>If incorrect, click "Wrong" to get the next pattern</li>
+                <li>Use "Clear Input" to reset the input field</li>
+            </ol>
+            <p><strong>Tip:</strong> Focus on chunks of the pattern rather than individual characters for better recall.</p>
+        </div>
     </div>
 
-    <textarea id="extractedText" placeholder="Extracted continuous B/S sequence will appear here..." readonly></textarea>
-    <textarea id="generatedDB" placeholder="Generated DB appears here after extraction..." readonly></textarea>
-
-    <div class="slots" id="slotsContainer"></div>
-
-    <div class="controls-row">
-      <button id="btnB" class="btn b big">B</button>
-      <button id="btnS" class="btn s big">S</button>
-      <button id="getResult" class="btn big">Get Result</button>
-    </div>
-
-    <div class="result-box">Result: <span id="resultText">—</span></div>
-  </div>
-
-<script src="https://cdn.jsdelivr.net/npm/tesseract.js@4.0.2/dist/tesseract.min.js"></script>
-<script>
-const INPUT_LENGTH = 10;
-let database = [];
-let slots = [];
-
-const fileInput = document.getElementById('fileInput');
-const extractBtn = document.getElementById('extractBtn');
-const extractedText = document.getElementById('extractedText');
-const generatedDB = document.getElementById('generatedDB');
-const slotsContainer = document.getElementById('slotsContainer');
-const btnB = document.getElementById('btnB');
-const btnS = document.getElementById('btnS');
-const getResult = document.getElementById('getResult');
-const resultText = document.getElementById('resultText');
-const clearAll = document.getElementById('clearAll');
-
-function initSlots(){
-  slots = Array(INPUT_LENGTH).fill('');
-  renderSlots();
-}
-function renderSlots(){
-  slotsContainer.innerHTML = '';
-  for(let i=0;i<INPUT_LENGTH;i++){
-    const el = document.createElement('div');
-    el.className = 'slot' + (slots[i] ? ' filled' : '');
-    el.textContent = slots[i] || '-';
-    el.addEventListener('click', ()=> {
-      if(slots[i]){
-        slots[i] = '';
-        renderSlots();
-      }
-    });
-    slotsContainer.appendChild(el);
-  }
-}
-function setResult(txt){
-  resultText.textContent = txt;
-}
-function markMissingSlots(){
-  const els = slotsContainer.querySelectorAll('.slot');
-  for(let i=0;i<els.length;i++){
-    if(!slots[i]) els[i].classList.add('missing');
-    else els[i].classList.remove('missing');
-  }
-}
-function clearMissingMarks(){
-  const els = slotsContainer.querySelectorAll('.slot');
-  els.forEach(el => el.classList.remove('missing'));
-}
-
-function generateDatabaseFromSequence(seq){
-  const arr = [];
-  seq = seq.toUpperCase().replace(/[^BS]/g,'');
-  for(let i=0;i + INPUT_LENGTH < seq.length; i++){
-    const key = seq.substring(i, i+INPUT_LENGTH);
-    const next = seq.charAt(i+INPUT_LENGTH);
-    if(key.length===INPUT_LENGTH && (next==='B' || next==='S')){
-      arr.push(key + next);
-    }
-  }
-  return arr;
-}
-
-async function runOCROnFile(file){
-  extractedText.value = 'OCR running — please wait...';
-  generatedDB.value = '';
-  database = [];
-  try{
-    const { data: { text } } = await Tesseract.recognize(file, 'eng');
-    const seq = (text || '')
-      .replace(/\s+/g,'')
-      .replace(/[^A-Za-z]/g,'')
-      .split('')
-      .filter(ch => /[BSbs]/.test(ch))
-      .map(c => c.toUpperCase())
-      .join('');
-    if(!seq || seq.length < INPUT_LENGTH+1){
-      extractedText.value = seq || '';
-      generatedDB.value = 'Error: extracted too short.';
-      alert('OCR result too short.');
-      return;
-    }
-    extractedText.value = seq;
-    database = generateDatabaseFromSequence(seq);
-    if(database.length === 0){
-      generatedDB.value = 'No valid patterns found.';
-      alert('No patterns found.');
-      return;
-    }
-    generatedDB.value = database.join('\n');
-    initSlots();
-    setResult('—');
-    alert('Extraction successful — ' + database.length + ' entries.');
-  }catch(err){
-    console.error(err);
-    extractedText.value = '';
-    generatedDB.value = 'OCR failed.';
-    alert('OCR failed.');
-  }
-}
-
-function findMatch(inputStr){
-  if(!inputStr || inputStr.length !== INPUT_LENGTH) return {found:false, predicted:null};
-  for(let entry of database){
-    const key = entry.slice(0, INPUT_LENGTH);
-    const next = entry.charAt(INPUT_LENGTH);
-    if(key === inputStr){
-      return { found:true, predicted: next };
-    }
-  }
-  return { found:false, predicted:null};
-}
-
-getResult.addEventListener('click', ()=>{
-  clearMissingMarks();
-  if(slots.includes('') || slots.length !== INPUT_LENGTH){
-    markMissingSlots();
-    alert('Kripya pehle 10 inputs fill karein (B ya S) — touch se.');
-    return;
-  }
-  if(database.length === 0){
-    alert('Database empty — pehle image se Extract B/S karo.');
-    return;
-  }
-  const inputStr = slots.join('');
-  const res = findMatch(inputStr);
-  if(res.found){
-    setResult(res.predicted);
-  } else {
-    setResult('Result No Match');
-  }
-});
-
-function fillNext(val){
-  for(let i=0;i<INPUT_LENGTH;i++){
-    if(!slots[i]){
-      slots[i] = val;
-      renderSlots();
-      return;
-    }
-  }
-}
-btnB.addEventListener('click', ()=> fillNext('B'));
-btnS.addEventListener('click', ()=> fillNext('S'));
-clearAll.addEventListener('click', ()=>{
-  initSlots();
-  setResult('—');
-  clearMissingMarks();
-});
-
-document.addEventListener('keydown',(e)=>{
-  if(e.key.toLowerCase() === 'b') fillNext('B');
-  if(e.key.toLowerCase() === 's') fillNext('S');
-  if(e.key === 'Enter') getResult.click();
-  if(e.key === 'Backspace'){ 
-    for(let i=INPUT_LENGTH-1;i>=0;i--){
-      if(slots[i]){ slots[i]=''; renderSlots(); break; } 
-    } 
-  }
-});
-
-initSlots();
-extractBtn.addEventListener('click', async ()=>{
-  const f = fileInput.files && fileInput.files[0];
-  if(!f){ alert('Kripya image select karo pahle.'); return; }
-  await runOCROnFile(f);
-});
-</script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Predefined pattern (converted R to B as requested)
+            const fullPattern = "BSBBSBSSSBSBSBBBSSBSBBBSSBBSSBBSBBSSSSSBSSS SSSSSSSSSBBSSBBSSSBSSB SBBBSBBBBSSBSSBBBBSBSSBBSBBBSSBBSSSSBBSBSSBSSSBBBSSBBSSBSBBBSSBBSSSSBSSBSSBSSBBSSSSBBSBBSBBSSBSSSBSBBSSSBBSBSBSBBSSSBBSBSBSBSSBBSBSSBBSSSSBBSSBSSBSBBSSBBBBBSSSBSSBBSSBSSBBSSSSBBSBBSBBSSBBBSSSBSSSBSBBSSSSBSBBSSSBBSBSSBBSSSBBSSBSSSBBSBBSSSSBBSBBBRSSBSBBBSBSBBSSBBBSBBSBBSSBSBBBBSBBRBBSSSBSSSBBBSSBSSSRSSBSSSSBSSBBSSBSBSSSBBSBSBBBSBBSBSSSBSBSBBBSSBSBBBSSBBSSBBSBBSSSSSBSSS SSSSSSSSSBBSSBBSSSBSSB SBBBSBBBBSSBSSBBBBSBSSBBSBBBSSBBSSSSBBSBSSBSSSBBBSSBBSSBSBBBSSBBSSSSBSSBSSBSSBBSSSSBBSBBSBBSSBSSSBSBBSSSBBSBSBSBBSSSBBSBSBSBSSBBSBSSBBSSSSBBSSBSSBSBBSSBBBBBSSSBSSBBSSBSSBBSSSSBBSBBSBBSSBBBSSSBSSSBSBBSSSSBSBBSSSBBSBSSBBSSSBBSSBSSSBBSBBSSSSBBSBBBRSSBSBBBSBSBBSSBBBSBBSBBSSBSBBBBSBBRBBSSSBSSSBBBSSBSSSRSSBSSSSBSSBBSSBSBSSSBBSBSBB";
+            
+            // Process the pattern: remove spaces and convert R to B
+            const cleanPattern = fullPattern.replace(/ /g, '').replace(/R/g, 'B');
+            
+            // Split into 10-character chunks
+            const chunks = [];
+            for (let i = 0; i < cleanPattern.length; i += 10) {
+                chunks.push(cleanPattern.substring(i, i + 10));
+            }
+            
+            // DOM elements
+            const patternDisplay = document.getElementById('patternDisplay');
+            const userInput = document.getElementById('userInput');
+            const resultBtn = document.getElementById('resultBtn');
+            const rightBtn = document.getElementById('rightBtn');
+            const wrongBtn = document.getElementById('wrongBtn');
+            const clearBtn = document.getElementById('clearBtn');
+            const feedbackMessage = document.getElementById('feedbackMessage');
+            const countdownEl = document.getElementById('countdown');
+            
+            // State variables
+            let currentChunkIndex = 0;
+            let timer;
+            let secondsLeft = 5;
+            
+            // Initialize the exercise
+            function init() {
+                showPattern();
+            }
+            
+            // Display current pattern
+            function showPattern() {
+                patternDisplay.textContent = chunks[currentChunkIndex];
+                feedbackMessage.textContent = "";
+                userInput.value = "";
+                userInput.disabled = true;
+                resultBtn.disabled = true;
+                rightBtn.disabled = true;
+                wrongBtn.disabled = true;
+                
+                // Start countdown
+                secondsLeft = 5;
+                countdownEl.textContent = secondsLeft;
+                
+                clearInterval(timer);
+                timer = setInterval(() => {
+                    secondsLeft--;
+                    countdownEl.textContent = secondsLeft;
+                    
+                    if (secondsLeft <= 0) {
+                        clearInterval(timer);
+                        patternDisplay.textContent = "⏱️ Time's up! Enter what you remember";
+                        userInput.disabled = false;
+                        resultBtn.disabled = false;
+                        userInput.focus();
+                    }
+                }, 1000);
+            }
+            
+            // Check user input against current pattern
+            function checkResult() {
+                const userPattern = userInput.value.toUpperCase();
+                
+                // Validate input
+                if (userPattern.length !== 10) {
+                    feedbackMessage.textContent = "Please enter exactly 10 characters!";
+                    feedbackMessage.className = "incorrect";
+                    return;
+                }
+                
+                if (!/^[BS]+$/.test(userPattern)) {
+                    feedbackMessage.textContent = "Only 'B' and 'S' are allowed!";
+                    feedbackMessage.className = "incorrect";
+                    return;
+                }
+                
+                const currentPattern = chunks[currentChunkIndex];
+                const isCorrect = userPattern === currentPattern;
+                
+                if (isCorrect) {
+                    feedbackMessage.textContent = "✅ Correct! Well done!";
+                    feedbackMessage.className = "correct";
+                } else {
+                    feedbackMessage.textContent = `❌ Incorrect! The pattern was: ${currentPattern}`;
+                    feedbackMessage.className = "incorrect";
+                }
+                
+                resultBtn.disabled = true;
+                rightBtn.disabled = false;
+                wrongBtn.disabled = false;
+            }
+            
+            // Move to next pattern
+            function nextPattern() {
+                currentChunkIndex = (currentChunkIndex + 1) % chunks.length;
+                showPattern();
+            }
+            
+            // Event listeners
+            resultBtn.addEventListener('click', checkResult);
+            
+            rightBtn.addEventListener('click', () => {
+                feedbackMessage.textContent = "Great recall! Moving to next pattern...";
+                feedbackMessage.className = "correct";
+                setTimeout(nextPattern, 1500);
+            });
+            
+            wrongBtn.addEventListener('click', () => {
+                feedbackMessage.textContent = "Keep trying! Moving to next pattern...";
+                feedbackMessage.className = "incorrect";
+                setTimeout(nextPattern, 1500);
+            });
+            
+            clearBtn.addEventListener('click', () => {
+                userInput.value = "";
+                userInput.focus();
+            });
+            
+            userInput.addEventListener('input', function() {
+                this.value = this.value.toUpperCase().replace(/[^BS]/g, '');
+            });
+            
+            // Start the exercise
+            init();
+        });
+    </script>
 </body>
 </html>
