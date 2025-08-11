@@ -1,191 +1,224 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="hi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KWG Big/Small Pattern Checker</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #121212;
-            color: white;
-            background-image: url('https://images.unsplash.com/photo-1560672657-a0431178403f?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
-            background-size: cover;
-            background-attachment: fixed;
-            text-align: center;
-            padding: 20px;
-        }
-        .container {
-            background-color: rgba(0, 0, 0, 0.7);
-            border-radius: 15px;
-            padding: 25px;
-            max-width: 650px;
-            margin: 0 auto;
-            box-shadow: 0 0 20px rgba(255, 204, 0, 0.5);
-        }
-        h1 {
-            color: #ffcc00;
-            margin-bottom: 15px;
-        }
-        .input-grid {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            flex-wrap: wrap;
-            margin: 20px 0;
-        }
-        .input-btn {
-            padding: 15px 25px;
-            border: none;
-            border-radius: 30px;
-            font-weight: bold;
-            cursor: pointer;
-            font-size: 16px;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-        .big {
-            background: linear-gradient(45deg, #ff4444, #cc0000);
-            color: white;
-            box-shadow: 0 4px 10px rgba(255, 0, 0, 0.5);
-        }
-        .small {
-            background: linear-gradient(45deg, #44aaff, #0066cc);
-            color: white;
-            box-shadow: 0 4px 10px rgba(0, 150, 255, 0.5);
-        }
-        .input-btn:hover {
-            transform: scale(1.1);
-            box-shadow: 0 6px 15px rgba(255, 255, 255, 0.4);
-        }
-        #result {
-            font-size: 24px;
-            margin: 20px 0;
-            min-height: 40px;
-        }
-        .match {
-            color: #00ff00;
-            font-weight: bold;
-        }
-        .no-match {
-            color: #ff0000;
-            font-weight: bold;
-        }
-        .action-btn {
-            padding: 12px 30px;
-            border: none;
-            border-radius: 25px;
-            font-weight: bold;
-            font-size: 16px;
-            margin: 10px;
-            cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-        #clear-btn {
-            background: linear-gradient(45deg, #ffcc00, #ff9900);
-            color: black;
-            box-shadow: 0 4px 10px rgba(255, 200, 0, 0.5);
-        }
-        #check-btn {
-            background: linear-gradient(45deg, #00cc66, #00994d);
-            color: white;
-            box-shadow: 0 4px 10px rgba(0, 255, 100, 0.5);
-        }
-        .action-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 6px 15px rgba(255, 255, 255, 0.4);
-        }
-    </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>RAJA GAMES — Big/Small Predictor</title>
+<style>
+  :root{--bg1:#071029;--bg2:#0b3d91;--card:rgba(255,255,255,0.04)}
+  body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;font-family:Inter,Segoe UI,Roboto,Arial;background:linear-gradient(135deg,var(--bg1),var(--bg2));color:#fff;padding:18px}
+  .wrap{width:980px;max-width:100%;background:var(--card);border-radius:14px;padding:14px;box-shadow:0 8px 30px rgba(2,6,23,0.6);backdrop-filter:blur(6px)}
+  h1{margin:0 0 6px;font-size:18px}
+  .controls-row{display:flex;gap:8px;align-items:center;margin:12px 0;flex-wrap:wrap}
+  .btn{padding:8px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:rgba(255,255,255,0.03);color:#fff;font-weight:700;cursor:pointer}
+  .btn:active{transform:translateY(1px)}
+  .btn.big{padding:12px 16px;font-size:15px}
+  .btn.b{background:linear-gradient(180deg,#08306b,#0b58a0)}
+  .btn.s{background:linear-gradient(180deg,#4b2b00,#7a4b0d)}
+  .slots{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+  .slot{width:54px;height:54px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:20px;background:rgba(255,255,255,0.02);border:2px solid rgba(255,255,255,0.03);user-select:none}
+  .slot.filled{box-shadow:0 6px 18px rgba(0,0,0,0.4);transform:translateY(-2px)}
+  .slot.missing{border-color:#cc3b3b}
+  .result-box{margin-top:10px;padding:12px;border-radius:10px;background:rgba(0,0,0,0.25);font-weight:800;font-size:18px}
+  textarea{width:100%;height:120px;margin-top:8px;border-radius:8px;padding:8px;background:rgba(0,0,0,0.35);color:#e8f0ff;border:1px solid rgba(255,255,255,0.04);resize:vertical;font-family:monospace}
+  .small{font-size:13px;color:#dfefff;opacity:0.95}
+  .row{display:flex;gap:8px;align-items:center}
+  @media (max-width:640px){ .slot{width:44px;height:44px;font-size:18px} .btn.big{padding:10px 12px} }
+</style>
 </head>
 <body>
-    <div class="container">
-        <h1>KWG Big/Small Pattern Checker</h1>
-        
-        <div class="input-grid">
-            <button class="input-btn big" onclick="addInput('Big')">Big</button>
-            <button class="input-btn small" onclick="addInput('Small')">Small</button>
-        </div>
-        
-        <h3>Your Input:</h3>
-        <div id="current-input"></div>
-        
-        <div id="result"></div>
-        
-        <div>
-            <button id="check-btn" class="action-btn" onclick="checkPattern()">Check Result</button>
-            <button id="clear-btn" class="action-btn" onclick="clearInput()">Clear</button>
-        </div>
+  <div class="wrap">
+    <h1>RAJA GAMES — Big/Small Predictor</h1>
+    <div class="small">Upload image → extract continuous B/S → app generates database (10→next) automatically.</div>
+
+    <div style="margin-top:12px" class="row">
+      <input id="fileInput" type="file" accept="image/*" />
+      <button id="extractBtn" class="btn">Extract B/S from Image</button>
+      <button id="clearAll" class="btn">Clear Inputs</button>
     </div>
 
-    <script>
-        let userInput = [];
-        
-        function addInput(value) {
-            if (userInput.length < 6) {
-                userInput.push(value);
-                updateDisplay();
-            }
-        }
-        
-        function updateDisplay() {
-            document.getElementById('current-input').textContent = userInput.join(', ');
-        }
-        
-        function checkPattern() {
-            if (userInput.length < 6) {
-                document.getElementById('result').innerHTML = `<span class="no-match">Please enter 6 values first</span>`;
-                return;
-            }
+    <textarea id="extractedText" placeholder="Extracted continuous B/S sequence will appear here..." readonly></textarea>
+    <textarea id="generatedDB" placeholder="Generated DB appears here after extraction..." readonly></textarea>
 
-            const inputString = userInput.join(',');
-            const patterns = {
-                "Big,Small,Small,Small,Small,Big": "Big",
-                "Big,Small,Small,Small,Big,Big": "Big",
-                "Small,Big,Big,Big,Big,Big": "Small",
-                "Small,Big,Big,Big,Small,Small": "Small",
-                "Big,Big,Small,Small,Small,Small": "Small",
-                "Big,Small,Small,Big,Big,Small": "Big",
-                "Small,Small,Big,Big,Small,Small": "Small",
-                "Small,Small,Small,Small,Big,Big": "Big",
-                "Big,Big,Small,Big,Big,Big": "Small",
-                "Big,Small,Big,Small,Small,Big": "Big",
-                "Big,Big,Small,Big,Small,Small": "Big",
-                "Small,Small,Big,Small,Big,Small": "Small",
-                "Big,Small,Small,Small,Big,Small": "Big",
-                "Small,Big,Big,Big,Big,Big": "Small",
-                "Small,Big,Small,Small,Small,Big": "Small",
-                "Big,Big,Small,Small,Small,Small": "Big",
-                "Small,Small,Big,Big,Small,Small": "Small",
-                "Big,Big,Big,Small,Big,Small": "Small",
-                "Small,Small,Small,Big,Small,Small": "Small",
-                "Big,Big,Small,Big,Big,Small": "Big",
-                "Small,Big,Big,Big,Big,Small": "Big",
-                "Big,Small,Big,Big,Big,Big": "Big",
-                "Big,Big,Small,Small,Big,Small": "Big",
-                "Big,Small,Big,Small,Small,Big": "Small",
-                "Small,Small,Big,Small,Small,Small": "Small",
-                "Small,Big,Big,Small,Big,Small": "Big",
-                "Small,Small,Small,Big,Big,Small": "Big",
-                "Small,Big,Small,Small,Big,Big": "Small",
-                "Big,Big,Big,Big,Big,Big": "Big",
-                "Small,Big,Small,Big,Big,Small": "Small",
-                "Big,Big,Big,Small,Small,Small": "Big",
-                "Small,Big,Small,Big,Big,Big": "Big",
-                "Small,Small,Small,Small,Big,Small": "Big",
-                "Small,Small,Small,Big,Big,Small": "Big"
-            };
-            
-            if (patterns.hasOwnProperty(inputString)) {
-                document.getElementById('result').innerHTML = `Result: <span class="match">${patterns[inputString]}</span>`;
-            } else {
-                document.getElementById('result').innerHTML = `<span class="no-match">Result match nahin ho raha hai</span>`;
-            }
-        }
-        
-        function clearInput() {
-            userInput = [];
-            document.getElementById('current-input').textContent = "";
-            document.getElementById('result').textContent = "";
-        }
-    </script>
+    <div class="slots" id="slotsContainer"></div>
+
+    <div class="controls-row">
+      <button id="btnB" class="btn b big">B</button>
+      <button id="btnS" class="btn s big">S</button>
+      <button id="getResult" class="btn big">Get Result</button>
+    </div>
+
+    <div class="result-box">Result: <span id="resultText">—</span></div>
+  </div>
+
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@4.0.2/dist/tesseract.min.js"></script>
+<script>
+const INPUT_LENGTH = 10;
+let database = [];
+let slots = [];
+
+const fileInput = document.getElementById('fileInput');
+const extractBtn = document.getElementById('extractBtn');
+const extractedText = document.getElementById('extractedText');
+const generatedDB = document.getElementById('generatedDB');
+const slotsContainer = document.getElementById('slotsContainer');
+const btnB = document.getElementById('btnB');
+const btnS = document.getElementById('btnS');
+const getResult = document.getElementById('getResult');
+const resultText = document.getElementById('resultText');
+const clearAll = document.getElementById('clearAll');
+
+function initSlots(){
+  slots = Array(INPUT_LENGTH).fill('');
+  renderSlots();
+}
+function renderSlots(){
+  slotsContainer.innerHTML = '';
+  for(let i=0;i<INPUT_LENGTH;i++){
+    const el = document.createElement('div');
+    el.className = 'slot' + (slots[i] ? ' filled' : '');
+    el.textContent = slots[i] || '-';
+    el.addEventListener('click', ()=> {
+      if(slots[i]){
+        slots[i] = '';
+        renderSlots();
+      }
+    });
+    slotsContainer.appendChild(el);
+  }
+}
+function setResult(txt){
+  resultText.textContent = txt;
+}
+function markMissingSlots(){
+  const els = slotsContainer.querySelectorAll('.slot');
+  for(let i=0;i<els.length;i++){
+    if(!slots[i]) els[i].classList.add('missing');
+    else els[i].classList.remove('missing');
+  }
+}
+function clearMissingMarks(){
+  const els = slotsContainer.querySelectorAll('.slot');
+  els.forEach(el => el.classList.remove('missing'));
+}
+
+function generateDatabaseFromSequence(seq){
+  const arr = [];
+  seq = seq.toUpperCase().replace(/[^BS]/g,'');
+  for(let i=0;i + INPUT_LENGTH < seq.length; i++){
+    const key = seq.substring(i, i+INPUT_LENGTH);
+    const next = seq.charAt(i+INPUT_LENGTH);
+    if(key.length===INPUT_LENGTH && (next==='B' || next==='S')){
+      arr.push(key + next);
+    }
+  }
+  return arr;
+}
+
+async function runOCROnFile(file){
+  extractedText.value = 'OCR running — please wait...';
+  generatedDB.value = '';
+  database = [];
+  try{
+    const { data: { text } } = await Tesseract.recognize(file, 'eng');
+    const seq = (text || '')
+      .replace(/\s+/g,'')
+      .replace(/[^A-Za-z]/g,'')
+      .split('')
+      .filter(ch => /[BSbs]/.test(ch))
+      .map(c => c.toUpperCase())
+      .join('');
+    if(!seq || seq.length < INPUT_LENGTH+1){
+      extractedText.value = seq || '';
+      generatedDB.value = 'Error: extracted too short.';
+      alert('OCR result too short.');
+      return;
+    }
+    extractedText.value = seq;
+    database = generateDatabaseFromSequence(seq);
+    if(database.length === 0){
+      generatedDB.value = 'No valid patterns found.';
+      alert('No patterns found.');
+      return;
+    }
+    generatedDB.value = database.join('\n');
+    initSlots();
+    setResult('—');
+    alert('Extraction successful — ' + database.length + ' entries.');
+  }catch(err){
+    console.error(err);
+    extractedText.value = '';
+    generatedDB.value = 'OCR failed.';
+    alert('OCR failed.');
+  }
+}
+
+function findMatch(inputStr){
+  if(!inputStr || inputStr.length !== INPUT_LENGTH) return {found:false, predicted:null};
+  for(let entry of database){
+    const key = entry.slice(0, INPUT_LENGTH);
+    const next = entry.charAt(INPUT_LENGTH);
+    if(key === inputStr){
+      return { found:true, predicted: next };
+    }
+  }
+  return { found:false, predicted:null};
+}
+
+getResult.addEventListener('click', ()=>{
+  clearMissingMarks();
+  if(slots.includes('') || slots.length !== INPUT_LENGTH){
+    markMissingSlots();
+    alert('Kripya pehle 10 inputs fill karein (B ya S) — touch se.');
+    return;
+  }
+  if(database.length === 0){
+    alert('Database empty — pehle image se Extract B/S karo.');
+    return;
+  }
+  const inputStr = slots.join('');
+  const res = findMatch(inputStr);
+  if(res.found){
+    setResult(res.predicted);
+  } else {
+    setResult('Result No Match');
+  }
+});
+
+function fillNext(val){
+  for(let i=0;i<INPUT_LENGTH;i++){
+    if(!slots[i]){
+      slots[i] = val;
+      renderSlots();
+      return;
+    }
+  }
+}
+btnB.addEventListener('click', ()=> fillNext('B'));
+btnS.addEventListener('click', ()=> fillNext('S'));
+clearAll.addEventListener('click', ()=>{
+  initSlots();
+  setResult('—');
+  clearMissingMarks();
+});
+
+document.addEventListener('keydown',(e)=>{
+  if(e.key.toLowerCase() === 'b') fillNext('B');
+  if(e.key.toLowerCase() === 's') fillNext('S');
+  if(e.key === 'Enter') getResult.click();
+  if(e.key === 'Backspace'){ 
+    for(let i=INPUT_LENGTH-1;i>=0;i--){
+      if(slots[i]){ slots[i]=''; renderSlots(); break; } 
+    } 
+  }
+});
+
+initSlots();
+extractBtn.addEventListener('click', async ()=>{
+  const f = fileInput.files && fileInput.files[0];
+  if(!f){ alert('Kripya image select karo pahle.'); return; }
+  await runOCROnFile(f);
+});
+</script>
 </body>
 </html>
