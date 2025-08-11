@@ -3,282 +3,188 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Big/Small Predictor</title>
+    <title>KWG Big/Small Pattern Checker</title>
     <style>
         body {
             font-family: Arial, sans-serif;
+            background-color: #121212;
+            color: white;
+            background-image: url('https://images.unsplash.com/photo-1560672657-a0431178403f?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
+            background-size: cover;
+            background-attachment: fixed;
             text-align: center;
             padding: 20px;
-            background-color: #f0f0f0;
         }
         .container {
-            max-width: 800px;
+            background-color: rgba(0, 0, 0, 0.7);
+            border-radius: 15px;
+            padding: 25px;
+            max-width: 650px;
             margin: 0 auto;
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            box-shadow: 0 0 20px rgba(255, 204, 0, 0.5);
         }
-        .section {
+        h1 {
+            color: #ffcc00;
+            margin-bottom: 15px;
+        }
+        .input-grid {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
             margin: 20px 0;
         }
-        .buttons button {
-            margin: 5px;
-            padding: 10px 15px;
-            font-size: 16px;
-            cursor: pointer;
+        .input-btn {
+            padding: 15px 25px;
             border: none;
-            border-radius: 5px;
-            background-color: #007bff;
+            border-radius: 30px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 16px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .big {
+            background: linear-gradient(45deg, #ff4444, #cc0000);
             color: white;
+            box-shadow: 0 4px 10px rgba(255, 0, 0, 0.5);
         }
-        .buttons button:hover {
-            background-color: #0056b3;
+        .small {
+            background: linear-gradient(45deg, #44aaff, #0066cc);
+            color: white;
+            box-shadow: 0 4px 10px rgba(0, 150, 255, 0.5);
         }
-        .buttons button.selected {
-            background-color: #28a745;
-        }
-        #predictButton, #clearButton {
-            padding: 10px 20px;
-            font-size: 18px;
-            margin: 10px;
+        .input-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 15px rgba(255, 255, 255, 0.4);
         }
         #result {
-            margin-top: 20px;
             font-size: 24px;
-            font-weight: bold;
-            color: #333;
+            margin: 20px 0;
+            min-height: 40px;
         }
-        #currentInput {
-            margin-top: 10px;
-            font-size: 18px;
-            color: #555;
+        .match {
+            color: #00ff00;
+            font-weight: bold;
+        }
+        .no-match {
+            color: #ff0000;
+            font-weight: bold;
+        }
+        .action-btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 25px;
+            font-weight: bold;
+            font-size: 16px;
+            margin: 10px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        #clear-btn {
+            background: linear-gradient(45deg, #ffcc00, #ff9900);
+            color: black;
+            box-shadow: 0 4px 10px rgba(255, 200, 0, 0.5);
+        }
+        #check-btn {
+            background: linear-gradient(45deg, #00cc66, #00994d);
+            color: white;
+            box-shadow: 0 4px 10px rgba(0, 255, 100, 0.5);
+        }
+        .action-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 15px rgba(255, 255, 255, 0.4);
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Big/Small Predictor</h1>
+        <h1>KWG Big/Small Pattern Checker</h1>
         
-        <div class="section">
-            <h3>Select First Number</h3>
-            <div class="buttons" id="firstNumberButtons">
-                <button onclick="selectFirstNumber(0)">0</button>
-                <button onclick="selectFirstNumber(1)">1</button>
-                <button onclick="selectFirstNumber(2)">2</button>
-                <button onclick="selectFirstNumber(3)">3</button>
-                <button onclick="selectFirstNumber(4)">4</button>
-                <button onclick="selectFirstNumber(5)">5</button>
-                <button onclick="selectFirstNumber(6)">6</button>
-                <button onclick="selectFirstNumber(7)">7</button>
-                <button onclick="selectFirstNumber(8)">8</button>
-                <button onclick="selectFirstNumber(9)">9</button>
-            </div>
+        <div class="input-grid">
+            <button class="input-btn big" onclick="addInput('Big')">Big</button>
+            <button class="input-btn small" onclick="addInput('Small')">Small</button>
         </div>
-
-        <div class="section">
-            <h3>Select Second Number</h3>
-            <div class="buttons" id="secondNumberButtons">
-                <button onclick="selectSecondNumber(0)">0</button>
-                <button onclick="selectSecondNumber(1)">1</button>
-                <button onclick="selectSecondNumber(2)">2</button>
-                <button onclick="selectSecondNumber(3)">3</button>
-                <button onclick="selectSecondNumber(4)">4</button>
-                <button onclick="selectSecondNumber(5)">5</button>
-                <button onclick="selectSecondNumber(6)">6</button>
-                <button onclick="selectSecondNumber(7)">7</button>
-                <button onclick="selectSecondNumber(8)">8</button>
-                <button onclick="selectSecondNumber(9)">9</button>
-            </div>
-        </div>
-
-        <div class="section">
-            <h3>Select Sequence (4 Elements)</h3>
-            <div class="section">
-                <h4>Element 1</h4>
-                <div class="buttons" id="seq1Buttons">
-                    <button onclick="selectSequence(1, 'Big')">Big</button>
-                    <button onclick="selectSequence(1, 'Small')">Small</button>
-                </div>
-            </div>
-            <div class="section">
-                <h4>Element 2</h4>
-                <div class="buttons" id="seq2Buttons">
-                    <button onclick="selectSequence(2, 'Big')">Big</button>
-                    <button onclick="selectSequence(2, 'Small')">Small</button>
-                </div>
-            </div>
-            <div class="section">
-                <h4>Element 3</h4>
-                <div class="buttons" id="seq3Buttons">
-                    <button onclick="selectSequence(3, 'Big')">Big</button>
-                    <button onclick="selectSequence(3, 'Small')">Small</button>
-                </div>
-            </div>
-            <div class="section">
-                <h4>Element 4</h4>
-                <div class="buttons" id="seq4Buttons">
-                    <button onclick="selectSequence(4, 'Big')">Big</button>
-                    <button onclick="selectSequence(4, 'Small')">Small</button>
-                </div>
-            </div>
-        </div>
-
-        <div class="section">
-            <button id="predictButton" onclick="predict()">Predict</button>
-            <button id="clearButton" onclick="clearInputs()">Clear</button>
-        </div>
-
-        <div id="currentInput"></div>
+        
+        <h3>Your Input:</h3>
+        <div id="current-input"></div>
+        
         <div id="result"></div>
+        
+        <div>
+            <button id="check-btn" class="action-btn" onclick="checkPattern()">Check Result</button>
+            <button id="clear-btn" class="action-btn" onclick="clearInput()">Clear</button>
+        </div>
     </div>
 
     <script>
-        // Store patterns
-        const patterns = [
-            { numbers: [6, 7], sequence: ["Small", "Small", "Big", "Big"], result: "Small" },
-            { numbers: [7, 8], sequence: ["Small", "Big", "Big", "Big"], result: "Small" },
-            { numbers: [8, 9], sequence: ["Big", "Small", "Small", "Small"], result: "Big" },
-            { numbers: [0, 9], sequence: ["Small", "Small", "Big", "Big"], result: "Big" },
-            { numbers: [1, 0], sequence: ["Big", "Big", "Small", "Small"], result: "Small" },
-            { numbers: [2, 1], sequence: ["Small", "Big", "Big", "Small"], result: "Small" },
-            { numbers: [3, 2], sequence: ["Small", "Small", "Big", "Big"], result: "Small" },
-            { numbers: [4, 3], sequence: ["Small", "Small", "Small", "Big"], result: "Big" },
-            { numbers: [5, 4], sequence: ["Big", "Small", "Small", "Small"], result: "Small" },
-            { numbers: [6, 5], sequence: ["Small", "Big", "Small", "Small"], result: "Small" },
-            { numbers: [7, 6], sequence: ["Big", "Small", "Small", "Big"], result: "Small" },
-            { numbers: [7, 6], sequence: ["Big", "Big", "Big", "Small"], result: "Big" },
-            { numbers: [8, 7], sequence: ["Big", "Big", "Big", "Big"], result: "Big" },
-            { numbers: [9, 8], sequence: ["Big", "Big", "Big", "Big"], result: "Small" },
-            { numbers: [0, 9], sequence: ["Small", "Big", "Big", "Big"], result: "Small" },
-            { numbers: [1, 0], sequence: ["Small", "Small", "Big", "Big"], result: "Small" },
-            { numbers: [2, 1], sequence: ["Small", "Small", "Small", "Big"], result: "Small" },
-            { numbers: [3, 2], sequence: ["Small", "Small", "Small", "Small"], result: "Small" },
-            { numbers: [4, 3], sequence: ["Small", "Small", "Small", "Small"], result: "Small" },
-            { numbers: [5, 4], sequence: ["Small", "Small", "Small", "Small"], result: "Small" },
-            { numbers: [6, 5], sequence: ["Small", "Small", "Small", "Small"], result: "Big" },
-            { numbers: [7, 6], sequence: ["Big", "Small", "Small", "Small"], result: "Big" },
-            { numbers: [8, 7], sequence: ["Big", "Big", "Small", "Small"], result: "Big" },
-            { numbers: [9, 8], sequence: ["Big", "Big", "Big", "Small"], result: "Big" },
-            { numbers: [0, 9], sequence: ["Big", "Big", "Big", "Big"], result: "Small" },
-            { numbers: [1, 0], sequence: ["Small", "Big", "Big", "Big"], result: "Small" },
-            { numbers: [2, 1], sequence: ["Small", "Small", "Big", "Big"], result: "Small" },
-            { numbers: [0, 9], sequence: ["Small", "Big", "Small", "Small"], result: "Small" },
-            { numbers: [1, 0], sequence: ["Small", "Small", "Big", "Small"], result: "Big" },
-            { numbers: [2, 1], sequence: ["Big", "Small", "Small", "Big"], result: "Big" },
-            { numbers: [3, 2], sequence: ["Big", "Big", "Small", "Small"], result: "Big" },
-            { numbers: [4, 3], sequence: ["Big", "Big", "Big", "Small"], result: "Big" },
-            { numbers: [5, 4], sequence: ["Big", "Big", "Big", "Big"], result: "Big" },
-            { numbers: [6, 5], sequence: ["Big", "Big", "Big", "Big"], result: "Small" },
-            { numbers: [7, 6], sequence: ["Small", "Big", "Big", "Big"], result: "Big" },
-            { numbers: [8, 7], sequence: ["Big", "Small", "Big", "Big"], result: "Small" },
-            { numbers: [9, 8], sequence: ["Small", "Big", "Small", "Big"], result: "Small" },
-            { numbers: [0, 9], sequence: ["Small", "Small", "Big", "Small"], result: "Big" },
-            { numbers: [9, 8], sequence: ["Small", "Small", "Small", "Big"], result: "Small" }, // Pattern 61 (replaces original)
-            { numbers: [4, 3], sequence: ["Small", "Big", "Small", "Big"], result: "Small" }, // Pattern 56 (replaces original)
-            { numbers: [1, 0], sequence: ["Big", "Small", "Small", "Big"], result: "Small" }, // Pattern 53
-            { numbers: [2, 1], sequence: ["Small", "Big", "Small", "Small"], result: "Big" }, // Pattern 54
-            { numbers: [3, 2], sequence: ["Big", "Small", "Big", "Small"], result: "Small" }, // Pattern 55
-            { numbers: [5, 4], sequence: ["Small", "Small", "Big", "Small"], result: "Big" }, // Pattern 57
-            { numbers: [6, 5], sequence: ["Big", "Small", "Small", "Big"], result: "Small" }, // Pattern 58
-            { numbers: [7, 6], sequence: ["Small", "Big", "Small", "Small"], result: "Small" }, // Pattern 59
-            { numbers: [8, 7], sequence: ["Small", "Small", "Big", "Small"], result: "Small" }, // Pattern 60
-            { numbers: [0, 9], sequence: ["Small", "Small", "Small", "Small"], result: "Big" }, // Pattern 62
-            { numbers: [1, 0], sequence: ["Big", "Small", "Small", "Small"], result: "Big" }, // Pattern 63
-            { numbers: [2, 1], sequence: ["Big", "Big", "Small", "Small"], result: "Small" }, // Pattern 64
-            { numbers: [3, 2], sequence: ["Small", "Big", "Big", "Small"], result: "Small" }, // Pattern 65
-            { numbers: [4, 3], sequence: ["Small", "Small", "Big", "Big"], result: "Small" }, // Pattern 66
-            { numbers: [5, 4], sequence: ["Small", "Small", "Small", "Big"], result: "Big" }, // Pattern 67
-            { numbers: [6, 5], sequence: ["Big", "Small", "Small", "Small"], result: "Small" }, // Pattern 68
-            { numbers: [7, 6], sequence: ["Small", "Big", "Small", "Small"], result: "Big" }, // Pattern 69
-            { numbers: [8, 7], sequence: ["Big", "Small", "Big", "Small"], result: "Big" } // Pattern 70
-        ];
-
-        // Store current selections
-        let firstNumber = null;
-        let secondNumber = null;
-        let sequence = [null, null, null, null];
-
-        // Function to update button styles
-        function updateButtonStyles(buttonGroupId, selectedValue) {
-            const buttons = document.querySelectorAll(`#${buttonGroupId} button`);
-            buttons.forEach(button => {
-                button.classList.remove('selected');
-                if (button.textContent == selectedValue) {
-                    button.classList.add('selected');
-                }
-            });
+        let userInput = [];
+        
+        function addInput(value) {
+            if (userInput.length < 6) {
+                userInput.push(value);
+                updateDisplay();
+            }
         }
-
-        // Select first number
-        function selectFirstNumber(num) {
-            firstNumber = num;
-            updateButtonStyles('firstNumberButtons', num);
-            updateCurrentInput();
+        
+        function updateDisplay() {
+            document.getElementById('current-input').textContent = userInput.join(', ');
         }
-
-        // Select second number
-        function selectSecondNumber(num) {
-            secondNumber = num;
-            updateButtonStyles('secondNumberButtons', num);
-            updateCurrentInput();
-        }
-
-        // Select sequence element
-        function selectSequence(index, value) {
-            sequence[index - 1] = value;
-            updateButtonStyles(`seq${index}Buttons`, value);
-            updateCurrentInput();
-        }
-
-        // Update current input display
-        function updateCurrentInput() {
-            const inputDisplay = document.getElementById('currentInput');
-            const num1 = firstNumber !== null ? firstNumber : '-';
-            const num2 = secondNumber !== null ? secondNumber : '-';
-            const seq = sequence.map(s => s !== null ? s : '-').join(', ');
-            inputDisplay.textContent = `Current Input: Numbers: [${num1}, ${num2}], Sequence: [${seq}]`;
-        }
-
-        // Predict result
-        function predict() {
-            const resultDisplay = document.getElementById('result');
-            // Check if all inputs are selected
-            if (firstNumber === null || secondNumber === null || sequence.includes(null)) {
-                resultDisplay.textContent = 'Please select all inputs!';
+        
+        function checkPattern() {
+            if (userInput.length < 6) {
+                document.getElementById('result').innerHTML = `<span class="no-match">Please enter 6 values first</span>`;
                 return;
             }
 
-            // Find matching pattern
-            const inputSequence = sequence.slice(); // Copy sequence
-            let result = 'Unknown';
-            for (let pattern of patterns) {
-                if (pattern.numbers[0] === firstNumber &&
-                    pattern.numbers[1] === secondNumber &&
-                    pattern.sequence.join(',') === inputSequence.join(',')) {
-                    result = pattern.result;
-                    break;
-                }
+            const inputString = userInput.join(',');
+            const patterns = {
+                "Big,Small,Small,Small,Small,Big": "Big",
+                "Big,Small,Small,Small,Big,Big": "Big",
+                "Small,Big,Big,Big,Big,Big": "Small",
+                "Small,Big,Big,Big,Small,Small": "Small",
+                "Big,Big,Small,Small,Small,Small": "Small",
+                "Big,Small,Small,Big,Big,Small": "Big",
+                "Small,Small,Big,Big,Small,Small": "Small",
+                "Small,Small,Small,Small,Big,Big": "Big",
+                "Big,Big,Small,Big,Big,Big": "Small",
+                "Big,Small,Big,Small,Small,Big": "Big",
+                "Big,Big,Small,Big,Small,Small": "Big",
+                "Small,Small,Big,Small,Big,Small": "Small",
+                "Big,Small,Small,Small,Big,Small": "Big",
+                "Small,Big,Big,Big,Big,Big": "Small",
+                "Small,Big,Small,Small,Small,Big": "Small",
+                "Big,Big,Small,Small,Small,Small": "Big",
+                "Small,Small,Big,Big,Small,Small": "Small",
+                "Big,Big,Big,Small,Big,Small": "Small",
+                "Small,Small,Small,Big,Small,Small": "Small",
+                "Big,Big,Small,Big,Big,Small": "Big",
+                "Small,Big,Big,Big,Big,Small": "Big",
+                "Big,Small,Big,Big,Big,Big": "Big",
+                "Big,Big,Small,Small,Big,Small": "Big",
+                "Big,Small,Big,Small,Small,Big": "Small",
+                "Small,Small,Big,Small,Small,Small": "Small",
+                "Small,Big,Big,Small,Big,Small": "Big",
+                "Small,Small,Small,Big,Big,Small": "Big",
+                "Small,Big,Small,Small,Big,Big": "Small",
+                "Big,Big,Big,Big,Big,Big": "Big",
+                "Small,Big,Small,Big,Big,Small": "Small",
+                "Big,Big,Big,Small,Small,Small": "Big",
+                "Small,Big,Small,Big,Big,Big": "Big",
+                "Small,Small,Small,Small,Big,Small": "Big",
+                "Small,Small,Small,Big,Big,Small": "Big"
+            };
+            
+            if (patterns.hasOwnProperty(inputString)) {
+                document.getElementById('result').innerHTML = `Result: <span class="match">${patterns[inputString]}</span>`;
+            } else {
+                document.getElementById('result').innerHTML = `<span class="no-match">Result match nahin ho raha hai</span>`;
             }
-
-            resultDisplay.textContent = `Predicted Result: ${result}`;
         }
-
-        // Clear inputs
-        function clearInputs() {
-            firstNumber = null;
-            secondNumber = null;
-            sequence = [null, null, null, null];
-
-            // Reset button styles
-            ['firstNumberButtons', 'secondNumberButtons', 'seq1Buttons', 'seq2Buttons', 'seq3Buttons', 'seq4Buttons'].forEach(id => {
-                const buttons = document.querySelectorAll(`#${id} button`);
-                buttons.forEach(button => button.classList.remove('selected'));
-            });
-
-            // Clear displays
-            document.getElementById('currentInput').textContent = '';
-            document.getElementById('result').textContent = '';
+        
+        function clearInput() {
+            userInput = [];
+            document.getElementById('current-input').textContent = "";
+            document.getElementById('result').textContent = "";
         }
     </script>
 </body>
