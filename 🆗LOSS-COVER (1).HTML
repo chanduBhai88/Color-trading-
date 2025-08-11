@@ -1,3 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>B/S Pattern Memory Exercise</title>
+<style>
+    * {box-sizing: border-box;margin: 0;padding: 0;font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;}
+    body {background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);color: white;min-height: 100vh;padding: 20px;display: flex;justify-content: center;align-items: center;}
+    .container {width: 100%;max-width: 800px;background: rgba(0, 0, 0, 0.7);border-radius: 20px;padding: 30px;box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);text-align: center;}
+    h1 {font-size: 2.8rem;margin-bottom: 5px;text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);background: linear-gradient(to right, #4facfe, #00f2fe);-webkit-background-clip: text;background-clip: text;color: transparent;}
+    .subtitle {font-size: 1.2rem;margin-bottom: 25px;color: #bbb;}
+    .pattern-display {font-size: 3rem;letter-spacing: 8px;margin: 30px 0;padding: 25px;background: rgba(0, 0, 0, 0.4);border-radius: 15px;border: 2px solid #00f2fe;min-height: 140px;display: flex;justify-content: center;align-items: center;text-shadow: 0 0 10px rgba(0, 242, 254, 0.7);}
+    .timer {font-size: 1.2rem;margin-bottom: 20px;color: #4facfe;font-weight: bold;}
+    .input-label {display: block;margin-bottom: 15px;font-size: 1.3rem;color: #4facfe;}
+    #userInput {width: 100%;max-width: 500px;padding: 18px;font-size: 1.8rem;text-align: center;text-transform: uppercase;border: 3px solid #4facfe;border-radius: 12px;background: rgba(0, 0, 0, 0.5);color: white;letter-spacing: 5px;margin-bottom: 25px;}
+    .buttons {display: flex;justify-content: center;flex-wrap: wrap;gap: 15px;margin: 25px 0;}
+    button {padding: 15px 30px;font-size: 1.3rem;border: none;border-radius: 50px;cursor: pointer;transition: all 0.3s ease;font-weight: bold;min-width: 160px;text-transform: uppercase;letter-spacing: 1px;}
+    #resultBtn {background: linear-gradient(to right, #4facfe, #00f2fe);color: black;}
+    #resultBtn:hover {transform: translateY(-3px);box-shadow: 0 5px 15px rgba(0, 242, 254, 0.4);}
+    #resultBtn:disabled {background: #555;transform: none;box-shadow: none;cursor: not-allowed;}
+    #clearBtn {background: linear-gradient(to right, #8e2de2, #4a00e0);color: white;}
+    #clearBtn:hover {transform: translateY(-3px);box-shadow: 0 5px 15px rgba(255, 255, 255, 0.2);}
+    .feedback-section {margin-top: 30px;padding: 20px;border-radius: 15px;background: rgba(0, 0, 0, 0.4);border: 2px solid #8e2de2;}
+    .feedback-title {font-size: 1.4rem;margin-bottom: 15px;color: #4facfe;}
+    #feedbackMessage {font-size: 1.6rem;font-weight: bold;min-height: 40px;padding: 10px;}
+    .correct {color: #96c93d;text-shadow: 0 0 10px rgba(150, 201, 61, 0.7);}
+    .incorrect {color: #ff4b2b;text-shadow: 0 0 10px rgba(255, 75, 43, 0.7);}
+</style>
+</head>
+<body>
+<div class="container">
+    <h1>B/S PATTERN MEMORY TEST</h1>
+    <div class="subtitle">Spaces in input automatically removed</div>
+    <div class="pattern-display" id="patternDisplay">Get ready for the first pattern...</div>
+    <div class="timer">Pattern will be shown for: <span id="countdown">5</span> seconds</div>
+    <div class="input-label">Enter the pattern you remember (10 characters):</div>
+    <input type="text" id="userInput" maxlength="15" placeholder="Enter B/S characters" disabled>
+    <div class="buttons">
+        <button id="resultBtn" disabled>Check Result</button>
+        <button id="clearBtn">Clear Input</button>
+    </div>
+    <div class="feedback-section">
+        <div class="feedback-title">Feedback:</div>
+        <div id="feedbackMessage"></div>
+    </div>
+</div>
+
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     const fullPattern = "BSBBSBSSSBSBSBBBSSBSBBBSSBBSSBBSBBSSSSSBSSS SSSSSSSSSBBSSBBSSSBSSB SBBBSBBBBSSBSSBBBBSBSSBBSBBBSSBBSSSSBBSBSSBSSSBBBSSBBSSBSBBBSSBBSSSSBSSBSSBSSBBSSSSBBSBBSBBSSBSSSBSBBSSSBBSBSBSBBSSSBBSBSBSBSSBBSBSSBBSSSSBBSSBSSBSBBSSBBBBBSSSBSSBBSSBSSBBSSSSBBSBBSBBSSBBBSSSBSSSBSBBSSSSBSBBSSSBBSBSSBBSSSBBSSBSSSBBSBBSSSSBBSBBBRSSBSBBBSBSBBSSBBBSBBSBBSSBSBBBBSBBRBBSSSBSSSBBBSSBSSSRSSBSSSSBSSBBSSBSBSSSBBSBSBB";
@@ -73,7 +121,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         resultBtn.disabled = true;
-        setTimeout(nextPattern, 2000); // 2 sec baad next pattern
+        setTimeout(nextPattern, 2000);
     }
 
     function nextPattern() {
@@ -93,3 +141,5 @@ document.addEventListener('DOMContentLoaded', function () {
     init();
 });
 </script>
+</body>
+</html>
