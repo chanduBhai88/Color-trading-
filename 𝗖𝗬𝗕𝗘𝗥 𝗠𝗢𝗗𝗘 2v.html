@@ -52,12 +52,17 @@
     font-size: 2.5rem;
     margin-top: 20px;
     min-height: 60px;
+    text-align: center;
   }
   #right-wrong-buttons {
     margin-top: 20px;
   }
   #right-wrong-buttons button {
     min-width: 100px;
+  }
+  .stats {
+    margin-top: 20px;
+    font-size: 1.2rem;
   }
 </style>
 </head>
@@ -77,44 +82,56 @@
   <button id="btn-Result" disabled>Result</button>
 </div>
 
-<div id="result"></div>
+<div id="result">Enter 9 B/S pattern</div>
 
 <div id="right-wrong-buttons" style="display:none;">
   <button id="btn-Right">Right</button>
   <button id="btn-Wrong">Wrong</button>
 </div>
 
+<div class="stats">
+  <div>Total: <span id="total-count">0</span></div>
+  <div>Right: <span id="right-count">0</span></div>
+  <div>Wrong: <span id="wrong-count">0</span></div>
+  <div>Accuracy: <span id="accuracy">0</span>%</div>
+</div>
+
 <script>
-// --- Your long pattern data as array of objects ---
-// Each pattern: {input: "9-char B/S string", result: "B" or "S"}
-// I'll parse your given data to create a simplified example here for demo.
-// In practice, you should convert your big pattern dataset into this format.
-// For now, I'm creating a sample patterns object with some patterns to demo.
-
+// Extended pattern database (replace with your actual patterns)
 const patterns = [
-  // Example patterns for demo (replace with your full dataset)
-  { input: "BSSBBBBSB", result: "B" },
-  { input: "SSBBBBSBB", result: "S" },
+  { input: "BBBBBBBBB", result: "B" },
+  { input: "SSSSSSSSS", result: "S" },
   { input: "BSBSBSBSB", result: "B" },
-  { input: "BBBBSSSSB", result: "S" },
-  { input: "BSSBBSBBS", result: "S" },
-  // ... add your actual patterns here
+  { input: "SBSBSBSBS", result: "S" },
+  { input: "BBBSSSBBB", result: "B" },
+  { input: "SSSBBBSSS", result: "S" },
+  { input: "BBSBBSBBS", result: "S" },
+  { input: "SSBSBSBBS", result: "B" },
+  { input: "BSSBSSBSS", result: "S" },
+  { input: "SBBBSBBBS", result: "B" },
+  { input: "BBSSBBSSB", result: "B" },
+  { input: "SSBBSSBBS", result: "S" },
+  { input: "BSBSSBSBB", result: "B" },
+  { input: "SBSBBSBSB", result: "S" },
+  { input: "BSSBBBSSB", result: "B" },
+  { input: "SBBSSSBBS", result: "S" },
+  { input: "BBSSBBSBB", result: "B" },
+  { input: "SSBBSBSSB", result: "S" },
+  { input: "BSBSBBSBS", result: "B" },
+  { input: "SBSBSBBSB", result: "S" },
+  // Add more patterns here...
 ];
-
-// A function to find result for a given 9-digit input string from patterns
-function findResult(inputStr) {
-  for (const pattern of patterns) {
-    if (pattern.input === inputStr) {
-      return pattern.result;
-    }
-  }
-  return null; // no match found
-}
 
 // App state
 let currentInput = "";
 let awaitingFeedback = false;
+let stats = {
+  total: 0,
+  right: 0,
+  wrong: 0
+};
 
+// DOM elements
 const inputDisplay = document.getElementById("input-display");
 const btnB = document.getElementById("btn-B");
 const btnS = document.getElementById("btn-S");
@@ -124,11 +141,48 @@ const resultDiv = document.getElementById("result");
 const rightWrongDiv = document.getElementById("right-wrong-buttons");
 const btnRight = document.getElementById("btn-Right");
 const btnWrong = document.getElementById("btn-Wrong");
+const totalCount = document.getElementById("total-count");
+const rightCount = document.getElementById("right-count");
+const wrongCount = document.getElementById("wrong-count");
+const accuracy = document.getElementById("accuracy");
+
+// Improved pattern matching function
+function findResult(inputStr) {
+  // First try exact match
+  const exactMatch = patterns.find(p => p.input === inputStr);
+  if (exactMatch) return exactMatch.result;
+  
+  // Then try partial match (last 8 characters)
+  const partial8 = inputStr.slice(1);
+  const match8 = patterns.find(p => p.input.slice(1) === partial8);
+  if (match8) return match8.result;
+  
+  // Then try partial match (last 7 characters)
+  const partial7 = inputStr.slice(2);
+  const match7 = patterns.find(p => p.input.slice(2) === partial7);
+  if (match7) return match7.result;
+  
+  // Then try most common result if no matches found
+  const bCount = patterns.filter(p => p.result === "B").length;
+  const sCount = patterns.filter(p => p.result === "S").length;
+  return bCount > sCount ? "B" : "S";
+}
+
+// Update statistics display
+function updateStats() {
+  totalCount.textContent = stats.total;
+  rightCount.textContent = stats.right;
+  wrongCount.textContent = stats.wrong;
+  const acc = stats.total > 0 ? Math.round((stats.right / stats.total) * 100) : 0;
+  accuracy.textContent = acc;
+}
 
 // Helper: update input display
 function updateInputDisplay() {
-  // Show spaced input for clarity
   inputDisplay.textContent = currentInput.split("").join(" ");
+  if (currentInput.length === 9) {
+    resultDiv.textContent = "Click Result to predict";
+  }
 }
 
 // Helper: reset all states for new input
@@ -136,7 +190,6 @@ function resetInput() {
   currentInput = "";
   updateInputDisplay();
   btnResult.disabled = true;
-  resultDiv.textContent = "";
   rightWrongDiv.style.display = "none";
   awaitingFeedback = false;
   enableBSButtons(true);
@@ -146,12 +199,12 @@ function resetInput() {
 function enableBSButtons(enable) {
   btnB.disabled = !enable;
   btnS.disabled = !enable;
-  btnClear.disabled = !enable ? false : currentInput.length === 0; // Clear always enabled if input present
+  btnClear.disabled = !enable ? false : currentInput.length === 0;
 }
 
 // Event: Clicking B or S buttons
 function onBSClick(char) {
-  if (awaitingFeedback) return; // block input until feedback given
+  if (awaitingFeedback) return;
   if (currentInput.length < 9) {
     currentInput += char;
     updateInputDisplay();
@@ -167,29 +220,46 @@ function onBSClick(char) {
 function onClear() {
   if (awaitingFeedback) return;
   resetInput();
+  resultDiv.textContent = "Enter 9 B/S pattern";
 }
 
 // Event: Show result after 9 inputs
 function onResult() {
-  if (currentInput.length !== 9) return; // safety check
+  if (currentInput.length !== 9) return;
 
   const res = findResult(currentInput);
-  if (res === null) {
-    resultDiv.textContent = "No Match Found";
-  } else {
-    resultDiv.textContent = "Result: " + res;
-  }
-
+  resultDiv.innerHTML = `Prediction: <strong>${res}</strong>`;
+  
   awaitingFeedback = true;
   rightWrongDiv.style.display = "block";
   btnResult.disabled = true;
   btnClear.disabled = true;
 }
 
-// Event: User clicks Right or Wrong
+// Event: User feedback on prediction
 function onFeedback(isRight) {
-  // For now, just clear input and allow new input
-  resetInput();
+  stats.total++;
+  if (isRight) {
+    stats.right++;
+    resultDiv.innerHTML = "✅ Prediction was correct";
+  } else {
+    stats.wrong++;
+    resultDiv.innerHTML = "❌ Prediction was wrong";
+  }
+  updateStats();
+  
+  // Add the new pattern to database if it didn't exist
+  const existingPattern = patterns.find(p => p.input === currentInput);
+  if (!existingPattern) {
+    const res = resultDiv.textContent.includes("B") ? "B" : "S";
+    patterns.push({
+      input: currentInput,
+      result: isRight ? res : (res === "B" ? "S" : "B")
+    });
+  }
+  
+  // Reset for next input after delay
+  setTimeout(resetInput, 1500);
 }
 
 // Bind events
@@ -200,9 +270,22 @@ btnResult.addEventListener("click", onResult);
 btnRight.addEventListener("click", () => onFeedback(true));
 btnWrong.addEventListener("click", () => onFeedback(false));
 
-// Init
-resetInput();
+// Keyboard support
+document.addEventListener("keydown", (e) => {
+  if (e.key.toUpperCase() === "B") {
+    btnB.click();
+  } else if (e.key.toUpperCase() === "S") {
+    btnS.click();
+  } else if (e.key === "Enter" && !btnResult.disabled) {
+    btnResult.click();
+  } else if (e.key === "Escape") {
+    btnClear.click();
+  }
+});
 
+// Initialize
+resetInput();
+updateStats();
 </script>
 </body>
 </html>
