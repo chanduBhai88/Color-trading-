@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Raja Luck Game Pattern Predictor</title>
+<style>
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #0b3d91, #071029);
+    color: #eee;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 30px;
+    min-height: 100vh;
+    margin: 0;
+  }
+  h1 {
+    margin-bottom: 10px;
+    text-shadow: 0 0 8px #2196f3;
+  }
+  .input-container {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 15px;
+  }
+  .bs-button {
+    width: 40px;
+    height: 40px;
+    border-radius: 6px;
+    border: none;
+    font-weight: bold;
+    font-size: 20px;
+    cursor: pointer;
+    background-color: #1144cc;
+    color: white;
+    transition: background-color 0.3s ease;
+    user-select: none;
+  }
+  .bs-button.active {
+    background-color: #00c853;
+    color: #fff;
+  }
+  .buttons {
+    margin: 15px 0;
+    display: flex;
+    gap: 15px;
+  }
+  button#predict, button#clear {
+    font-size: 16px;
+    padding: 10px 18px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    color: white;
+    background-color: #2196f3;
+    box-shadow: 0 4px 8px #0d47a1;
+    transition: background-color 0.3s ease;
+  }
+  button#clear {
+    background-color: #f44336;
+    box-shadow: 0 4px 8px #b71c1c;
+  }
+  button#predict:hover {
+    background-color: #0d47a1;
+  }
+  button#clear:hover {
+    background-color: #b71c1c;
+  }
+  #result {
+    font-size: 22px;
+    margin-top: 20px;
+    min-height: 28px;
+    font-weight: 700;
+    text-shadow: 0 0 6px #00e676;
+  }
+  footer {
+    margin-top: auto;
+    font-size: 12px;
+    color: #777;
+  }
+</style>
+</head>
+<body>
+
+<h1>Raja Luck Game Predictor</h1>
+
+<p>Click 8 times to input pattern (B or S). Then press Predict.</p>
+
+<div class="input-container" id="inputContainer">
+  <!-- 8 buttons will appear here -->
+</div>
+
+<div class="buttons">
+  <button id="predict">Predict</button>
+  <button id="clear">Clear</button>
+</div>
+
+<div id="result"></div>
+
+<footer>Created by ChatGPT for Raja Luck Game</footer>
+
+<script>
+  // Pattern data: first 8 are input, 9th is prediction result
+  const rawData = `
+B,S,S,B,B,B,B,S,B
+S,B,S,S,B,S,S,S,B
+B,S,S,S,B,S,B,B,S
+B,S,B,S,B,B,B,S,B
+S,B,B,B,S,B,B,B,B
+B,S,S,B,S,B,B,S,S
+B,S,B,B,S,B,B,B,B
+S,B,B,B,B,B,S,B,S
+B,S,S,B,B,B,S,B,B
+S,B,S,B,B,S,B,S,S
+B,B,S,B,S,B,B,S,B
+S,B,S,B,S,B,B,S,B
+B,S,B,B,B,S,B,S,S
+S,B,S,S,B,S,B,S,S
+B,S,B,S,B,B,S,B,S
+B,S,S,B,B,S,B,S,S
+S,B,S,B,B,S,B,S,S
+B,S,B,B,S,B,B,B,B
+B,S,B,B,B,S,B,S,S
+B,S,B,S,B,B,B,S,B
+B,B,B,S,B,B,B,B,B
+B,S,B,B,S,B,S,S,B
+B,B,S,B,B,S,B,B,B
+B,B,S,B,B,S,B,S,S
+S,S,B,S,B,B,B,S,S
+B,S,B,B,S,B,B,S,S
+S,B,B,S,B,B,B,S,B
+B,S,B,S,B,B,B,B,B
+B,S,S,B,B,B,S,B,S
+B,B,S,B,B,S,B,B,B
+B,B,S,S,S,B,B,B,S
+S,B,S,B,B,B,S,B,B
+B,S,B,B,S,B,B,B,B
+B,S,B,S,B,S,B,B,B
+B,S,S,B,B,B,B,B,B
+B,S,S,S,S,S,B,S,S
+S,B,B,B,S,B,B,S,B
+B,S,S,B,S,B,B,B,B
+B,S,B,S,B,B,B,S,B
+B,B,S,B,B,S,B,B,B
+B,S,B,B,S,B,B,B,B
+S,B,S,B,B,S,B,S,S
+B,S,S,B,B,B,S,B,S
+B,S,B,S,B,B,S,B,S
+S,B,S,B,S,B,B,B,B
+
+S,B,B,B,B,S,S,S,S
+B,B,S,B,S,S,S,S,S
+S,B,B,S,B,B,B,B,S
+S,S,B,S,B,S,B,S,S
+B,B,S,S,B,S,B,B,B
+B,S,B,S,B,B,S,B,S
+B,S,S,B,B,S,B,S,S
+`;
+
+  // Parse rawData into patternDB
+  const patternDB = [];
+  rawData.trim().split('\n').forEach(line => {
+    const parts = line.trim().split(',');
+    if(parts.length >= 9){
+      const pattern = parts.slice(0,8).join(',');
+      const result = parts[8];
+      patternDB.push({pattern, result});
+    }
+  });
+
+  const inputContainer = document.getElementById('inputContainer');
+  const predictBtn = document.getElementById('predict');
+  const clearBtn = document.getElementById('clear');
+  const resultDiv = document.getElementById('result');
+
+  // Initialize user input with all 'B'
+  let userInput = Array(8).fill('B');
+
+  // Create 8 input buttons with initial 'B'
+  for(let i=0; i<8; i++){
+    const btn = document.createElement('button');
+    btn.classList.add('bs-button');
+    btn.textContent = 'B';
+    btn.dataset.index = i;
+    btn.addEventListener('click', () => {
+      // Cycle B -> S -> B
+      btn.textContent = btn.textContent === 'B' ? 'S' : 'B';
+      userInput[btn.dataset.index] = btn.textContent;
+      resultDiv.textContent = '';
+    });
+    inputContainer.appendChild(btn);
+  }
+
+  predictBtn.addEventListener('click', () => {
+    if(userInput.length < 8){
+      resultDiv.textContent = "Please input all 8 digits.";
+      return;
+    }
+    const inputPattern = userInput.join(',');
+    const found = patternDB.find(p => p.pattern === inputPattern);
+    if(found){
+      resultDiv.textContent = `Prediction: ${found.result}`;
+    } else {
+      resultDiv.textContent = "No Match Found";
+    }
+  });
+
+  clearBtn.addEventListener('click', () => {
+    userInput = Array(8).fill('B');
+    Array.from(inputContainer.children).forEach(btn => {
+      btn.textContent = 'B';
+    });
+    resultDiv.textContent = '';
+  });
+</script>
+
+</body>
+</html>
