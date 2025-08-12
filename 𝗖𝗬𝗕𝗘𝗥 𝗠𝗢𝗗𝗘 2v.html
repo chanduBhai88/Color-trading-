@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>RAJA GAMES — 7-digit B/S Predictor</title>
+<title>7-digit B/S Predictor</title>
 <style>
   body{
     font-family: Arial, sans-serif;
@@ -44,9 +44,7 @@
 <body>
   <div class="card">
     <h1>7-digit B/S Predictor</h1>
-    <div class="input-row" id="inputRow">
-      <!-- 6 cells -->
-    </div>
+    <div class="input-row" id="inputRow"></div>
     <div class="controls">
       <button id="resultBtn" class="btn-result">RESULT</button>
       <button id="clearBtn" class="btn-clear">CLEAR</button>
@@ -55,28 +53,26 @@
   </div>
 
 <script>
-/*
-  PATTERNS: array of objects { input: "BBBBSS", next: "B" }
-  input = first 6 chars
-  next = 7th char
-*/
+// Converted from your image (R→B, G→S, V→S)
+// Format: first 6 inputs = 'input', 7th = 'next'
 const PATTERNS = [
-  // Converted from your list (R→B, G→S, V→S)
-  // Example: first pattern from your data
   { input: "BSSBBS", next: "B" },
-  { input: "SSSBB", next: "S" }, // <-- fill from actual sequence
-  // Add rest patterns here
+  { input: "SSBSSS", next: "B" },
+  { input: "BBBSBB", next: "B" },
+  { input: "SBSSBS", next: "S" },
+  { input: "SSBSSB", next: "B" },
+  { input: "BSSBSS", next: "B" },
+  { input: "BSSBBS", next: "B" }
 ];
 
 const cells = [];
 const inputRow = document.getElementById('inputRow');
 const resultDiv = document.getElementById('result');
 
-// create 6 clickable cells
-for (let i=0;i<6;i++){
+// Create 6 clickable cells
+for (let i=0; i<6; i++){
   const c = document.createElement('div');
   c.className = 'cell';
-  c.dataset.pos = i;
   c.textContent = '';
   c.addEventListener('click', () => {
     const cur = c.textContent;
@@ -105,12 +101,12 @@ document.getElementById('resultBtn').addEventListener('click', () => {
 });
 
 function showResult(text){
-  resultDiv.style.display='block';
+  resultDiv.style.display = 'block';
   resultDiv.textContent = text;
 }
 function clearAll(){
   cells.forEach(c => { c.textContent=''; c.classList.remove('activeB','activeS'); });
-  resultDiv.style.display='none';
+  resultDiv.style.display = 'none';
 }
 </script>
 </body>
