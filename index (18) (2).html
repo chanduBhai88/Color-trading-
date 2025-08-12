@@ -161,13 +161,14 @@ B,S,B,S,B,B,S,B,S
 B,S,S,B,B,S,B,S,S
 `;
 
-  // Parse rawData into patternDB
+  // Parse rawData into patternDB with trim to avoid spaces issue
   const patternDB = [];
   rawData.trim().split('\n').forEach(line => {
     const parts = line.trim().split(',');
     if(parts.length >= 9){
-      const pattern = parts.slice(0,8).join(',');
-      const result = parts[8];
+      const patternParts = parts.slice(0,8).map(x => x.trim());
+      const pattern = patternParts.join(',');
+      const result = parts[8].trim();
       patternDB.push({pattern, result});
     }
   });
@@ -187,7 +188,6 @@ B,S,S,B,B,S,B,S,S
     btn.textContent = 'B';
     btn.dataset.index = i;
     btn.addEventListener('click', () => {
-      // Cycle B -> S -> B
       btn.textContent = btn.textContent === 'B' ? 'S' : 'B';
       userInput[btn.dataset.index] = btn.textContent;
       resultDiv.textContent = '';
