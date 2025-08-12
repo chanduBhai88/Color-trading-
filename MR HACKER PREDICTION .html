@@ -1,434 +1,288 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>B/S Pattern Memory Exercise</title>
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        
-        body {
-            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
-            color: white;
-            min-height: 100vh;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        
-        .container {
-            width: 100%;
-            max-width: 800px;
-            background: rgba(0, 0, 0, 0.7);
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            text-align: center;
-        }
-        
-        h1 {
-            font-size: 2.8rem;
-            margin-bottom: 5px;
-            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
-            background: linear-gradient(to right, #4facfe, #00f2fe);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-        }
-        
-        .subtitle {
-            font-size: 1.2rem;
-            margin-bottom: 25px;
-            color: #bbb;
-        }
-        
-        .pattern-display {
-            font-size: 3rem;
-            letter-spacing: 8px;
-            margin: 30px 0;
-            padding: 25px;
-            background: rgba(0, 0, 0, 0.4);
-            border-radius: 15px;
-            border: 2px solid #00f2fe;
-            min-height: 140px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            text-shadow: 0 0 10px rgba(0, 242, 254, 0.7);
-        }
-        
-        .timer {
-            font-size: 1.2rem;
-            margin-bottom: 20px;
-            color: #4facfe;
-            font-weight: bold;
-        }
-        
-        .input-section {
-            margin: 25px 0;
-        }
-        
-        .input-label {
-            display: block;
-            margin-bottom: 15px;
-            font-size: 1.3rem;
-            color: #4facfe;
-        }
-        
-        #userInput {
-            width: 100%;
-            max-width: 500px;
-            padding: 18px;
-            font-size: 1.8rem;
-            text-align: center;
-            text-transform: uppercase;
-            border: 3px solid #4facfe;
-            border-radius: 12px;
-            background: rgba(0, 0, 0, 0.5);
-            color: white;
-            letter-spacing: 5px;
-            margin-bottom: 25px;
-        }
-        
-        .buttons {
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
-            gap: 15px;
-            margin: 25px 0;
-        }
-        
-        button {
-            padding: 15px 30px;
-            font-size: 1.3rem;
-            border: none;
-            border-radius: 50px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-weight: bold;
-            min-width: 160px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        
-        #resultBtn {
-            background: linear-gradient(to right, #4facfe, #00f2fe);
-            color: black;
-        }
-        
-        #resultBtn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0, 242, 254, 0.4);
-        }
-        
-        #resultBtn:disabled {
-            background: #555;
-            transform: none;
-            box-shadow: none;
-            cursor: not-allowed;
-        }
-        
-        #rightBtn {
-            background: linear-gradient(to right, #00b09b, #96c93d);
-            color: black;
-        }
-        
-        #wrongBtn {
-            background: linear-gradient(to right, #ff416c, #ff4b2b);
-            color: white;
-        }
-        
-        #clearBtn {
-            background: linear-gradient(to right, #8e2de2, #4a00e0);
-            color: white;
-        }
-        
-        #rightBtn:hover, #wrongBtn:hover, #clearBtn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(255, 255, 255, 0.2);
-        }
-        
-        #rightBtn:disabled, #wrongBtn:disabled {
-            background: #555;
-            transform: none;
-            box-shadow: none;
-            cursor: not-allowed;
-        }
-        
-        .feedback-section {
-            margin-top: 30px;
-            padding: 20px;
-            border-radius: 15px;
-            background: rgba(0, 0, 0, 0.4);
-            border: 2px solid #8e2de2;
-        }
-        
-        .feedback-title {
-            font-size: 1.4rem;
-            margin-bottom: 15px;
-            color: #4facfe;
-        }
-        
-        #feedbackMessage {
-            font-size: 1.6rem;
-            font-weight: bold;
-            min-height: 40px;
-            padding: 10px;
-        }
-        
-        .correct {
-            color: #96c93d;
-            text-shadow: 0 0 10px rgba(150, 201, 61, 0.7);
-        }
-        
-        .incorrect {
-            color: #ff4b2b;
-            text-shadow: 0 0 10px rgba(255, 75, 43, 0.7);
-        }
-        
-        .instructions {
-            background: rgba(0, 0, 0, 0.4);
-            border-radius: 15px;
-            padding: 20px;
-            margin-top: 25px;
-            border: 2px solid #00f2fe;
-            text-align: left;
-        }
-        
-        .instructions h3 {
-            color: #4facfe;
-            margin-bottom: 15px;
-            text-align: center;
-        }
-        
-        .instructions ol {
-            padding-left: 20px;
-            margin-bottom: 15px;
-        }
-        
-        .instructions li {
-            margin-bottom: 10px;
-            line-height: 1.5;
-        }
-        
-        .input-hint {
-            color: #ffcc00;
-            font-size: 1.1rem;
-            margin-top: -10px;
-            margin-bottom: 20px;
-        }
-        
-        @media (max-width: 600px) {
-            .container {
-                padding: 15px;
-            }
-            
-            h1 {
-                font-size: 2rem;
-            }
-            
-            .pattern-display {
-                font-size: 2rem;
-                padding: 15px;
-                min-height: 110px;
-            }
-            
-            button {
-                min-width: 140px;
-                padding: 12px 20px;
-                font-size: 1.1rem;
-            }
-            
-            #userInput {
-                font-size: 1.4rem;
-                padding: 15px;
-            }
-        }
-    </style>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>RAJA GAMES — 8-digit B/S Predictor</title>
+<style>
+  :root{
+    --bg:#0b1220; --card:#071427; --accent:#00ff7f; --text:#d6f8e6;
+    --muted:#9fb5a3; --btn:#0f1720;
+  }
+  [data-theme="white"]{
+    --bg:#f7fafc; --card:#ffffff; --accent:#0b6cff; --text:#0b1220; --muted:#6b7280; --btn:#eef2ff;
+  }
+
+  *{box-sizing:border-box;font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;}
+  body{margin:0;background:linear-gradient(180deg,var(--bg),#061022); color:var(--text); min-height:100vh; display:flex;align-items:center;justify-content:center;padding:24px;}
+  .app{width:920px; max-width:96vw; background:var(--card); border-radius:12px; padding:18px; box-shadow: 0 8px 30px rgba(0,0,0,0.5); position:relative; overflow:hidden;}
+  .header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
+  .title{font-size:20px;font-weight:700;letter-spacing:0.6px}
+  .controls{display:flex;gap:8px;align-items:center}
+  button{background:var(--btn); color:var(--text); border:0; padding:8px 12px; border-radius:8px; cursor:pointer; font-weight:600}
+  button.ghost{background:transparent;border:1px solid rgba(255,255,255,0.06)}
+  .grid{display:grid;grid-template-columns:1fr 360px; gap:14px}
+  .left{padding:12px}
+  .right{padding:12px;background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent); border-radius:10px; min-height:320px}
+  .inputs{display:flex;gap:8px;margin:12px 0;}
+  .slot{width:44px;height:44px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px;background:rgba(255,255,255,0.02);cursor:pointer;border:1px solid rgba(255,255,255,0.03)}
+  .slot.active-b{background:rgba(0,0,0,0.35); color:#fff}
+  .slot.active-s{background:rgba(255,255,255,0.05); color:#fff}
+  .big-btn{width:100%; padding:12px 16px; border-radius:10px; font-size:16px}
+  .result-box{margin-top:12px;padding:10px;border-radius:8px;background:rgba(255,255,255,0.02);min-height:70px; display:flex;flex-direction:column;gap:8px}
+  .result-value{font-size:28px;font-weight:800}
+  .small{font-size:13px;color:var(--muted)}
+  .history{margin-top:12px; display:flex; gap:8px; flex-wrap:wrap}
+  .chip{padding:6px 10px;border-radius:999px;background:rgba(255,255,255,0.03); font-weight:700}
+  .footer{margin-top:12px; font-size:13px; color:var(--muted)}
+  .theme-hint{font-size:12px;color:var(--muted)}
+  /* Hacker theme special look */
+  .hacker-bg::before{
+    content:"";
+    position:absolute; left:-30%; top:-20%; width:160%; height:140%; background-image:radial-gradient(circle at 10% 10%, rgba(0,255,123,0.03), transparent 2%), linear-gradient(90deg, rgba(0,0,0,0.12), transparent 50%);
+    transform:rotate(-8deg);
+    pointer-events:none;
+  }
+  /* small responsive */
+  @media (max-width:860px){
+    .grid{grid-template-columns:1fr}
+    .right{order:2}
+  }
+</style>
 </head>
 <body>
-    <div class="container">
-        <h1>B/S PATTERN MEMORY TEST</h1>
-        <div class="subtitle">Enhanced version - spaces in input automatically removed</div>
-        
-        <div class="pattern-display" id="patternDisplay">
-            Get ready for the first pattern...
-        </div>
-        
-        <div class="timer" id="timer">
-            Pattern will be shown for: <span id="countdown">5</span> seconds
-        </div>
-        
-        <div class="input-section">
-            <div class="input-label">Enter the pattern you remember (10 characters):</div>
-            <div class="input-hint">Spaces will be automatically removed during validation</div>
-            <input type="text" id="userInput" maxlength="15" placeholder="Enter B/S characters" disabled>
-        </div>
-        
-        <div class="buttons">
-            <button id="resultBtn" disabled>Check Result</button>
-            <button id="rightBtn" disabled>Right ✓</button>
-            <button id="wrongBtn" disabled>Wrong ✗</button>
-            <button id="clearBtn">Clear Input</button>
-        </div>
-        
-        <div class="feedback-section">
-            <div class="feedback-title">Feedback:</div>
-            <div id="feedbackMessage"></div>
-        </div>
-        
-        <div class="instructions">
-            <h3>How to Use This Exercise</h3>
-            <ol>
-                <li>A 10-character pattern of 'B' and 'S' will appear for 5 seconds</li>
-                <li>Memorize the pattern and enter it in the input field</li>
-                <li><strong>Note:</strong> You can enter with or without spaces</li>
-                <li>Click "Check Result" to verify your input</li>
-                <li>If correct, click "Right" to get the next pattern</li>
-                <li>If incorrect, click "Wrong" to get the next pattern</li>
-                <li>Use "Clear Input" to reset the input field</li>
-            </ol>
-            <p><strong>Tip:</strong> Focus on chunks of the pattern rather than individual characters for better recall.</p>
-        </div>
+  <div class="app hacker-bg" id="app" data-theme="hacker">
+    <div class="header">
+      <div>
+        <div class="title">RAJA GAMES — 8-digit B/S Predictor</div>
+        <div class="small">Click 8 B/S slots, press Result → then use Right/Wrong to cycle predictions</div>
+      </div>
+      <div class="controls">
+        <label class="theme-hint small">Theme:</label>
+        <button id="toggleTheme">Hacker / White</button>
+        <button id="clearAll" class="ghost">Clear</button>
+      </div>
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Predefined pattern (converted R to B as requested)
-            const fullPattern = "BSBBSBSSSBSBSBBBSSBSBBBSSBBSSBBSBBSSSSSBSSS SSSSSSSSSBBSSBBSSSBSSB SBBBSBBBBSSBSSBBBBSBSSBBSBBBSSBBSSSSBBSBSSBSSSBBBSSBBSSBSBBBSSBBSSSSBSSBSSBSSBBSSSSBBSBBSBBSSBSSSBSBBSSSBBSBSBSBBSSSBBSBSBSBSSBBSBSSBBSSSSBBSSBSSBSBBSSBBBBBSSSBSSBBSSBSSBBSSSSBBSBBSBBSSBBBSSSBSSSBSBBSSSSBSBBSSSBBSBSSBBSSSBBSSBSSSBBSBBSSSSBBSBBBRSSBSBBBSBSBBSSBBBSBBSBBSSBSBBBBSBBRBBSSSBSSSBBBSSBSSSRSSBSSSSBSSBBSSBSBSSSBBSBSBBBSBBSBSSSBSBSBBBSSBSBBBSSBBSSBBSBBSSSSSBSSS SSSSSSSSSBBSSBBSSSBSSB SBBBSBBBBSSBSSBBBBSBSSBBSBBBSSBBSSSSBBSBSSBSSSBBBSSBBSSBSBBBSSBBSSSSBSSBSSBSSBBSSSSBBSBBSBBSSBSSSBSBBSSSBBSBSBSBBSSSBBSBSBSBSSBBSBSSBBSSSSBBSSBSSBSBBSSBBBBBSSSBSSBBSSBSSBBSSSSBBSBBSBBSSBBBSSSBSSSBSBBSSSSBSBBSSSBBSBSSBBSSSBBSSBSSSBBSBBSSSSBBSBBBRSSBSBBBSBSBBSSBBBSBBSBBSSBSBBBBSBBRBBSSSBSSSBBBSSBSSSRSSBSSSSBSSBBSSBSBSSSBBSBSBB";
-            
-            // Process the pattern: remove spaces and convert R to B
-            const cleanPattern = fullPattern.replace(/ /g, '').replace(/R/g, 'B');
-            
-            // Split into 10-character chunks
-            const chunks = [];
-            for (let i = 0; i < cleanPattern.length; i += 10) {
-                chunks.push(cleanPattern.substring(i, i + 10));
-            }
-            
-            // DOM elements
-            const patternDisplay = document.getElementById('patternDisplay');
-            const userInput = document.getElementById('userInput');
-            const resultBtn = document.getElementById('resultBtn');
-            const rightBtn = document.getElementById('rightBtn');
-            const wrongBtn = document.getElementById('wrongBtn');
-            const clearBtn = document.getElementById('clearBtn');
-            const feedbackMessage = document.getElementById('feedbackMessage');
-            const countdownEl = document.getElementById('countdown');
-            
-            // State variables
-            let currentChunkIndex = 0;
-            let timer;
-            let secondsLeft = 5;
-            
-            // Initialize the exercise
-            function init() {
-                showPattern();
-            }
-            
-            // Display current pattern
-            function showPattern() {
-                patternDisplay.textContent = chunks[currentChunkIndex];
-                feedbackMessage.textContent = "";
-                userInput.value = "";
-                userInput.disabled = true;
-                resultBtn.disabled = true;
-                rightBtn.disabled = true;
-                wrongBtn.disabled = true;
-                
-                // Start countdown
-                secondsLeft = 5;
-                countdownEl.textContent = secondsLeft;
-                
-                clearInterval(timer);
-                timer = setInterval(() => {
-                    secondsLeft--;
-                    countdownEl.textContent = secondsLeft;
-                    
-                    if (secondsLeft <= 0) {
-                        clearInterval(timer);
-                        patternDisplay.textContent = "⏱️ Time's up! Enter what you remember";
-                        userInput.disabled = false;
-                        resultBtn.disabled = false;
-                        userInput.focus();
-                    }
-                }, 1000);
-            }
-            
-            // Check user input against current pattern
-            function checkResult() {
-                // Remove spaces and convert to uppercase
-                const userPattern = userInput.value.toUpperCase().replace(/\s/g, '');
-                
-                // Validate input
-                if (userPattern.length !== 10) {
-                    feedbackMessage.textContent = "Please enter exactly 10 characters!";
-                    feedbackMessage.className = "incorrect";
-                    return;
-                }
-                
-                if (!/^[BS]+$/.test(userPattern)) {
-                    feedbackMessage.textContent = "Only 'B' and 'S' are allowed!";
-                    feedbackMessage.className = "incorrect";
-                    return;
-                }
-                
-                const currentPattern = chunks[currentChunkIndex];
-                const isCorrect = userPattern === currentPattern;
-                
-                if (isCorrect) {
-                    feedbackMessage.textContent = "✅ Correct! Well done!";
-                    feedbackMessage.className = "correct";
-                } else {
-                    feedbackMessage.textContent = `❌ Incorrect! The pattern was: ${currentPattern}`;
-                    feedbackMessage.className = "incorrect";
-                }
-                
-                resultBtn.disabled = true;
-                rightBtn.disabled = false;
-                wrongBtn.disabled = false;
-            }
-            
-            // Move to next pattern
-            function nextPattern() {
-                currentChunkIndex = (currentChunkIndex + 1) % chunks.length;
-                showPattern();
-            }
-            
-            // Event listeners
-            resultBtn.addEventListener('click', checkResult);
-            
-            rightBtn.addEventListener('click', () => {
-                feedbackMessage.textContent = "Great recall! Moving to next pattern...";
-                feedbackMessage.className = "correct";
-                setTimeout(nextPattern, 1500);
-            });
-            
-            wrongBtn.addEventListener('click', () => {
-                feedbackMessage.textContent = "Keep trying! Moving to next pattern...";
-                feedbackMessage.className = "incorrect";
-                setTimeout(nextPattern, 1500);
-            });
-            
-            clearBtn.addEventListener('click', () => {
-                userInput.value = "";
-                userInput.focus();
-            });
-            
-            userInput.addEventListener('input', function() {
-                // Allow spaces but show them as entered
-                this.value = this.value.toUpperCase().replace(/[^BS\s]/g, '');
-            });
-            
-            // Start the exercise
-            init();
-        });
-    </script>
+    <div class="grid">
+      <div class="left">
+        <div style="display:flex;align-items:center;gap:12px">
+          <div style="flex:1">
+            <div class="small">Your 8-digit input (click to toggle B↔S)</div>
+            <div class="inputs" id="inputs"></div>
+            <div style="display:flex;gap:8px;margin-top:10px">
+              <button id="resultBtn" class="big-btn">Result</button>
+              <button id="rightBtn" class="big-btn ghost" disabled>Right</button>
+              <button id="wrongBtn" class="big-btn ghost" disabled>Wrong</button>
+            </div>
+            <div class="result-box" id="resultBox">
+              <div class="small">Result:</div>
+              <div class="result-value" id="resultValue">—</div>
+              <div class="small" id="matchInfo">Press Result to search the pattern DB.</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top:14px">
+          <div class="small">Predictions history (last 10):</div>
+          <div class="history" id="history"></div>
+        </div>
+
+      </div>
+
+      <div class="right">
+        <div class="small">Pattern Database (read-only)</div>
+        <textarea id="patternBox" rows="12" style="width:100%;margin-top:8px;border-radius:8px;padding:10px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:var(--text);resize:vertical"></textarea>
+        <div class="small" style="margin-top:8px">Tip: the app will find *all* places where your 8-digit input exactly matches and use the following character in the pattern as next prediction. If there are multiple matches it cycles through them when you press Right/Wrong.</div>
+        <div class="footer">Made for RAJA GAMES — input via clicks, result only after pressing <strong>Result</strong>.</div>
+      </div>
+    </div>
+  </div>
+
+<script>
+/*
+Behavior:
+- Uses the pattern string (provided by user) in the textarea (preloaded).
+- Clicking Result: find all indices i where pattern.substr(i,8) === input and i+8 < pattern.length
+  -> collect nextChars array (one per match).
+- Show the current prediction from nextChars[currentIndex] (if any). Enable Right/Wrong.
+- Pressing Right or Wrong increments currentIndex and shows next prediction (wraps). Also pushes shown prediction into history (last 10) and stored to localStorage.
+*/
+
+const DEFAULT_PATTERN = `BSBBSBSSSSBBSBSSBBBBSSBBBBSSBSBBBSBSSBBSSBBBSSBBSSSBSSBSSSBBSSSSSBSSBSSSSSSSSSSSSSBSBBBBSSSBBSSSBSSBSSBSBBSSBBSBBBBSSBBSSBBBBSBSSBSBSBBBBBBSBBBSSBBBBSSSSSBBSSBSBSBSSSSSSBBBBSSBBSSSBSBBBSSBBBBBSSSSSBSSSBSBBSBSSBBBBBSBSSSSBSSBSBBBSSBSSSBBSBBSSSSBSBSBSBBBSSBBSSSBSSSBBBBSSSSSBBSBBSBBBSBSBBSSSBSBSSSBSSBSSBBBSSBBSBSBSSBSBSSSBSSBSSBSSSSSBBSSBSBBSBSSSSSBBBBSSBBBBBSBSBSSBBBBBSSSBSSBBSSBBBBSBBSBBSSBSBSBBSBSBSBBBBBBBBSSSBSBBBSBSBBSSBBSSBSSBSSSBSSBBSSBBSBBSSBSSBBBSBSBSBB`;
+const inputsEl = document.getElementById('inputs');
+const resultBtn = document.getElementById('resultBtn');
+const rightBtn = document.getElementById('rightBtn');
+const wrongBtn = document.getElementById('wrongBtn');
+const resultValue = document.getElementById('resultValue');
+const matchInfo = document.getElementById('matchInfo');
+const historyEl = document.getElementById('history');
+const patternBox = document.getElementById('patternBox');
+const clearAll = document.getElementById('clearAll');
+const toggleTheme = document.getElementById('toggleTheme');
+const app = document.getElementById('app');
+
+let slots = Array(8).fill('B'); // default B
+let nextCandidates = []; // array of predictions from pattern
+let currentIndex = 0;
+let history = JSON.parse(localStorage.getItem('rg_history')||'[]').slice(-10);
+let currentPattern = DEFAULT_PATTERN;
+
+// initialize
+patternBox.value = DEFAULT_PATTERN;
+renderInputs();
+renderHistory();
+updateResultDisplay(null);
+
+// create 8 clickable slots
+function renderInputs(){
+  inputsEl.innerHTML = '';
+  for(let i=0;i<8;i++){
+    const btn = document.createElement('div');
+    btn.className = 'slot';
+    btn.textContent = slots[i];
+    btn.dataset.index = i;
+    btn.addEventListener('click', () => {
+      toggleSlot(i);
+    });
+    styleSlot(btn, slots[i]);
+    inputsEl.appendChild(btn);
+  }
+}
+function styleSlot(el, val){
+  el.classList.remove('active-b','active-s');
+  if(val === 'B') el.classList.add('active-b');
+  else el.classList.add('active-s');
+}
+
+function toggleSlot(i){
+  slots[i] = (slots[i] === 'B') ? 'S' : 'B';
+  const btn = inputsEl.querySelector(`[data-index="${i}"]`);
+  btn.textContent = slots[i];
+  styleSlot(btn, slots[i]);
+}
+
+// compute matches and show result
+resultBtn.addEventListener('click', () => {
+  currentPattern = (patternBox.value || '').replace(/\\s+/g,'').toUpperCase();
+  if(!currentPattern || currentPattern.length < 9){
+    updateResultDisplay(null, 'Pattern DB too short (need at least 9 chars).');
+    return;
+  }
+  const query = slots.join('').toUpperCase();
+  // ensure exactly 8 char
+  if(query.length !== 8){
+    updateResultDisplay(null, 'Please provide exactly 8 inputs.');
+    return;
+  }
+  // find all matches
+  nextCandidates = [];
+  for(let i=0;i+8<currentPattern.length;i++){
+    if(currentPattern.substr(i,8) === query){
+      nextCandidates.push(currentPattern.charAt(i+8));
+    }
+  }
+  if(nextCandidates.length === 0){
+    updateResultDisplay(null, 'Result No Match');
+    rightBtn.disabled = true;
+    wrongBtn.disabled = true;
+    return;
+  }
+  currentIndex = 0;
+  const pick = nextCandidates[currentIndex];
+  pushToHistory(query + ' → ' + pick);
+  updateResultDisplay(pick, `Matches found: ${nextCandidates.length}. Showing 1 of ${nextCandidates.length}.`);
+  rightBtn.disabled = false;
+  wrongBtn.disabled = false;
+});
+
+// Right / Wrong behave same: move to next candidate and show (wrap)
+function advanceCandidate(label){
+  if(nextCandidates.length === 0){
+    updateResultDisplay(null, 'No matches to advance.');
+    return;
+  }
+  currentIndex = (currentIndex + 1) % nextCandidates.length;
+  const pick = nextCandidates[currentIndex];
+  const query = slots.join('');
+  pushToHistory(query + ' → ' + pick);
+  updateResultDisplay(pick, `Matches found: ${nextCandidates.length}. Showing ${currentIndex+1} of ${nextCandidates.length} (after ${label}).`);
+}
+rightBtn.addEventListener('click', () => advanceCandidate('Right'));
+wrongBtn.addEventListener('click', () => advanceCandidate('Wrong'));
+
+function updateResultDisplay(value, info){
+  if(value === null){
+    resultValue.textContent = (info && info.includes('No Match')) ? 'No Match' : '—';
+    matchInfo.textContent = info || 'Press Result to search the pattern DB.';
+  } else {
+    resultValue.textContent = value;
+    matchInfo.textContent = info || '';
+  }
+}
+
+// history handling (last 10)
+function renderHistory(){
+  historyEl.innerHTML = '';
+  if(history.length === 0){
+    historyEl.innerHTML = `<div class="small" style="color:var(--muted)">No predictions yet.</div>`;
+    return;
+  }
+  history.slice().reverse().forEach(h=>{
+    const c = document.createElement('div');
+    c.className = 'chip';
+    c.textContent = h;
+    historyEl.appendChild(c);
+  });
+}
+function pushToHistory(entry){
+  history.push(entry);
+  history = history.slice(-10);
+  localStorage.setItem('rg_history', JSON.stringify(history));
+  renderHistory();
+}
+
+// Clear button resets slots
+clearAll.addEventListener('click', () => {
+  slots = Array(8).fill('B');
+  renderInputs();
+  nextCandidates = [];
+  updateResultDisplay(null, 'Cleared inputs.');
+  rightBtn.disabled = true;
+  wrongBtn.disabled = true;
+});
+
+// Theme toggle
+toggleTheme.addEventListener('click', () => {
+  const cur = app.getAttribute('data-theme');
+  if(cur === 'hacker'){
+    app.setAttribute('data-theme','white');
+    // subtle change for white theme
+    app.style.boxShadow = '0 6px 20px rgba(2,6,23,0.08)';
+    toggleTheme.textContent = 'Hacker / White';
+  } else {
+    app.setAttribute('data-theme','hacker');
+    app.style.boxShadow = '';
+    toggleTheme.textContent = 'Hacker / White';
+  }
+});
+
+// initialize buttons disabled
+rightBtn.disabled = true;
+wrongBtn.disabled = true;
+
+/* Allow user to paste or change pattern; keep it upper-case and no spaces */
+patternBox.addEventListener('input', () => {
+  patternBox.value = patternBox.value.replace(/[^BSbs\\s]/g,'').toUpperCase();
+});
+
+// handy: press Enter on pattern box triggers Result
+patternBox.addEventListener('keydown', (e)=>{
+  if(e.key === 'Enter' && !e.shiftKey){
+    e.preventDefault();
+    resultBtn.click();
+  }
+});
+</script>
 </body>
 </html>
