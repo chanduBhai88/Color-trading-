@@ -1,162 +1,88 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aviator Game Simulator</title>
+    <title>Big/Small Predictor</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #f5f5f5;
+            text-align: center;
+            margin: 20px;
+            background-color: #f0f0f0;
         }
-        .game-container {
-            background-color: white;
+        .container {
+            background: white;
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            max-width: 500px;
+            margin: 0 auto;
         }
-        .plane {
-            font-size: 24px;
-            transition: transform 0.1s;
-            margin: 20px 0;
-        }
-        #multiplier {
-            font-size: 32px;
-            font-weight: bold;
-            color: #e74c3c;
+        input {
+            padding: 10px;
+            width: 200px;
             margin: 10px 0;
         }
         button {
-            background-color: #2ecc71;
+            padding: 10px 20px;
+            background: #4CAF50;
             color: white;
             border: none;
-            padding: 10px 20px;
             border-radius: 5px;
             cursor: pointer;
-            font-size: 16px;
-            margin: 5px;
         }
-        button:hover {
-            background-color: #27ae60;
+        .result {
+            margin: 20px 0;
+            font-size: 18px;
         }
-        button:disabled {
-            background-color: #95a5a6;
-            cursor: not-allowed;
+        .big {
+            color: green;
+            font-weight: bold;
         }
-        .history {
-            margin-top: 20px;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 5px;
-        }
-        .history-item {
-            background-color: #e74c3c;
-            color: white;
-            padding: 5px 10px;
-            border-radius: 5px;
-        }
-        .bet-controls {
-            margin: 15px 0;
-        }
-        input {
-            padding: 8px;
-            width: 100px;
-            margin-right: 10px;
+        .small {
+            color: red;
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
-    <div class="game-container">
-        <h1>Aviator Simulator</h1>
-        <p>For educational purposes only</p>
+    <div class="container">
+        <h1>Big/Small Predictor</h1>
+        <p>Enter 8-digit number:</p>
+        <input type="text" id="userInput" maxlength="8" placeholder="12345678">
+        <br>
+        <button onclick="predict()">Predict</button>
         
-        <div id="multiplier">1.00x</div>
-        <div class="plane">✈️</div>
-        
-        <div class="bet-controls">
-            <input type="number" id="betAmount" min="1" value="10" placeholder="Bet amount">
-            <button id="placeBet">Place Bet</button>
-            <button id="cashOut" disabled>Cash Out</button>
+        <div class="result" id="result">
+            <p>Prediction will appear here</p>
         </div>
-        
-        <div class="history" id="history"></div>
     </div>
 
     <script>
-        const betButton = document.getElementById('placeBet');
-        const cashOutButton = document.getElementById('cashOut');
-        const multiplierDisplay = document.getElementById('multiplier');
-        const plane = document.querySelector('.plane');
-        const historyContainer = document.getElementById('history');
-        const betAmountInput = document.getElementById('betAmount');
-        
-        let currentMultiplier = 1.00;
-        let gameInterval;
-        let isGameRunning = false;
-        let crashPoint;
-        let hasCashedOut = false;
-        
-        // Generate a random crash point (between 1.10x and 10.00x)
-        function generateCrashPoint() {
-            return Math.max(1.10, Math.random() * 10).toFixed(2);
-        }
-        
-        // Start a new round
-        function startRound() {
-            if (isGameRunning) return;
+        function predict() {
+            const input = document.getElementById('userInput').value;
             
-            crashPoint = generateCrashPoint();
-            currentMultiplier = 1.00;
-            hasCashedOut = false;
-            isGameRunning = true;
-            
-            betButton.disabled = true;
-            cashOutButton.disabled = false;
-            
-            gameInterval = setInterval(() => {
-                currentMultiplier += 0.01;
-                multiplierDisplay.textContent = currentMultiplier.toFixed(2) + 'x';
-                
-                // Move the plane up
-                plane.style.transform = `translateY(-${(currentMultiplier - 1) * 5}px)`;
-                
-                // Check if crashed
-                if (currentMultiplier >= parseFloat(crashPoint)) {
-                    endRound(false);
-                }
-            }, 100);
-        }
-        
-        // End the current round
-        function endRound(manualCashOut) {
-            clearInterval(gameInterval);
-            isGameRunning = false;
-            
-            // Add to history
-            const historyItem = document.createElement('div');
-            historyItem.className = 'history-item';
-            historyItem.textContent = currentMultiplier.toFixed(2) + 'x';
-            historyContainer.prepend(historyItem);
-            
-            if (manualCashOut) {
-                hasCashedOut = true;
-                alert(`You cashed out at ${currentMultiplier.toFixed(2)}x!`);
-            } else {
-                alert(`Crashed at ${crashPoint}x!`);
+            if (input.length !== 8 || isNaN(input)) {
+                alert("Please enter exactly 8 digits");
+                return;
             }
             
-            // Reset UI
-            betButton.disabled = false;
-            cashOutButton.disabled = true;
-            plane.style.transform = 'translateY(0)';
+            // First fixed result (always 9 - Big)
+            const result1 = { number: 9, type: "Big" };
+            
+            // Second result based on last digit
+            const lastDigit = parseInt(input.slice(-1));
+            const result2 = {
+                number: lastDigit,
+                type: lastDigit >= 5 ? "Big" : "Small"
+            };
+            
+            // Display results
+            document.getElementById('result').innerHTML = `
+                <h3>Prediction Results:</h3>
+                <p>1. Fixed Result: <span class="${result1.type.toLowerCase()}">${result1.number} (${result1.type})</span></p>
+                <p>2. Calculated Result: <span class="${result2.type.toLowerCase()}">${result2.number} (${result2.type})</span></p>
+            `;
         }
-        
-        // Event listeners
-        betButton.addEventListener('click', startRound);
-        cashOutButton.addEventListener('click', () => endRound(true));
     </script>
 </body>
 </html>
