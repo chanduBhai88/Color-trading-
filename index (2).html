@@ -1,203 +1,131 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Big/Small Predictor</title>
+    <title>Color Trading Simulator</title>
     <style>
-        :root {
-            --bg-color: white;
-            --text-color: black;
-            --button-color: #ddd;
-            --big-color: #ff6b6b;
-            --small-color: #48dbfb;
-            --result-color: #1dd1a1;
-            --clear-color: #576574;
-        }
-
-        [data-theme="dark"] {
-            --bg-color: black;
-            --text-color: white;
-            --button-color: #333;
-        }
-
-        body {
-            font-family: Arial, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            margin: 0;
-            padding: 20px;
-            text-align: center;
-            transition: background-color 0.3s, color 0.3s;
-        }
-
-        .input-buttons {
+        body { font-family: Arial; background: #f5f5f5; }
+        .game { background: white; padding: 20px; border-radius: 10px; max-width: 500px; margin: auto; }
+        .result { 
+            height: 100px; 
+            background: #333; 
+            color: white; 
+            font-size: 48px; 
             display: flex;
+            align-items: center;
             justify-content: center;
-            gap: 15px;
-            margin-bottom: 20px;
+            margin: 10px 0;
+            border-radius: 8px;
         }
-
-        button {
-            padding: 12px 25px;
-            font-size: 18px;
-            cursor: pointer;
-            border: none;
-            border-radius: 5px;
+        .bet-options { display: flex; gap: 10px; margin: 15px 0; }
+        .bet-btn { 
+            flex: 1; padding: 10px; text-align: center; 
+            border-radius: 5px; cursor: pointer; font-weight: bold;
         }
-
-        #bigBtn {
-            background-color: var(--big-color);
-            color: white;
-        }
-
-        #smallBtn {
-            background-color: var(--small-color);
-            color: black;
-        }
-
-        #resultBtn {
-            background-color: var(--result-color);
-            color: white;
-        }
-
-        #clearBtn {
-            background-color: var(--clear-color);
-            color: white;
-        }
-
-        #inputsList {
-            margin: 20px 0;
-            font-size: 18px;
-        }
-
-        #prediction {
-            font-size: 22px;
-            font-weight: bold;
-            margin-top: 20px;
-            min-height: 30px;
-        }
-
-        #memoryList {
-            margin-top: 30px;
-            font-size: 16px;
-        }
-
-        .hidden {
-            display: none;
-        }
-
-        #themeToggle {
-            margin-top: 10px;
-            cursor: pointer;
-            padding: 8px 16px;
-            background-color: var(--button-color);
-            color: var(--text-color);
-            border-radius: 5px;
-        }
+        .big { background: #e74c3c; color: white; }
+        .small { background: #3498db; color: white; }
+        .history { margin-top: 20px; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 8px; text-align: center; border: 1px solid #ddd; }
+        .red { color: #e74c3c; }
+        .blue { color: #3498db; }
     </style>
 </head>
-<body data-theme="light">
-    <h1>Big/Small Predictor</h1>
-
-    <div class="input-buttons">
-        <button id="bigBtn">BIG</button>
-        <button id="smallBtn">SMALL</button>
-        <button id="clearBtn">CLEAR</button>
+<body>
+    <div class="game">
+        <h1>Color Trading Simulator</h1>
+        
+        <div class="result" id="result">-</div>
+        
+        <div>
+            <label>Bet Amount: </label>
+            <input type="number" id="betAmount" min="10" value="10">
+        </div>
+        
+        <div class="bet-options">
+            <div class="bet-btn big" onclick="placeBet('big')">Big (5-9)</div>
+            <div class="bet-btn small" onclick="placeBet('small')">Small (0-4)</div>
+        </div>
+        
+        <div class="history">
+            <h3>Game History</h3>
+            <table id="historyTable">
+                <tr>
+                    <th>Round</th>
+                    <th>Number</th>
+                    <th>Size</th>
+                    <th>Color</th>
+                </tr>
+            </table>
+        </div>
     </div>
 
-    <div id="inputsList">Inputs: </div>
-
-    <button id="resultBtn" class="hidden">GET RESULT</button>
-
-    <div id="prediction"></div>
-
-    <div id="memoryList"><strong>Last 10 Predictions:</strong><br><ul id="memoryOutput"></ul></div>
-
-    <button id="themeToggle">Switch Theme</button>
-
     <script>
-        const inputs = [];
-        const memory = [];
-        const maxMemory = 10;
-
-        const bigBtn = document.getElementById('bigBtn');
-        const smallBtn = document.getElementById('smallBtn');
-        const resultBtn = document.getElementById('resultBtn');
-        const clearBtn = document.getElementById('clearBtn');
-        const themeToggle = document.getElementById('themeToggle');
-        const inputsList = document.getElementById('inputsList');
-        const predictionDiv = document.getElementById('prediction');
-        const memoryOutput = document.getElementById('memoryOutput');
-        const body = document.body;
-
-        bigBtn.addEventListener('click', () => addInput('Big'));
-        smallBtn.addEventListener('click', () => addInput('Small'));
-        resultBtn.addEventListener('click', showPrediction);
-        clearBtn.addEventListener('click', clearInputs);
-        themeToggle.addEventListener('click', toggleTheme);
-
-        function addInput(value) {
-            inputs.push(value);
-            updateInputsDisplay();
-            if (inputs.length >= 5) {
-                resultBtn.classList.remove('hidden');
-            }
+        let history = [];
+        let balance = 1000;
+        
+        function generateResult() {
+            // Random number 0-9
+            const num = Math.floor(Math.random() * 10);
+            const size = num >= 5 ? 'Big' : 'small';
+            const color = Math.random() > 0.5 ? 'red' : 'blue'; // Simplified color logic
+            
+            return { num, size, color };
         }
-
-        function updateInputsDisplay() {
-            inputsList.textContent = 'Inputs: ' + inputs.join(', ');
-        }
-
-        function showPrediction() {
-            if (inputs.length < 5) {
-                predictionDiv.textContent = "Please enter at least 5 inputs";
+        
+        function placeBet(type) {
+            const betAmount = parseInt(document.getElementById('betAmount').value);
+            if (betAmount < 10) {
+                alert("Minimum bet is 10");
                 return;
             }
-
-            const lastFive = inputs.slice(-5);
-            const bigCount = lastFive.filter(x => x === 'Big').length;
-            const smallCount = lastFive.filter(x => x === 'Small').length;
-
-            let prediction;
-            if (bigCount > smallCount) {
-                prediction = "Small (since there were more Bigs)";
-            } else if (smallCount > bigCount) {
-                prediction = "Big (since there were more Smalls)";
-            } else {
-                prediction = "Could be Big or Small (equal count)";
-            }
-
-            predictionDiv.textContent = "Prediction: " + prediction;
-
-            // Add to memory
-            memory.unshift(prediction);
-            if (memory.length > maxMemory) {
-                memory.pop();
-            }
-            updateMemoryDisplay();
-        }
-
-        function updateMemoryDisplay() {
-            memoryOutput.innerHTML = '';
-            memory.forEach((item, index) => {
-                const li = document.createElement('li');
-                li.textContent = `${index + 1}. ${item}`;
-                memoryOutput.appendChild(li);
+            
+            const result = generateResult();
+            const win = (type === 'big' && result.size === 'Big') || 
+                        (type === 'small' && result.size === 'small');
+            
+            // Update history
+            history.unshift({
+                round: history.length + 1,
+                number: result.num,
+                size: result.size,
+                color: result.color
             });
+            
+            // Update UI
+            displayResult(result);
+            updateHistory();
+            
+            // Show result
+            if (win) {
+                const winAmount = betAmount * 1.95;
+                alert(`You won! Payout: ${winAmount}`);
+            } else {
+                alert(`You lost. Result was ${result.num} (${result.size})`);
+            }
         }
-
-        function clearInputs() {
-            inputs.length = 0;
-            updateInputsDisplay();
-            predictionDiv.textContent = "";
-            resultBtn.classList.add('hidden');
+        
+        function displayResult(result) {
+            const resultEl = document.getElementById('result');
+            resultEl.textContent = result.num;
+            resultEl.className = 'result ' + result.color;
         }
-
-        function toggleTheme() {
-            const currentTheme = body.getAttribute('data-theme');
-            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
-            body.setAttribute('data-theme', newTheme);
-            themeToggle.textContent = newTheme === 'light' ? "Switch Theme" : "Switch Theme";
+        
+        function updateHistory() {
+            const table = document.getElementById('historyTable');
+            // Clear existing rows (except header)
+            while (table.rows.length > 1) table.deleteRow(1);
+            
+            // Add new rows
+            history.slice(0, 10).forEach(item => {
+                const row = table.insertRow();
+                row.insertCell().textContent = item.round;
+                row.insertCell().textContent = item.number;
+                row.insertCell().textContent = item.size;
+                
+                const colorCell = row.insertCell();
+                colorCell.innerHTML = '●';
+                colorCell.className = item.color;
+            });
         }
     </script>
 </body>
