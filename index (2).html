@@ -1,131 +1,108 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Color Trading Simulator</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modern HTML + JavaScript Page</title>
     <style>
-        body { font-family: Arial; background: #f5f5f5; }
-        .game { background: white; padding: 20px; border-radius: 10px; max-width: 500px; margin: auto; }
-        .result { 
-            height: 100px; 
-            background: #333; 
-            color: white; 
-            font-size: 48px; 
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        /* Modern Styling */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        p {
+            margin-bottom: 15px;
+        }
+        button {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background: #2980b9;
+        }
+        input {
+            padding: 10px;
+            width: 100%;
             margin: 10px 0;
-            border-radius: 8px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
         }
-        .bet-options { display: flex; gap: 10px; margin: 15px 0; }
-        .bet-btn { 
-            flex: 1; padding: 10px; text-align: center; 
-            border-radius: 5px; cursor: pointer; font-weight: bold;
+        #output {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 5px;
+            border-left: 4px solid #3498db;
         }
-        .big { background: #e74c3c; color: white; }
-        .small { background: #3498db; color: white; }
-        .history { margin-top: 20px; }
-        table { width: 100%; border-collapse: collapse; }
-        th, td { padding: 8px; text-align: center; border: 1px solid #ddd; }
-        .red { color: #e74c3c; }
-        .blue { color: #3498db; }
+        @media (max-width: 600px) {
+            .container {
+                padding: 15px;
+            }
+        }
     </style>
 </head>
 <body>
-    <div class="game">
-        <h1>Color Trading Simulator</h1>
+    <div class="container">
+        <h1>Welcome to My Page! 👋</h1>
+        <p>This is a <strong>modern HTML + JavaScript</strong> example without any password protection.</p>
         
-        <div class="result" id="result">-</div>
+        <h2>Try These Features:</h2>
+        <button onclick="showAlert()">Click for Alert</button>
+        <button onclick="changeText()">Change Text</button>
         
-        <div>
-            <label>Bet Amount: </label>
-            <input type="number" id="betAmount" min="10" value="10">
-        </div>
+        <h2>Enter Your Name</h2>
+        <input type="text" id="nameInput" placeholder="Type your name...">
+        <button onclick="greetUser()">Greet Me</button>
         
-        <div class="bet-options">
-            <div class="bet-btn big" onclick="placeBet('big')">Big (5-9)</div>
-            <div class="bet-btn small" onclick="placeBet('small')">Small (0-4)</div>
-        </div>
-        
-        <div class="history">
-            <h3>Game History</h3>
-            <table id="historyTable">
-                <tr>
-                    <th>Round</th>
-                    <th>Number</th>
-                    <th>Size</th>
-                    <th>Color</th>
-                </tr>
-            </table>
-        </div>
+        <div id="output">Output will appear here.</div>
     </div>
 
     <script>
-        let history = [];
-        let balance = 1000;
-        
-        function generateResult() {
-            // Random number 0-9
-            const num = Math.floor(Math.random() * 10);
-            const size = num >= 5 ? 'Big' : 'small';
-            const color = Math.random() > 0.5 ? 'red' : 'blue'; // Simplified color logic
-            
-            return { num, size, color };
+        // Simple Alert Function
+        function showAlert() {
+            alert("Hello! This is a JavaScript alert. 🚀");
         }
-        
-        function placeBet(type) {
-            const betAmount = parseInt(document.getElementById('betAmount').value);
-            if (betAmount < 10) {
-                alert("Minimum bet is 10");
-                return;
-            }
-            
-            const result = generateResult();
-            const win = (type === 'big' && result.size === 'Big') || 
-                        (type === 'small' && result.size === 'small');
-            
-            // Update history
-            history.unshift({
-                round: history.length + 1,
-                number: result.num,
-                size: result.size,
-                color: result.color
-            });
-            
-            // Update UI
-            displayResult(result);
-            updateHistory();
-            
-            // Show result
-            if (win) {
-                const winAmount = betAmount * 1.95;
-                alert(`You won! Payout: ${winAmount}`);
+
+        // Change Text Dynamically
+        function changeText() {
+            document.getElementById("output").innerHTML = "<strong>Text changed!</strong> This is dynamic content using JavaScript.";
+        }
+
+        // Greet User Based on Input
+        function greetUser() {
+            const name = document.getElementById("nameInput").value;
+            if (name.trim() === "") {
+                document.getElementById("output").innerHTML = "Please enter your name!";
             } else {
-                alert(`You lost. Result was ${result.num} (${result.size})`);
+                document.getElementById("output").innerHTML = `Hello, <strong>${name}</strong>! Welcome to this page. 😊`;
             }
-        }
-        
-        function displayResult(result) {
-            const resultEl = document.getElementById('result');
-            resultEl.textContent = result.num;
-            resultEl.className = 'result ' + result.color;
-        }
-        
-        function updateHistory() {
-            const table = document.getElementById('historyTable');
-            // Clear existing rows (except header)
-            while (table.rows.length > 1) table.deleteRow(1);
-            
-            // Add new rows
-            history.slice(0, 10).forEach(item => {
-                const row = table.insertRow();
-                row.insertCell().textContent = item.round;
-                row.insertCell().textContent = item.number;
-                row.insertCell().textContent = item.size;
-                
-                const colorCell = row.insertCell();
-                colorCell.innerHTML = '●';
-                colorCell.className = item.color;
-            });
         }
     </script>
 </body>
