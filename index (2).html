@@ -1,198 +1,134 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Big/Small Predictor</title>
+    <title>Big/Small Click Predictor</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #f5f5f5;
+            text-align: center;
+            margin: 20px;
+            background-color: #f0f8ff;
         }
         .container {
-            background-color: white;
+            background: white;
             padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        .btn-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .btn {
+            padding: 15px 25px;
+            font-size: 18px;
+            border: none;
             border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: all 0.3s;
         }
-        h1 {
-            color: #333;
-            text-align: center;
-        }
-        .input-group {
-            margin-bottom: 20px;
-        }
-        input[type="text"] {
-            padding: 10px;
-            width: 100%;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 16px;
-        }
-        button {
+        .big-btn {
             background-color: #4CAF50;
             color: white;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 16px;
         }
-        button:hover {
-            background-color: #45a049;
+        .small-btn {
+            background-color: #f44336;
+            color: white;
+        }
+        .btn:hover {
+            transform: scale(1.05);
         }
         .result {
-            margin-top: 20px;
-            padding: 15px;
-            background-color: #e9f7ef;
-            border-radius: 4px;
-        }
-        .pattern-display {
-            margin-top: 30px;
-            overflow-x: auto;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: center;
-        }
-        th {
-            background-color: #f2f2f2;
+            margin: 25px 0;
+            font-size: 20px;
+            min-height: 100px;
         }
         .big {
-            color: green;
+            color: #4CAF50;
             font-weight: bold;
         }
         .small {
-            color: red;
+            color: #f44336;
             font-weight: bold;
+        }
+        .history {
+            margin-top: 30px;
+            text-align: left;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Big/Small Predictor</h1>
+        <h1>Big/Small Click Predictor</h1>
+        <p>Click your prediction:</p>
         
-        <div class="input-group">
-            <label for="userInput">Enter 8-digit number:</label>
-            <input type="text" id="userInput" maxlength="8" placeholder="Enter 8 digits">
+        <div class="btn-container">
+            <button class="btn big-btn" onclick="predict('Big')">BIG (5-9)</button>
+            <button class="btn small-btn" onclick="predict('Small')">SMALL (0-4)</button>
         </div>
         
-        <button onclick="predict()">Predict</button>
-        
-        <div class="result" id="predictionResult">
-            <h3>Prediction Results:</h3>
-            <p>Enter an 8-digit number to get predictions</p>
+        <div class="result" id="result">
+            <p>Click either button to see predictions</p>
         </div>
         
-        <div class="pattern-display">
-            <h3>Full Pattern Analysis (in chunks of 10):</h3>
-            <div id="patternTable"></div>
+        <div class="history" id="history">
+            <h3>Prediction History:</h3>
+            <ul id="historyList"></ul>
         </div>
     </div>
 
     <script>
-        // Full Big/Small pattern data (144 entries)
-        const fullPattern = [
-            // First 10 entries (sample)
-            { period: "2025081401348", number: 7, type: "Big" },
-            { period: "2025081401347", number: 8, type: "Big" },
-            { period: "2025081401346", number: 5, type: "Big" },
-            { period: "2025081401345", number: 3, type: "Small" },
-            { period: "2025081401344", number: 9, type: "Big" },
-            { period: "2025081401343", number: 4, type: "Small" },
-            { period: "2025081401342", number: 1, type: "Small" },
-            { period: "2025081401341", number: 5, type: "Big" },
-            { period: "2025081401340", number: 7, type: "Big" },
-            { period: "2025081401339", number: 9, type: "Big" },
-            // Add all 144 entries here in the same format
-            // ...
-        ];
-
-        // Function to predict Big/Small based on input
-        function predict() {
-            const input = document.getElementById('userInput').value;
+        const history = [];
+        
+        function predict(userChoice) {
+            // First fixed result (always Big)
+            const result1 = { prediction: "Big", actual: "Big" };
             
-            if (input.length !== 8 || isNaN(input)) {
-                alert("Please enter a valid 8-digit number");
-                return;
-            }
-            
-            // First fixed result (always 9)
-            const result1 = {
-                number: 9,
-                type: "Big"
-            };
-            
-            // Second calculated result (based on pattern)
-            // This is a simplified calculation - replace with your actual algorithm
-            const lastDigit = parseInt(input.slice(-1));
+            // Second calculated result (random for demo)
+            const randomNum = Math.floor(Math.random() * 10);
             const result2 = {
-                number: lastDigit,
-                type: lastDigit >= 5 ? "Big" : "Small"
+                prediction: userChoice,
+                actual: randomNum >= 5 ? "Big" : "Small",
+                number: randomNum
             };
+            
+            // Add to history
+            history.push({
+                choice: userChoice,
+                results: [result1, result2],
+                timestamp: new Date().toLocaleTimeString()
+            });
             
             // Display results
-            const resultHtml = `
+            document.getElementById('result').innerHTML = `
                 <h3>Prediction Results:</h3>
-                <p>1. Fixed Result: <span class="${result1.type.toLowerCase()}">${result1.number} (${result1.type})</span></p>
-                <p>2. Calculated Result: <span class="${result2.type.toLowerCase()}">${result2.number} (${result2.type})</span></p>
+                <p>1. Fixed Result: <span class="big">Big (9)</span></p>
+                <p>2. Your Choice (${userChoice}) vs Actual: 
+                <span class="${result2.actual.toLowerCase()}">${result2.actual} (${result2.number})</span></p>
+                <p>${result2.prediction === result2.actual ? '✅ Correct!' : '❌ Wrong'}</p>
             `;
             
-            document.getElementById('predictionResult').innerHTML = resultHtml;
-            
-            // Display the full pattern in chunks of 10
-            displayPattern();
+            // Update history
+            updateHistory();
         }
         
-        // Function to display the pattern in chunks of 10
-        function displayPattern() {
-            let tableHtml = `
-                <table>
-                    <tr>
-                        <th>Chunk</th>
-                        <th>Period</th>
-                        <th>Number</th>
-                        <th>Type</th>
-                    </tr>
-            `;
-            
-            // Group into chunks of 10 (sample with first 20 entries)
-            for (let i = 0; i < 20; i += 10) {
-                const chunkNumber = (i / 10) + 1;
-                tableHtml += `
-                    <tr>
-                        <td rowspan="10">Chunk ${chunkNumber}</td>
-                        <td>${fullPattern[i].period}</td>
-                        <td>${fullPattern[i].number}</td>
-                        <td class="${fullPattern[i].type.toLowerCase()}">${fullPattern[i].type}</td>
-                    </tr>
+        function updateHistory() {
+            const list = document.getElementById('historyList');
+            list.innerHTML = '';
+            history.slice().reverse().forEach((item, index) => {
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    [${item.timestamp}] You chose <strong>${item.choice}</strong> - 
+                    Result: ${item.results[1].actual} (${item.results[1].number}) 
+                    ${item.results[1].prediction === item.results[1].actual ? '✅' : '❌'}
                 `;
-                
-                for (let j = i + 1; j < i + 10 && j < fullPattern.length; j++) {
-                    tableHtml += `
-                        <tr>
-                            <td>${fullPattern[j].period}</td>
-                            <td>${fullPattern[j].number}</td>
-                            <td class="${fullPattern[j].type.toLowerCase()}">${fullPattern[j].type}</td>
-                        </tr>
-                    `;
-                }
-            }
-            
-            tableHtml += `</table>`;
-            document.getElementById('patternTable').innerHTML = tableHtml;
+                list.appendChild(li);
+            });
         }
-        
-        // Initialize with sample data display
-        displayPattern();
     </script>
 </body>
 </html>
