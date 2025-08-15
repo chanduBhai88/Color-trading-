@@ -1,20 +1,52 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
- <title>BIG SMALL Game</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TC Lottery Color Prediction</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+        .color-box {
+            width: 100px;
+            height: 100px;
+            margin: 10px auto;
+            border: 1px solid #000;
+            display: inline-block;
+        }
+        #result {
+            margin-top: 20px;
+            font-size: 20px;
+        }
+    </style>
 </head>
 <body>
- <h1 id="result">BIG ya SMALL kya aayega?</h1>
- <button onclick="game()">Khelte Hain</button>
- <script>
-  function game() {
-   var rand = Math.floor(Math.random() * 2);
-   if (rand == 0) {
-    document.getElementById("result").innerHTML = "BIG aaya hai!";
-   } else {
-    document.getElementById("result").innerHTML = "SMALL aaya hai!";
-   }
-  }
- </script>
+
+<h1>TC Lottery Color Prediction Game</h1>
+<p>Select a color for your prediction!</p>
+
+<div class="color-box" style="background-color: red;" onclick="makePrediction('Red')"></div>
+<div class="color-box" style="background-color: green;" onclick="makePrediction('Green')"></div>
+<div class="color-box" style="background-color: blue;" onclick="makePrediction('Blue')"></div>
+
+<div id="result"></div>
+
+<script>
+    function makePrediction(color) {
+        const colors = ['Red', 'Green', 'Blue'];
+        const randomColor = colors[Math.floor(Math.random() * colors.length)];
+        const resultDiv = document.getElementById('result');
+
+        if (color === randomColor) {
+            resultDiv.innerHTML = `Congratulations! You predicted ${color} and it was ${randomColor}. You win!`;
+        } else {
+            resultDiv.innerHTML = `Sorry! You predicted ${color}, but it was ${randomColor}. Better luck next time!`;
+        }
+    }
+</script>
+
 </body>
 </html>
