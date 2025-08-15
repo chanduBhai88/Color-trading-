@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+ <title>BIG SMALL Game</title>
+</head>
+<body>
+ <h1 id="result">BIG ya SMALL kya aayega?</h1>
+ <button onclick="game()">Khelte Hain</button>
+ <script>
+  function game() {
+   var rand = Math.floor(Math.random() * 2);
+   if (rand == 0) {
+    document.getElementById("result").innerHTML = "BIG aaya hai!";
+   } else {
+    document.getElementById("result").innerHTML = "SMALL aaya hai!";
+   }
+  }
+ </script>
+</body>
+</html>
