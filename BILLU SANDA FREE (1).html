@@ -3,53 +3,51 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Big/Small Prediction Game</title>
+    <title>Auto Big/Small Prediction Game</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             text-align: center;
             margin-top: 50px;
         }
-        .button {
-            padding: 10px 20px;
-            margin: 10px;
-            border: none;
-            cursor: pointer;
-            font-size: 16px;
-        }
         #result {
             margin-top: 20px;
             font-size: 20px;
+        }
+        #timer {
+            font-size: 24px;
+            color: red;
         }
     </style>
 </head>
 <body>
 
-<h1>Big/Small Prediction Game</h1>
-<p>Select your prediction:</p>
-
-<button class="button" onclick="makePrediction('Big')">Big</button>
-<button class="button" onclick="makePrediction('Small')">Small</button>
-
+<h1>Auto Big/Small Prediction Game</h1>
+<p id="timer">Time Left: 120 seconds</p>
 <div id="result"></div>
 
 <script>
-    function makePrediction(prediction) {
-        // Randomly decide if the result is Big or Small
-        const randomResult = Math.random() < 0.5 ? 'Big' : 'Small';
-        const resultDiv = document.getElementById('result');
+    let timer = 120; // 2 minutes in seconds
+    const resultDiv = document.getElementById('result');
 
-        if (prediction === randomResult) {
-            resultDiv.innerHTML = `Congratulations! You predicted ${prediction} and it was ${randomResult}. You win!`;
-        } else {
-            resultDiv.innerHTML = `Sorry! You predicted ${prediction}, but it was ${randomResult}. Better luck next time!`;
-        }
-
-        // Set timeout for the next round after 2 minutes
-        setTimeout(() => {
-            resultDiv.innerHTML = '';
-        }, 120000); // 120000 milliseconds = 2 minutes
+    function startGame() {
+        setInterval(() => {
+            if (timer <= 0) {
+                makePrediction();
+                timer = 120; // Reset timer
+            }
+            document.getElementById('timer').innerText = `Time Left: ${timer} seconds`;
+            timer--;
+        }, 1000);
     }
+
+    function makePrediction() {
+        const randomResult = Math.random() < 0.5 ? 'Big' : 'Small';
+        resultDiv.innerHTML = `The result is: ${randomResult}`;
+    }
+
+    // Start the game when the page loads
+    window.onload = startGame;
 </script>
 
 </body>
