@@ -1,228 +1,118 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Advanced Big/Small Predictor</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            background-color: #f5f5f5;
-        }
-        .container {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            max-width: 800px;
-            margin: 0 auto;
-        }
-        .input-pad {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-            margin: 20px 0;
-        }
-        .btn {
-            padding: 15px;
-            font-size: 16px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .btn-big {
-            background-color: #4CAF50;
-            color: white;
-        }
-        .btn-small {
-            background-color: #f44336;
-            color: white;
-        }
-        .btn-clear {
-            background-color: #ff9800;
-            color: white;
-            grid-column: span 2;
-        }
-        .btn-submit {
-            background-color: #2196F3;
-            color: white;
-            grid-column: span 2;
-        }
-        .btn:hover {
-            opacity: 0.9;
-            transform: scale(1.02);
-        }
-        .input-display {
-            padding: 15px;
-            background: #eee;
-            border-radius: 5px;
-            margin-bottom: 10px;
-            min-height: 20px;
-            font-size: 18px;
-        }
-        .result {
-            margin: 20px 0;
-            padding: 15px;
-            background: #e8f5e9;
-            border-radius: 5px;
-        }
-        .big {
-            color: #4CAF50;
-            font-weight: bold;
-        }
-        .small {
-            color: #f44336;
-            font-weight: bold;
-        }
-        .pattern-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-        .pattern-table th, .pattern-table td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: center;
-        }
-        .pattern-table th {
-            background-color: #f2f2f2;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dragon Tiger Predictor</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #0d1b2a, #1b263b);
+    color: white;
+    text-align: center;
+    padding: 20px;
+  }
+  h1 {
+    margin-bottom: 20px;
+  }
+  .buttons {
+    margin: 15px 0;
+  }
+  button {
+    font-size: 20px;
+    padding: 12px 25px;
+    margin: 5px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: transform 0.1s ease;
+  }
+  button:active {
+    transform: scale(0.95);
+  }
+  .t-btn {
+    background: #ff4d4d;
+    color: white;
+  }
+  .d-btn {
+    background: #4da6ff;
+    color: white;
+  }
+  .clear-btn {
+    background: #ff9900;
+    color: white;
+  }
+  .result-btn {
+    background: #00cc66;
+    color: white;
+  }
+  #input-seq {
+    font-size: 22px;
+    margin-top: 15px;
+    padding: 10px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 8px;
+    display: inline-block;
+    min-width: 150px;
+    letter-spacing: 2px;
+  }
+  #output {
+    margin-top: 20px;
+    font-size: 24px;
+  }
+</style>
 </head>
 <body>
-    <div class="container">
-        <h1>Advanced Big/Small Predictor</h1>
-        <p>Enter 8 Big/Small inputs:</p>
-        
-        <div class="input-display" id="inputDisplay">
-            Your sequence will appear here
-        </div>
-        
-        <div class="input-pad">
-            <button class="btn btn-big" onclick="addInput('Big')">BIG (5-9)</button>
-            <button class="btn btn-small" onclick="addInput('Small')">SMALL (0-4)</button>
-            <button class="btn btn-clear" onclick="clearInput()">CLEAR</button>
-            <button class="btn btn-submit" onclick="predict()">PREDICT</button>
-        </div>
-        
-        <div class="result" id="result">
-            <h3>Prediction Rules:</h3>
-            <p>1. After 8 inputs, next 2 results will show (including fixed "9" as Big)</p>
-            <p>2. The system analyzes patterns in chunks of 10</p>
-        </div>
-        
-        <h3>Pattern Analysis (10-item chunks):</h3>
-        <table class="pattern-table" id="patternTable">
-            <tr>
-                <th>Position</th>
-                <th>Type</th>
-                <th>Pattern</th>
-            </tr>
-        </table>
-    </div>
 
-    <script>
-        // Your complete pattern data (144 entries)
-        const fullPattern = [
-            // First 20 entries for demonstration
-            { type: "Big" }, { type: "Big" }, { type: "Big" }, { type: "Small" }, 
-            { type: "Big" }, { type: "Small" }, { type: "Small" }, { type: "Big" },
-            { type: "Big" }, { type: "Big" }, { type: "Small" }, { type: "Small" },
-            { type: "Big" }, { type: "Big" }, { type: "Big" }, { type: "Big" },
-            { type: "Big" }, { type: "Small" }, { type: "Small" }, { type: "Small" }
-            // Add all 144 entries here in the same format
-        ];
-        
-        let userInputs = [];
-        
-        function addInput(type) {
-            if (userInputs.length >= 8) return;
-            userInputs.push(type);
-            updateDisplay();
-        }
-        
-        function clearInput() {
-            userInputs = [];
-            updateDisplay();
-        }
-        
-        function updateDisplay() {
-            const display = document.getElementById('inputDisplay');
-            if (userInputs.length === 0) {
-                display.textContent = "Your sequence will appear here";
-                return;
-            }
-            
-            display.innerHTML = userInputs.map((type, index) => 
-                `<span class="${type.toLowerCase()}">${index+1}. ${type}</span>`
-            ).join(', ');
-        }
-        
-        function predict() {
-            if (userInputs.length !== 8) {
-                alert("Please enter exactly 8 inputs");
-                return;
-            }
-            
-            // Create a 10-item chunk (8 user inputs + 2 predictions)
-            const chunk = [...userInputs];
-            
-            // First prediction (fixed "9" which is Big)
-            const prediction1 = { type: "Big", number: 9, isFixed: true };
-            chunk.push(prediction1.type);
-            
-            // Second prediction (calculated from pattern)
-            // This is simplified - replace with your actual algorithm
-            const lastThree = userInputs.slice(-3);
-            const bigCount = lastThree.filter(x => x === "Big").length;
-            const prediction2 = {
-                type: bigCount >= 2 ? "Big" : "Small",
-                number: bigCount >= 2 ? 7 : 3, // example numbers
-                isFixed: false
-            };
-            chunk.push(prediction2.type);
-            
-            // Display results
-            document.getElementById('result').innerHTML = `
-                <h3>Prediction Results:</h3>
-                <p>1. Fixed Result: <span class="big">${prediction1.number} (${prediction1.type})</span></p>
-                <p>2. Calculated Result: <span class="${prediction2.type.toLowerCase()}">
-                ${prediction2.number} (${prediction2.type})</span></p>
-                <p>Based on your 8 inputs + these 2 predictions completes a 10-item pattern</p>
-            `;
-            
-            // Update pattern analysis table
-            updatePatternTable(chunk);
-            
-            // Clear inputs after prediction
-            userInputs = [];
-            updateDisplay();
-        }
-        
-        function updatePatternTable(chunk) {
-            const table = document.getElementById('patternTable');
-            // Clear existing rows (keep header)
-            while (table.rows.length > 1) table.deleteRow(1);
-            
-            // Add the new pattern chunk
-            chunk.forEach((type, index) => {
-                const row = table.insertRow();
-                const cell1 = row.insertCell(0);
-                const cell2 = row.insertCell(1);
-                const cell3 = row.insertCell(2);
-                
-                cell1.textContent = index + 1;
-                cell2.innerHTML = `<span class="${type.toLowerCase()}">${type}</span>`;
-                
-                // Pattern analysis (simplified)
-                if (index >= 2) {
-                    const prevTwo = `${chunk[index-2]}-${chunk[index-1]}`;
-                    cell3.textContent = `${prevTwo} → ${type}`;
-                } else {
-                    cell3.textContent = "Start";
-                }
-            });
-        }
-    </script>
+<h1>Dragon Tiger Predictor</h1>
+
+<div id="input-seq"> </div>
+
+<div class="buttons">
+  <button class="t-btn" onclick="addSymbol('T')">T</button>
+  <button class="d-btn" onclick="addSymbol('D')">D</button>
+  <button class="clear-btn" onclick="clearSeq()">Clear</button>
+  <button class="result-btn" onclick="getResult()">Result</button>
+</div>
+
+<div id="output"></div>
+
+<script>
+  const pattern = "TDDDTDDTDTDTDTDTDTTDTDDDTTTDDTDDDDTDDTTDDTDTDDTDTTDTDTTDDT".split('');
+  let inputSeq = [];
+
+  function addSymbol(sym) {
+    if (inputSeq.length < 5) {
+      inputSeq.push(sym);
+      document.getElementById("input-seq").textContent = inputSeq.join('');
+    }
+  }
+
+  function clearSeq() {
+    inputSeq = [];
+    document.getElementById("input-seq").textContent = '';
+    document.getElementById("output").textContent = '';
+  }
+
+  function getResult() {
+    if (inputSeq.length < 5) {
+      document.getElementById("output").textContent = "Please enter 5 inputs.";
+      return;
+    }
+    let found = false;
+    for (let i = 0; i <= pattern.length - 6; i++) {
+      if (pattern.slice(i, i+5).join('') === inputSeq.join('')) {
+        let nextVal = pattern[i+5];
+        document.getElementById("output").innerHTML = `✅ Match Found! Next: <b>${nextVal}</b>`;
+        found = true;
+        break;
+      }
+    }
+    if (!found) {
+      document.getElementById("output").textContent = "❌ Match nahi ho raha hai";
+    }
+  }
+</script>
+
 </body>
 </html>
