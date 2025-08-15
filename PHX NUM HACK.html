@@ -31,7 +31,7 @@
         }
         .buttons {
             display: flex;
-            gap: 20px;
+            gap: 15px;
             justify-content: center;
             flex-wrap: wrap;
         }
@@ -41,7 +41,7 @@
             border: 3px solid lime;
             font-size: 30px;
             padding: 15px 25px;
-            min-width: 80px;
+            min-width: 100px;
             cursor: pointer;
             border-radius: 8px;
         }
@@ -55,12 +55,13 @@
 </head>
 <body>
     <h1>BS PREDICTOR</h1>
-    <div id="sequence">CLICK B OR S</div>
+    <div id="sequence">CLICK B OR S (9 Times)</div>
     <div id="result" class="hidden"></div>
     
     <div class="buttons">
         <button onclick="addChar('B')">B</button>
         <button onclick="addChar('S')">S</button>
+        <button onclick="showResult()">RESULT</button>
         <button onclick="reset()">RESET</button>
     </div>
 
@@ -70,22 +71,26 @@
         const sequenceDiv = document.getElementById("sequence");
         
         function addChar(char) {
+            if (sequence.length >= 9) return; // Stop after 9 inputs
             sequence.push(char);
             updateDisplay();
-            
-            // Show result only after 10th click
-            if (sequence.length >= 10) {
-                const lastTen = sequence.slice(-10);
-                const prediction = predictNext(lastTen.slice(0, 9), lastTen[9]);
-                
-                resultDiv.innerHTML = `9: ${formatSeq(lastTen.slice(0, 9))} → 10: <span class="${lastTen[9]}">${lastTen[9]}</span>`;
-                resultDiv.classList.remove("hidden");
-            }
         }
         
-        function predictNext(prev9, tenth) {
-            // Your prediction logic here (if any)
-            return "";
+        function showResult() {
+            if (sequence.length < 9) {
+                resultDiv.innerHTML = `Enter ${9 - sequence.length} more!`;
+                resultDiv.classList.remove("hidden");
+                return;
+            }
+            
+            // Your 10th Prediction Logic Here (Example: Random B/S)
+            const predicted10th = Math.random() > 0.5 ? 'B' : 'S'; 
+            
+            resultDiv.innerHTML = `
+                9 Inputs: ${formatSeq(sequence)}<br>
+                10th Prediction: <span class="${predicted10th}">${predicted10th}</span>
+            `;
+            resultDiv.classList.remove("hidden");
         }
         
         function formatSeq(seq) {
@@ -93,12 +98,14 @@
         }
         
         function updateDisplay() {
-            sequenceDiv.innerHTML = sequence.length ? formatSeq(sequence) : "CLICK B OR S";
+            sequenceDiv.innerHTML = sequence.length ? 
+                `${formatSeq(sequence)} (${sequence.length}/9)` : 
+                "CLICK B OR S (9 Times)";
         }
         
         function reset() {
             sequence = [];
-            sequenceDiv.innerHTML = "CLICK B OR S";
+            sequenceDiv.innerHTML = "CLICK B OR S (9 Times)";
             resultDiv.classList.add("hidden");
         }
     </script>
