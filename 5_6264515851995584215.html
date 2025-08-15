@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Big Small Pattern</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            max-width: 400px;
+            margin: auto;
+        }
+        .input-area {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        button {
+            padding: 10px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button.clear {
+            background: #f44336;
+        }
+        .history {
+            margin-top: 20px;
+            border-top: 1px solid #ddd;
+            padding-top: 10px;
+        }
+        .history-item {
+            display: inline-block;
+            margin: 5px;
+            padding: 5px 10px;
+            background: #e0e0e0;
+            border-radius: 5px;
+        }
+        .big {
+            background: #ff9800;
+            color: white;
+        }
+        .small {
+            background: #2196F3;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Big/Small Pattern</h2>
+        
+        <div class="input-area">
+            <select id="bsInput">
+                <option value="Big">Big</option>
+                <option value="Small">Small</option>
+            </select>
+            <button onclick="addBS()">Add</button>
+            <button class="clear" onclick="clearAll()">Clear</button>
+        </div>
+
+        <div>
+            <h3>Last 8 Inputs:</h3>
+            <div id="last8"></div>
+        </div>
+
+        <div class="history">
+            <h3>Full History (Big/Small Only):</h3>
+            <div id="fullHistory"></div>
+        </div>
+    </div>
+
+    <script>
+        let history = [];
+
+        // Add Big/Small to history
+        function addBS() {
+            const input = document.getElementById("bsInput").value;
+            history.push(input);
+            updateDisplay();
+        }
+
+        // Clear all data
+        function clearAll() {
+            history = [];
+            updateDisplay();
+        }
+
+        // Update UI
+        function updateDisplay() {
+            // Show Last 8
+            const last8 = history.slice(-8);
+            document.getElementById("last8").innerHTML = last8.map(item => 
+                `<span class="history-item ${item.toLowerCase()}">${item}</span>`
+            ).join('');
+
+            // Show Full History
+            document.getElementById("fullHistory").innerHTML = history.map(item => 
+                `<span class="history-item ${item.toLowerCase()}">${item}</span>`
+            ).join('');
+        }
+    </script>
+</body>
+</html>
