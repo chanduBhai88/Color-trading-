@@ -3,19 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TC Lottery Color Prediction</title>
+    <title>Big/Small Prediction Game</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             text-align: center;
             margin-top: 50px;
         }
-        .color-box {
-            width: 100px;
-            height: 100px;
-            margin: 10px auto;
-            border: 1px solid #000;
-            display: inline-block;
+        .button {
+            padding: 10px 20px;
+            margin: 10px;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
         }
         #result {
             margin-top: 20px;
@@ -25,26 +25,30 @@
 </head>
 <body>
 
-<h1>TC Lottery Color Prediction Game</h1>
-<p>Select a color for your prediction!</p>
+<h1>Big/Small Prediction Game</h1>
+<p>Select your prediction:</p>
 
-<div class="color-box" style="background-color: red;" onclick="makePrediction('Red')"></div>
-<div class="color-box" style="background-color: green;" onclick="makePrediction('Green')"></div>
-<div class="color-box" style="background-color: blue;" onclick="makePrediction('Blue')"></div>
+<button class="button" onclick="makePrediction('Big')">Big</button>
+<button class="button" onclick="makePrediction('Small')">Small</button>
 
 <div id="result"></div>
 
 <script>
-    function makePrediction(color) {
-        const colors = ['Red', 'Green', 'Blue'];
-        const randomColor = colors[Math.floor(Math.random() * colors.length)];
+    function makePrediction(prediction) {
+        // Randomly decide if the result is Big or Small
+        const randomResult = Math.random() < 0.5 ? 'Big' : 'Small';
         const resultDiv = document.getElementById('result');
 
-        if (color === randomColor) {
-            resultDiv.innerHTML = `Congratulations! You predicted ${color} and it was ${randomColor}. You win!`;
+        if (prediction === randomResult) {
+            resultDiv.innerHTML = `Congratulations! You predicted ${prediction} and it was ${randomResult}. You win!`;
         } else {
-            resultDiv.innerHTML = `Sorry! You predicted ${color}, but it was ${randomColor}. Better luck next time!`;
+            resultDiv.innerHTML = `Sorry! You predicted ${prediction}, but it was ${randomResult}. Better luck next time!`;
         }
+
+        // Set timeout for the next round after 2 minutes
+        setTimeout(() => {
+            resultDiv.innerHTML = '';
+        }, 120000); // 120000 milliseconds = 2 minutes
     }
 </script>
 
