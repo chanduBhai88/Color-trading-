@@ -7,85 +7,62 @@
             background-color: black;
             color: lime;
             font-family: monospace;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            margin: 0;
-            overflow: hidden;
-        }
-        .container {
             text-align: center;
+            margin-top: 50px;
         }
         #result {
             font-size: 24px;
+            letter-spacing: 5px;
             margin: 20px;
-            min-height: 30px;
-            letter-spacing: 3px;
-        }
-        .buttons {
-            margin: 20px;
+            min-height: 40px;
+            word-break: break-all;
         }
         button {
-            background-color: black;
+            background: black;
             color: lime;
-            border: 1px solid lime;
-            padding: 10px 20px;
-            margin: 0 10px;
-            font-family: monospace;
+            border: 2px solid lime;
+            font-size: 20px;
+            padding: 10px 25px;
+            margin: 10px;
             cursor: pointer;
-            font-size: 18px;
         }
         button:hover {
-            background-color: #003300;
+            background: #002200;
         }
-        .hidden {
-            display: none;
-        }
+        .B { color: cyan; }  /* Blue for B */
+        .S { color: yellow; } /* Yellow for S */
     </style>
 </head>
 <body>
-    <div class="container">
-        <div id="result" class="hidden"></div>
-        <div class="buttons">
-            <button id="bBtn">B</button>
-            <button id="sBtn">S</button>
-            <button id="resetBtn">Reset</button>
-        </div>
+    <h1>BS CLICKER</h1>
+    <div id="result">CLICK B OR S</div>
+    
+    <div>
+        <button onclick="addChar('B')">B</button>
+        <button onclick="addChar('S')">S</button>
+        <button onclick="reset()">RESET</button>
     </div>
 
     <script>
         let sequence = [];
-        const resultDiv = document.getElementById('result');
-        const bBtn = document.getElementById('bBtn');
-        const sBtn = document.getElementById('sBtn');
-        const resetBtn = document.getElementById('resetBtn');
-
-        function updateDisplay() {
-            if (sequence.length >= 9) {
-                const lastNine = sequence.slice(-9).join('');
-                resultDiv.textContent = `Result: ${lastNine}`;
-                resultDiv.classList.remove('hidden');
-            } else {
-                resultDiv.classList.add('hidden');
-            }
+        
+        function addChar(char) {
+            sequence.push(char);
+            updateResult();
         }
-
-        bBtn.addEventListener('click', () => {
-            sequence.push('B');
-            updateDisplay();
-        });
-
-        sBtn.addEventListener('click', () => {
-            sequence.push('S');
-            updateDisplay();
-        });
-
-        resetBtn.addEventListener('click', () => {
+        
+        function updateResult() {
+            let coloredText = sequence.map(char => 
+                `<span class="${char}">${char}</span>`
+            ).join('');
+            
+            document.getElementById("result").innerHTML = coloredText;
+        }
+        
+        function reset() {
             sequence = [];
-            resultDiv.classList.add('hidden');
-        });
+            document.getElementById("result").innerHTML = "CLICK B OR S";
+        }
     </script>
 </body>
 </html>
