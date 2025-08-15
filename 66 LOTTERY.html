@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>BS Predictor</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <style>
+        body {
+            background: black;
+            color: lime;
+            font-family: monospace;
+            text-align: center;
+            padding: 20px;
+            touch-action: manipulation;
+        }
+        h1 {
+            font-size: 28px;
+            margin-bottom: 30px;
+        }
+        #sequence {
+            font-size: 24px;
+            letter-spacing: 3px;
+            margin: 20px 0;
+            min-height: 40px;
+            word-break: break-all;
+        }
+        #result {
+            font-size: 30px;
+            color: white;
+            margin: 25px 0;
+            min-height: 50px;
+        }
+        .buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        button {
+            background: black;
+            color: lime;
+            border: 3px solid lime;
+            font-size: 30px;
+            padding: 15px 25px;
+            min-width: 100px;
+            cursor: pointer;
+            border-radius: 8px;
+        }
+        button:active {
+            background: #002200;
+        }
+        .B { color: cyan; }
+        .S { color: yellow; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+    <h1>BS PREDICTOR</h1>
+    <div id="sequence">CLICK B OR S (9 Times)</div>
+    <div id="result" class="hidden"></div>
+    
+    <div class="buttons">
+        <button onclick="addChar('B')">B</button>
+        <button onclick="addChar('S')">S</button>
+        <button onclick="showResult()">RESULT</button>
+        <button onclick="reset()">RESET</button>
+    </div>
+
+    <script>
+        let sequence = [];
+        const resultDiv = document.getElementById("result");
+        const sequenceDiv = document.getElementById("sequence");
+        
+        function addChar(char) {
+            if (sequence.length >= 9) return; // Stop after 9 inputs
+            sequence.push(char);
+            updateDisplay();
+        }
+        
+        function showResult() {
+            if (sequence.length < 9) {
+                resultDiv.innerHTML = `Enter ${9 - sequence.length} more!`;
+                resultDiv.classList.remove("hidden");
+                return;
+            }
+            
+            // Your 10th Prediction Logic Here (Example: Random B/S)
+            const predicted10th = Math.random() > 0.5 ? 'B' : 'S'; 
+            
+            resultDiv.innerHTML = `
+                9 Inputs: ${formatSeq(sequence)}<br>
+                10th Prediction: <span class="${predicted10th}">${predicted10th}</span>
+            `;
+            resultDiv.classList.remove("hidden");
+        }
+        
+        function formatSeq(seq) {
+            return seq.map(c => `<span class="${c}">${c}</span>`).join("");
+        }
+        
+        function updateDisplay() {
+            sequenceDiv.innerHTML = sequence.length ? 
+                `${formatSeq(sequence)} (${sequence.length}/9)` : 
+                "CLICK B OR S (9 Times)";
+        }
+        
+        function reset() {
+            sequence = [];
+            sequenceDiv.innerHTML = "CLICK B OR S (9 Times)";
+            resultDiv.classList.add("hidden");
+        }
+    </script>
+</body>
+</html>
