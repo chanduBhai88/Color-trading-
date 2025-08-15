@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>BS Predictor</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <style>
+        body {
+            background: black;
+            color: lime;
+            font-family: monospace;
+            text-align: center;
+            padding: 20px;
+            touch-action: manipulation;
+        }
+        h1 {
+            font-size: 28px;
+            margin-bottom: 30px;
+        }
+        #sequence {
+            font-size: 24px;
+            letter-spacing: 3px;
+            margin: 20px 0;
+            min-height: 40px;
+            word-break: break-all;
+        }
+        #result {
+            font-size: 30px;
+            color: white;
+            margin: 25px 0;
+            min-height: 50px;
+        }
+        .buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        button {
+            background: black;
+            color: lime;
+            border: 3px solid lime;
+            font-size: 30px;
+            padding: 15px 25px;
+            min-width: 80px;
+            cursor: pointer;
+            border-radius: 8px;
+        }
+        button:active {
+            background: #002200;
+        }
+        .B { color: cyan; }
+        .S { color: yellow; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+    <h1>BS PREDICTOR</h1>
+    <div id="sequence">CLICK B OR S</div>
+    <div id="result" class="hidden"></div>
+    
+    <div class="buttons">
+        <button onclick="addChar('B')">B</button>
+        <button onclick="addChar('S')">S</button>
+        <button onclick="reset()">RESET</button>
+    </div>
+
+    <script>
+        let sequence = [];
+        const resultDiv = document.getElementById("result");
+        const sequenceDiv = document.getElementById("sequence");
+        
+        function addChar(char) {
+            sequence.push(char);
+            updateDisplay();
+            
+            // Show result only after 10th click
+            if (sequence.length >= 10) {
+                const lastTen = sequence.slice(-10);
+                const prediction = predictNext(lastTen.slice(0, 9), lastTen[9]);
+                
+                resultDiv.innerHTML = `9: ${formatSeq(lastTen.slice(0, 9))} → 10: <span class="${lastTen[9]}">${lastTen[9]}</span>`;
+                resultDiv.classList.remove("hidden");
+            }
+        }
+        
+        function predictNext(prev9, tenth) {
+            // Your prediction logic here (if any)
+            return "";
+        }
+        
+        function formatSeq(seq) {
+            return seq.map(c => `<span class="${c}">${c}</span>`).join("");
+        }
+        
+        function updateDisplay() {
+            sequenceDiv.innerHTML = sequence.length ? formatSeq(sequence) : "CLICK B OR S";
+        }
+        
+        function reset() {
+            sequence = [];
+            sequenceDiv.innerHTML = "CLICK B OR S";
+            resultDiv.classList.add("hidden");
+        }
+    </script>
+</body>
+</html>
