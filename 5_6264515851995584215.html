@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Big Small Pattern</title>
+    <title>Big Small Pattern Predictor</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -15,24 +15,34 @@
             border-radius: 10px;
             padding: 20px;
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            max-width: 400px;
+            max-width: 500px;
             margin: auto;
         }
         .input-area {
             display: flex;
             gap: 10px;
             margin-bottom: 20px;
+            flex-wrap: wrap;
         }
         button {
-            padding: 10px;
+            padding: 10px 15px;
             background: #4CAF50;
             color: white;
             border: none;
             border-radius: 5px;
             cursor: pointer;
+            font-weight: bold;
         }
         button.clear {
             background: #f44336;
+        }
+        button.predict {
+            background: #9C27B0;
+        }
+        select {
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
         }
         .history {
             margin-top: 20px;
@@ -42,40 +52,65 @@
         .history-item {
             display: inline-block;
             margin: 5px;
-            padding: 5px 10px;
+            padding: 8px 12px;
             background: #e0e0e0;
             border-radius: 5px;
+            font-weight: bold;
         }
         .big {
-            background: #ff9800;
+            background: #FF5722;
             color: white;
         }
         .small {
             background: #2196F3;
             color: white;
         }
+        .prediction {
+            margin: 20px 0;
+            padding: 15px;
+            background: #4CAF50;
+            color: white;
+            border-radius: 5px;
+            text-align: center;
+            font-size: 18px;
+            display: none;
+        }
+        .section-title {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .input-count {
+            margin: 10px 0;
+            font-style: italic;
+            color: #666;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h2>Big/Small Pattern</h2>
+        <h2>Big/Small Pattern Predictor</h2>
         
         <div class="input-area">
             <select id="bsInput">
                 <option value="Big">Big</option>
                 <option value="Small">Small</option>
             </select>
-            <button onclick="addBS()">Add</button>
-            <button class="clear" onclick="clearAll()">Clear</button>
+            <button onclick="addBS()">Add Input</button>
+            <button class="clear" onclick="clearAll()">Clear All</button>
+            <button class="predict" onclick="predictNext()" id="predictBtn" disabled>Predict Next</button>
         </div>
 
+        <div class="input-count" id="inputCount">Inputs added: 0/8</div>
+
+        <div class="prediction" id="predictionResult"></div>
+
         <div>
-            <h3>Last 8 Inputs:</h3>
+            <h3 class="section-title">Last 8 Inputs:</h3>
             <div id="last8"></div>
         </div>
 
         <div class="history">
-            <h3>Full History (Big/Small Only):</h3>
+            <h3 class="section-title">Full History:</h3>
             <div id="fullHistory"></div>
         </div>
     </div>
@@ -88,19 +123,57 @@
             const input = document.getElementById("bsInput").value;
             history.push(input);
             updateDisplay();
+            
+            // Enable predict button when we have 8 inputs
+            if (history.length >= 8) {
+                document.getElementById("predictBtn").disabled = false;
+            }
         }
 
         // Clear all data
         function clearAll() {
             history = [];
             updateDisplay();
+            document.getElementById("predictionResult").style.display = 'none';
+            document.getElementById("predictBtn").disabled = true;
+        }
+
+        // Predict next result
+        function predictNext() {
+            if (history.length < 8) {
+                alert("Please enter at least 8 inputs first");
+                return;
+            }
+            
+            // Get last 8 inputs
+            const last8 = history.slice(-8);
+            
+            // Simple prediction logic (can be enhanced)
+            const bigCount = last8.filter(item => item === 'Big').length;
+            const smallCount = last8.filter(item => item === 'Small').length;
+            
+            let prediction = '';
+            if (bigCount > smallCount) {
+                prediction = 'Next is likely to be <span class="small">Small</span> (after ' + bigCount + ' Big)';
+            } else if (smallCount > bigCount) {
+                prediction = 'Next is likely to be <span class="big">Big</span> (after ' + smallCount + ' Small)';
+            } else {
+                prediction = 'No clear pattern (4 Big and 4 Small in last 8)';
+            }
+            
+            document.getElementById("predictionResult").innerHTML = prediction;
+            document.getElementById("predictionResult").style.display = 'block';
         }
 
         // Update UI
         function updateDisplay() {
-            // Show Last 8
-            const last8 = history.slice(-8);
-            document.getElementById("last8").innerHTML = last8.map(item => 
+            // Update input count
+            document.getElementById("inputCount").textContent = `Inputs added: ${history.length}/8`;
+            
+            // Show Last 8 (or all if less than 8)
+            const displayCount = Math.min(history.length, 8);
+            const last8 = history.slice(-displayCount);
+            document.getElementById("last8").innerHTML = last8.map((item, index) => 
                 `<span class="history-item ${item.toLowerCase()}">${item}</span>`
             ).join('');
 
