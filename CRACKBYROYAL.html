@@ -22,13 +22,15 @@
 <script>
 let countdown;
 let timeLeft = 60; // 1 minute
+let currentTimeForResult = 60; // to store the timer value for result
 
 function startGame() {
   document.getElementById('status').innerText = 'Game Started! Wait for result...';
   document.getElementById('result').innerText = '';
+
   startTimer();
 
-  // After 5 seconds, generate result
+  // After 5 seconds, generate result using the current timer value
   setTimeout(() => {
     determineResult();
   }, 5000);
@@ -57,13 +59,17 @@ function updateTimerDisplay() {
 }
 
 function determineResult() {
+  // Save current timer value for result
+  currentTimeForResult = timeLeft;
+
   const number = Math.floor(Math.random() * 100) + 1;
   const resultType = number > 50 ? 'Big' : 'Small';
 
+  // Prediction is random; you can modify to get user input if needed
   const prediction = Math.random() > 0.5 ? 'Big' : 'Small';
 
   document.getElementById('result').innerText = 
-    `Number: ${number} (${resultType})\nYour prediction was: ${prediction}`;
+    `Number: ${number} (${resultType})\nYour prediction was: ${prediction}\nTimer at result: ${currentTimeForResult}s`;
 
   if (prediction === resultType) {
     document.getElementById('status').innerText = 'Auto Prediction: You won!';
