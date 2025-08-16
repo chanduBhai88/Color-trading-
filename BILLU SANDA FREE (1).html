@@ -1,53 +1,70 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Auto Big/Small Prediction Game</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            margin-top: 50px;
-        }
-        #result {
-            margin-top: 20px;
-            font-size: 20px;
-        }
-        #timer {
-            font-size: 24px;
-            color: red;
-        }
-    </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Big Small 1 Minute Prediction</title>
+<style>
+  body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
+  #timer { font-size: 2em; margin: 20px 0; }
+  button { padding: 10px 20px; font-size: 1em; margin: 10px; }
+  #result { font-size: 1.5em; margin-top: 20px; }
+</style>
 </head>
 <body>
 
-<h1>Auto Big/Small Prediction Game</h1>
-<p id="timer">Time Left: 120 seconds</p>
+<h1>Big Small Prediction Game</h1>
+<div id="timer">01:00</div>
+<button onclick="predict('Big')">Predict Big</button>
+<button onclick="predict('Small')">Predict Small</button>
+
+<div id="status"></div>
 <div id="result"></div>
 
 <script>
-    let timer = 120; // 2 minutes in seconds
-    const resultDiv = document.getElementById('result');
+let countdown;
+let timeLeft = 60; // 1 minute in seconds
+let userPrediction = '';
 
-    function startGame() {
-        setInterval(() => {
-            if (timer <= 0) {
-                makePrediction();
-                timer = 120; // Reset timer
-            }
-            document.getElementById('timer').innerText = `Time Left: ${timer} seconds`;
-            timer--;
-        }, 1000);
+function startTimer() {
+  document.getElementById('status').innerText = 'Game Started! Make your prediction.';
+  countdown = setInterval(() => {
+    if (timeLeft > 0) {
+      timeLeft--;
+      let minutes = Math.floor(timeLeft / 60);
+      let seconds = timeLeft % 60;
+      document.getElementById('timer').innerText = 
+        `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    } else {
+      clearInterval(countdown);
+      document.getElementById('status').innerText = 'Time Over! Determining result...';
+      determineResult();
     }
+  }, 1000);
+}
 
-    function makePrediction() {
-        const randomResult = Math.random() < 0.5 ? 'Big' : 'Small';
-        resultDiv.innerHTML = `The result is: ${randomResult}`;
-    }
+function predict(choice) {
+  userPrediction = choice;
+  document.getElementById('status').innerText = `You predicted: ${choice}`;
+}
 
-    // Start the game when the page loads
-    window.onload = startGame;
+function determineResult() {
+  // Randomly generate Big (above 50) or Small (below 50)
+  const number = Math.floor(Math.random() * 100) + 1; // 1 to 100
+  let resultType = number > 50 ? 'Big' : 'Small';
+
+  document.getElementById('result').innerText = 
+    `Number: ${number} (${resultType})`;
+
+  if (userPrediction === resultType) {
+    document.getElementById('status').innerText = 'Congratulations! You won!';
+  } else {
+    document.getElementById('status').innerText = 'Sorry! You lost.';
+  }
+}
+
+// Start the timer when page loads
+window.onload = startTimer;
 </script>
 
 </body>
