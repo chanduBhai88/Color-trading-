@@ -1,80 +1,77 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Instagram Info Finder</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 500px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        .container {
-            border: 1px solid #ddd;
-            padding: 20px;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-        }
-        input {
-            width: 100%;
-            padding: 10px;
-            margin: 10px 0;
-            box-sizing: border-box;
-        }
-        button {
-            background-color: #3897f0;
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        #result {
-            margin-top: 20px;
-            padding: 10px;
-            border: 1px dashed #ccc;
-            display: none;
-        }
-    </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Auto Prediction Game</title>
+<style>
+  body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
+  #timer { font-size: 2em; margin: 20px 0; }
+  #status, #result { font-size: 1.5em; margin-top: 20px; white-space: pre-line; }
+</style>
 </head>
 <body>
-    <div class="container">
-        <h2>Instagram Account Info</h2>
-        <p>Enter username to view details (demo only):</p>
-        
-        <input type="text" id="usernameInput" placeholder="Enter Instagram username">
-        <button onclick="showPassword()">Get Info</button>
-        
-        <div id="result">
-            <h3>Account Information</h3>
-            <p><strong>Username:</strong> <span id="displayUsername"></span></p>
-            <p><strong>Password:</strong> <span id="displayPassword"></span></p>
-            <p><em>Note: This is a fake demo. Real passwords cannot be fetched this way.</em></p>
-        </div>
-    </div>
 
-    <script>
-        // Ye fake data hai - real nahi
-        const fakeDatabase = {
-            "testuser": "password123",
-            "demoaccount": "insta@2024",
-            "example": "examplepass"
-        };
+<h1>Big Small Auto Prediction Game</h1>
+<div id="timer">01:00</div>
+<button onclick="startGame()">Start Game</button>
 
-        function showPassword() {
-            const username = document.getElementById("usernameInput").value.toLowerCase();
-            const resultDiv = document.getElementById("result");
-            
-            if (fakeDatabase[username]) {
-                document.getElementById("displayUsername").textContent = username;
-                document.getElementById("displayPassword").textContent = fakeDatabase[username];
-                resultDiv.style.display = "block";
-            } else {
-                document.getElementById("displayUsername").textContent = username;
-                document.getElementById("displayPassword").textContent = "Not found in demo database";
-                resultDiv.style.display = "block";
-            }
-        }
-    </script>
+<div id="status"></div>
+<div id="result"></div>
+
+<script>
+let countdown;
+let timeLeft = 60; // 1 minute
+
+function startGame() {
+  document.getElementById('status').innerText = 'Game Started! Wait for result...';
+  document.getElementById('result').innerText = '';
+  startTimer();
+
+  // After 5 seconds, generate result
+  setTimeout(() => {
+    determineResult();
+  }, 5000);
+}
+
+function startTimer() {
+  clearInterval(countdown); // Clear any existing timer
+  timeLeft = 60; // Reset time
+  updateTimerDisplay();
+
+  countdown = setInterval(() => {
+    if (timeLeft > 0) {
+      timeLeft--;
+      updateTimerDisplay();
+    } else {
+      clearInterval(countdown);
+    }
+  }, 1000);
+}
+
+function updateTimerDisplay() {
+  let minutes = Math.floor(timeLeft / 60);
+  let seconds = timeLeft % 60;
+  document.getElementById('timer').innerText = 
+    `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+}
+
+function determineResult() {
+  const number = Math.floor(Math.random() * 100) + 1;
+  const resultType = number > 50 ? 'Big' : 'Small';
+
+  const prediction = Math.random() > 0.5 ? 'Big' : 'Small';
+
+  document.getElementById('result').innerText = 
+    `Number: ${number} (${resultType})\nYour prediction was: ${prediction}`;
+
+  if (prediction === resultType) {
+    document.getElementById('status').innerText = 'Auto Prediction: You won!';
+  } else {
+    document.getElementById('status').innerText = 'Auto Prediction: You lost.';
+  }
+}
+</script>
+
 </body>
 </html>
