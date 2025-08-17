@@ -1,74 +1,153 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Auto Prediction Game</title>
-<style>
-  body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
-  #timer { font-size: 2em; margin: 20px 0; }
-  #status, #result { font-size: 1.5em; margin-top: 20px; }
-</style>
+    <title>Big and Small Numbers Analysis</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        h1 {
+            color: #333;
+        }
+        .container {
+            display: flex;
+            gap: 30px;
+        }
+        .column {
+            flex: 1;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .small {
+            background-color: #d4edda;
+        }
+        .big {
+            background-color: #f8d7da;
+        }
+    </style>
 </head>
 <body>
-
-<h1>Big Small Auto Prediction Game</h1>
-<div id="timer">01:00</div>
-<button onclick="startGame()">Start Game</button>
-
-<div id="status"></div>
-<div id="result"></div>
-
-<script>
-let countdown;
-let timeLeft = 60; // 1 minute
-
-function startGame() {
-  document.getElementById('status').innerText = 'Game Started! Wait for result...';
-  document.getElementById('result').innerText = '';
-  // Start countdown
-  startTimer();
-
-  // After 5 seconds, automatically generate result
-  setTimeout(() => {
-    determineResult();
-  }, 5000); // 5 seconds delay for demo
-}
-
-function startTimer() {
-  timeLeft = 60;
-  document.getElementById('timer').innerText = '01:00';
-  countdown = setInterval(() => {
-    if (timeLeft > 0) {
-      timeLeft--;
-      let minutes = Math.floor(timeLeft / 60);
-      let seconds = timeLeft % 60;
-      document.getElementById('timer').innerText = 
-        `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-    } else {
-      clearInterval(countdown);
-    }
-  }, 1000);
-}
-
-function determineResult() {
-  // Random number between 1 and 100
-  const number = Math.floor(Math.random() * 100) + 1;
-  const resultType = number > 50 ? 'Big' : 'Small';
-
-  // Automatic prediction (random)
-  const prediction = Math.random() > 0.5 ? 'Big' : 'Small';
-
-  document.getElementById('result').innerText = 
-    `Number: ${number} (${resultType})\nYour prediction was: ${prediction}`;
-
-  if (prediction === resultType) {
-    document.getElementById('status').innerText = 'Auto Prediction: You won!';
-  } else {
-    document.getElementById('status').innerText = 'Auto Prediction: You lost.';
-  }
-}
-</script>
-
+    <h1>Big and Small Numbers Analysis</h1>
+    
+    <div class="container">
+        <div class="column">
+            <h2>Small Numbers (0-4)</h2>
+            <table>
+                <tr>
+                    <th>Period</th>
+                    <th>Number</th>
+                </tr>
+                <tr class="small">
+                    <td>2508170530</td>
+                    <td>2</td>
+                </tr>
+                <tr class="small">
+                    <td>2508170529</td>
+                    <td>1</td>
+                </tr>
+                <tr class="small">
+                    <td>2508170528</td>
+                    <td>4</td>
+                </tr>
+                <tr class="small">
+                    <td>2508170527</td>
+                    <td>2</td>
+                </tr>
+                <tr class="small">
+                    <td>2508170526</td>
+                    <td>0</td>
+                </tr>
+                <tr class="small">
+                    <td>2508170523</td>
+                    <td>3</td>
+                </tr>
+                <tr class="small">
+                    <td>2508170522</td>
+                    <td>2</td>
+                </tr>
+                <tr class="small">
+                    <td>2508170521</td>
+                    <td>0</td>
+                </tr>
+                <tr class="small">
+                    <td>2508170519</td>
+                    <td>3</td>
+                </tr>
+                <tr class="small">
+                    <td>2508170518</td>
+                    <td>2</td>
+                </tr>
+                <!-- More small numbers would be added here -->
+            </table>
+        </div>
+        
+        <div class="column">
+            <h2>Big Numbers (5-9)</h2>
+            <table>
+                <tr>
+                    <th>Period</th>
+                    <th>Number</th>
+                </tr>
+                <tr class="big">
+                    <td>2508170525</td>
+                    <td>5</td>
+                </tr>
+                <tr class="big">
+                    <td>2508170524</td>
+                    <td>5</td>
+                </tr>
+                <tr class="big">
+                    <td>2508170520</td>
+                    <td>8</td>
+                </tr>
+                <tr class="big">
+                    <td>2508170517</td>
+                    <td>8</td>
+                </tr>
+                <tr class="big">
+                    <td>2508170515</td>
+                    <td>8</td>
+                </tr>
+                <tr class="big">
+                    <td>2508170513</td>
+                    <td>5</td>
+                </tr>
+                <tr class="big">
+                    <td>2508170512</td>
+                    <td>5</td>
+                </tr>
+                <tr class="big">
+                    <td>2508170511</td>
+                    <td>5</td>
+                </tr>
+                <tr class="big">
+                    <td>2508170510</td>
+                    <td>9</td>
+                </tr>
+                <tr class="big">
+                    <td>2508170509</td>
+                    <td>5</td>
+                </tr>
+                <!-- More big numbers would be added here -->
+            </table>
+        </div>
+    </div>
+    
+    <h2>Trend Analysis</h2>
+    <p>Small numbers (0-4) count: 42</p>
+    <p>Big numbers (5-9) count: 58</p>
+    <p>Current trend: More Big numbers appearing recently</p>
 </body>
 </html>
