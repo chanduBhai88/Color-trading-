@@ -1,113 +1,296 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="hi">
 <head>
-    <title>BS Predictor</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <style>
-        body {
-            background: black;
-            color: lime;
-            font-family: monospace;
-            text-align: center;
-            padding: 20px;
-            touch-action: manipulation;
-        }
-        h1 {
-            font-size: 28px;
-            margin-bottom: 30px;
-        }
-        #sequence {
-            font-size: 24px;
-            letter-spacing: 3px;
-            margin: 20px 0;
-            min-height: 40px;
-            word-break: break-all;
-        }
-        #result {
-            font-size: 30px;
-            color: white;
-            margin: 25px 0;
-            min-height: 50px;
-        }
-        .buttons {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-        button {
-            background: black;
-            color: lime;
-            border: 3px solid lime;
-            font-size: 30px;
-            padding: 15px 25px;
-            min-width: 100px;
-            cursor: pointer;
-            border-radius: 8px;
-        }
-        button:active {
-            background: #002200;
-        }
-        .B { color: cyan; }
-        .S { color: yellow; }
-        .hidden { display: none; }
-    </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>RAJA GAMES — 9-Digit B/S Predictor</title>
+<style>
+  /* --- Khatarnak animated wallpaper --- */
+  :root{
+    --bg1:#060916; --bg2:#0b1b3a; --neon:#00ffd5; --hot:#ff006e; --card:rgba(255,255,255,0.08);
+    --text:#ecf1ff; --muted:#9fb0ff; --good:#2ee85f; --bad:#ff3b3b; --amber:#ffd166;
+  }
+  html,body{height:100%}
+  body{
+    margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; color:var(--text);
+    background:
+      radial-gradient(1200px 800px at 10% 20%, rgba(255,0,120,.15), transparent 60%),
+      radial-gradient(1200px 800px at 90% 30%, rgba(0,255,213,.12), transparent 60%),
+      radial-gradient(1200px 800px at 40% 80%, rgba(255,215,0,.10), transparent 60%),
+      linear-gradient(135deg, var(--bg1), var(--bg2));
+    overflow-x:hidden;
+  }
+  /* Subtle animated energy lines */
+  .energy{
+    position:fixed; inset:0; pointer-events:none; opacity:.25; mix-blend-mode:screen;
+    background:
+      repeating-linear-gradient(115deg, transparent 0 40px, rgba(0,255,213,.08) 40px 44px),
+      repeating-linear-gradient(245deg, transparent 0 50px, rgba(255,0,110,.07) 50px 54px);
+    animation: drift 12s linear infinite;
+  }
+  @keyframes drift{0%{transform:translateX(0)}100%{transform:translateX(-80px)}}
+
+  .wrap{
+    max-width:980px; margin:32px auto; padding:16px;
+  }
+  .glass{
+    background:var(--card); backdrop-filter: blur(10px); border:1px solid rgba(255,255,255,.12);
+    border-radius:24px; box-shadow: 0 10px 30px rgba(0,0,0,.35);
+  }
+  header{
+    padding:22px 24px 8px; display:flex; align-items:center; justify-content:space-between;
+  }
+  .title{font-size:clamp(20px,3vw,28px); font-weight:800; letter-spacing:.3px}
+  .subtitle{color:var(--muted); font-size:14px}
+  .panel{padding:18px 20px}
+  .grid{display:grid; grid-template-columns:1fr; gap:16px}
+  @media (min-width:800px){ .grid{grid-template-columns: 1.2fr .8fr} }
+
+  /* Input dots */
+  .slots{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
+  .slot{
+    width:40px;height:40px;border-radius:12px;border:1px solid rgba(255,255,255,.18);
+    display:grid;place-items:center;background:rgba(255,255,255,.06); font-weight:800; font-size:18px;
+    color:#d7e0ff; box-shadow: inset 0 0 10px rgba(255,255,255,.04);
+  }
+  .slot.b{outline:2px solid rgba(0,255,213,.4)}
+  .slot.s{outline:2px solid rgba(255,0,110,.4)}
+
+  /* Buttons */
+  .btnrow{display:flex; gap:12px; flex-wrap:wrap}
+  .btn{
+    border:none; padding:14px 18px; border-radius:14px; font-size:16px; font-weight:700; cursor:pointer;
+    background:linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,.06));
+    color:var(--text); border:1px solid rgba(255,255,255,.16); transition: transform .05s ease, box-shadow .2s ease;
+    box-shadow: 0 6px 18px rgba(0,0,0,.25);
+  }
+  .btn:active{ transform: translateY(1px) }
+  .b-btn{ box-shadow: 0 8px 24px rgba(0,255,213,.25) }
+  .s-btn{ box-shadow: 0 8px 24px rgba(255,0,110,.25) }
+  .go{ box-shadow: 0 8px 24px rgba(255,209,102,.25) }
+  .clr{ box-shadow: 0 8px 24px rgba(255,59,59,.25) }
+
+  /* Result box */
+  .result{
+    display:grid; grid-template-columns:auto 1fr; gap:14px; align-items:center;
+    padding:16px; border-radius:16px; border:1px solid rgba(255,255,255,.16);
+    background:linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.04));
+  }
+  .badge{font-size:14px; padding:6px 10px; border-radius:999px; border:1px solid rgba(255,255,255,.2); color:var(--muted)}
+  .predict{
+    font-size:40px; font-weight:900; letter-spacing:2px; min-height:48px;
+  }
+
+  /* Boom animation for matched result */
+  .boom{ position:relative; display:inline-block; padding:8px 16px; border-radius:14px; }
+  .boom.good{ background: rgba(46,232,95,.16); border:1px solid rgba(46,232,95,.35) }
+  .boom.bad{ background: rgba(255,59,59,.16); border:1px solid rgba(255,59,59,.35) }
+  .boom::after{
+    content:""; position:absolute; inset:-2px; border-radius:16px; filter:blur(6px); opacity:0; pointer-events:none;
+  }
+  .boom.flash{ animation: flash 900ms ease }
+  @keyframes flash{
+    0%{ box-shadow: 0 0 0 rgba(255,255,255,0); transform:scale(0.98) }
+    25%{ transform:scale(1.02) }
+    50%{ box-shadow: 0 0 40px rgba(255,255,255,.45) }
+    100%{ box-shadow: 0 0 0 rgba(255,255,255,0); transform:scale(1) }
+  }
+
+  /* History */
+  .history{ display:flex; flex-direction:column; gap:10px; max-height:380px; overflow:auto; padding-right:6px }
+  .hitem{
+    display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:12px;
+    background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size:13px;
+  }
+  .mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace }
+  .pill{ padding:3px 8px; border-radius:999px; border:1px solid rgba(255,255,255,.18); font-weight:700 }
+  .pill.b{ color:var(--neon) }
+  .pill.s{ color:var(--hot) }
+  .muted{ color:var(--muted) }
+  .tiny{ font-size:12px }
+  .hint{ color:var(--muted); font-size:13px }
+</style>
 </head>
 <body>
-    <h1>BS PREDICTOR</h1>
-    <div id="sequence">CLICK B OR S (9 Times)</div>
-    <div id="result" class="hidden"></div>
-    
-    <div class="buttons">
-        <button onclick="addChar('B')">B</button>
-        <button onclick="addChar('S')">S</button>
-        <button onclick="showResult()">RESULT</button>
-        <button onclick="reset()">RESET</button>
-    </div>
+  <div class="energy"></div>
+  <div class="wrap glass">
+    <header>
+      <div>
+        <div class="title">RAJA GAMES — 9-Digit B/S Predictor</div>
+        <div class="subtitle">Sirf click se input. Result database se hi aayega. Match na ho to: “Aaj nahin ho raha hai”.</div>
+      </div>
+      <div class="badge">Fixed Pattern DB • 9 Input</div>
+    </header>
+    <div class="panel">
+      <div class="grid">
+        <!-- LEFT: Input + Controls + Result -->
+        <section class="glass" style="padding:16px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+            <div class="hint">Input (9): <span id="count" class="mono">0/9</span></div>
+            <div class="hint">Only B/S clicks — no typing</div>
+          </div>
+          <div id="slots" class="slots" style="margin-bottom:14px"></div>
 
-    <script>
-        let sequence = [];
-        const resultDiv = document.getElementById("result");
-        const sequenceDiv = document.getElementById("sequence");
-        
-        function addChar(char) {
-            if (sequence.length >= 9) return; // Stop after 9 inputs
-            sequence.push(char);
-            updateDisplay();
-        }
-        
-        function showResult() {
-            if (sequence.length < 9) {
-                resultDiv.innerHTML = `Enter ${9 - sequence.length} more!`;
-                resultDiv.classList.remove("hidden");
-                return;
-            }
-            
-            // Your 10th Prediction Logic Here (Example: Random B/S)
-            const predicted10th = Math.random() > 0.5 ? 'B' : 'S'; 
-            
-            resultDiv.innerHTML = `
-                9 Inputs: ${formatSeq(sequence)}<br>
-                10th Prediction: <span class="${predicted10th}">${predicted10th}</span>
-            `;
-            resultDiv.classList.remove("hidden");
-        }
-        
-        function formatSeq(seq) {
-            return seq.map(c => `<span class="${c}">${c}</span>`).join("");
-        }
-        
-        function updateDisplay() {
-            sequenceDiv.innerHTML = sequence.length ? 
-                `${formatSeq(sequence)} (${sequence.length}/9)` : 
-                "CLICK B OR S (9 Times)";
-        }
-        
-        function reset() {
-            sequence = [];
-            sequenceDiv.innerHTML = "CLICK B OR S (9 Times)";
-            resultDiv.classList.add("hidden");
-        }
-    </script>
+          <div class="btnrow" style="margin-bottom:14px">
+            <button class="btn b-btn" id="addB">➕ B</button>
+            <button class="btn s-btn" id="addS">➕ S</button>
+            <button class="btn clr" id="clear">Clear</button>
+            <button class="btn go" id="result">Result</button>
+          </div>
+
+          <div class="result" style="margin-top:10px">
+            <div class="badge">Prediction</div>
+            <div id="prediction" class="predict mono"></div>
+          </div>
+
+          <div style="margin-top:10px" class="hint">
+            Tip: 9 letters bharne ke baad “Result” dabao. Multiple matches hon to majority-next value li jaati hai.
+          </div>
+        </section>
+
+        <!-- RIGHT: History -->
+        <aside class="glass" style="padding:16px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+            <div class="hint">Last 10 Results (auto-saved)</div>
+            <button class="btn" id="clearHist" title="Clear History">Clear History</button>
+          </div>
+          <div id="history" class="history"></div>
+        </aside>
+      </div>
+    </div>
+  </div>
+
+<script>
+/* ======== FIXED PATTERN DATABASE (from your message) ======== */
+const RAW_DB = `
+SBBBBBSSBBSSSSBSBSSSSBSSBBBSBBBSSBBSSBBBSSSBBBBSSBBBBBBBBBBBBBBBBSSBBSSSSSBBSSBSSSSBBBBSBBBSBSBSSBBSSSBBSSSSSBSBBSSBBBBBSSBBBBSSBBBBSSBBSSBBSBSSBSBBBSBSSSBSSBSSBBSSBSBSSBBBBBBBSBSSBBBBSSSSBSBSSSBSBSBSSBSBBSBBBSSSSBSSBBBSBSBSSBBSBSSSBSSBSSBSSSBSSBSBBSSSBSBSSBSSSBBBBSBBBSSBSSSSBSSSBSSBSSSSSSSSSBBBBSBSSSSSBBSSSBBBSSSBBSSBBBSSBSBBSBSSSBSBBBSSSBBBSBSSBBSBSBSBBSBBSSBSSSBBSBBBSSSSSBBSSSBSSSSBSBSSSSSBSSBBBBBSSBBSBBBSBSBBBSSBBBSSBSSBSBBSBSS
+`.trim();
+
+/* ======== UTIL: sanitize DB to array of 'B'/'S' ======== */
+function sanitizeDB(str){
+  return str.toUpperCase().replace(/[^BS]/g,'');
+}
+const DB = sanitizeDB(RAW_DB);
+const DB_ARR = DB.split('');
+
+/* Build map: key = 9-length window, value = {B:count, S:count} for next char(s) */
+const WIN = 9;
+const nextMap = new Map();
+for(let i=0;i<=DB_ARR.length-WIN-1;i++){
+  const key = DB_ARR.slice(i,i+WIN).join('');
+  const next = DB_ARR[i+WIN];
+  if(!nextMap.has(key)) nextMap.set(key,{B:0,S:0,total:0});
+  const obj = nextMap.get(key);
+  obj[next]++; obj.total++;
+}
+
+/* ======== UI State ======== */
+let input = [];
+
+/* Elements */
+const slotsEl = document.getElementById('slots');
+const countEl = document.getElementById('count');
+const predictionEl = document.getElementById('prediction');
+const historyEl = document.getElementById('history');
+
+/* Create 9 slots */
+function renderSlots(){
+  slotsEl.innerHTML = '';
+  for(let i=0;i<WIN;i++){
+    const d = document.createElement('div');
+    d.className = 'slot' + (input[i] ? (' ' + (input[i].toLowerCase())) : '');
+    d.textContent = input[i] || '•';
+    slotsEl.appendChild(d);
+  }
+  countEl.textContent = `${input.length}/${WIN}`;
+}
+renderSlots();
+
+/* Buttons */
+document.getElementById('addB').onclick = ()=>{ if(input.length<WIN){ input.push('B'); renderSlots(); } };
+document.getElementById('addS').onclick = ()=>{ if(input.length<WIN){ input.push('S'); renderSlots(); } };
+document.getElementById('clear').onclick = ()=>{ input.length=0; renderSlots(); showPredict(''); };
+document.getElementById('result').onclick = onResult;
+document.getElementById('clearHist').onclick = ()=>{ localStorage.removeItem('rg9_hist'); renderHistory(); };
+
+/* Prediction */
+function onResult(){
+  if(input.length!==WIN){
+    boomText(`Pehle 9 input bharo (${input.length}/9)`, 'bad');
+    return;
+  }
+  const key = input.join('');
+  const stats = nextMap.get(key);
+  if(!stats || stats.total===0){
+    boomText('Aaj nahin ho raha hai', 'bad');
+    saveHistory({in:key, out:'—', msg:'No match', occ:0, conf:0});
+    return;
+  }
+  const out = (stats.B===stats.S) ? (DB_ARR.join('').indexOf(key) % 2 ? 'S':'B') // tie-break: simple deterministic
+            : (stats.B>stats.S ? 'B' : 'S');
+  const conf = Math.round(100 * Math.max(stats.B,stats.S) / stats.total);
+  boomText(out, 'good');
+  saveHistory({in:key, out, msg:'Match', occ:stats.total, conf});
+  input.length=0; renderSlots(); // auto-clear after result
+}
+
+/* Fancy animated result text */
+function boomText(txt, mode){
+  predictionEl.innerHTML = '';
+  const span = document.createElement('span');
+  span.className = `boom ${mode} flash mono`;
+  span.textContent = txt;
+  predictionEl.appendChild(span);
+  // remove flash class after animation so next time it can re-run
+  setTimeout(()=>span.classList.remove('flash'), 950);
+}
+
+/* ======== History (persist last 10) ======== */
+function loadHistory(){
+  try{
+    return JSON.parse(localStorage.getItem('rg9_hist')||'[]');
+  }catch{ return []; }
+}
+function saveHistory(entry){
+  const row = { ...entry, t: new Date().toISOString() };
+  const hist = loadHistory();
+  hist.unshift(row);
+  while(hist.length>10) hist.pop();
+  localStorage.setItem('rg9_hist', JSON.stringify(hist));
+  renderHistory();
+}
+function renderHistory(){
+  const hist = loadHistory();
+  historyEl.innerHTML = '';
+  if(hist.length===0){
+    const d=document.createElement('div');
+    d.className='hint'; d.textContent='No history yet.';
+    historyEl.appendChild(d);
+    return;
+  }
+  hist.forEach(h=>{
+    const d = document.createElement('div');
+    d.className='hitem';
+    const dt = new Date(h.t);
+    const when = dt.toLocaleString();
+    d.innerHTML = `
+      <span class="tiny muted">${when}</span>
+      <span class="pill ${h.out==='B'?'b':(h.out==='S'?'s':'')}" title="Next">${h.out}</span>
+      <span class="mono">Input:</span><span class="mono">${h.in}</span>
+      <span class="muted tiny">${h.msg}${h.occ?` • occ:${h.occ} • conf:${h.conf}%`:''}</span>
+    `;
+    historyEl.appendChild(d);
+  });
+}
+renderHistory();
+
+/* Keyboard is disabled by design; but in case someone types, block non-B/S and length>9 */
+document.addEventListener('keydown', (e)=>{
+  if(['b','B','s','S','Backspace','Delete'].includes(e.key)){
+    e.preventDefault(); // no typing; keep it purely click-based
+  }
+});
+</script>
 </body>
 </html>
