@@ -2,121 +2,266 @@
 <html lang="hi">
 <head>
     <meta charset="UTF-8">
-    <title>पैटर्न प्रेडिक्शन</title>
+    <title>TC Game Predictor Pro</title>
     <style>
         body {
-            font-family: 'Arial', sans-serif;
-            text-align: center;
-            margin-top: 50px;
-            background-color: #f5f5f5;
-        }
-        button {
-            font-size: 20px;
-            padding: 10px 20px;
-            margin: 10px;
-            cursor: pointer;
-        }
-        #sequence {
-            font-size: 24px;
-            margin-top: 20px;
-        }
-        #prediction-box {
-            font-size: 24px;
-            font-weight: bold;
-            margin-top: 30px;
+            font-family: 'Courier New', monospace;
+            background-color: #0a0a0a;
+            color: #0f0;
+            margin: 0;
             padding: 20px;
-            border: 2px solid black;
+            background-image: 
+                radial-gradient(circle at 25% 25%, rgba(30, 30, 30, 0.8) 0%, rgba(0,0,0,0.9) 100%),
+                url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect fill="%23121212" width="50" height="50" x="0" y="0"/><rect fill="%23121212" width="50" height="50" x="50" y="50"/></svg>');
+            background-size: 100px 100px, auto;
+            text-shadow: 0 0 5px #0f0;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background-color: rgba(10, 10, 10, 0.9);
+            border-radius: 5px;
+            padding: 25px;
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
+            border: 1px solid rgba(0, 255, 0, 0.2);
+        }
+        
+        h1, h2, h3 {
+            color: #0f0;
+            text-align: center;
+            margin-bottom: 20px;
+            border-bottom: 1px dashed #0f0;
+            padding-bottom: 10px;
+        }
+        
+        .input-section {
+            background-color: rgba(0, 20, 0, 0.3);
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 25px;
+            border: 1px solid #0f0;
+        }
+        
+        .number-inputs {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .number-selector {
+            position: relative;
             display: inline-block;
-            min-width: 200px;
+            width: 80px;  /* Increased from 60px */
+            height: 80px; /* Increased from 60px */
+            margin: 5px;
         }
-        .feedback-btn {
+        
+        .number-display {
+            width: 100%;
+            height: 100%;
+            font-size: 36px; /* Increased from 24px */
+            text-align: center;
+            background-color: black;
+            color: #0f0;
+            border: 2px solid #0f0;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .number-display:hover {
+            box-shadow: 0 0 15px #0f0; /* Increased glow */
+            transform: scale(1.08); /* Slightly larger hover effect */
+        }
+        
+        .number-options {
+            display: none;
+            position: absolute;
+            z-index: 100;
+            background-color: rgba(0, 15, 0, 0.95);
+            border: 1px solid #0f0;
+            border-radius: 5px;
+            width: 80px;  /* Match selector width */
+            max-height: 300px; /* Increased from 200px */
+            overflow-y: auto;
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.7); /* Stronger shadow */
+            left: 0;
+            top: 85px; /* Position below selector */
+        }
+        
+        .number-option {
+            padding: 15px; /* Increased from 10px */
+            text-align: center;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            border-bottom: 1px dashed rgba(0, 255, 0, 0.2);
+            font-size: 24px; /* Larger font for options */
+        }
+        
+        .number-option:last-child {
+            border-bottom: none;
+        }
+        
+        .number-option:hover {
+            background-color: rgba(0, 255, 0, 0.3);
+            transform: scale(1.05); /* Slight grow effect */
+        }
+        
+        /* Rest of your existing CSS remains the same */
+        .button-group {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
             margin-top: 20px;
+            flex-wrap: wrap;
         }
+        
+        .btn {
+            padding: 15px 30px; /* Slightly larger buttons */
+            font-size: 18px; /* Larger font */
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 1px solid #0f0;
+            background-color: black;
+            color: #0f0;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px; /* Slightly more spacing */
+        }
+        
+        /* ... (rest of your existing CSS remains unchanged) ... */
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-
-    <h1>आपका पैटर्न क्या है?</h1>
-    <div>
-        <button onclick="addInput('B')">B</button>
-        <button onclick="addInput('S')">S</button>
-        <button onclick="reset()">रीसेट करें</button>
-    </div>
-
-    <div id="sequence">अब तक का इनपुट: </div>
-
-    <div id="prediction-box" style="background-color: gray;">
-        <span id="prediction-label">कोई प्रेडिक्शन नहीं</span>
-    </div>
-
-    <div class="feedback-btn" id="feedback" style="display:none;">
-        <p>क्या यह सही था?</p>
-        <button onclick="giveFeedback(true)">✔️ हाँ</button>
-        <button onclick="giveFeedback(false)">❌ नहीं</button>
+    <div class="container">
+        <h1>TC Game Predictor Pro</h1>
+        <h3>Big (5-9) / Small (0-4) Analysis Tool</h3>
+        
+        <div class="input-section">
+            <h2>Enter Last 5 Numbers</h2>
+            <div class="number-inputs">
+                <div class="number-selector" id="num1-selector">
+                    <div class="number-display" onclick="showNumberOptions('num1-selector')">0</div>
+                    <div class="number-options" id="num1-options"></div>
+                </div>
+                <div class="number-selector" id="num2-selector">
+                    <div class="number-display" onclick="showNumberOptions('num2-selector')">0</div>
+                    <div class="number-options" id="num2-options"></div>
+                </div>
+                <div class="number-selector" id="num3-selector">
+                    <div class="number-display" onclick="showNumberOptions('num3-selector')">0</div>
+                    <div class="number-options" id="num3-options"></div>
+                </div>
+                <div class="number-selector" id="num4-selector">
+                    <div class="number-display" onclick="showNumberOptions('num4-selector')">0</div>
+                    <div class="number-options" id="num4-options"></div>
+                </div>
+                <div class="number-selector" id="num5-selector">
+                    <div class="number-display" onclick="showNumberOptions('num5-selector')">0</div>
+                    <div class="number-options" id="num5-options"></div>
+                </div>
+            </div>
+            <div class="button-group">
+                <button class="btn" onclick="calculate()">
+                    <span>🔮 Predict Next Number</span>
+                </button>
+                <button class="btn" onclick="clearInputs()">
+                    <span>❌ Clear Inputs</span>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Rest of your HTML remains the same -->
+        <div id="result-section" class="result-section">
+            <!-- ... -->
+        </div>
+        
+        <div class="stats-section">
+            <!-- ... -->
+        </div>
+        
+        <div class="chart-container">
+            <canvas id="trend-chart"></canvas>
+        </div>
+        
+        <div class="memory-section">
+            <!-- ... -->
+        </div>
+        
+        <div class="history-section">
+            <!-- ... -->
+        </div>
     </div>
 
     <script>
-        let userSequence = [];
-        let currentPrediction = null;
-
-        const patterns = [
-            { sequence: 'BS', next: 'B', color: 'lightgreen' },
-            { sequence: 'SB', next: 'S', color: 'lightblue' },
-            { sequence: 'BB', next: 'S', color: 'yellow' },
-            { sequence: 'SS', next: 'B', color: 'pink' },
+        // Game history data
+        const gameHistory = [
+            {period: "2508170530", number: 2, type: "Small"},
+            {period: "2508170529", number: 1, type: "Small"},
+            {period: "2508170528", number: 4, type: "Small"},
+            // ... (rest of your game history data)
         ];
 
-        function addInput(letter) {
-            userSequence.push(letter);
-            updateDisplay();
-            predictNext();
-        }
-
-        function updateDisplay() {
-            document.getElementById('sequence').textContent = 'अब तक का इनपुट: ' + userSequence.join(' ');
-        }
-
-        function reset() {
-            userSequence = [];
-            currentPrediction = null;
-            document.getElementById('sequence').textContent = 'अब तक का इनपुट: ';
-            document.getElementById('prediction-box').style.backgroundColor = 'gray';
-            document.getElementById('prediction-label').textContent = 'कोई प्रेडिक्शन नहीं';
-            document.getElementById('feedback').style.display = 'none';
-        }
-
-        function predictNext() {
-            const input = userSequence.join('');
-            const pattern = patterns.find(p => input.endsWith(p.sequence));
-            const predictionBox = document.getElementById('prediction-box');
-            const predictionLabel = document.getElementById('prediction-label');
+        // Initialize number selectors with larger options
+        function initializeNumberSelectors() {
+            for (let i = 1; i <= 5; i++) {
+                const optionsContainer = document.getElementById(`num${i}-options`);
+                for (let num = 0; num <= 9; num++) {
+                    const option = document.createElement('div');
+                    option.className = 'number-option';
+                    option.textContent = num;
+                    option.onclick = function() {
+                        selectNumber(`num${i}`, num);
+                    };
+                    optionsContainer.appendChild(option);
+                }
+            }
             
-            if (pattern) {
-                currentPrediction = pattern.next;
-                predictionBox.style.backgroundColor = pattern.color;
-                predictionLabel.textContent = `अगला अनुमान: ${pattern.next}`;
-                showFeedbackButtons(true);
-            } else {
-                currentPrediction = null;
-                predictionBox.style.backgroundColor = 'gray';
-                predictionLabel.textContent = 'कोई पैटर्न नहीं मिला';
-                showFeedbackButtons(false);
-            }
+            // Close options when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('.number-selector')) {
+                    document.querySelectorAll('.number-options').forEach(opt => {
+                        opt.style.display = 'none';
+                    });
+                }
+            });
         }
-
-        function showFeedbackButtons(show) {
-            document.getElementById('feedback').style.display = show ? 'block' : 'none';
+        
+        // Rest of your JavaScript remains the same
+        function showNumberOptions(selectorId) {
+            document.querySelectorAll('.number-options').forEach(opt => {
+                opt.style.display = 'none';
+            });
+            const options = document.getElementById(selectorId.replace('selector', 'options'));
+            options.style.display = 'block';
         }
-
-        function giveFeedback(correct) {
-            if (correct) {
-                alert('✅ धन्यवाद! हमें खुशी है कि अनुमान सही था।');
-            } else {
-                alert('❌ धन्यवाद! हम कोशिश करेंगे बेहतर होने की।');
-            }
-            showFeedbackButtons(false);
+        
+        function selectNumber(inputId, number) {
+            document.getElementById(inputId + '-selector').querySelector('.number-display').textContent = number;
+            document.getElementById(inputId + '-options').style.display = 'none';
         }
+        
+        // ... (rest of your existing JavaScript functions)
+        
+        // Initialize the page
+        window.onload = function() {
+            initializeNumberSelectors();
+            updateHistoryTable();
+            updateHotColdNumbers();
+            updateCurrentTrend();
+            updateTrendChart();
+        };
     </script>
-
 </body>
 </html>
