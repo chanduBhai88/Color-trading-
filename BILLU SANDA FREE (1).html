@@ -5,135 +5,72 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Number Prediction Tool</title>
     <style>
-        :root {
-            --primary: #3498db;
-            --secondary: #2ecc71;
-            --danger: #e74c3c;
-            --warning: #f39c12;
-            --dark: #2c3e50;
-            --light: #ecf0f1;
-        }
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f5f7fa;
-            color: #333;
-            line-height: 1.6;
-        }
-        .container {
-            max-width: 800px;
+            font-family: Arial, sans-serif;
+            max-width: 600px;
             margin: 0 auto;
             padding: 20px;
+            background-color: #f5f5f5;
         }
-        header {
-            background-color: var(--dark);
-            color: white;
-            padding: 20px 0;
-            text-align: center;
-            margin-bottom: 30px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        .container {
+            background-color: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
         h1 {
-            font-size: 2rem;
-            margin-bottom: 10px;
-        }
-        .upload-section {
-            background-color: white;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            margin-bottom: 30px;
+            color: #2c3e50;
             text-align: center;
+            margin-bottom: 20px;
         }
         .upload-area {
-            border: 3px dashed #bdc3c7;
+            border: 3px dashed #7f8c8d;
             padding: 40px;
+            text-align: center;
+            margin: 20px 0;
             border-radius: 8px;
-            margin-bottom: 20px;
             cursor: pointer;
             transition: all 0.3s;
-            position: relative;
         }
         .upload-area:hover {
-            border-color: var(--primary);
-        }
-        #fileInput {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
-            opacity: 0;
-            cursor: pointer;
-        }
-        .preview-container {
-            margin: 20px 0;
-            text-align: center;
+            border-color: #3498db;
+            background-color: #f8f9fa;
         }
         #imagePreview {
             max-width: 100%;
             max-height: 300px;
-            border-radius: 8px;
-            border: 1px solid #ddd;
+            margin: 15px 0;
             display: none;
+            border-radius: 5px;
         }
-        .btn {
-            display: inline-block;
-            background-color: var(--primary);
+        button {
+            background-color: #2ecc71;
             color: white;
-            padding: 12px 25px;
             border: none;
+            padding: 12px 25px;
             border-radius: 6px;
             cursor: pointer;
             font-size: 16px;
             font-weight: bold;
-            transition: all 0.3s;
             margin-top: 15px;
-        }
-        .btn:hover {
-            opacity: 0.9;
-            transform: translateY(-2px);
-        }
-        .btn-analyze {
-            background-color: var(--secondary);
             display: none;
         }
-        .results-section {
-            display: none;
-            background-color: white;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            margin-bottom: 30px;
+        button:hover {
+            background-color: #27ae60;
         }
-        .prediction-card {
-            border-left: 5px solid var(--secondary);
+        .result {
+            margin-top: 25px;
             padding: 20px;
-            margin: 20px 0;
-            background-color: #f8f9fa;
+            background-color: #e8f4f8;
             border-radius: 8px;
+            display: none;
         }
-        .prediction-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-        .prediction-title {
-            font-size: 1.3rem;
-            color: var(--dark);
+        .big {
+            color: #e74c3c;
             font-weight: bold;
         }
-        .prediction-accuracy {
-            background-color: var(--secondary);
-            color: white;
-            padding: 5px 15px;
-            border-radius: 20px;
+        .small {
+            color: #2980b9;
             font-weight: bold;
         }
         .number-badge {
@@ -143,31 +80,22 @@
             border-radius: 20px;
             font-weight: bold;
         }
-        .number-badge.big {
+        .big-badge {
             background-color: #e74c3c;
             color: white;
         }
-        .number-badge.small {
-            background-color: #3498db;
+        .small-badge {
+            background-color: #2980b9;
             color: white;
-        }
-        .pattern-display {
-            font-family: monospace;
-            background-color: #2c3e50;
-            color: white;
-            padding: 10px;
-            border-radius: 5px;
-            margin: 10px 0;
-            overflow-x: auto;
         }
         .loading {
             text-align: center;
-            padding: 30px;
+            padding: 20px;
             display: none;
         }
         .spinner {
             border: 5px solid #f3f3f3;
-            border-top: 5px solid var(--primary);
+            border-top: 5px solid #3498db;
             border-radius: 50%;
             width: 50px;
             height: 50px;
@@ -178,172 +106,136 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-        .confidence-badge {
-            display: inline-block;
-            padding: 3px 10px;
-            margin-left: 10px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            background-color: var(--light);
-        }
-        .big-text {
-            color: var(--danger);
-            font-weight: bold;
-        }
-        .small-text {
-            color: var(--primary);
-            font-weight: bold;
-        }
     </style>
 </head>
 <body>
-    <header>
-        <div class="container">
-            <h1>Number Prediction Tool</h1>
-            <p>Upload one screenshot for instant analysis</p>
-        </div>
-    </header>
-
     <div class="container">
-        <section class="upload-section">
-            <h2>Upload Game Screenshot</h2>
-            <div class="upload-area" id="uploadArea">
-                <p>Click to select or drag & drop one image</p>
-                <input type="file" id="fileInput" accept="image/*">
-            </div>
-
-            <div class="preview-container">
-                <img id="imagePreview" alt="Preview of uploaded image">
-            </div>
-
-            <button class="btn btn-analyze" id="analyzeBtn">Analyze Now</button>
-        </section>
-
+        <h1>Number Prediction Tool</h1>
+        <p style="text-align: center;">Upload one screenshot for instant analysis</p>
+        
+        <div class="upload-area" id="uploadArea">
+            <p>Click to select or drag & drop one image</p>
+            <input type="file" id="fileInput" accept="image/*" style="display: none;">
+        </div>
+        
+        <img id="imagePreview" alt="Preview of uploaded image">
+        
+        <button id="analyzeBtn">Analyze Now</button>
+        
         <div class="loading" id="loadingIndicator">
             <div class="spinner"></div>
-            <p>Analyzing patterns and making predictions...</p>
+            <p>Analyzing image...</p>
         </div>
-
-        <section class="results-section" id="resultsSection">
+        
+        <div class="result" id="resultSection">
             <h2>Prediction Result</h2>
-            
-            <div class="prediction-card" id="predictionResult">
-                <!-- Prediction will be inserted here -->
-            </div>
-        </section>
+            <div id="predictionResult"></div>
+        </div>
     </div>
 
     <script>
-        // DOM elements
+        // Get DOM elements
         const uploadArea = document.getElementById('uploadArea');
         const fileInput = document.getElementById('fileInput');
         const imagePreview = document.getElementById('imagePreview');
         const analyzeBtn = document.getElementById('analyzeBtn');
         const loadingIndicator = document.getElementById('loadingIndicator');
-        const resultsSection = document.getElementById('resultsSection');
+        const resultSection = document.getElementById('resultSection');
         const predictionResult = document.getElementById('predictionResult');
 
-        // Event listeners
-        uploadArea.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            uploadArea.style.borderColor = var(--primary);
+        // Click on upload area to trigger file input
+        uploadArea.addEventListener('click', () => {
+            fileInput.click();
         });
-        
-        uploadArea.addEventListener('dragleave', () => {
-            uploadArea.style.borderColor = '#bdc3c7';
-        });
-        
-        uploadArea.addEventListener('drop', (e) => {
-            e.preventDefault();
-            uploadArea.style.borderColor = '#bdc3c7';
-            if (e.dataTransfer.files.length > 0) {
-                handleFile(e.dataTransfer.files[0]);
-            }
-        });
-        
-        fileInput.addEventListener('change', (e) => {
-            if (fileInput.files.length > 0) {
-                handleFile(fileInput.files[0]);
-            }
-        });
-        
-        analyzeBtn.addEventListener('click', analyzeImage);
 
         // Handle file selection
-        function handleFile(file) {
-            if (!file.type.startsWith('image/')) {
-                alert('Please upload an image file');
-                return;
+        fileInput.addEventListener('change', (e) => {
+            if (fileInput.files.length > 0) {
+                const file = fileInput.files[0];
+                if (file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        imagePreview.src = e.target.result;
+                        imagePreview.style.display = 'block';
+                        analyzeBtn.style.display = 'block';
+                        resultSection.style.display = 'none';
+                    };
+                    reader.readAsDataURL(file);
+                }
             }
+        });
 
-            const reader = new FileReader();
-            
-            reader.onload = function(e) {
-                imagePreview.src = e.target.result;
-                imagePreview.style.display = 'block';
-                analyzeBtn.style.display = 'inline-block';
-                resultsSection.style.display = 'none';
-            };
-            
-            reader.readAsDataURL(file);
-        }
+        // Drag and drop functionality
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.style.borderColor = '#3498db';
+        });
 
-        // Analyze the image
-        function analyzeImage() {
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.style.borderColor = '#7f8c8d';
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.style.borderColor = '#7f8c8d';
+            if (e.dataTransfer.files.length > 0) {
+                fileInput.files = e.dataTransfer.files;
+                const event = new Event('change');
+                fileInput.dispatchEvent(event);
+            }
+        });
+
+        // Analyze button click
+        analyzeBtn.addEventListener('click', () => {
             if (!imagePreview.src || imagePreview.src === '') {
                 alert('Please upload an image first');
                 return;
             }
 
             loadingIndicator.style.display = 'block';
-            resultsSection.style.display = 'none';
+            analyzeBtn.style.display = 'none';
+            resultSection.style.display = 'none';
 
             // Simulate analysis (in real app, this would process the image)
             setTimeout(() => {
                 generatePrediction();
                 loadingIndicator.style.display = 'none';
-                resultsSection.style.display = 'block';
-            }, 1500);
-        }
+                resultSection.style.display = 'block';
+            }, 2000);
+        });
 
-        // Generate prediction result
+        // Generate prediction
         function generatePrediction() {
-            // Clear previous prediction
+            // Clear previous result
             predictionResult.innerHTML = '';
 
-            // Determine prediction type (random for demo)
+            // Random prediction for demo (in real app, this would analyze the image)
             const isBig = Math.random() > 0.5;
-            const predictionType = isBig ? 'BIG' : 'SMALL';
-            const accuracy = Math.floor(Math.random() * 16) + 70; // 70-85%
+            const type = isBig ? 'BIG' : 'SMALL';
             const numbers = isBig ? 
                 ['5', '6', '7', '8', '9'].sort(() => 0.5 - Math.random()).slice(0, 3) : 
                 ['0', '1', '2', '3', '4'].sort(() => 0.5 - Math.random()).slice(0, 3);
-            
-            // Generate pattern (random for demo)
+            const accuracy = Math.floor(Math.random() * 16) + 70; // 70-85%
+
+            // Create pattern for demo
             const patternLength = Math.floor(Math.random() * 4) + 5; // 5-8
             let pattern = [];
             for (let i = 0; i < patternLength; i++) {
                 pattern.push(Math.random() > 0.5 ? 'B' : 'S');
             }
-            const patternStr = pattern.join(' → ');
 
-            // Create prediction card
+            // Display prediction
             predictionResult.innerHTML = `
-                <div class="prediction-header">
-                    <div class="prediction-title ${predictionType.toLowerCase()}-text">${predictionType} Numbers Prediction</div>
-                    <div class="prediction-accuracy">${accuracy}% Accuracy</div>
-                </div>
-                <p>Recommended numbers to bet on:</p>
+                <p>Predicted type: <span class="${type.toLowerCase()}">${type}</span></p>
+                <p>Recommended numbers:</p>
                 <div>
                     ${numbers.map(num => `
-                        <span class="number-badge ${predictionType.toLowerCase()}">${num}</span>
+                        <span class="number-badge ${isBig ? 'big-badge' : 'small-badge'}">${num}</span>
                     `).join('')}
                 </div>
-                <div class="pattern-display">
-                    Pattern Detected: ${patternStr}
-                </div>
-                <p><strong>Confidence:</strong> <span class="confidence-badge">${accuracy >= 80 ? '✔ HIGH CONFIDENCE' : '◉ MEDIUM CONFIDENCE'}</span></p>
-                <p style="margin-top: 15px; font-style: italic;">Analysis based on the detected pattern in your screenshot</p>
+                <p>Accuracy: ${accuracy}%</p>
+                <p>Detected pattern: ${pattern.join(' → ')}</p>
+                <p>Confidence: ${accuracy >= 80 ? 'High' : 'Medium'}</p>
             `;
         }
     </script>
