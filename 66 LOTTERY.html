@@ -1,296 +1,327 @@
-<!doctype html>
-<html lang="hi">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>RAJA GAMES — 9-Digit B/S Predictor</title>
-<style>
-  /* --- Khatarnak animated wallpaper --- */
-  :root{
-    --bg1:#060916; --bg2:#0b1b3a; --neon:#00ffd5; --hot:#ff006e; --card:rgba(255,255,255,0.08);
-    --text:#ecf1ff; --muted:#9fb0ff; --good:#2ee85f; --bad:#ff3b3b; --amber:#ffd166;
-  }
-  html,body{height:100%}
-  body{
-    margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; color:var(--text);
-    background:
-      radial-gradient(1200px 800px at 10% 20%, rgba(255,0,120,.15), transparent 60%),
-      radial-gradient(1200px 800px at 90% 30%, rgba(0,255,213,.12), transparent 60%),
-      radial-gradient(1200px 800px at 40% 80%, rgba(255,215,0,.10), transparent 60%),
-      linear-gradient(135deg, var(--bg1), var(--bg2));
-    overflow-x:hidden;
-  }
-  /* Subtle animated energy lines */
-  .energy{
-    position:fixed; inset:0; pointer-events:none; opacity:.25; mix-blend-mode:screen;
-    background:
-      repeating-linear-gradient(115deg, transparent 0 40px, rgba(0,255,213,.08) 40px 44px),
-      repeating-linear-gradient(245deg, transparent 0 50px, rgba(255,0,110,.07) 50px 54px);
-    animation: drift 12s linear infinite;
-  }
-  @keyframes drift{0%{transform:translateX(0)}100%{transform:translateX(-80px)}}
-
-  .wrap{
-    max-width:980px; margin:32px auto; padding:16px;
-  }
-  .glass{
-    background:var(--card); backdrop-filter: blur(10px); border:1px solid rgba(255,255,255,.12);
-    border-radius:24px; box-shadow: 0 10px 30px rgba(0,0,0,.35);
-  }
-  header{
-    padding:22px 24px 8px; display:flex; align-items:center; justify-content:space-between;
-  }
-  .title{font-size:clamp(20px,3vw,28px); font-weight:800; letter-spacing:.3px}
-  .subtitle{color:var(--muted); font-size:14px}
-  .panel{padding:18px 20px}
-  .grid{display:grid; grid-template-columns:1fr; gap:16px}
-  @media (min-width:800px){ .grid{grid-template-columns: 1.2fr .8fr} }
-
-  /* Input dots */
-  .slots{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
-  .slot{
-    width:40px;height:40px;border-radius:12px;border:1px solid rgba(255,255,255,.18);
-    display:grid;place-items:center;background:rgba(255,255,255,.06); font-weight:800; font-size:18px;
-    color:#d7e0ff; box-shadow: inset 0 0 10px rgba(255,255,255,.04);
-  }
-  .slot.b{outline:2px solid rgba(0,255,213,.4)}
-  .slot.s{outline:2px solid rgba(255,0,110,.4)}
-
-  /* Buttons */
-  .btnrow{display:flex; gap:12px; flex-wrap:wrap}
-  .btn{
-    border:none; padding:14px 18px; border-radius:14px; font-size:16px; font-weight:700; cursor:pointer;
-    background:linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,.06));
-    color:var(--text); border:1px solid rgba(255,255,255,.16); transition: transform .05s ease, box-shadow .2s ease;
-    box-shadow: 0 6px 18px rgba(0,0,0,.25);
-  }
-  .btn:active{ transform: translateY(1px) }
-  .b-btn{ box-shadow: 0 8px 24px rgba(0,255,213,.25) }
-  .s-btn{ box-shadow: 0 8px 24px rgba(255,0,110,.25) }
-  .go{ box-shadow: 0 8px 24px rgba(255,209,102,.25) }
-  .clr{ box-shadow: 0 8px 24px rgba(255,59,59,.25) }
-
-  /* Result box */
-  .result{
-    display:grid; grid-template-columns:auto 1fr; gap:14px; align-items:center;
-    padding:16px; border-radius:16px; border:1px solid rgba(255,255,255,.16);
-    background:linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.04));
-  }
-  .badge{font-size:14px; padding:6px 10px; border-radius:999px; border:1px solid rgba(255,255,255,.2); color:var(--muted)}
-  .predict{
-    font-size:40px; font-weight:900; letter-spacing:2px; min-height:48px;
-  }
-
-  /* Boom animation for matched result */
-  .boom{ position:relative; display:inline-block; padding:8px 16px; border-radius:14px; }
-  .boom.good{ background: rgba(46,232,95,.16); border:1px solid rgba(46,232,95,.35) }
-  .boom.bad{ background: rgba(255,59,59,.16); border:1px solid rgba(255,59,59,.35) }
-  .boom::after{
-    content:""; position:absolute; inset:-2px; border-radius:16px; filter:blur(6px); opacity:0; pointer-events:none;
-  }
-  .boom.flash{ animation: flash 900ms ease }
-  @keyframes flash{
-    0%{ box-shadow: 0 0 0 rgba(255,255,255,0); transform:scale(0.98) }
-    25%{ transform:scale(1.02) }
-    50%{ box-shadow: 0 0 40px rgba(255,255,255,.45) }
-    100%{ box-shadow: 0 0 0 rgba(255,255,255,0); transform:scale(1) }
-  }
-
-  /* History */
-  .history{ display:flex; flex-direction:column; gap:10px; max-height:380px; overflow:auto; padding-right:6px }
-  .hitem{
-    display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:12px;
-    background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12);
-    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size:13px;
-  }
-  .mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace }
-  .pill{ padding:3px 8px; border-radius:999px; border:1px solid rgba(255,255,255,.18); font-weight:700 }
-  .pill.b{ color:var(--neon) }
-  .pill.s{ color:var(--hot) }
-  .muted{ color:var(--muted) }
-  .tiny{ font-size:12px }
-  .hint{ color:var(--muted); font-size:13px }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Number Game Analysis Tool</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1, h2 {
+            color: #333;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .big {
+            color: red;
+            font-weight: bold;
+        }
+        .small {
+            color: blue;
+            font-weight: bold;
+        }
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            margin: 20px 0;
+        }
+        .stat-box {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            width: 30%;
+            text-align: center;
+        }
+        .prediction {
+            background-color: #e9f7ef;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .upload-area {
+            border: 2px dashed #ccc;
+            padding: 20px;
+            text-align: center;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
 </head>
 <body>
-  <div class="energy"></div>
-  <div class="wrap glass">
-    <header>
-      <div>
-        <div class="title">RAJA GAMES — 9-Digit B/S Predictor</div>
-        <div class="subtitle">Sirf click se input. Result database se hi aayega. Match na ho to: “Aaj nahin ho raha hai”.</div>
-      </div>
-      <div class="badge">Fixed Pattern DB • 9 Input</div>
-    </header>
-    <div class="panel">
-      <div class="grid">
-        <!-- LEFT: Input + Controls + Result -->
-        <section class="glass" style="padding:16px">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
-            <div class="hint">Input (9): <span id="count" class="mono">0/9</span></div>
-            <div class="hint">Only B/S clicks — no typing</div>
-          </div>
-          <div id="slots" class="slots" style="margin-bottom:14px"></div>
-
-          <div class="btnrow" style="margin-bottom:14px">
-            <button class="btn b-btn" id="addB">➕ B</button>
-            <button class="btn s-btn" id="addS">➕ S</button>
-            <button class="btn clr" id="clear">Clear</button>
-            <button class="btn go" id="result">Result</button>
-          </div>
-
-          <div class="result" style="margin-top:10px">
-            <div class="badge">Prediction</div>
-            <div id="prediction" class="predict mono"></div>
-          </div>
-
-          <div style="margin-top:10px" class="hint">
-            Tip: 9 letters bharne ke baad “Result” dabao. Multiple matches hon to majority-next value li jaati hai.
-          </div>
-        </section>
-
-        <!-- RIGHT: History -->
-        <aside class="glass" style="padding:16px">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-            <div class="hint">Last 10 Results (auto-saved)</div>
-            <button class="btn" id="clearHist" title="Clear History">Clear History</button>
-          </div>
-          <div id="history" class="history"></div>
-        </aside>
-      </div>
+    <div class="container">
+        <h1>Number Game Analysis Tool</h1>
+        
+        <div class="upload-area" id="uploadArea">
+            <p>Drag & drop screenshots here or click to upload</p>
+            <input type="file" id="fileInput" accept="image/*" multiple style="display: none;">
+            <button onclick="document.getElementById('fileInput').click()">Upload Screenshots</button>
+        </div>
+        
+        <div id="analysisSection" style="display: none;">
+            <h2>Game History Analysis</h2>
+            
+            <div class="stats">
+                <div class="stat-box">
+                    <h3>Last 10 Results</h3>
+                    <table id="recentResults">
+                        <tr>
+                            <th>Period</th>
+                            <th>Number</th>
+                            <th>B/S</th>
+                        </tr>
+                    </table>
+                </div>
+                
+                <div class="stat-box">
+                    <h3>Distribution</h3>
+                    <p>Big: <span id="bigCount">0</span> (<span id="bigPercent">0%</span>)</p>
+                    <p>Small: <span id="smallCount">0</span> (<span id="smallPercent">0%</span>)</p>
+                </div>
+                
+                <div class="stat-box">
+                    <h3>Trends</h3>
+                    <p>Current Streak: <span id="currentStreak">0</span> <span id="streakType"></span></p>
+                    <p>Max Streak: <span id="maxStreak">0</span></p>
+                </div>
+            </div>
+            
+            <div class="prediction">
+                <h2>Prediction Insights</h2>
+                <p>Next number is more likely to be: <span id="nextPrediction">-</span></p>
+                <p>Probability: <span id="predictionProbability">-</span></p>
+                <p>Hot numbers: <span id="hotNumbers">-</span></p>
+                <p>Cold numbers: <span id="coldNumbers">-</span></p>
+            </div>
+            
+            <h2>Full History</h2>
+            <div style="overflow-x: auto;">
+                <table id="fullHistory">
+                    <tr>
+                        <th>Period</th>
+                        <th>Number</th>
+                        <th>B/S</th>
+                        <th>Streak</th>
+                    </tr>
+                </table>
+            </div>
+        </div>
     </div>
-  </div>
 
-<script>
-/* ======== FIXED PATTERN DATABASE (from your message) ======== */
-const RAW_DB = `
-SBBBBBSSBBSSSSBSBSSSSBSSBBBSBBBSSBBSSBBBSSSBBBBSSBBBBBBBBBBBBBBBBSSBBSSSSSBBSSBSSSSBBBBSBBBSBSBSSBBSSSBBSSSSSBSBBSSBBBBBSSBBBBSSBBBBSSBBSSBBSBSSBSBBBSBSSSBSSBSSBBSSBSBSSBBBBBBBSBSSBBBBSSSSBSBSSSBSBSBSSBSBBSBBBSSSSBSSBBBSBSBSSBBSBSSSBSSBSSBSSSBSSBSBBSSSBSBSSBSSSBBBBSBBBSSBSSSSBSSSBSSBSSSSSSSSSBBBBSBSSSSSBBSSSBBBSSSBBSSBBBSSBSBBSBSSSBSBBBSSSBBBSBSSBBSBSBSBBSBBSSBSSSBBSBBBSSSSSBBSSSBSSSSBSBSSSSSBSSBBBBBSSBBSBBBSBSBBBSSBBBSSBSSBSBBSBSS
-`.trim();
-
-/* ======== UTIL: sanitize DB to array of 'B'/'S' ======== */
-function sanitizeDB(str){
-  return str.toUpperCase().replace(/[^BS]/g,'');
-}
-const DB = sanitizeDB(RAW_DB);
-const DB_ARR = DB.split('');
-
-/* Build map: key = 9-length window, value = {B:count, S:count} for next char(s) */
-const WIN = 9;
-const nextMap = new Map();
-for(let i=0;i<=DB_ARR.length-WIN-1;i++){
-  const key = DB_ARR.slice(i,i+WIN).join('');
-  const next = DB_ARR[i+WIN];
-  if(!nextMap.has(key)) nextMap.set(key,{B:0,S:0,total:0});
-  const obj = nextMap.get(key);
-  obj[next]++; obj.total++;
-}
-
-/* ======== UI State ======== */
-let input = [];
-
-/* Elements */
-const slotsEl = document.getElementById('slots');
-const countEl = document.getElementById('count');
-const predictionEl = document.getElementById('prediction');
-const historyEl = document.getElementById('history');
-
-/* Create 9 slots */
-function renderSlots(){
-  slotsEl.innerHTML = '';
-  for(let i=0;i<WIN;i++){
-    const d = document.createElement('div');
-    d.className = 'slot' + (input[i] ? (' ' + (input[i].toLowerCase())) : '');
-    d.textContent = input[i] || '•';
-    slotsEl.appendChild(d);
-  }
-  countEl.textContent = `${input.length}/${WIN}`;
-}
-renderSlots();
-
-/* Buttons */
-document.getElementById('addB').onclick = ()=>{ if(input.length<WIN){ input.push('B'); renderSlots(); } };
-document.getElementById('addS').onclick = ()=>{ if(input.length<WIN){ input.push('S'); renderSlots(); } };
-document.getElementById('clear').onclick = ()=>{ input.length=0; renderSlots(); showPredict(''); };
-document.getElementById('result').onclick = onResult;
-document.getElementById('clearHist').onclick = ()=>{ localStorage.removeItem('rg9_hist'); renderHistory(); };
-
-/* Prediction */
-function onResult(){
-  if(input.length!==WIN){
-    boomText(`Pehle 9 input bharo (${input.length}/9)`, 'bad');
-    return;
-  }
-  const key = input.join('');
-  const stats = nextMap.get(key);
-  if(!stats || stats.total===0){
-    boomText('Aaj nahin ho raha hai', 'bad');
-    saveHistory({in:key, out:'—', msg:'No match', occ:0, conf:0});
-    return;
-  }
-  const out = (stats.B===stats.S) ? (DB_ARR.join('').indexOf(key) % 2 ? 'S':'B') // tie-break: simple deterministic
-            : (stats.B>stats.S ? 'B' : 'S');
-  const conf = Math.round(100 * Math.max(stats.B,stats.S) / stats.total);
-  boomText(out, 'good');
-  saveHistory({in:key, out, msg:'Match', occ:stats.total, conf});
-  input.length=0; renderSlots(); // auto-clear after result
-}
-
-/* Fancy animated result text */
-function boomText(txt, mode){
-  predictionEl.innerHTML = '';
-  const span = document.createElement('span');
-  span.className = `boom ${mode} flash mono`;
-  span.textContent = txt;
-  predictionEl.appendChild(span);
-  // remove flash class after animation so next time it can re-run
-  setTimeout(()=>span.classList.remove('flash'), 950);
-}
-
-/* ======== History (persist last 10) ======== */
-function loadHistory(){
-  try{
-    return JSON.parse(localStorage.getItem('rg9_hist')||'[]');
-  }catch{ return []; }
-}
-function saveHistory(entry){
-  const row = { ...entry, t: new Date().toISOString() };
-  const hist = loadHistory();
-  hist.unshift(row);
-  while(hist.length>10) hist.pop();
-  localStorage.setItem('rg9_hist', JSON.stringify(hist));
-  renderHistory();
-}
-function renderHistory(){
-  const hist = loadHistory();
-  historyEl.innerHTML = '';
-  if(hist.length===0){
-    const d=document.createElement('div');
-    d.className='hint'; d.textContent='No history yet.';
-    historyEl.appendChild(d);
-    return;
-  }
-  hist.forEach(h=>{
-    const d = document.createElement('div');
-    d.className='hitem';
-    const dt = new Date(h.t);
-    const when = dt.toLocaleString();
-    d.innerHTML = `
-      <span class="tiny muted">${when}</span>
-      <span class="pill ${h.out==='B'?'b':(h.out==='S'?'s':'')}" title="Next">${h.out}</span>
-      <span class="mono">Input:</span><span class="mono">${h.in}</span>
-      <span class="muted tiny">${h.msg}${h.occ?` • occ:${h.occ} • conf:${h.conf}%`:''}</span>
-    `;
-    historyEl.appendChild(d);
-  });
-}
-renderHistory();
-
-/* Keyboard is disabled by design; but in case someone types, block non-B/S and length>9 */
-document.addEventListener('keydown', (e)=>{
-  if(['b','B','s','S','Backspace','Delete'].includes(e.key)){
-    e.preventDefault(); // no typing; keep it purely click-based
-  }
-});
-</script>
+    <script>
+        let gameData = [];
+        
+        // Handle file upload
+        document.getElementById('fileInput').addEventListener('change', function(e) {
+            const files = e.target.files;
+            if (files.length > 0) {
+                alert('Image processing would happen here in a real implementation. For this demo, we\'ll use sample data.');
+                processSampleData();
+            }
+        });
+        
+        // Drag and drop functionality
+        const uploadArea = document.getElementById('uploadArea');
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.style.borderColor = '#4CAF50';
+        });
+        
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.style.borderColor = '#ccc';
+        });
+        
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.style.borderColor = '#ccc';
+            document.getElementById('fileInput').files = e.dataTransfer.files;
+            const event = new Event('change');
+            document.getElementById('fileInput').dispatchEvent(event);
+        });
+        
+        // Process sample data (in a real app, this would analyze the images)
+        function processSampleData() {
+            // Sample data based on the screenshots
+            gameData = [
+                { period: "2508180592", number: 8, type: "Big" },
+                { period: "2508180591", number: 3, type: "Small" },
+                { period: "2508180590", number: 6, type: "Big" },
+                { period: "2508180589", number: 3, type: "Small" },
+                { period: "2508180588", number: 0, type: "Small" },
+                { period: "2508180587", number: 5, type: "Big" },
+                { period: "2508180586", number: 8, type: "Big" },
+                { period: "2508180585", number: 7, type: "Big" },
+                { period: "2508180584", number: 0, type: "Small" },
+                { period: "2508180583", number: 3, type: "Small" },
+                { period: "2508180582", number: 3, type: "Small" },
+                { period: "2508180581", number: 9, type: "Big" },
+                { period: "2508180580", number: 5, type: "Big" },
+                { period: "2508180579", number: 0, type: "Small" },
+                { period: "2508180578", number: 6, type: "Big" }
+            ];
+            
+            analyzeData();
+            document.getElementById('analysisSection').style.display = 'block';
+        }
+        
+        function analyzeData() {
+            // Sort by period (newest first)
+            gameData.sort((a, b) => b.period - a.period);
+            
+            // Update recent results
+            const recentTable = document.getElementById('recentResults');
+            // Clear existing rows (except header)
+            while (recentTable.rows.length > 1) {
+                recentTable.deleteRow(1);
+            }
+            
+            for (let i = 0; i < Math.min(10, gameData.length); i++) {
+                const row = recentTable.insertRow();
+                row.insertCell().textContent = gameData[i].period;
+                row.insertCell().textContent = gameData[i].number;
+                
+                const typeCell = row.insertCell();
+                typeCell.textContent = gameData[i].type;
+                typeCell.className = gameData[i].type.toLowerCase();
+            }
+            
+            // Calculate distribution
+            const bigCount = gameData.filter(item => item.type === "Big").length;
+            const smallCount = gameData.filter(item => item.type === "Small").length;
+            const total = gameData.length;
+            
+            document.getElementById('bigCount').textContent = bigCount;
+            document.getElementById('smallCount').textContent = smallCount;
+            document.getElementById('bigPercent').textContent = Math.round((bigCount / total) * 100) + '%';
+            document.getElementById('smallPercent').textContent = Math.round((smallCount / total) * 100) + '%';
+            
+            // Calculate streaks
+            let currentStreak = 1;
+            let maxStreak = 1;
+            let currentType = gameData[0].type;
+            
+            for (let i = 1; i < gameData.length; i++) {
+                if (gameData[i].type === currentType) {
+                    currentStreak++;
+                    if (currentStreak > maxStreak) {
+                        maxStreak = currentStreak;
+                    }
+                } else {
+                    currentStreak = 1;
+                    currentType = gameData[i].type;
+                }
+            }
+            
+            document.getElementById('currentStreak').textContent = currentStreak;
+            document.getElementById('streakType').textContent = currentType;
+            document.getElementById('streakType').className = currentType.toLowerCase();
+            document.getElementById('maxStreak').textContent = maxStreak;
+            
+            // Generate predictions
+            const lastType = gameData[0].type;
+            const nextPrediction = lastType === "Big" ? "Small" : "Big";
+            const predictionProbability = Math.round((lastType === "Big" ? smallCount/total : bigCount/total) * 100);
+            
+            document.getElementById('nextPrediction').textContent = nextPrediction;
+            document.getElementById('nextPrediction').className = nextPrediction.toLowerCase();
+            document.getElementById('predictionProbability').textContent = predictionProbability + '%';
+            
+            // Find hot and cold numbers
+            const numberCounts = {};
+            for (let i = 0; i <= 9; i++) {
+                numberCounts[i] = 0;
+            }
+            
+            gameData.forEach(item => {
+                numberCounts[item.number]++;
+            });
+            
+            // Convert to array and sort
+            const numbersArray = Object.keys(numberCounts).map(num => ({
+                number: num,
+                count: numberCounts[num]
+            }));
+            
+            numbersArray.sort((a, b) => b.count - a.count);
+            
+            const hotNumbers = numbersArray.slice(0, 3).map(item => item.number).join(', ');
+            const coldNumbers = numbersArray.slice(-3).map(item => item.number).join(', ');
+            
+            document.getElementById('hotNumbers').textContent = hotNumbers;
+            document.getElementById('coldNumbers').textContent = coldNumbers;
+            
+            // Update full history table
+            const fullHistoryTable = document.getElementById('fullHistory');
+            // Clear existing rows (except header)
+            while (fullHistoryTable.rows.length > 1) {
+                fullHistoryTable.deleteRow(1);
+            }
+            
+            // Calculate streaks for full history
+            let streakCount = 1;
+            let previousType = gameData[0].type;
+            
+            for (let i = 0; i < gameData.length; i++) {
+                const row = fullHistoryTable.insertRow();
+                row.insertCell().textContent = gameData[i].period;
+                row.insertCell().textContent = gameData[i].number;
+                
+                const typeCell = row.insertCell();
+                typeCell.textContent = gameData[i].type;
+                typeCell.className = gameData[i].type.toLowerCase();
+                
+                // Calculate streak
+                if (i > 0) {
+                    if (gameData[i].type === previousType) {
+                        streakCount++;
+                    } else {
+                        streakCount = 1;
+                        previousType = gameData[i].type;
+                    }
+                }
+                
+                const streakCell = row.insertCell();
+                streakCell.textContent = streakCount;
+            }
+        }
+        
+        // Initialize with sample data for demo
+        window.onload = function() {
+            processSampleData();
+        };
+    </script>
 </body>
 </html>
