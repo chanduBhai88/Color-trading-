@@ -1,114 +1,222 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>BS Clicker</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <style>
-        body {
-            background-color: black;
-            color: lime;
-            font-family: monospace;
-            text-align: center;
-            margin: 0;
-            padding: 20px;
-            touch-action: manipulation; /* Disable double-tap zoom */
-        }
-        h1 {
-            font-size: 28px;
-            margin-bottom: 30px;
-        }
-        #result {
-            font-size: 26px;
-            letter-spacing: 5px;
-            margin: 25px 0;
-            min-height: 50px;
-            word-break: break-all;
-        }
-        .buttons {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            align-items: center;
-        }
-        .row {
-            display: flex;
-            gap: 15px;
-        }
-        button {
-            background: black;
-            color: lime;
-            border: 3px solid lime;
-            font-size: 28px;
-            padding: 15px 30px;
-            min-width: 100px;
-            cursor: pointer;
-            border-radius: 8px;
-        }
-        button:active {
-            background: #002200;
-        }
-        .B { color: cyan; }
-        .S { color: yellow; }
-        .highlight {
-            font-size: 30px;
-            color: white;
-            margin-top: 20px;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>RAJA THE BOSS 🔮</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+  <style>
+    * {
+      box-sizing: border-box;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: url('https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=crop&w=1920&q=80') no-repeat center center fixed;
+      background-size: cover;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .container {
+      background: rgba(0, 0, 0, 0.75);
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.7);
+      width: 95%;
+      max-width: 500px;
+      text-align: center;
+      color: white;
+    }
+
+    h1 {
+      margin-top: 0;
+      font-size: 28px;
+      color: #00ffc8;
+      text-shadow: 1px 1px 4px black;
+    }
+
+    .inputs {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+    }
+
+    label {
+      font-weight: bold;
+      margin-bottom: 4px;
+    }
+
+    input, select {
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 8px;
+      border: none;
+      outline: none;
+    }
+
+    select {
+      background: #fff;
+    }
+
+    .buttons {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    button:hover {
+      transform: scale(1.05);
+    }
+
+    #addBtn {
+      background-color: #28a745;
+      color: white;
+    }
+
+    #clearBtn {
+      background-color: #dc3545;
+      color: white;
+    }
+
+    .results {
+      max-height: 250px;
+      overflow-y: auto;
+      text-align: left;
+    }
+
+    .result {
+      background: rgba(0, 255, 200, 0.2);
+      padding: 10px;
+      margin-bottom: 10px;
+      border-left: 4px solid #00ffc8;
+      border-radius: 6px;
+      animation: slideDown 0.4s ease-out;
+    }
+
+    @keyframes slideDown {
+      from {
+        transform: translateY(-20px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    /* Prevent zooming on mobile double tap */
+    input, select, button {
+      touch-action: manipulation;
+    }
+  </style>
 </head>
 <body>
-    <h1>BS CLICKER</h1>
-    <div id="result">CLICK B OR S</div>
-    
-    <div class="buttons">
-        <div class="row">
-            <button onclick="addChar('B')">B</button>
-            <button onclick="addChar('S')">S</button>
-        </div>
-        <div class="row">
-            <button onclick="showResult()">RESULT</button>
-            <button onclick="reset()">RESET</button>
-        </div>
+
+  <div class="container">
+    <h1>RAJA THE BOSS 🔮</h1>
+
+    <div class="inputs" id="inputsContainer">
+      <!-- Input groups will be injected -->
     </div>
 
-    <div id="latestResult" class="highlight"></div>
+    <div class="buttons">
+      <button id="addBtn">Add Result</button>
+      <button id="clearBtn">Clear</button>
+    </div>
 
-    <script>
-        let sequence = [];
-        
-        function addChar(char) {
-            sequence.push(char);
-            updateDisplay();
+    <div class="results" id="results"></div>
+  </div>
+
+  <script>
+    const inputsContainer = document.getElementById('inputsContainer');
+    const resultsDiv = document.getElementById('results');
+    const addBtn = document.getElementById('addBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    let dataLog = [];
+
+    function createInputs() {
+      for (let i = 0; i < 3; i++) {
+        const group = document.createElement('div');
+        group.classList.add('input-group');
+
+        group.innerHTML = `
+          <label>Number ${i + 1}</label>
+          <input type="number" min="0" max="9" id="num${i}" placeholder="0-9">
+          <select id="type${i}">
+            <option value="BIG">BIG</option>
+            <option value="SMALL">SMALL</option>
+          </select>
+        `;
+        inputsContainer.appendChild(group);
+      }
+    }
+
+    createInputs();
+
+    addBtn.addEventListener('click', () => {
+      const nums = [];
+      const types = [];
+
+      for (let i = 0; i < 3; i++) {
+        const num = document.getElementById(`num${i}`).value;
+        const type = document.getElementById(`type${i}`).value;
+
+        if (num === '' || isNaN(num) || num < 0 || num > 9) {
+          alert('Please enter numbers between 0-9.');
+          return;
         }
-        
-        function updateDisplay() {
-            let coloredText = sequence.map(char => 
-                `<span class="${char}">${char}</span>`
-            ).join('');
-            
-            document.getElementById("result").innerHTML = coloredText || "CLICK B OR S";
-        }
-        
-        function showResult() {
-            if (sequence.length < 9) {
-                document.getElementById("latestResult").innerHTML = 
-                    `Need ${9 - sequence.length} more clicks!`;
-            } else {
-                const lastNine = sequence.slice(-9);
-                let coloredResult = lastNine.map(char => 
-                    `<span class="${char}">${char}</span>`
-                ).join('');
-                
-                document.getElementById("latestResult").innerHTML = 
-                    `LATEST 9: ${coloredResult}`;
-            }
-        }
-        
-        function reset() {
-            sequence = [];
-            updateDisplay();
-            document.getElementById("latestResult").innerHTML = "";
-        }
-    </script>
+
+        nums.push(parseInt(num));
+        types.push(type);
+      }
+
+      dataLog.push({ numbers: nums, types: types });
+
+      const nextNumber = Math.floor(Math.random() * 10);
+      const nextType = nextNumber >= 5 ? 'BIG' : 'SMALL';
+
+      const resultDiv = document.createElement('div');
+      resultDiv.classList.add('result');
+      resultDiv.innerHTML = `<strong>Next:</strong> ${nextNumber} <strong>${nextType}</strong>`;
+
+      resultsDiv.prepend(resultDiv);
+
+      // Clear inputs
+      for (let i = 0; i < 3; i++) {
+        document.getElementById(`num${i}`).value = '';
+        document.getElementById(`type${i}`).value = 'BIG';
+      }
+    });
+
+    clearBtn.addEventListener('click', () => {
+      resultsDiv.innerHTML = '';
+      dataLog = [];
+    });
+  </script>
+
 </body>
 </html>
