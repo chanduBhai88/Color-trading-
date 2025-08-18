@@ -1,748 +1,340 @@
 <!DOCTYPE html>
-<html lang="hi">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>TC Game Predictor Pro</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Battery Game Predictor</title>
     <style>
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #121212;
-            color: #e0e0e0;
-            margin: 0;
-            padding: 20px;
-            background-image: 
-                radial-gradient(circle at 25% 25%, rgba(30, 30, 30, 0.8) 0%, rgba(0,0,0,0.9) 100%),
-                url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect fill="%23121212" width="50" height="50" x="0" y="0"/><rect fill="%23121212" width="50" height="50" x="50" y="50"/></svg>');
-            background-size: 100px 100px, auto;
-        }
-        
-        .container {
-            max-width: 900px;
+            font-family: Arial, sans-serif;
+            max-width: 800px;
             margin: 0 auto;
-            background-color: rgba(30, 30, 30, 0.9);
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
             border-radius: 10px;
-            padding: 25px;
-            box-shadow: 0 0 25px rgba(0, 150, 255, 0.3);
-            border: 1px solid rgba(0, 150, 255, 0.2);
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
         }
-        
-        h1, h2, h3 {
-            color: #4fc3f7;
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        
         h1 {
-            font-size: 2.2em;
-            border-bottom: 2px solid rgba(79, 195, 247, 0.3);
-            padding-bottom: 10px;
-            margin-top: 0;
+            color: #333;
+            text-align: center;
         }
-        
         .input-section {
-            background-color: rgba(20, 20, 40, 0.7);
-            padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 25px;
-            border: 1px solid rgba(79, 195, 247, 0.2);
-        }
-        
-        .number-inputs {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
             margin-bottom: 20px;
-            flex-wrap: wrap;
         }
-        
-        .number-input {
-            width: 60px;
-            height: 60px;
-            font-size: 24px;
+        input {
+            padding: 10px;
+            width: 50px;
+            margin-right: 10px;
             text-align: center;
-            background-color: rgba(10, 10, 20, 0.8);
-            color: #4fc3f7;
-            border: 2px solid rgba(79, 195, 247, 0.4);
-            border-radius: 8px;
-            transition: all 0.3s;
+            font-size: 18px;
         }
-        
-        .number-input:focus {
-            outline: none;
-            border-color: #4fc3f7;
-            box-shadow: 0 0 10px rgba(79, 195, 247, 0.5);
-            transform: scale(1.05);
-        }
-        
-        .button-group {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            flex-wrap: wrap;
-        }
-        
-        .btn {
-            padding: 12px 25px;
-            font-size: 16px;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.3s;
+        button {
+            padding: 10px 15px;
+            background-color: #4CAF50;
+            color: white;
             border: none;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-right: 10px;
         }
-        
-        .btn-predict {
-            background-color: #00c853;
-            color: white;
+        button:hover {
+            background-color: #45a049;
         }
-        
-        .btn-predict:hover {
-            background-color: #00e676;
-            box-shadow: 0 0 15px rgba(0, 200, 83, 0.5);
+        #clearBtn {
+            background-color: #f44336;
         }
-        
-        .btn-clear {
-            background-color: #d50000;
-            color: white;
+        #clearBtn:hover {
+            background-color: #d32f2f;
         }
-        
-        .btn-clear:hover {
-            background-color: #ff1744;
-            box-shadow: 0 0 15px rgba(213, 0, 0, 0.5);
-        }
-        
-        .result-section {
-            background-color: rgba(20, 30, 40, 0.7);
-            padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 25px;
-            border: 1px solid rgba(79, 195, 247, 0.2);
-            display: none;
-        }
-        
-        .result-display {
-            text-align: center;
-            margin-bottom: 15px;
-        }
-        
-        .prediction-number {
-            font-size: 3em;
-            font-weight: bold;
-            color: #4fc3f7;
-            margin: 10px 0;
-            text-shadow: 0 0 10px rgba(79, 195, 247, 0.7);
-        }
-        
-        .prediction-type {
-            font-size: 1.5em;
-            margin: 10px 0;
-        }
-        
-        .small-type {
-            color: #69f0ae;
-        }
-        
-        .big-type {
-            color: #ff8a80;
-        }
-        
-        .win-rate {
-            font-size: 1.2em;
-            color: #ffee58;
-            margin: 10px 0;
-        }
-        
-        .pattern-info {
-            font-style: italic;
-            color: #b388ff;
-            margin-top: 15px;
-        }
-        
-        .stats-section {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-            margin-bottom: 25px;
-            justify-content: center;
-        }
-        
-        .stat-box {
-            flex: 1;
-            min-width: 200px;
-            background-color: rgba(20, 20, 40, 0.7);
+        .result {
+            margin-top: 20px;
             padding: 15px;
-            border-radius: 8px;
-            border: 1px solid rgba(79, 195, 247, 0.2);
+            background-color: #e9f7ef;
+            border-radius: 5px;
+            font-size: 18px;
         }
-        
-        .stat-box h3 {
-            margin-top: 0;
-            color: #4fc3f7;
-            border-bottom: 1px solid rgba(79, 195, 247, 0.3);
-            padding-bottom: 8px;
+        .history {
+            margin-top: 20px;
         }
-        
-        .hot-number {
-            color: #ff5252;
-            font-weight: bold;
-        }
-        
-        .cold-number {
-            color: #40c4ff;
-            font-weight: bold;
-        }
-        
-        .chart-container {
-            width: 100%;
-            height: 300px;
-            margin-bottom: 25px;
-            background-color: rgba(20, 20, 30, 0.7);
-            border-radius: 8px;
-            padding: 15px;
-            border: 1px solid rgba(79, 195, 247, 0.2);
-        }
-        
-        .history-section {
-            margin-bottom: 25px;
-        }
-        
-        .history-table {
+        table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 15px;
         }
-        
-        .history-table th, .history-table td {
-            padding: 12px;
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
             text-align: center;
-            border: 1px solid rgba(79, 195, 247, 0.2);
         }
-        
-        .history-table th {
-            background-color: rgba(30, 40, 50, 0.7);
-            color: #4fc3f7;
-        }
-        
-        .history-table tr:nth-child(even) {
-            background-color: rgba(30, 30, 40, 0.5);
-        }
-        
-        .small-row {
-            background-color: rgba(30, 70, 50, 0.3);
-        }
-        
-        .big-row {
-            background-color: rgba(70, 30, 50, 0.3);
-        }
-        
-        .memory-section {
-            background-color: rgba(20, 30, 40, 0.7);
-            padding: 20px;
-            border-radius: 8px;
-            border: 1px solid rgba(79, 195, 247, 0.2);
-        }
-        
-        .memory-list {
-            margin-top: 15px;
-        }
-        
-        .memory-item {
-            padding: 10px;
-            border-bottom: 1px solid rgba(79, 195, 247, 0.1);
-            display: flex;
-            justify-content: space-between;
-            flex-wrap: wrap;
-        }
-        
-        .memory-item:last-child {
-            border-bottom: none;
-        }
-        
-        .memory-input {
-            color: #69f0ae;
-        }
-        
-        .memory-prediction {
-            color: #4fc3f7;
-            font-weight: bold;
-        }
-        
-        .memory-wins {
-            color: #ffee58;
-        }
-        
-        @media (max-width: 768px) {
-            .number-input {
-                width: 50px;
-                height: 50px;
-                font-size: 20px;
-            }
-            
-            .container {
-                padding: 15px;
-            }
-            
-            .stat-box {
-                min-width: 100%;
-            }
+        th {
+            background-color: #f2f2f2;
         }
     </style>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <div class="container">
-        <h1>TC Game Predictor Pro</h1>
-        <h3>Big (5-9) / Small (0-4) Analysis Tool</h3>
+        <h1>Battery Game Predictor</h1>
         
         <div class="input-section">
-            <h2>Enter Last 5 Numbers</h2>
-            <div class="number-inputs">
-                <input type="number" id="num1" class="number-input" min="0" max="9" placeholder="0">
-                <input type="number" id="num2" class="number-input" min="0" max="9" placeholder="0">
-                <input type="number" id="num3" class="number-input" min="0" max="9" placeholder="0">
-                <input type="number" id="num4" class="number-input" min="0" max="9" placeholder="0">
-                <input type="number" id="num5" class="number-input" min="0" max="9" placeholder="0">
-            </div>
-            <div class="button-group">
-                <button class="btn btn-predict" onclick="calculate()">
-                    <span>🔮 Predict Next Number</span>
-                </button>
-                <button class="btn btn-clear" onclick="clearInputs()">
-                    <span>❌ Clear Inputs</span>
-                </button>
+            <h3>Enter last 6 numbers (0-9):</h3>
+            <input type="number" min="0" max="9" id="num1" maxlength="1">
+            <input type="number" min="0" max="9" id="num2" maxlength="1">
+            <input type="number" min="0" max="9" id="num3" maxlength="1">
+            <input type="number" min="0" max="9" id="num4" maxlength="1">
+            <input type="number" min="0" max="9" id="num5" maxlength="1">
+            <input type="number" min="0" max="9" id="num6" maxlength="1">
+            
+            <div style="margin-top: 15px;">
+                <button id="predictBtn">Predict Next</button>
+                <button id="clearBtn">Clear</button>
             </div>
         </div>
         
-        <div id="result-section" class="result-section">
-            <div class="result-display">
-                <h2>Prediction Result</h2>
-                <div class="prediction-number" id="prediction-number">?</div>
-                <div class="prediction-type" id="prediction-type"></div>
-                <div class="win-rate" id="win-rate"></div>
-                <div class="pattern-info" id="pattern-info"></div>
-            </div>
+        <div id="result" class="result" style="display: none;">
+            <h3>Prediction Result:</h3>
+            <p id="predictionText"></p>
+            <p id="confidenceText"></p>
+            <p id="patternInfo"></p>
         </div>
         
-        <div class="stats-section">
-            <div class="stat-box">
-                <h3>🔥 Hot Numbers</h3>
-                <div id="hot-numbers">Loading...</div>
-            </div>
-            <div class="stat-box">
-                <h3>❄️ Cold Numbers</h3>
-                <div id="cold-numbers">Loading...</div>
-            </div>
-            <div class="stat-box">
-                <h3>📈 Current Trend</h3>
-                <div id="current-trend">Loading...</div>
-            </div>
-        </div>
-        
-        <div class="chart-container">
-            <canvas id="trend-chart"></canvas>
-        </div>
-        
-        <div class="memory-section">
-            <h2>💾 Prediction Memory (Last 10)</h2>
-            <div class="memory-list" id="memory-list">
-                <div>No predictions made yet</div>
-            </div>
-        </div>
-        
-        <div class="history-section">
-            <h2>📜 Game History</h2>
-            <p>Total Numbers: <span id="total-numbers">0</span> | 
-               Small (0-4): <span id="small-count">0</span> | 
-               Big (5-9): <span id="big-count">0</span></p>
-            <div style="overflow-x: auto;">
-                <table class="history-table" id="history-table">
-                    <thead>
-                        <tr>
-                            <th>Period</th>
-                            <th>Number</th>
-                            <th>Type</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- Will be populated by JavaScript -->
-                    </tbody>
-                </table>
-            </div>
+        <div class="history">
+            <h3>Recent History</h3>
+            <table id="historyTable">
+                <thead>
+                    <tr>
+                        <th>Position</th>
+                        <th>Number</th>
+                        <th>Big/Small</th>
+                    </tr>
+                </thead>
+                <tbody id="historyBody">
+                </tbody>
+            </table>
         </div>
     </div>
 
     <script>
-        // Game history data (sample - replace with your actual data)
-        const gameHistory = [
-            {period: "2508170530", number: 2, type: "Small"},
-            {period: "2508170529", number: 1, type: "Small"},
-            {period: "2508170528", number: 4, type: "Small"},
-            {period: "2508170527", number: 2, type: "Small"},
-            {period: "2508170526", number: 0, type: "Small"},
-            {period: "2508170525", number: 5, type: "Big"},
-            {period: "2508170524", number: 5, type: "Big"},
-            {period: "2508170523", number: 3, type: "Small"},
-            {period: "2508170522", number: 2, type: "Small"},
-            {period: "2508170521", number: 0, type: "Small"},
-            {period: "2508170520", number: 8, type: "Big"},
-            {period: "2508170519", number: 3, type: "Small"},
-            {period: "2508170518", number: 2, type: "Small"},
-            {period: "2508170517", number: 8, type: "Big"},
-            {period: "2508170516", number: 4, type: "Small"},
-            {period: "2508170515", number: 8, type: "Big"},
-            {period: "2508170514", number: 2, type: "Small"},
-            {period: "2508170513", number: 5, type: "Big"},
-            {period: "2508170512", number: 5, type: "Big"},
-            {period: "2508170511", number: 5, type: "Big"},
-            // Add more historical data as needed
-        ];
-
-        // Prediction memory
-        let predictionMemory = [];
-        let trendChart = null;
-
-        // Initialize the page
-        window.onload = function() {
-            updateHistoryTable();
-            updateHotColdNumbers();
-            updateCurrentTrend();
-            updateTrendChart();
-        };
-
-        // Clear input fields
-        function clearInputs() {
-            document.getElementById('num1').value = '';
-            document.getElementById('num2').value = '';
-            document.getElementById('num3').value = '';
-            document.getElementById('num4').value = '';
-            document.getElementById('num5').value = '';
-            document.getElementById('result-section').style.display = 'none';
-        }
-
-        // Calculate prediction
-        function calculate() {
-            const nums = [
-                parseInt(document.getElementById('num1').value),
-                parseInt(document.getElementById('num2').value),
-                parseInt(document.getElementById('num3').value),
-                parseInt(document.getElementById('num4').value),
-                parseInt(document.getElementById('num5').value)
+        document.addEventListener('DOMContentLoaded', function() {
+            const inputs = [
+                document.getElementById('num1'),
+                document.getElementById('num2'),
+                document.getElementById('num3'),
+                document.getElementById('num4'),
+                document.getElementById('num5'),
+                document.getElementById('num6')
             ];
             
-            // Validate inputs
-            if (nums.some(isNaN)) {
-                alert("Please enter all 5 numbers (0-9)");
-                return;
-            }
+            const predictBtn = document.getElementById('predictBtn');
+            const clearBtn = document.getElementById('clearBtn');
+            const resultDiv = document.getElementById('result');
+            const predictionText = document.getElementById('predictionText');
+            const confidenceText = document.getElementById('confidenceText');
+            const patternInfo = document.getElementById('patternInfo');
+            const historyBody = document.getElementById('historyBody');
             
-            // Count small/big in input
-            const smallCount = nums.filter(n => n <= 4).length;
-            const bigCount = nums.filter(n => n >= 5).length;
-            
-            // Pattern recognition
-            let prediction, type, confidence, patternInfo = "";
-            
-            // Strategy 1: Opposite of current trend
-            if (bigCount > smallCount) {
-                prediction = getRandomNumber(0, 4); // Predict small
-                type = "Small";
-                confidence = (70 - (bigCount * 10)).toFixed(2);
-                patternInfo = "Opposite trend prediction (more Big numbers in input)";
-            } else {
-                prediction = getRandomNumber(5, 9); // Predict big
-                type = "Big";
-                confidence = (70 - (smallCount * 10)).toFixed(2);
-                patternInfo = "Opposite trend prediction (more Small numbers in input)";
-            }
-            
-            // Strategy 2: Check for repeating numbers
-            const repeatingNum = findRepeatingNumber(nums);
-            if (repeatingNum !== null) {
-                if (repeatingNum <= 4) {
-                    prediction = getRandomNumber(5, 9); // If small repeating, predict big
-                    type = "Big";
-                    patternInfo = "Repeating small number pattern detected";
-                } else {
-                    prediction = getRandomNumber(0, 4); // If big repeating, predict small
-                    type = "Small";
-                    patternInfo = "Repeating big number pattern detected";
-                }
-                confidence = (parseFloat(confidence) * 1.2).toFixed(2);
-            }
-            
-            // Strategy 3: Check history patterns
-            const lastPattern = nums.join('');
-            const patternMatch = findPatternInHistory(lastPattern);
-            if (patternMatch) {
-                prediction = patternMatch.nextNumber;
-                type = patternMatch.nextNumber <= 4 ? "Small" : "Big";
-                patternInfo = `Historical pattern matched: ${patternMatch.pattern} → ${patternMatch.nextNumber}`;
-                confidence = (parseFloat(confidence) + 15).toFixed(2);
-            }
-            
-            // Ensure confidence is within bounds
-            confidence = Math.min(95, Math.max(60, parseFloat(confidence))).toFixed(2);
-            
-            // Add to memory
-            predictionMemory.unshift({
-                input: [...nums],
-                prediction: prediction,
-                type: type,
-                confidence: confidence,
-                timestamp: new Date().toLocaleTimeString(),
-                patternInfo: patternInfo
-            });
-            
-            // Keep only last 10 predictions
-            if (predictionMemory.length > 10) {
-                predictionMemory.pop();
-            }
-            
-            // Display results
-            document.getElementById('prediction-number').textContent = prediction;
-            document.getElementById('prediction-type').textContent = type;
-            document.getElementById('prediction-type').className = `prediction-type ${type.toLowerCase()}-type`;
-            document.getElementById('win-rate').textContent = `${confidence}% confidence`;
-            document.getElementById('pattern-info').textContent = patternInfo;
-            document.getElementById('result-section').style.display = 'block';
-            
-            // Update memory display
-            updateMemoryList();
-            
-            // Scroll to results
-            document.getElementById('result-section').scrollIntoView({
-                behavior: 'smooth'
-            });
-        }
-
-        // Update history table
-        function updateHistoryTable() {
-            const tableBody = document.querySelector('#history-table tbody');
-            tableBody.innerHTML = '';
-            
-            let smallCount = 0;
-            let bigCount = 0;
-            
-            gameHistory.forEach(item => {
-                const row = document.createElement('tr');
-                row.className = `${item.type.toLowerCase()}-row`;
+            // Auto-focus and auto-tab between inputs
+            inputs.forEach((input, index) => {
+                input.addEventListener('input', function() {
+                    if (this.value.length === 1 && index < inputs.length - 1) {
+                        inputs[index + 1].focus();
+                    }
+                });
                 
-                row.innerHTML = `
-                    <td>${item.period}</td>
-                    <td>${item.number}</td>
-                    <td>${item.type}</td>
-                `;
-                tableBody.appendChild(row);
+                // Allow only numbers 0-9
+                input.addEventListener('keydown', function(e) {
+                    if (e.key === 'Backspace' && this.value === '' && index > 0) {
+                        inputs[index - 1].focus();
+                    }
+                    if (!/[0-9]|Backspace|Delete|ArrowLeft|ArrowRight/.test(e.key)) {
+                        e.preventDefault();
+                    }
+                });
+            });
+            
+            // Predict button click handler
+            predictBtn.addEventListener('click', function() {
+                const numbers = [];
+                let isValid = true;
                 
-                if (item.type === 'Small') smallCount++;
-                else bigCount++;
-            });
-            
-            document.getElementById('total-numbers').textContent = gameHistory.length;
-            document.getElementById('small-count').textContent = smallCount;
-            document.getElementById('big-count').textContent = bigCount;
-        }
-
-        // Update hot and cold numbers
-        function updateHotColdNumbers() {
-            const numberCounts = {};
-            
-            // Count occurrences of each number
-            gameHistory.forEach(item => {
-                if (!numberCounts[item.number]) {
-                    numberCounts[item.number] = 0;
+                // Validate inputs
+                for (let i = 0; i < inputs.length; i++) {
+                    const value = parseInt(inputs[i].value);
+                    if (isNaN(value) || value < 0 || value > 9) {
+                        alert(`Please enter a valid number (0-9) in position ${i + 1}`);
+                        inputs[i].focus();
+                        isValid = false;
+                        break;
+                    }
+                    numbers.push(value);
                 }
-                numberCounts[item.number]++;
+                
+                if (!isValid) return;
+                
+                // Analyze the pattern
+                const analysis = analyzePattern(numbers);
+                
+                // Display results
+                predictionText.textContent = `Next Prediction: ${analysis.prediction}`;
+                confidenceText.textContent = `Confidence: ${analysis.confidence}%`;
+                patternInfo.textContent = `Pattern Detected: ${analysis.patternType}`;
+                
+                // Update history table
+                updateHistoryTable(numbers, analysis.prediction);
+                
+                // Show result div
+                resultDiv.style.display = 'block';
             });
             
-            // Convert to array and sort
-            const numbers = Object.keys(numberCounts).map(num => ({
-                number: num,
-                count: numberCounts[num]
-            }));
+            // Clear button click handler
+            clearBtn.addEventListener('click', function() {
+                inputs.forEach(input => {
+                    input.value = '';
+                });
+                resultDiv.style.display = 'none';
+                historyBody.innerHTML = '';
+                inputs[0].focus();
+            });
             
-            numbers.sort((a, b) => b.count - a.count);
-            
-            // Get top 3 hot and cold numbers
-            const hotNumbers = numbers.slice(0, 3);
-            const coldNumbers = numbers.slice(-3).reverse();
-            
-            document.getElementById('hot-numbers').innerHTML = hotNumbers.map(num => 
-                `<span class="hot-number">${num.number}</span> (${num.count} times)`
-            ).join(', ');
-            
-            document.getElementById('cold-numbers').innerHTML = coldNumbers.map(num => 
-                `<span class="cold-number">${num.number}</span> (${num.count} times)`
-            ).join(', ');
-        }
-
-        // Update current trend
-        function updateCurrentTrend() {
-            const last10 = gameHistory.slice(0, 10);
-            const last10Small = last10.filter(item => item.type === 'Small').length;
-            const last10Big = last10.filter(item => item.type === 'Big').length;
-            
-            let trendText;
-            if (last10Small > last10Big) {
-                trendText = "Small numbers (0-4) trending";
-            } else if (last10Big > last10Small) {
-                trendText = "Big numbers (5-9) trending";
-            } else {
-                trendText = "Balanced trend";
-            }
-            
-            document.getElementById('current-trend').textContent = trendText;
-        }
-
-        // Update trend chart
-        function updateTrendChart() {
-            const ctx = document.getElementById('trend-chart').getContext('2d');
-            
-            // Prepare data for last 20 results
-            const recentHistory = gameHistory.slice(0, 20).reverse();
-            const labels = recentHistory.map(item => item.period.substring(6));
-            const data = recentHistory.map(item => item.number);
-            const bgColors = recentHistory.map(item => 
-                item.type === 'Small' ? 'rgba(105, 240, 174, 0.7)' : 'rgba(255, 138, 128, 0.7)'
-            );
-            
-            // Destroy previous chart if exists
-            if (trendChart) {
-                trendChart.destroy();
-            }
-            
-            trendChart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Number',
-                        data: data,
-                        backgroundColor: bgColors,
-                        borderColor: bgColors.map(c => c.replace('0.7', '1')),
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            max: 9,
-                            ticks: {
-                                stepSize: 1
-                            },
-                            grid: {
-                                color: 'rgba(79, 195, 247, 0.1)'
-                            }
-                        },
-                        x: {
-                            grid: {
-                                display: false
-                            }
+            // Pattern analysis function
+            function analyzePattern(numbers) {
+                // Convert numbers to Big/Small (B/S)
+                const bsSequence = numbers.map(num => num >= 5 ? 'B' : 'S');
+                
+                // Calculate frequencies
+                const bigCount = bsSequence.filter(x => x === 'B').length;
+                const smallCount = bsSequence.filter(x => x === 'S').length;
+                
+                // Check for streaks
+                let currentStreak = 1;
+                let maxStreak = 1;
+                let streakType = bsSequence[0];
+                
+                for (let i = 1; i < bsSequence.length; i++) {
+                    if (bsSequence[i] === bsSequence[i - 1]) {
+                        currentStreak++;
+                        if (currentStreak > maxStreak) {
+                            maxStreak = currentStreak;
+                            streakType = bsSequence[i];
                         }
-                    },
-                    plugins: {
-                        legend: {
-                            display: false
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    const item = recentHistory[context.dataIndex];
-                                    return `Number: ${item.number} (${item.type})`;
-                                }
-                            }
-                        }
+                    } else {
+                        currentStreak = 1;
                     }
                 }
-            });
-        }
-
-        // Update memory list
-        function updateMemoryList() {
-            const memoryList = document.getElementById('memory-list');
-            memoryList.innerHTML = '';
-            
-            if (predictionMemory.length === 0) {
-                memoryList.innerHTML = '<div>No predictions made yet</div>';
-                return;
+                
+                // Check for alternations
+                let alternationScore = 0;
+                for (let i = 1; i < bsSequence.length; i++) {
+                    if (bsSequence[i] !== bsSequence[i - 1]) {
+                        alternationScore++;
+                    }
+                }
+                
+                // Check last few for immediate patterns
+                const lastThree = bsSequence.slice(-3);
+                const allSameLastThree = lastThree.every(val => val === lastThree[0]);
+                const isAlternating = bsSequence.length >= 3 && 
+                                      ((bsSequence[bsSequence.length - 3] !== bsSequence[bsSequence.length - 2]) && 
+                                      (bsSequence[bsSequence.length - 2] !== bsSequence[bsSequence.length - 1]));
+                
+                // Analyze number distribution
+                const highNumbers = numbers.filter(num => num >= 5).length;
+                const lowNumbers = numbers.filter(num => num < 5).length;
+                
+                // Make prediction based on analysis
+                let prediction;
+                let confidence;
+                let patternType;
+                
+                // If there's a strong streak (4+ of same type)
+                if (maxStreak >= 4) {
+                    prediction = streakType === 'B' ? 'Big' : 'Small';
+                    confidence = 70 + (maxStreak * 5);
+                    patternType = `Streak of ${maxStreak} ${streakType === 'B' ? 'Big' : 'Small'}`;
+                }
+                // If alternating pattern detected
+                else if (alternationScore >= 4 && isAlternating) {
+                    prediction = bsSequence[bsSequence.length - 1] === 'B' ? 'Small' : 'Big';
+                    confidence = 75;
+                    patternType = 'Alternating pattern';
+                }
+                // If last three are same
+                else if (allSameLastThree) {
+                    prediction = lastThree[0] === 'B' ? 'Small' : 'Big';
+                    confidence = 65;
+                    patternType = `Last 3 all ${lastThree[0] === 'B' ? 'Big' : 'Small'}`;
+                }
+                // If more Big numbers recently
+                else if (highNumbers > lowNumbers) {
+                    prediction = 'Small';
+                    confidence = 60;
+                    patternType = `More Big numbers (${highNumbers} Big vs ${lowNumbers} Small)`;
+                }
+                // If more Small numbers recently
+                else if (lowNumbers > highNumbers) {
+                    prediction = 'Big';
+                    confidence = 60;
+                    patternType = `More Small numbers (${lowNumbers} Small vs ${highNumbers} Big)`;
+                }
+                // Default prediction based on overall balance
+                else {
+                    prediction = bigCount >= smallCount ? 'Small' : 'Big';
+                    confidence = 55;
+                    patternType = 'Balanced distribution';
+                }
+                
+                // Adjust confidence based on recent trend
+                if (bsSequence.slice(-2).every(x => x === bsSequence[bsSequence.length - 1])) {
+                    confidence += 5;
+                }
+                
+                // Cap confidence at 90%
+                confidence = Math.min(90, confidence);
+                
+                return {
+                    prediction,
+                    confidence: Math.round(confidence),
+                    patternType
+                };
             }
             
-            predictionMemory.forEach((item, index) => {
-                const memItem = document.createElement('div');
-                memItem.className = 'memory-item';
+            // Update history table
+            function updateHistoryTable(numbers, prediction) {
+                historyBody.innerHTML = '';
                 
-                memItem.innerHTML = `
-                    <div><strong>#${index+1}</strong> [${item.timestamp}]</div>
-                    <div class="memory-input">Input: ${item.input.join(', ')}</div>
-                    <div class="memory-prediction">Predicted: ${item.prediction} (${item.type})</div>
-                    <div class="memory-wins">Confidence: ${item.confidence}%</div>
-                `;
-                
-                memoryList.appendChild(memItem);
-            });
-        }
-
-        // Helper functions
-        function getRandomNumber(min, max) {
-            return Math.floor(Math.random() * (max - min + 1)) + min;
-        }
-        
-        function findRepeatingNumber(nums) {
-            const count = {};
-            nums.forEach(num => {
-                count[num] = (count[num] || 0) + 1;
-            });
-            
-            for (const num in count) {
-                if (count[num] >= 3) { // If a number repeats 3+ times
-                    return parseInt(num);
+                for (let i = 0; i < numbers.length; i++) {
+                    const row = document.createElement('tr');
+                    
+                    const posCell = document.createElement('td');
+                    posCell.textContent = i + 1;
+                    
+                    const numCell = document.createElement('td');
+                    numCell.textContent = numbers[i];
+                    
+                    const bsCell = document.createElement('td');
+                    bsCell.textContent = numbers[i] >= 5 ? 'Big' : 'Small';
+                    bsCell.style.color = numbers[i] >= 5 ? 'blue' : 'green';
+                    
+                    row.appendChild(posCell);
+                    row.appendChild(numCell);
+                    row.appendChild(bsCell);
+                    
+                    historyBody.appendChild(row);
                 }
+                
+                // Add prediction row
+                const predRow = document.createElement('tr');
+                const predCell = document.createElement('td');
+                predCell.colSpan = 3;
+                predCell.textContent = `Next Prediction: ${prediction}`;
+                predCell.style.fontWeight = 'bold';
+                predCell.style.color = prediction === 'Big' ? 'blue' : 'green';
+                predRow.appendChild(predCell);
+                historyBody.appendChild(predRow);
             }
-            return null;
-        }
-        
-        function findPatternInHistory(pattern) {
-            // Check if this sequence of 5 numbers appeared before
-            for (let i = 0; i < gameHistory.length - 6; i++) {
-                const currentPattern = [
-                    gameHistory[i].number,
-                    gameHistory[i+1].number,
-                    gameHistory[i+2].number,
-                    gameHistory[i+3].number,
-                    gameHistory[i+4].number
-                ].join('');
-                
-                if (currentPattern === pattern) {
-                    return {
-                        pattern: pattern,
-                        nextNumber: gameHistory[i+5].number
-                    };
-                }
-            }
-            return null;
-        }
-
-        // Initialize number inputs to focus next on input
-        const inputs = document.querySelectorAll('.number-input');
-        inputs.forEach((input, index) => {
-            input.addEventListener('input', function() {
-                if (this.value.length === 1 && index < inputs.length - 1) {
-                    inputs[index + 1].focus();
-                }
-            });
-            
-            input.addEventListener('keydown', function(e) {
-                if (e.key === 'Backspace' && this.value.length === 0 && index > 0) {
-                    inputs[index - 1].focus();
-                }
-            });
         });
     </script>
 </body>
