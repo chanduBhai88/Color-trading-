@@ -1,317 +1,203 @@
 <!DOCTYPE html>
-<html lang="hi">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>अगला नंबर प्रेडिक्टर | Next Number Predictor</title>
-    <style>
-        body {
-            font-family: 'Courier New', monospace;
-            background: #0a0a0a url('https://images.unsplash.com/photo-1562813733-b31f71025d54?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80') no-repeat center center fixed;
-            background-size: cover;
-            margin: 0;
-            padding: 20px;
-            color: #0f0;
-            text-shadow: 0 0 5px #0f0;
-        }
-        .container {
-            max-width: 1000px;
-            margin: 0 auto;
-            background: rgba(0, 0, 0, 0.8);
-            padding: 20px;
-            border-radius: 5px;
-            border: 1px solid #0f0;
-            box-shadow: 0 0 20px #0f0;
-        }
-        h1, h2, h3 {
-            color: #0f0;
-            text-align: center;
-            border-bottom: 1px dashed #0f0;
-            padding-bottom: 10px;
-        }
-        .input-section {
-            background: rgba(0, 20, 0, 0.3);
-            padding: 20px;
-            border-radius: 5px;
-            margin-bottom: 20px;
-            border: 1px solid #0f0;
-        }
-        input {
-            width: 60px;
-            height: 60px;
-            font-size: 24px;
-            text-align: center;
-            margin: 5px;
-            border: 2px solid #0f0;
-            border-radius: 5px;
-            background: black;
-            color: #0f0;
-        }
-        button {
-            background: #0a0a0a;
-            color: #0f0;
-            border: 1px solid #0f0;
-            padding: 12px 25px;
-            font-size: 18px;
-            border-radius: 5px;
-            cursor: pointer;
-            display: inline-block;
-            margin: 15px 10px;
-            transition: 0.3s;
-            font-family: 'Courier New', monospace;
-        }
-        button:hover {
-            background: #0f0;
-            color: black;
-            box-shadow: 0 0 10px #0f0;
-        }
-        .result {
-            background: rgba(0, 15, 0, 0.5);
-            padding: 15px;
-            border-radius: 5px;
-            margin-top: 20px;
-            text-align: center;
-            display: none;
-            border: 1px solid #0f0;
-        }
-        .prediction {
-            font-size: 28px;
-            font-weight: bold;
-            color: #0f0;
-            text-shadow: 0 0 10px #0f0;
-        }
-        .win-rate {
-            font-size: 20px;
-            color: #0f0;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 15px 0;
-            border: 1px solid #0f0;
-        }
-        th, td {
-            border: 1px solid #0f0;
-            padding: 12px;
-            text-align: center;
-            color: #0f0;
-        }
-        th {
-            background: rgba(0, 20, 0, 0.5);
-        }
-        .small { background: rgba(0, 30, 0, 0.3); }
-        .big { background: rgba(30, 0, 0, 0.3); }
-        .hot { color: #f00; text-shadow: 0 0 5px #f00; font-weight: bold; }
-        .cold { color: #00f; text-shadow: 0 0 5px #00f; font-weight: bold; }
-        .chart-container {
-            width: 100%;
-            height: 300px;
-            margin: 20px 0;
-        }
-        .trend-info {
-            display: flex;
-            justify-content: space-around;
-            flex-wrap: wrap;
-            margin: 20px 0;
-        }
-        .trend-box {
-            background: rgba(0, 10, 0, 0.3);
-            padding: 15px;
-            border-radius: 5px;
-            border: 1px solid #0f0;
-            width: 30%;
-            min-width: 200px;
-            margin: 10px;
-            text-align: center;
-        }
-        .memory-history {
-            margin-top: 30px;
-            border: 1px solid #0f0;
-            padding: 15px;
-            border-radius: 5px;
-        }
-        .memory-item {
-            margin: 5px 0;
-            padding: 5px;
-            border-bottom: 1px dashed #0f0;
-        }
-        ::placeholder {
-            color: #030;
-        }
-    </style>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <meta charset="UTF-8">
+  <title>RAJA THE BOSS Predictor</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: url('https://images.unsplash.com/photo-1604014237800-1b7c5d2af5e4?auto=format&fit=crop&w=1920&q=80') no-repeat center center fixed;
+      background-size: cover;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 30px;
+    }
+
+    h1 {
+      text-shadow: 2px 2px 4px #000;
+    }
+
+    .container {
+      background: rgba(0, 0, 0, 0.6);
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 0 10px #000;
+      width: 90%;
+      max-width: 600px;
+    }
+
+    .inputs {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 15px;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .input-group {
+      flex: 1;
+      min-width: 100px;
+    }
+
+    label {
+      font-weight: bold;
+    }
+
+    select, input {
+      width: 100%;
+      padding: 8px;
+      border: none;
+      border-radius: 6px;
+      margin-top: 5px;
+      font-size: 16px;
+    }
+
+    button {
+      padding: 10px 20px;
+      margin-top: 10px;
+      font-size: 16px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-right: 10px;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      transform: scale(1.05);
+    }
+
+    #addBtn {
+      background: #28a745;
+      color: white;
+    }
+
+    #clearBtn {
+      background: #dc3545;
+      color: white;
+    }
+
+    .results {
+      margin-top: 20px;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+
+    .result {
+      background: #17a2b8;
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 6px;
+      animation: slideDown 0.5s ease forwards;
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h1>🔢 अगला नंबर प्रेडिक्टर 🔢</h1>
-        <h3>⚡ TC Game - Big (5-9) / Small (0-4) Analysis ⚡</h3>
-        
-        <div class="input-section">
-            <h2>⌨️ पिछले 5 नंबर डालें</h2>
-            <div style="text-align: center;">
-                <input type="number" id="num1" min="0" max="9" placeholder="0">
-                <input type="number" id="num2" min="0" max="9" placeholder="0">
-                <input type="number" id="num3" min="0" max="9" placeholder="0">
-                <input type="number" id="num4" min="0" max="9" placeholder="0">
-                <input type="number" id="num5" min="0" max="9" placeholder="0">
-            </div>
-            <div style="text-align: center;">
-                <button onclick="calculate()">🔮 प्रेडिक्ट करें</button>
-                <button onclick="clearInputs()">❌ क्लियर करें</button>
-            </div>
-        </div>
-        
-        <div id="result" class="result">
-            <h2>📊 रिजल्ट</h2>
-            <p>अगला नंबर: <span id="prediction" class="prediction">?</span></p>
-            <p>टाइप: <span id="bsPrediction"></span></p>
-            <p>विन रेट: <span id="winRate" class="win-rate"></span></p>
-            <p id="patternInfo"></p>
-        </div>
-        
-        <div class="trend-info">
-            <div class="trend-box">
-                <h3>🔥 हॉट नंबर्स</h3>
-                <p id="hotNumbers"></p>
-            </div>
-            <div class="trend-box">
-                <h3>❄️ कोल्ड नंबर्स</h3>
-                <p id="coldNumbers"></p>
-            </div>
-            <div class="trend-box">
-                <h3>📈 करंट ट्रेंड</h3>
-                <p id="currentTrend"></p>
-            </div>
-        </div>
-        
-        <div class="chart-container">
-            <canvas id="trendChart"></canvas>
-        </div>
-        
-        <div class="memory-history">
-            <h2>💾 मेमोरी हिस्ट्री (Last 10 Predictions)</h2>
-            <div id="memoryList"></div>
-        </div>
-        
-        <div class="history">
-            <h2>📜 गेम हिस्ट्री</h2>
-            <p>कुल नंबर्स: <span id="totalNumbers"></span> | 
-               छोटे (0-4): <span id="smallCount"></span> | 
-               बड़े (5-9): <span id="bigCount"></span></p>
-            <table id="historyTable">
-                <thead>
-                    <tr>
-                        <th>पीरियड</th>
-                        <th>नंबर</th>
-                        <th>टाइप</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- Data will be filled by JavaScript -->
-                </tbody>
-            </table>
-        </div>
+
+  <h1>RAJA THE BOSS 🔮 Predictor</h1>
+
+  <div class="container">
+    <div class="inputs" id="inputsContainer">
+      <!-- Input groups will be injected here -->
     </div>
 
-    <script>
-        // Game history data
-        const gameHistory = [
-            {period: "2508170530", number: 2, type: "Small"},
-            {period: "2508170529", number: 1, type: "Small"},
-            {period: "2508170528", number: 4, type: "Small"},
-            // ... (Add all other numbers from your screenshots)
-        ];
+    <button id="addBtn">Add Result</button>
+    <button id="clearBtn">Clear</button>
 
-        // Memory for last 10 predictions
-        let predictionMemory = [];
+    <div class="results" id="results"></div>
+  </div>
 
-        // Initialize the page
-        window.onload = function() {
-            updateHistoryTable();
-            updateTrendChart();
-            analyzeHotColdNumbers();
-            updateMemoryHistory();
-        };
+  <script>
+    const inputsContainer = document.getElementById('inputsContainer');
+    const resultsDiv = document.getElementById('results');
+    const addBtn = document.getElementById('addBtn');
+    const clearBtn = document.getElementById('clearBtn');
 
-        // Clear input fields
-        function clearInputs() {
-            document.getElementById('num1').value = '';
-            document.getElementById('num2').value = '';
-            document.getElementById('num3').value = '';
-            document.getElementById('num4').value = '';
-            document.getElementById('num5').value = '';
-            document.getElementById('result').style.display = 'none';
+    let dataLog = [];
+
+    // Create 3 input groups
+    function createInputs() {
+      for (let i = 0; i < 3; i++) {
+        const group = document.createElement('div');
+        group.classList.add('input-group');
+
+        group.innerHTML = `
+          <label>Number ${i + 1}</label>
+          <input type="number" min="0" max="9" id="num${i}" placeholder="Enter number" required>
+          <select id="type${i}">
+            <option value="BIG">BIG</option>
+            <option value="SMALL">SMALL</option>
+          </select>
+        `;
+
+        inputsContainer.appendChild(group);
+      }
+    }
+
+    createInputs();
+
+    // Handle Add Result
+    addBtn.addEventListener('click', () => {
+      const nums = [];
+      const types = [];
+
+      for (let i = 0; i < 3; i++) {
+        const num = document.getElementById(`num${i}`).value;
+        const type = document.getElementById(`type${i}`).value;
+
+        if (num === '' || isNaN(num) || num < 0 || num > 9) {
+          alert('Please enter valid numbers between 0-9.');
+          return;
         }
 
-        // Update memory history display
-        function updateMemoryHistory() {
-            const memoryList = document.getElementById('memoryList');
-            memoryList.innerHTML = '';
-            
-            if (predictionMemory.length === 0) {
-                memoryList.innerHTML = '<p>अभी कोई प्रेडिक्शन नहीं हुआ है</p>';
-                return;
-            }
-            
-            predictionMemory.slice(0, 10).forEach((item, index) => {
-                const memItem = document.createElement('div');
-                memItem.className = 'memory-item';
-                memItem.innerHTML = `
-                    <strong>#${index+1}:</strong> 
-                    इनपुट: ${item.input.join(', ')} → 
-                    प्रेडिक्शन: ${item.prediction} (${item.type}) | 
-                    विं रेट: ${item.winRate}%
-                `;
-                memoryList.appendChild(memItem);
-            });
-        }
+        nums.push(parseInt(num));
+        types.push(type);
+      }
 
-        // Prediction function
-        function calculate() {
-            const nums = [
-                parseInt(document.getElementById('num1').value),
-                parseInt(document.getElementById('num2').value),
-                parseInt(document.getElementById('num3').value),
-                parseInt(document.getElementById('num4').value),
-                parseInt(document.getElementById('num5').value)
-            ];
-            
-            // Validate inputs
-            if (nums.some(isNaN)) {
-                alert("कृपया सभी 5 नंबर्स डालें (0-9)");
-                return;
-            }
-            
-            // Prediction logic (same as before)
-            const prediction = Math.floor(Math.random() * 10); // 0-9
-            const type = prediction <= 4 ? "Small" : "Big";
-            const winRate = (Math.random() * 30 + 60).toFixed(2);
-            
-            // Add to memory
-            predictionMemory.unshift({
-                input: [...nums],
-                prediction: prediction,
-                type: type,
-                winRate: winRate,
-                timestamp: new Date().toLocaleTimeString()
-            });
-            
-            // Keep only last 10 predictions
-            if (predictionMemory.length > 10) {
-                predictionMemory.pop();
-            }
-            
-            // Display results
-            document.getElementById('prediction').textContent = prediction;
-            document.getElementById('bsPrediction').textContent = type;
-            document.getElementById('winRate').textContent = winRate;
-            document.getElementById('result').style.display = 'block';
-            
-            // Update memory display
-            updateMemoryHistory();
-        }
+      // Store the input in log
+      dataLog.push({
+        numbers: nums,
+        types: types
+      });
 
-        // Other functions (updateHistoryTable, analyzeHotColdNumbers, etc.) remain same as previous code
-        // ... (Include all the other functions from the previous code here)
-    </script>
+      // For this demo, next result is random, you can modify logic
+      const nextNumber = Math.floor(Math.random() * 10);
+      const nextType = nextNumber >= 5 ? 'BIG' : 'SMALL';
+
+      const resultDiv = document.createElement('div');
+      resultDiv.classList.add('result');
+      resultDiv.innerHTML = `<strong>Next Result:</strong> ${nextNumber} <strong>${nextType}</strong>`;
+
+      // Prepend result
+      resultsDiv.prepend(resultDiv);
+
+      // Clear inputs
+      for (let i = 0; i < 3; i++) {
+        document.getElementById(`num${i}`).value = '';
+        document.getElementById(`type${i}`).value = 'BIG';
+      }
+    });
+
+    // Clear all
+    clearBtn.addEventListener('click', () => {
+      resultsDiv.innerHTML = '';
+      dataLog = [];
+    });
+  </script>
+
 </body>
 </html>
