@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Number Pattern Result</title>
+  <style>
+    body {
+      font-family: 'Courier New', monospace;
+      background-image: url('https://wallpapercave.com/wp/wp2568942.jpg'); /* Hacker-style background */
+      background-size: cover;
+      color: #00ff00;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+      font-size: 2em;
+    }
+
+    #inputArea, #buttonArea, #actionButtons {
+      display: flex;
+      margin: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .number {
+      width: 50px;
+      height: 50px;
+      margin: 5px;
+      font-size: 24px;
+      background-color: #111;
+      color: #00ff00;
+      border: 2px solid #00ff00;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    .number:hover {
+      transform: scale(1.1);
+    }
+
+    .action-btn {
+      padding: 10px 20px;
+      margin: 10px;
+      font-size: 18px;
+      background-color: #000;
+      color: #00ff00;
+      border: 2px solid #00ff00;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    #displayInput {
+      margin-top: 20px;
+      font-size: 24px;
+      border: 2px solid #00ff00;
+      padding: 10px;
+      background-color: #000;
+      min-width: 260px;
+      text-align: center;
+    }
+
+    #result {
+      font-size: 28px;
+      margin-top: 20px;
+      color: #00ffcc;
+    }
+  </style>
+</head>
+<body>
+  <h1>Pattern Result Calculator</h1>
+
+  <div id="displayInput">Input: </div>
+
+  <div id="inputArea">
+    <!-- Buttons 0-9 -->
+    <button class="number" onclick="addNumber(0)">0</button>
+    <button class="number" onclick="addNumber(1)">1</button>
+    <button class="number" onclick="addNumber(2)">2</button>
+    <button class="number" onclick="addNumber(3)">3</button>
+    <button class="number" onclick="addNumber(4)">4</button>
+    <button class="number" onclick="addNumber(5)">5</button>
+    <button class="number" onclick="addNumber(6)">6</button>
+    <button class="number" onclick="addNumber(7)">7</button>
+    <button class="number" onclick="addNumber(8)">8</button>
+    <button class="number" onclick="addNumber(9)">9</button>
+  </div>
+
+  <div id="actionButtons">
+    <button class="action-btn" onclick="calculateResult()">Result</button>
+    <button class="action-btn" onclick="clearInput()">Clear</button>
+  </div>
+
+  <div id="result"></div>
+
+  <script>
+    let inputList = [];
+
+    function addNumber(num) {
+      if (inputList.length < 5) {
+        inputList.push(num);
+        document.getElementById("displayInput").innerText = "Input: " + inputList.join(' ');
+      }
+    }
+
+    function clearInput() {
+      inputList = [];
+      document.getElementById("displayInput").innerText = "Input: ";
+      document.getElementById("result").innerText = "";
+    }
+
+    function calculateResult() {
+      if (inputList.length !== 5) {
+        alert("Please enter exactly 5 numbers.");
+        return;
+      }
+
+      let sum = inputList.reduce((a, b) => a + b, 0);
+
+      let resultType = (sum > 25) ? "Big" : "Small";
+      let resultValue = (resultType === "Big") 
+                        ? Math.floor(Math.random() * 5) + 5   // 5-9
+                        : Math.floor(Math.random() * 5);      // 0-4
+
+      document.getElementById("result").innerText = 
+        `Result is ${resultType} ${resultValue} number`;
+    }
+  </script>
+</body>
+</html>
