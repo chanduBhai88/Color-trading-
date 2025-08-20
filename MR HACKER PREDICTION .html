@@ -1,49 +1,64 @@
 <!DOCTYPE html>
-<html>
+<html lang="hi">
 <head>
-  <meta charset="UTF-8">
-  <title>Color Trading Simulation</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      background: #f2f2f2;
-      padding-top: 50px;
-    }
-    #result {
-      font-size: 2rem;
-      margin-top: 20px;
-    }
-    .big { color: green; }
-    .small { color: red; }
-  </style>
+<meta charset="UTF-8">
+<title>Live Period Number Simulation</title>
+<style>
+  body { font-family: Arial, sans-serif; text-align: center; background: #f4f4f4; }
+  h1 { color: #333; }
+  #period { font-size: 1.5rem; margin: 10px 0; }
+  #result { font-size: 2rem; margin-top: 20px; }
+  .big { color: blue; font-weight: bold; }
+  .small { color: red; font-weight: bold; }
+</style>
 </head>
 <body>
-  <h1>Wingo 1-Minute Big/Small Simulation</h1>
-  <p id="timer">Next result in: 60s</p>
-  <button onclick="generatePrediction()">Predict Now</button>
-  <div id="result">Waiting for next round...</div>
 
-  <script>
-    let seconds = 60;
-    let timer = setInterval(function() {
-      seconds--;
-      document.getElementById("timer").innerText = `Next result in: ${seconds}s`;
-      if (seconds <= 0) {
-        generatePrediction();
-        seconds = 60;
-      }
-    }, 1000);
+<h1>🎯 Live Period Number Simulation</h1>
+<p id="period">Period: -</p>
+<p id="timer">Next result in: 60s</p>
+<div id="result">Waiting...</div>
 
-    function generatePrediction() {
-      let outcome = Math.random() < 0.5 ? "BIG" : "SMALL";
-      let resultDiv = document.getElementById("result");
-      if (outcome === "BIG") {
-        resultDiv.innerHTML = "Result: <span class='big'>BIG</span> 🟢";
-      } else {
-        resultDiv.innerHTML = "Result: <span class='small'>SMALL</span> 🔴";
-      }
+<script>
+  let periodCounter = 1;
+  let seconds = 60;
+
+  function getTodayDateString() {
+    let d = new Date();
+    let year = d.getFullYear();
+    let month = String(d.getMonth() + 1).padStart(2, '0');
+    let day = String(d.getDate()).padStart(2, '0');
+    return `${year}${month}${day}`;
+  }
+
+  function generatePeriodNumber() {
+    let dateStr = getTodayDateString();
+    return dateStr + String(periodCounter).padStart(3, '0');
+  }
+
+  function generateResult() {
+    let outcome = Math.random() < 0.5 ? "BIG" : "SMALL";
+    document.getElementById("period").innerText = "Period: " + generatePeriodNumber();
+    if (outcome === "BIG") {
+      document.getElementById("result").innerHTML = "<span class='big'>BIG 🔵</span>";
+    } else {
+      document.getElementById("result").innerHTML = "<span class='small'>SMALL 🔴</span>";
     }
-  </script>
+    periodCounter++;
+  }
+
+  setInterval(function() {
+    seconds--;
+    document.getElementById("timer").innerText = `Next result in: ${seconds}s`;
+    if (seconds <= 0) {
+      generateResult();
+      seconds = 60;
+    }
+  }, 1000);
+
+  // Pehle hi ek result show karo
+  generateResult();
+</script>
+
 </body>
 </html>
