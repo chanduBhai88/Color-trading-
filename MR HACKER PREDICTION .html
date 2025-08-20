@@ -1,64 +1,63 @@
 <!DOCTYPE html>
-<html lang="hi">
+<html>
 <head>
-<meta charset="UTF-8">
-<title>Live Period Number Simulation</title>
-<style>
-  body { font-family: Arial, sans-serif; text-align: center; background: #f4f4f4; }
-  h1 { color: #333; }
-  #period { font-size: 1.5rem; margin: 10px 0; }
-  #result { font-size: 2rem; margin-top: 20px; }
-  .big { color: blue; font-weight: bold; }
-  .small { color: red; font-weight: bold; }
-</style>
+    <meta charset="UTF-8">
+    <title>Live Period Number Simulator</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
+        .big { color: green; font-weight: bold; }
+        .small { color: red; font-weight: bold; }
+        table { margin: auto; border-collapse: collapse; width: 50%; }
+        th, td { border: 1px solid #ccc; padding: 8px; }
+    </style>
 </head>
 <body>
+    <h1>🕒 Live Period Simulator</h1>
+    <p id="period"></p>
+    <p id="result"></p>
+    <table>
+        <thead>
+            <tr>
+                <th>Period</th>
+                <th>Time</th>
+                <th>Result</th>
+            </tr>
+        </thead>
+        <tbody id="history"></tbody>
+    </table>
 
-<h1>🎯 Live Period Number Simulation</h1>
-<p id="period">Period: -</p>
-<p id="timer">Next result in: 60s</p>
-<div id="result">Waiting...</div>
+    <script>
+        function generatePeriodNumber() {
+            let now = new Date();
+            let dateStr = now.getFullYear().toString().slice(2) + 
+                          (now.getMonth()+1).toString().padStart(2, '0') + 
+                          now.getDate().toString().padStart(2, '0');
+            let timeStr = now.getHours().toString().padStart(2,'0') + 
+                          now.getMinutes().toString().padStart(2,'0');
+            return dateStr + timeStr;
+        }
 
-<script>
-  let periodCounter = 1;
-  let seconds = 60;
+        function generateResult() {
+            return Math.random() < 0.5 ? "BIG" : "SMALL";
+        }
 
-  function getTodayDateString() {
-    let d = new Date();
-    let year = d.getFullYear();
-    let month = String(d.getMonth() + 1).padStart(2, '0');
-    let day = String(d.getDate()).padStart(2, '0');
-    return `${year}${month}${day}`;
-  }
+        function update() {
+            let period = generatePeriodNumber();
+            let result = generateResult();
+            let now = new Date().toLocaleTimeString();
 
-  function generatePeriodNumber() {
-    let dateStr = getTodayDateString();
-    return dateStr + String(periodCounter).padStart(3, '0');
-  }
+            document.getElementById("period").innerHTML = `<b>Period:</b> ${period}`;
+            document.getElementById("result").innerHTML =
+                result === "BIG" ? `<span class='big'>BIG 🔵</span>` : `<span class='small'>SMALL 🔴</span>`;
 
-  function generateResult() {
-    let outcome = Math.random() < 0.5 ? "BIG" : "SMALL";
-    document.getElementById("period").innerText = "Period: " + generatePeriodNumber();
-    if (outcome === "BIG") {
-      document.getElementById("result").innerHTML = "<span class='big'>BIG 🔵</span>";
-    } else {
-      document.getElementById("result").innerHTML = "<span class='small'>SMALL 🔴</span>";
-    }
-    periodCounter++;
-  }
+            let history = document.getElementById("history");
+            let row = document.createElement("tr");
+            row.innerHTML = `<td>${period}</td><td>${now}</td><td>${result}</td>`;
+            history.prepend(row);
+        }
 
-  setInterval(function() {
-    seconds--;
-    document.getElementById("timer").innerText = `Next result in: ${seconds}s`;
-    if (seconds <= 0) {
-      generateResult();
-      seconds = 60;
-    }
-  }, 1000);
-
-  // Pehle hi ek result show karo
-  generateResult();
-</script>
-
+        setInterval(update, 60000); // 1 minute interval
+        update(); // initial call
+    </script>
 </body>
 </html>
