@@ -1,137 +1,184 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Number Pattern Result</title>
-  <style>
-    body {
-      font-family: 'Courier New', monospace;
-      background-image: url('https://wallpapercave.com/wp/wp2568942.jpg'); /* Hacker-style background */
-      background-size: cover;
-      color: #00ff00;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      margin: 0;
-    }
+<meta charset="UTF-8">
+<title>Big-Small Pattern Game</title>
+<style>
+  body {
+    font-family: 'Courier New', monospace;
+    background-image: url('https://wallpapercave.com/wp/wp2568942.jpg');
+    background-size: cover;
+    color: #00ff00;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    min-height: 100vh;
+    margin: 0;
+    padding-top: 50px;
+  }
 
-    h1 {
-      margin-bottom: 20px;
-      font-size: 2em;
-    }
+  h1 {
+    margin-bottom: 20px;
+    font-size: 2em;
+  }
 
-    #inputArea, #buttonArea, #actionButtons {
-      display: flex;
-      margin: 10px;
-      flex-wrap: wrap;
-      justify-content: center;
-    }
+  #choiceButtons {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 20px;
+  }
 
-    .number {
-      width: 50px;
-      height: 50px;
-      margin: 5px;
-      font-size: 24px;
-      background-color: #111;
-      color: #00ff00;
-      border: 2px solid #00ff00;
-      border-radius: 5px;
-      cursor: pointer;
-      transition: transform 0.2s;
-    }
+  .choice {
+    padding: 15px 30px;
+    background-color: #111;
+    border: 2px solid #00ff00;
+    color: #00ff00;
+    font-size: 22px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 0.3s;
+  }
 
-    .number:hover {
-      transform: scale(1.1);
-    }
+  .choice:hover {
+    background-color: #00ff00;
+    color: #000;
+    transform: scale(1.1);
+  }
 
-    .action-btn {
-      padding: 10px 20px;
-      margin: 10px;
-      font-size: 18px;
-      background-color: #000;
-      color: #00ff00;
-      border: 2px solid #00ff00;
-      border-radius: 5px;
-      cursor: pointer;
-    }
+  .choice.locked {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
 
-    #displayInput {
-      margin-top: 20px;
-      font-size: 24px;
-      border: 2px solid #00ff00;
-      padding: 10px;
-      background-color: #000;
-      min-width: 260px;
-      text-align: center;
-    }
+  #actionButtons {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 20px;
+  }
 
-    #result {
-      font-size: 28px;
-      margin-top: 20px;
-      color: #00ffcc;
-    }
-  </style>
+  .action-btn {
+    padding: 12px 25px;
+    font-size: 20px;
+    background-color: #000;
+    color: #00ff00;
+    border: 2px solid #00ff00;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+
+  #result {
+    font-size: 30px;
+    color: #00ffcc;
+    margin-top: 20px;
+    opacity: 0;
+    transform: scale(0.5);
+    transition: all 0.5s ease;
+  }
+
+  #result.show {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  #history {
+    margin-top: 30px;
+    font-size: 18px;
+    max-width: 300px;
+    text-align: center;
+  }
+
+  .history-item {
+    border-bottom: 1px solid #00ff00;
+    padding: 5px;
+  }
+</style>
 </head>
 <body>
-  <h1>Pattern Result Calculator</h1>
+  <h1>🔮 Big-Small Pattern Game</h1>
 
-  <div id="displayInput">Input: </div>
-
-  <div id="inputArea">
-    <!-- Buttons 0-9 -->
-    <button class="number" onclick="addNumber(0)">0</button>
-    <button class="number" onclick="addNumber(1)">1</button>
-    <button class="number" onclick="addNumber(2)">2</button>
-    <button class="number" onclick="addNumber(3)">3</button>
-    <button class="number" onclick="addNumber(4)">4</button>
-    <button class="number" onclick="addNumber(5)">5</button>
-    <button class="number" onclick="addNumber(6)">6</button>
-    <button class="number" onclick="addNumber(7)">7</button>
-    <button class="number" onclick="addNumber(8)">8</button>
-    <button class="number" onclick="addNumber(9)">9</button>
+  <div id="choiceButtons">
+    <button id="bigBtn" class="choice" ondblclick="lockChoice('BIG')" onclick="selectChoice('BIG')">BIG</button>
+    <button id="smallBtn" class="choice" ondblclick="lockChoice('SMALL')" onclick="selectChoice('SMALL')">SMALL</button>
   </div>
 
   <div id="actionButtons">
-    <button class="action-btn" onclick="calculateResult()">Result</button>
-    <button class="action-btn" onclick="clearInput()">Clear</button>
+    <button class="action-btn" onclick="showResult()">Result</button>
+    <button class="action-btn" onclick="resetGame()">Clear</button>
   </div>
 
   <div id="result"></div>
 
-  <script>
-    let inputList = [];
+  <div id="history">
+    <h3>📜 Last 10 Results:</h3>
+    <div id="historyList"></div>
+  </div>
 
-    function addNumber(num) {
-      if (inputList.length < 5) {
-        inputList.push(num);
-        document.getElementById("displayInput").innerText = "Input: " + inputList.join(' ');
-      }
-    }
+<script>
+let userChoice = "";
+let locked = false;
+let historyData = [];
 
-    function clearInput() {
-      inputList = [];
-      document.getElementById("displayInput").innerText = "Input: ";
-      document.getElementById("result").innerText = "";
-    }
+function selectChoice(choice) {
+  if (locked) return;
+  userChoice = choice;
+  document.getElementById("bigBtn").style.backgroundColor = choice === "BIG" ? "#00ff00" : "#111";
+  document.getElementById("bigBtn").style.color = choice === "BIG" ? "#000" : "#00ff00";
+  document.getElementById("smallBtn").style.backgroundColor = choice === "SMALL" ? "#00ff00" : "#111";
+  document.getElementById("smallBtn").style.color = choice === "SMALL" ? "#000" : "#00ff00";
+}
 
-    function calculateResult() {
-      if (inputList.length !== 5) {
-        alert("Please enter exactly 5 numbers.");
-        return;
-      }
+function lockChoice(choice) {
+  locked = true;
+  document.getElementById("bigBtn").classList.add("locked");
+  document.getElementById("smallBtn").classList.add("locked");
+  alert("🔒 Choice Locked: " + choice);
+}
 
-      let sum = inputList.reduce((a, b) => a + b, 0);
+function resetGame() {
+  userChoice = "";
+  locked = false;
+  document.getElementById("bigBtn").classList.remove("locked");
+  document.getElementById("smallBtn").classList.remove("locked");
+  document.getElementById("bigBtn").style.backgroundColor = "#111";
+  document.getElementById("bigBtn").style.color = "#00ff00";
+  document.getElementById("smallBtn").style.backgroundColor = "#111";
+  document.getElementById("smallBtn").style.color = "#00ff00";
+  document.getElementById("result").innerText = "";
+  document.getElementById("result").classList.remove("show");
+}
 
-      let resultType = (sum > 25) ? "Big" : "Small";
-      let resultValue = (resultType === "Big") 
-                        ? Math.floor(Math.random() * 5) + 5   // 5-9
-                        : Math.floor(Math.random() * 5);      // 0-4
+function showResult() {
+  if (!userChoice) {
+    alert("⚠️ Please select BIG or SMALL first!");
+    return;
+  }
 
-      document.getElementById("result").innerText = 
-        `Result is ${resultType} ${resultValue} number`;
-    }
-  </script>
+  let randomNumber = Math.floor(Math.random() * 10);
+  let resultType = randomNumber >= 5 ? "BIG" : "SMALL";
+  let win = (userChoice === resultType) ? "✅ You Won!" : "❌ You Lost!";
+
+  let resultText = `Result: ${resultType} (${randomNumber}) - ${win}`;
+  let resultDiv = document.getElementById("result");
+  resultDiv.innerText = resultText;
+  resultDiv.classList.remove("show");
+  setTimeout(() => resultDiv.classList.add("show"), 50);
+
+  historyData.unshift(resultText);
+  if (historyData.length > 10) historyData.pop();
+  updateHistory();
+}
+
+function updateHistory() {
+  let historyList = document.getElementById("historyList");
+  historyList.innerHTML = "";
+  historyData.forEach(item => {
+    let div = document.createElement("div");
+    div.classList.add("history-item");
+    div.innerText = item;
+    historyList.appendChild(div);
+  });
+}
+</script>
 </body>
 </html>
