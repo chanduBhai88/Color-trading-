@@ -1,341 +1,49 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Battery Game Predictor</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #f5f5f5;
-        }
-        .container {
-            background-color: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-        }
-        h1 {
-            color: #333;
-            text-align: center;
-        }
-        .input-section {
-            margin-bottom: 20px;
-        }
-        input {
-            padding: 10px;
-            width: 50px;
-            margin-right: 10px;
-            text-align: center;
-            font-size: 18px;
-        }
-        button {
-            padding: 10px 15px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 16px;
-            margin-right: 10px;
-        }
-        button:hover {
-            background-color: #45a049;
-        }
-        #clearBtn {
-            background-color: #f44336;
-        }
-        #clearBtn:hover {
-            background-color: #d32f2f;
-        }
-        .result {
-            margin-top: 20px;
-            padding: 15px;
-            background-color: #e9f7ef;
-            border-radius: 5px;
-            font-size: 18px;
-        }
-        .history {
-            margin-top: 20px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: center;
-        }
-        th {
-            background-color: #f2f2f2;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>Color Trading Simulation</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background: #f2f2f2;
+      padding-top: 50px;
+    }
+    #result {
+      font-size: 2rem;
+      margin-top: 20px;
+    }
+    .big { color: green; }
+    .small { color: red; }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Battery Game Predictor</h1>
-        
-        <div class="input-section">
-            <h3>Enter last 6 numbers (0-9):</h3>
-            <input type="number" min="0" max="9" id="num1" maxlength="1">
-            <input type="number" min="0" max="9" id="num2" maxlength="1">
-            <input type="number" min="0" max="9" id="num3" maxlength="1">
-            <input type="number" min="0" max="9" id="num4" maxlength="1">
-            <input type="number" min="0" max="9" id="num5" maxlength="1">
-            <input type="number" min="0" max="9" id="num6" maxlength="1">
-            
-            <div style="margin-top: 15px;">
-                <button id="predictBtn">Predict Next</button>
-                <button id="clearBtn">Clear</button>
-            </div>
-        </div>
-        
-        <div id="result" class="result" style="display: none;">
-            <h3>Prediction Result:</h3>
-            <p id="predictionText"></p>
-            <p id="confidenceText"></p>
-            <p id="patternInfo"></p>
-        </div>
-        
-        <div class="history">
-            <h3>Recent History</h3>
-            <table id="historyTable">
-                <thead>
-                    <tr>
-                        <th>Position</th>
-                        <th>Number</th>
-                        <th>Big/Small</th>
-                    </tr>
-                </thead>
-                <tbody id="historyBody">
-                </tbody>
-            </table>
-        </div>
-    </div>
+  <h1>Wingo 1-Minute Big/Small Simulation</h1>
+  <p id="timer">Next result in: 60s</p>
+  <button onclick="generatePrediction()">Predict Now</button>
+  <div id="result">Waiting for next round...</div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const inputs = [
-                document.getElementById('num1'),
-                document.getElementById('num2'),
-                document.getElementById('num3'),
-                document.getElementById('num4'),
-                document.getElementById('num5'),
-                document.getElementById('num6')
-            ];
-            
-            const predictBtn = document.getElementById('predictBtn');
-            const clearBtn = document.getElementById('clearBtn');
-            const resultDiv = document.getElementById('result');
-            const predictionText = document.getElementById('predictionText');
-            const confidenceText = document.getElementById('confidenceText');
-            const patternInfo = document.getElementById('patternInfo');
-            const historyBody = document.getElementById('historyBody');
-            
-            // Auto-focus and auto-tab between inputs
-            inputs.forEach((input, index) => {
-                input.addEventListener('input', function() {
-                    if (this.value.length === 1 && index < inputs.length - 1) {
-                        inputs[index + 1].focus();
-                    }
-                });
-                
-                // Allow only numbers 0-9
-                input.addEventListener('keydown', function(e) {
-                    if (e.key === 'Backspace' && this.value === '' && index > 0) {
-                        inputs[index - 1].focus();
-                    }
-                    if (!/[0-9]|Backspace|Delete|ArrowLeft|ArrowRight/.test(e.key)) {
-                        e.preventDefault();
-                    }
-                });
-            });
-            
-            // Predict button click handler
-            predictBtn.addEventListener('click', function() {
-                const numbers = [];
-                let isValid = true;
-                
-                // Validate inputs
-                for (let i = 0; i < inputs.length; i++) {
-                    const value = parseInt(inputs[i].value);
-                    if (isNaN(value) || value < 0 || value > 9) {
-                        alert(`Please enter a valid number (0-9) in position ${i + 1}`);
-                        inputs[i].focus();
-                        isValid = false;
-                        break;
-                    }
-                    numbers.push(value);
-                }
-                
-                if (!isValid) return;
-                
-                // Analyze the pattern
-                const analysis = analyzePattern(numbers);
-                
-                // Display results
-                predictionText.textContent = `Next Prediction: ${analysis.prediction}`;
-                confidenceText.textContent = `Confidence: ${analysis.confidence}%`;
-                patternInfo.textContent = `Pattern Detected: ${analysis.patternType}`;
-                
-                // Update history table
-                updateHistoryTable(numbers, analysis.prediction);
-                
-                // Show result div
-                resultDiv.style.display = 'block';
-            });
-            
-            // Clear button click handler
-            clearBtn.addEventListener('click', function() {
-                inputs.forEach(input => {
-                    input.value = '';
-                });
-                resultDiv.style.display = 'none';
-                historyBody.innerHTML = '';
-                inputs[0].focus();
-            });
-            
-            // Pattern analysis function
-            function analyzePattern(numbers) {
-                // Convert numbers to Big/Small (B/S)
-                const bsSequence = numbers.map(num => num >= 5 ? 'B' : 'S');
-                
-                // Calculate frequencies
-                const bigCount = bsSequence.filter(x => x === 'B').length;
-                const smallCount = bsSequence.filter(x => x === 'S').length;
-                
-                // Check for streaks
-                let currentStreak = 1;
-                let maxStreak = 1;
-                let streakType = bsSequence[0];
-                
-                for (let i = 1; i < bsSequence.length; i++) {
-                    if (bsSequence[i] === bsSequence[i - 1]) {
-                        currentStreak++;
-                        if (currentStreak > maxStreak) {
-                            maxStreak = currentStreak;
-                            streakType = bsSequence[i];
-                        }
-                    } else {
-                        currentStreak = 1;
-                    }
-                }
-                
-                // Check for alternations
-                let alternationScore = 0;
-                for (let i = 1; i < bsSequence.length; i++) {
-                    if (bsSequence[i] !== bsSequence[i - 1]) {
-                        alternationScore++;
-                    }
-                }
-                
-                // Check last few for immediate patterns
-                const lastThree = bsSequence.slice(-3);
-                const allSameLastThree = lastThree.every(val => val === lastThree[0]);
-                const isAlternating = bsSequence.length >= 3 && 
-                                      ((bsSequence[bsSequence.length - 3] !== bsSequence[bsSequence.length - 2]) && 
-                                      (bsSequence[bsSequence.length - 2] !== bsSequence[bsSequence.length - 1]));
-                
-                // Analyze number distribution
-                const highNumbers = numbers.filter(num => num >= 5).length;
-                const lowNumbers = numbers.filter(num => num < 5).length;
-                
-                // Make prediction based on analysis
-                let prediction;
-                let confidence;
-                let patternType;
-                
-                // If there's a strong streak (4+ of same type)
-                if (maxStreak >= 4) {
-                    prediction = streakType === 'B' ? 'Big' : 'Small';
-                    confidence = 70 + (maxStreak * 5);
-                    patternType = `Streak of ${maxStreak} ${streakType === 'B' ? 'Big' : 'Small'}`;
-                }
-                // If alternating pattern detected
-                else if (alternationScore >= 4 && isAlternating) {
-                    prediction = bsSequence[bsSequence.length - 1] === 'B' ? 'Small' : 'Big';
-                    confidence = 75;
-                    patternType = 'Alternating pattern';
-                }
-                // If last three are same
-                else if (allSameLastThree) {
-                    prediction = lastThree[0] === 'B' ? 'Small' : 'Big';
-                    confidence = 65;
-                    patternType = `Last 3 all ${lastThree[0] === 'B' ? 'Big' : 'Small'}`;
-                }
-                // If more Big numbers recently
-                else if (highNumbers > lowNumbers) {
-                    prediction = 'Small';
-                    confidence = 60;
-                    patternType = `More Big numbers (${highNumbers} Big vs ${lowNumbers} Small)`;
-                }
-                // If more Small numbers recently
-                else if (lowNumbers > highNumbers) {
-                    prediction = 'Big';
-                    confidence = 60;
-                    patternType = `More Small numbers (${lowNumbers} Small vs ${highNumbers} Big)`;
-                }
-                // Default prediction based on overall balance
-                else {
-                    prediction = bigCount >= smallCount ? 'Small' : 'Big';
-                    confidence = 55;
-                    patternType = 'Balanced distribution';
-                }
-                
-                // Adjust confidence based on recent trend
-                if (bsSequence.slice(-2).every(x => x === bsSequence[bsSequence.length - 1])) {
-                    confidence += 5;
-                }
-                
-                // Cap confidence at 90%
-                confidence = Math.min(90, confidence);
-                
-                return {
-                    prediction,
-                    confidence: Math.round(confidence),
-                    patternType
-                };
-            }
-            
-            // Update history table
-            function updateHistoryTable(numbers, prediction) {
-                historyBody.innerHTML = '';
-                
-                for (let i = 0; i < numbers.length; i++) {
-                    const row = document.createElement('tr');
-                    
-                    const posCell = document.createElement('td');
-                    posCell.textContent = i + 1;
-                    
-                    const numCell = document.createElement('td');
-                    numCell.textContent = numbers[i];
-                    
-                    const bsCell = document.createElement('td');
-                    bsCell.textContent = numbers[i] >= 5 ? 'Big' : 'Small';
-                    bsCell.style.color = numbers[i] >= 5 ? 'blue' : 'green';
-                    
-                    row.appendChild(posCell);
-                    row.appendChild(numCell);
-                    row.appendChild(bsCell);
-                    
-                    historyBody.appendChild(row);
-                }
-                
-                // Add prediction row
-                const predRow = document.createElement('tr');
-                const predCell = document.createElement('td');
-                predCell.colSpan = 3;
-                predCell.textContent = `Next Prediction: ${prediction}`;
-                predCell.style.fontWeight = 'bold';
-                predCell.style.color = prediction === 'Big' ? 'blue' : 'green';
-                predRow.appendChild(predCell);
-                historyBody.appendChild(predRow);
-            }
-        });
-    </script>
+  <script>
+    let seconds = 60;
+    let timer = setInterval(function() {
+      seconds--;
+      document.getElementById("timer").innerText = `Next result in: ${seconds}s`;
+      if (seconds <= 0) {
+        generatePrediction();
+        seconds = 60;
+      }
+    }, 1000);
+
+    function generatePrediction() {
+      let outcome = Math.random() < 0.5 ? "BIG" : "SMALL";
+      let resultDiv = document.getElementById("result");
+      if (outcome === "BIG") {
+        resultDiv.innerHTML = "Result: <span class='big'>BIG</span> 🟢";
+      } else {
+        resultDiv.innerHTML = "Result: <span class='small'>SMALL</span> 🔴";
+      }
+    }
+  </script>
 </body>
 </html>
