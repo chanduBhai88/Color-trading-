@@ -9,7 +9,7 @@
         color: red;
         font-family: monospace;
         text-align: center;
-        padding-top: 50px;
+        padding-top: 30px;
     }
     h1 {
         font-size: 28px;
@@ -65,14 +65,14 @@
 
 <h1>🔥 BIG-SMALL Prediction Tool 🔥</h1>
 <div class="container">
-    <p>Enter Last 6 Results:</p>
+    <p>Enter Last 6 Results (Example: 7 BIG):</p>
     <div>
-        <input type="text" id="in1" placeholder="No.">
-        <input type="text" id="in2" placeholder="No.">
-        <input type="text" id="in3" placeholder="No.">
-        <input type="text" id="in4" placeholder="No.">
-        <input type="text" id="in5" placeholder="No.">
-        <input type="text" id="in6" placeholder="No.">
+        <input type="text" id="in1" placeholder="No. BIG/SMALL">
+        <input type="text" id="in2" placeholder="No. BIG/SMALL">
+        <input type="text" id="in3" placeholder="No. BIG/SMALL">
+        <input type="text" id="in4" placeholder="No. BIG/SMALL">
+        <input type="text" id="in5" placeholder="No. BIG/SMALL">
+        <input type="text" id="in6" placeholder="No. BIG/SMALL">
     </div>
     <div>
         <button onclick="predict()">Predict</button>
@@ -82,24 +82,43 @@
 </div>
 
 <script>
+    // Your full dataset here (only a sample added for demo, you will need to paste all sequences in the same format)
+    let data = [
+        "6 BIG","2 SMALL","3 SMALL","1 SMALL","1 SMALL","6 BIG","5 BIG","6 BIG","2 SMALL","2 SMALL",
+        "2 SMALL","4 SMALL","6 BIG","2 SMALL","3 SMALL","0 SMALL","7 BIG","7 BIG","0 SMALL","7 BIG",
+        "4 SMALL","8 BIG","0 SMALL","1 SMALL","9 BIG","5 BIG","4 SMALL","5 BIG","2 SMALL","3 SMALL",
+        // ⚡ Paste all results here in same format ⚡
+    ];
+
     function predict() {
         let inputs = [];
         for (let i = 1; i <= 6; i++) {
-            let val = document.getElementById("in"+i).value.trim();
+            let val = document.getElementById("in"+i).value.trim().toUpperCase();
             if(val === "") {
                 alert("Please fill all 6 inputs!");
                 return;
             }
-            inputs.push(val.toUpperCase());
+            inputs.push(val);
         }
 
-        // 🔮 Dummy prediction logic: just a random number & type
-        let num = Math.floor(Math.random() * 10);
-        let type = num >= 5 ? "BIG" : "SMALL";
+        let lastIndex = -1;
 
-        // In real scenario, yahan pattern matching / ML model lagega
+        // Pattern Matching Search
+        for (let i = 0; i <= data.length - 7; i++) { 
+            let sequence = data.slice(i, i + 6);
+            if (JSON.stringify(sequence) === JSON.stringify(inputs)) {
+                lastIndex = i;
+            }
+        }
+
         let resultArea = document.getElementById("result");
-        resultArea.innerHTML = `<span style="color:lime;">PREDICTION ➡ ${num} ${type}</span>`;
+
+        if (lastIndex !== -1) {
+            let prediction = data[lastIndex + 6];
+            resultArea.innerHTML = `<span style="color:lime;">PREDICTION ➡ ${prediction}</span>`;
+        } else {
+            resultArea.innerHTML = `<span style="color:orange;">⚠ Pattern Not Found</span>`;
+        }
     }
 
     function clearInputs() {
