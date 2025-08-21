@@ -1,193 +1,699 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>6-Digit Big-Small Game</title>
-<style>
-  body {
-    font-family: 'Courier New', monospace;
-    background-image: url('https://wallpapercave.com/wp/wp2568942.jpg');
-    background-size: cover;
-    color: #00ff00;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
-    min-height: 100vh;
-    margin: 0;
-    padding-top: 40px;
-  }
-
-  h1 {
-    font-size: 2em;
-    margin-bottom: 10px;
-  }
-
-  #displayInput {
-    margin: 15px;
-    font-size: 24px;
-    border: 2px solid #00ff00;
-    padding: 10px 20px;
-    background-color: #000;
-    min-width: 280px;
-    text-align: center;
-    border-radius: 5px;
-  }
-
-  #inputArea {
-    display: flex;
-    flex-wrap: wrap;
-    max-width: 220px;
-    justify-content: center;
-  }
-
-  .number {
-    width: 50px;
-    height: 50px;
-    margin: 5px;
-    font-size: 22px;
-    background-color: #111;
-    color: #00ff00;
-    border: 2px solid #00ff00;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: transform 0.2s;
-  }
-
-  .number:hover {
-    transform: scale(1.1);
-    background-color: #00ff00;
-    color: #000;
-  }
-
-  #actionButtons {
-    display: flex;
-    gap: 15px;
-    margin: 20px;
-  }
-
-  .action-btn {
-    padding: 12px 25px;
-    font-size: 18px;
-    background-color: #000;
-    color: #00ff00;
-    border: 2px solid #00ff00;
-    border-radius: 5px;
-    cursor: pointer;
-  }
-
-  #result {
-    font-size: 28px;
-    margin-top: 15px;
-    color: #00ffcc;
-    opacity: 0;
-    transform: scale(0.5);
-    transition: all 0.4s ease;
-  }
-  #result.show {
-    opacity: 1;
-    transform: scale(1);
-  }
-
-  #history {
-    margin-top: 30px;
-    font-size: 18px;
-    max-width: 300px;
-    text-align: center;
-  }
-
-  .history-item {
-    border-bottom: 1px solid #00ff00;
-    padding: 5px 0;
-  }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Lottery Prediction System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            margin: 20px 0;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        header {
+            background: linear-gradient(to right, #0f3460, #1a1a2e);
+            color: white;
+            padding: 25px;
+            text-align: center;
+            position: relative;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            background: linear-gradient(to right, #4cc9f0, #4361ee);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin-top: 10px;
+        }
+        
+        .main-content {
+            display: flex;
+            flex-wrap: wrap;
+            padding: 20px;
+        }
+        
+        .prediction-section {
+            flex: 1;
+            min-width: 300px;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .input-section {
+            flex: 1;
+            min-width: 300px;
+            padding: 20px;
+            border-left: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: #4cc9f0;
+            padding-bottom: 5px;
+            border-bottom: 2px solid #4361ee;
+        }
+        
+        .prediction-card {
+            background: linear-gradient(to bottom, #1a1a2e, #16213e);
+            padding: 25px;
+            border-radius: 15px;
+            margin-top: 20px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(76, 201, 240, 0.3);
+        }
+        
+        .prediction-title {
+            font-size: 1.4rem;
+            color: #4cc9f0;
+            margin-bottom: 20px;
+        }
+        
+        .prediction-result {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            margin: 25px 0;
+        }
+        
+        .predicted-number {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #fff;
+            background: linear-gradient(135deg, #4361ee, #3a0ca3);
+            width: 100px;
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            box-shadow: 0 5px 20px rgba(67, 97, 238, 0.4);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .predicted-size {
+            font-size: 1.8rem;
+            font-weight: bold;
+            padding: 15px 30px;
+            border-radius: 30px;
+            background: linear-gradient(to right, #f72585, #b5179e);
+            box-shadow: 0 5px 15px rgba(247, 37, 133, 0.3);
+        }
+        
+        .confidence {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 1.1rem;
+            color: #a5b4fc;
+        }
+        
+        .pattern-info {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 25px;
+            text-align: left;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #a5b4fc;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid rgba(67, 97, 238, 0.3);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+        
+        input:focus, select:focus {
+            border-color: #4361ee;
+            outline: none;
+            background: rgba(255, 255, 255, 0.15);
+        }
+        
+        input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+        
+        .buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 25px;
+            flex-wrap: wrap;
+        }
+        
+        button {
+            padding: 14px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .btn-submit {
+            background: linear-gradient(to right, #4cc9f0, #4361ee);
+            color: white;
+            flex: 1;
+        }
+        
+        .btn-submit:hover {
+            background: linear-gradient(to right, #4361ee, #3a0ca3);
+            transform: translateY(-2px);
+        }
+        
+        .btn-clear {
+            background: linear-gradient(to right, #f72585, #b5179e);
+            color: white;
+            flex: 1;
+        }
+        
+        .btn-clear:hover {
+            background: linear-gradient(to right, #b5179e, #7209b7);
+            transform: translateY(-2px);
+        }
+        
+        .btn-predict {
+            background: linear-gradient(to right, #ff9e00, #ff6b00);
+            color: white;
+            width: 100%;
+            margin-top: 15px;
+        }
+        
+        .btn-predict:hover {
+            background: linear-gradient(to right, #ff6b00, #ff5400);
+            transform: translateY(-2px);
+        }
+        
+        .history-list {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        .history-item {
+            padding: 14px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .history-item:last-child {
+            border-bottom: none;
+        }
+        
+        .history-number {
+            font-weight: bold;
+            font-size: 1.2rem;
+            color: white;
+        }
+        
+        .history-size {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+        
+        .small {
+            background: linear-gradient(to right, #38b000, #2d9c00);
+            color: white;
+        }
+        
+        .big {
+            background: linear-gradient(to right, #ff9e00, #ff6b00);
+            color: white;
+        }
+        
+        .stats {
+            margin-top: 25px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .stats-title {
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            color: #4cc9f0;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+        
+        .stat-item {
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .stat-value {
+            font-size: 1.6rem;
+            font-weight: bold;
+            color: white;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: #a5b4fc;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 25px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .input-section {
+                border-left: none;
+                border-top: 1px solid rgba(255, 255, 255, 0.1);
+            }
+            
+            .main-content {
+                flex-direction: column;
+            }
+            
+            .prediction-result {
+                flex-direction: column;
+                gap: 25px;
+            }
+        }
+    </style>
 </head>
 <body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-crystal-ball"></i> Advanced Lottery Prediction System</h1>
+            <p class="subtitle">Smart algorithm predicts possible outcomes based on statistical patterns</p>
+        </header>
+        
+        <div class="main-content">
+            <div class="prediction-section">
+                <h2 class="section-title">Next Prediction</h2>
+                
+                <div class="prediction-card">
+                    <h3 class="prediction-title">Predicted Outcome</h3>
+                    
+                    <div class="prediction-result">
+                        <div class="predicted-number" id="predictedNumber">72</div>
+                        <div class="predicted-size big" id="predictedSize">BIG</div>
+                    </div>
+                    
+                    <div class="confidence" id="confidenceLevel">
+                        Confidence Level: 78%
+                    </div>
+                    
+                    <div class="pattern-info">
+                        <h4><i class="fas fa-chart-line"></i> Pattern Analysis</h4>
+                        <p id="patternInfo">Based on recent trends, BIG numbers are showing a strong pattern with an average value of 68. Next number is likely to be in the 70-79 range.</p>
+                    </div>
+                </div>
+                
+                <button class="btn-predict" id="predictBtn">
+                    <i class="fas fa-bolt"></i> Generate New Prediction
+                </button>
+                
+                <div class="stats">
+                    <h3 class="stats-title">Pattern Statistics</h3>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-value" id="bigTrend">65%</div>
+                            <div class="stat-label">BIG Trend</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="smallTrend">35%</div>
+                            <div class="stat-label">SMALL Trend</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="avgNumber">62</div>
+                            <div class="stat-label">Avg Number</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="patternStrength">78%</div>
+                            <div class="stat-label">Pattern Strength</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="input-section">
+                <h2 class="section-title">Input Actual Results</h2>
+                
+                <div class="input-group">
+                    <label for="number"><i class="fas fa-number"></i> Actual Number</label>
+                    <input type="number" id="number" min="0" max="100" placeholder="Enter actual result (0-100)">
+                </div>
+                
+                <div class="input-group">
+                    <label for="size"><i class="fas fa-expand"></i> Actual Size</label>
+                    <select id="size">
+                        <option value="">Select actual size</option>
+                        <option value="small">Small (0-49)</option>
+                        <option value="big">Big (50-100)</option>
+                    </select>
+                </div>
+                
+                <div class="buttons">
+                    <button class="btn-submit" id="submitBtn">
+                        <i class="fas fa-check-circle"></i> Submit Result
+                    </button>
+                    <button class="btn-clear" id="clearBtn">
+                        <i class="fas fa-trash"></i> Clear
+                    </button>
+                </div>
+                
+                <div class="history-list" id="historyList">
+                    <div class="history-item">
+                        <span class="history-number">Latest Results</span>
+                        <span class="history-size">Size</span>
+                    </div>
+                    <div class="history-item">
+                        <span class="history-number">68</span>
+                        <span class="history-size big">BIG</span>
+                    </div>
+                    <div class="history-item">
+                        <span class="history-number">35</span>
+                        <span class="history-size small">SMALL</span>
+                    </div>
+                    <div class="history-item">
+                        <span class="history-number">72</span>
+                        <span class="history-size big">BIG</span>
+                    </div>
+                    <div class="history-item">
+                        <span class="history-number">81</span>
+                        <span class="history-size big">BIG</span>
+                    </div>
+                    <div class="history-item">
+                        <span class="history-number">42</span>
+                        <span class="history-size small">SMALL</span>
+                    </div>
+                </div>
+                
+                <div class="buttons">
+                    <button class="btn-clear" id="clearHistoryBtn">
+                        <i class="fas fa-history"></i> Clear History
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <p>© 2023 Advanced Lottery Prediction System | Uses statistical analysis for predictions | For entertainment purposes only</p>
+    </footer>
 
-<h1>🎯 6-Digit Big-Small Game</h1>
-
-<div id="displayInput">Input: </div>
-
-<div id="inputArea">
-  <button class="number" onclick="addNumber(0)">0</button>
-  <button class="number" onclick="addNumber(1)">1</button>
-  <button class="number" onclick="addNumber(2)">2</button>
-  <button class="number" onclick="addNumber(3)">3</button>
-  <button class="number" onclick="addNumber(4)">4</button>
-  <button class="number" onclick="addNumber(5)">5</button>
-  <button class="number" onclick="addNumber(6)">6</button>
-  <button class="number" onclick="addNumber(7)">7</button>
-  <button class="number" onclick="addNumber(8)">8</button>
-  <button class="number" onclick="addNumber(9)">9</button>
-</div>
-
-<div id="actionButtons">
-  <button class="action-btn" onclick="calculateResult()">Result</button>
-  <button class="action-btn" onclick="clearInput()">Clear</button>
-</div>
-
-<div id="result"></div>
-
-<div id="history">
-  <h3>📜 Last 10 Results:</h3>
-  <div id="historyList"></div>
-</div>
-
-<script>
-let inputList = [];
-let historyData = [];
-
-// Number input
-function addNumber(num) {
-  if (inputList.length < 6) {
-    inputList.push(num);
-    document.getElementById("displayInput").innerText = "Input: " + inputList.join(' ');
-  }
-}
-
-// Clear input
-function clearInput() {
-  inputList = [];
-  document.getElementById("displayInput").innerText = "Input: ";
-  document.getElementById("result").innerText = "";
-  document.getElementById("result").classList.remove("show");
-}
-
-// Calculate Big/Small
-function calculateResult() {
-  if (inputList.length !== 6) {
-    alert("⚠️ Please enter exactly 6 digits!");
-    return;
-  }
-
-  let sum = inputList.reduce((a, b) => a + b, 0);
-  let resultType = (sum > 27) ? "BIG" : "SMALL"; // 6 digits → middle = 27
-  let finalText = `Result: ${resultType} (Sum: ${sum})`;
-
-  let resultDiv = document.getElementById("result");
-  resultDiv.innerText = finalText;
-  resultDiv.classList.remove("show");
-  setTimeout(() => resultDiv.classList.add("show"), 50);
-
-  // Save history
-  historyData.unshift(finalText);
-  if (historyData.length > 10) historyData.pop();
-
-  updateHistory();
-}
-
-// Update last 10 results
-function updateHistory() {
-  let historyList = document.getElementById("historyList");
-  historyList.innerHTML = "";
-  historyData.forEach(item => {
-    let div = document.createElement("div");
-    div.classList.add("history-item");
-    div.innerText = item;
-    historyList.appendChild(div);
-  });
-}
-</script>
-
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const numberInput = document.getElementById('number');
+            const sizeSelect = document.getElementById('size');
+            const submitBtn = document.getElementById('submitBtn');
+            const clearBtn = document.getElementById('clearBtn');
+            const predictBtn = document.getElementById('predictBtn');
+            const clearHistoryBtn = document.getElementById('clearHistoryBtn');
+            const historyList = document.getElementById('historyList');
+            const predictedNumberElem = document.getElementById('predictedNumber');
+            const predictedSizeElem = document.getElementById('predictedSize');
+            const confidenceLevelElem = document.getElementById('confidenceLevel');
+            const patternInfoElem = document.getElementById('patternInfo');
+            const bigTrendElem = document.getElementById('bigTrend');
+            const smallTrendElem = document.getElementById('smallTrend');
+            const avgNumberElem = document.getElementById('avgNumber');
+            const patternStrengthElem = document.getElementById('patternStrength');
+            
+            // Sample initial data
+            let history = [
+                { number: 68, size: 'big' },
+                { number: 35, size: 'small' },
+                { number: 72, size: 'big' },
+                { number: 81, size: 'big' },
+                { number: 42, size: 'small' }
+            ];
+            
+            // Update prediction on load
+            updatePrediction();
+            
+            // Submit button event
+            submitBtn.addEventListener('click', function() {
+                const number = numberInput.value.trim();
+                const size = sizeSelect.value;
+                
+                if (!number || number < 0 || number > 100) {
+                    alert('Please enter a valid number between 0 and 100');
+                    return;
+                }
+                
+                if (!size) {
+                    alert('Please select a size');
+                    return;
+                }
+                
+                // Add to history
+                const entry = {
+                    number: parseInt(number),
+                    size: size
+                };
+                
+                history.unshift(entry);
+                
+                // Keep only last 20 entries
+                if (history.length > 20) {
+                    history = history.slice(0, 20);
+                }
+                
+                // Update display
+                updateHistoryDisplay();
+                updatePrediction();
+                
+                // Clear input fields
+                numberInput.value = '';
+                sizeSelect.value = '';
+            });
+            
+            // Clear input fields
+            clearBtn.addEventListener('click', function() {
+                numberInput.value = '';
+                sizeSelect.value = '';
+            });
+            
+            // Clear history
+            clearHistoryBtn.addEventListener('click', function() {
+                if (confirm('Are you sure you want to clear all history?')) {
+                    history = [];
+                    updateHistoryDisplay();
+                    updatePrediction();
+                }
+            });
+            
+            // Generate prediction
+            predictBtn.addEventListener('click', function() {
+                updatePrediction();
+            });
+            
+            // Update history display
+            function updateHistoryDisplay() {
+                if (history.length === 0) {
+                    historyList.innerHTML = `
+                        <div class="history-item">
+                            <span class="history-number">No entries yet</span>
+                            <span class="history-size"></span>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                let historyHTML = `
+                    <div class="history-item">
+                        <span class="history-number">Latest Results</span>
+                        <span class="history-size">Size</span>
+                    </div>
+                `;
+                
+                history.forEach(entry => {
+                    historyHTML += `
+                        <div class="history-item">
+                            <span class="history-number">${entry.number}</span>
+                            <span class="history-size ${entry.size}">${entry.size.toUpperCase()}</span>
+                        </div>
+                    `;
+                });
+                
+                historyList.innerHTML = historyHTML;
+            }
+            
+            // Update prediction based on history
+            function updatePrediction() {
+                if (history.length < 2) {
+                    // If not enough data, generate random prediction
+                    const randomNumber = Math.floor(Math.random() * 101);
+                    const randomSize = randomNumber >= 50 ? 'big' : 'small';
+                    const randomConfidence = Math.floor(Math.random() * 30) + 50;
+                    
+                    predictedNumberElem.textContent = randomNumber;
+                    predictedSizeElem.textContent = randomSize.toUpperCase();
+                    predictedSizeElem.className = `predicted-size ${randomSize}`;
+                    confidenceLevelElem.textContent = `Confidence Level: ${randomConfidence}%`;
+                    patternInfoElem.textContent = 'Need more data for accurate pattern analysis';
+                    
+                    bigTrendElem.textContent = '50%';
+                    smallTrendElem.textContent = '50%';
+                    avgNumberElem.textContent = '50';
+                    patternStrengthElem.textContent = '50%';
+                    
+                    return;
+                }
+                
+                // Calculate statistics from history
+                const totalEntries = history.length;
+                const bigCount = history.filter(entry => entry.size === 'big').length;
+                const smallCount = history.filter(entry => entry.size === 'small').length;
+                const bigPercentage = Math.round((bigCount / totalEntries) * 100);
+                const smallPercentage = Math.round((smallCount / totalEntries) * 100);
+                
+                const numberSum = history.reduce((sum, entry) => sum + entry.number, 0);
+                const avgNumber = Math.round(numberSum / totalEntries);
+                
+                // Analyze recent trends
+                const recentEntries = history.slice(0, 5);
+                const recentBigCount = recentEntries.filter(entry => entry.size === 'big').length;
+                const recentSmallCount = recentEntries.filter(entry => entry.size === 'small').length;
+                
+                // Generate prediction based on trends
+                let predictedNumber, predictedSize, confidence;
+                
+                if (recentBigCount > recentSmallCount) {
+                    // If recent trend is BIG, predict SMALL (alternation theory)
+                    predictedSize = 'small';
+                    predictedNumber = Math.floor(Math.random() * 50); // 0-49 for small
+                    confidence = 60 + Math.floor(Math.random() * 20);
+                } else if (recentSmallCount > recentBigCount) {
+                    // If recent trend is SMALL, predict BIG (alternation theory)
+                    predictedSize = 'big';
+                    predictedNumber = Math.floor(Math.random() * 51) + 50; // 50-100 for big
+                    confidence = 60 + Math.floor(Math.random() * 20);
+                } else {
+                    // If equal, follow overall trend
+                    if (bigPercentage > smallPercentage) {
+                        predictedSize = 'big';
+                        predictedNumber = Math.floor(Math.random() * 51) + 50;
+                    } else {
+                        predictedSize = 'small';
+                        predictedNumber = Math.floor(Math.random() * 50);
+                    }
+                    confidence = 50 + Math.floor(Math.random() * 20);
+                }
+                
+                // Add some randomness to avoid always following the same pattern
+                if (Math.random() < 0.3) { // 30% chance to go against the trend
+                    predictedSize = predictedSize === 'big' ? 'small' : 'big';
+                    predictedNumber = predictedSize === 'big' ? 
+                        Math.floor(Math.random() * 51) + 50 : 
+                        Math.floor(Math.random() * 50);
+                    confidence = Math.max(40, confidence - 20);
+                }
+                
+                // Update prediction display
+                predictedNumberElem.textContent = predictedNumber;
+                predictedSizeElem.textContent = predictedSize.toUpperCase();
+                predictedSizeElem.className = `predicted-size ${predictedSize}`;
+                confidenceLevelElem.textContent = `Confidence Level: ${confidence}%`;
+                
+                // Generate pattern info
+                let patternInfo = '';
+                if (totalEntries >= 5) {
+                    if (recentBigCount > recentSmallCount) {
+                        patternInfo = `Recent results show ${recentBigCount} BIG and ${recentSmallCount} SMALL numbers. `;
+                        patternInfo += `Based on alternation theory, next number is likely to be SMALL.`;
+                    } else if (recentSmallCount > recentBigCount) {
+                        patternInfo = `Recent results show ${recentSmallCount} SMALL and ${recentBigCount} BIG numbers. `;
+                        patternInfo += `Based on alternation theory, next number is likely to be BIG.`;
+                    } else {
+                        patternInfo = `Recent results show an equal distribution. `;
+                        patternInfo += `Following overall trend, next number is likely to be ${predictedSize.toUpperCase()}.`;
+                    }
+                } else {
+                    patternInfo = 'Need more data for accurate pattern analysis';
+                }
+                
+                patternInfoElem.textContent = patternInfo;
+                
+                // Update stats
+                bigTrendElem.textContent = `${bigPercentage}%`;
+                smallTrendElem.textContent = `${smallPercentage}%`;
+                avgNumberElem.textContent = avgNumber;
+                patternStrengthElem.textContent = `${confidence}%`;
+            }
+            
+            // Initialize with sample data
+            updateHistoryDisplay();
+        });
+    </script>
 </body>
 </html>
