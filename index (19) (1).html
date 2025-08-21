@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lottery Result Tracker</title>
+    <title>Smart Lottery Predictor</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -25,7 +25,7 @@
         
         .container {
             width: 100%;
-            max-width: 1000px;
+            max-width: 1200px;
             background: rgba(255, 255, 255, 0.95);
             border-radius: 15px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
@@ -65,10 +65,17 @@
             border-right: 1px dashed #ccc;
         }
         
-        .history-section {
+        .prediction-section {
             flex: 1;
             min-width: 300px;
             padding: 20px;
+        }
+        
+        .history-section {
+            width: 100%;
+            padding: 20px;
+            margin-top: 20px;
+            border-top: 1px dashed #ccc;
         }
         
         .section-title {
@@ -144,6 +151,18 @@
         
         .btn-clear:hover {
             background: linear-gradient(to right, #c0392b, #e74c3c);
+            transform: translateY(-2px);
+        }
+        
+        .btn-predict {
+            background: linear-gradient(to right, #3498db, #2980b9);
+            color: white;
+            width: 100%;
+            margin-top: 10px;
+        }
+        
+        .btn-predict:hover {
+            background: linear-gradient(to right, #2980b9, #256a9e);
             transform: translateY(-2px);
         }
         
@@ -227,6 +246,63 @@
             color: #7f8c8d;
         }
         
+        .prediction-card {
+            background: linear-gradient(to right, #f5f7fa, #c3cfe2);
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .prediction-title {
+            font-size: 1.3rem;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .prediction-result {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            margin: 20px 0;
+        }
+        
+        .predicted-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #2c3e50;
+            background: white;
+            width: 80px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .predicted-size {
+            font-size: 1.5rem;
+            font-weight: bold;
+            padding: 10px 20px;
+            border-radius: 30px;
+        }
+        
+        .confidence {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 1rem;
+            color: #7f8c8d;
+        }
+        
+        .pattern-info {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        
         footer {
             text-align: center;
             padding: 20px;
@@ -244,29 +320,34 @@
             .main-content {
                 flex-direction: column;
             }
+            
+            .prediction-result {
+                flex-direction: column;
+                gap: 20px;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>Lottery Result Tracker</h1>
-            <p class="subtitle">Track your lottery results with ease and analyze patterns</p>
+            <h1>Smart Lottery Predictor</h1>
+            <p class="subtitle">Analyzes patterns to predict possible outcomes</p>
         </header>
         
         <div class="main-content">
             <div class="input-section">
-                <h2 class="section-title">Enter New Result</h2>
+                <h2 class="section-title">Enter Actual Results</h2>
                 
                 <div class="input-group">
                     <label for="number">Number</label>
-                    <input type="number" id="number" min="0" max="100" placeholder="Enter a number (0-100)">
+                    <input type="number" id="number" min="0" max="100" placeholder="Enter actual number (0-100)">
                 </div>
                 
                 <div class="input-group">
                     <label for="size">Size</label>
                     <select id="size">
-                        <option value="">Select Size</option>
+                        <option value="">Select actual size</option>
                         <option value="small">Small</option>
                         <option value="big">Big</option>
                     </select>
@@ -280,6 +361,10 @@
                         <i class="fas fa-trash"></i> Clear
                     </button>
                 </div>
+                
+                <button class="btn-predict" id="predictBtn">
+                    <i class="fas fa-crystal-ball"></i> Generate Prediction
+                </button>
                 
                 <div class="stats">
                     <h3 class="stats-title">Statistics</h3>
@@ -304,11 +389,39 @@
                 </div>
             </div>
             
+            <div class="prediction-section">
+                <h2 class="section-title">Prediction</h2>
+                
+                <div class="prediction-card">
+                    <h3 class="prediction-title">Next Possible Outcome</h3>
+                    
+                    <div class="prediction-result">
+                        <div class="predicted-number" id="predictedNumber">--</div>
+                        <div class="predicted-size small" id="predictedSize">SMALL</div>
+                    </div>
+                    
+                    <div class="confidence" id="confidenceLevel">
+                        Confidence Level: Calculating...
+                    </div>
+                    
+                    <div class="pattern-info">
+                        <h4>Pattern Analysis</h4>
+                        <p id="patternInfo">Enter at least 5 results to generate predictions</p>
+                    </div>
+                </div>
+                
+                <div class="stats">
+                    <h3 class="stats-title">Tips</h3>
+                    <p>• Enter actual results to improve prediction accuracy</p>
+                    <p>• The more data you provide, the better the predictions</p>
+                    <p>• Remember that all predictions are probabilistic</p>
+                </div>
+            </div>
+            
             <div class="history-section">
                 <h2 class="section-title">Result History (Last 10)</h2>
                 
                 <div class="history-list" id="historyList">
-                    <!-- History items will be added here dynamically -->
                     <div class="history-item">
                         <span class="history-number">No entries yet</span>
                         <span class="history-size"></span>
@@ -320,19 +433,12 @@
                         <i class="fas fa-history"></i> Clear History
                     </button>
                 </div>
-                
-                <div class="stats">
-                    <h3 class="stats-title">Tips</h3>
-                    <p>• Always verify your numbers twice before submitting</p>
-                    <p>• Look for patterns in the history to make informed choices</p>
-                    <p>• Set a budget and stick to it</p>
-                </div>
             </div>
         </div>
     </div>
     
     <footer>
-        <p>© 2023 Lottery Result Tracker | Designed for educational purposes</p>
+        <p>© 2023 Smart Lottery Predictor | For entertainment purposes only</p>
     </footer>
 
     <script>
@@ -341,12 +447,17 @@
             const sizeSelect = document.getElementById('size');
             const submitBtn = document.getElementById('submitBtn');
             const clearBtn = document.getElementById('clearBtn');
+            const predictBtn = document.getElementById('predictBtn');
             const clearHistoryBtn = document.getElementById('clearHistoryBtn');
             const historyList = document.getElementById('historyList');
             const totalCountElem = document.getElementById('totalCount');
             const smallCountElem = document.getElementById('smallCount');
             const bigCountElem = document.getElementById('bigCount');
             const lastNumberElem = document.getElementById('lastNumber');
+            const predictedNumberElem = document.getElementById('predictedNumber');
+            const predictedSizeElem = document.getElementById('predictedSize');
+            const confidenceLevelElem = document.getElementById('confidenceLevel');
+            const patternInfoElem = document.getElementById('patternInfo');
             
             let history = JSON.parse(localStorage.getItem('lotteryHistory')) || [];
             let smallCount = 0;
@@ -409,7 +520,18 @@
                     localStorage.removeItem('lotteryHistory');
                     updateHistoryDisplay();
                     updateStats();
+                    resetPrediction();
                 }
+            });
+            
+            // Generate prediction
+            predictBtn.addEventListener('click', function() {
+                if (history.length < 3) {
+                    alert('Enter at least 3 results to generate a prediction');
+                    return;
+                }
+                
+                generatePrediction();
             });
             
             // Update history display
@@ -452,6 +574,80 @@
                 } else {
                     lastNumberElem.textContent = '-';
                 }
+            }
+            
+            // Reset prediction display
+            function resetPrediction() {
+                predictedNumberElem.textContent = '--';
+                predictedSizeElem.textContent = 'SMALL';
+                predictedSizeElem.className = 'predicted-size small';
+                confidenceLevelElem.textContent = 'Confidence Level: Enter more data';
+                patternInfoElem.textContent = 'Enter at least 5 results to generate predictions';
+            }
+            
+            // Generate prediction based on history
+            function generatePrediction() {
+                // Simple prediction algorithm (can be enhanced)
+                const lastNumbers = history.map(entry => parseInt(entry.number));
+                const lastSizes = history.map(entry => entry.size);
+                
+                // Calculate average of last numbers
+                const sum = lastNumbers.reduce((acc, num) => acc + num, 0);
+                const avg = Math.round(sum / lastNumbers.length);
+                
+                // Predict next number (with some randomness)
+                const predictedNumber = Math.max(0, Math.min(100, 
+                    avg + Math.floor(Math.random() * 21) - 10
+                ));
+                
+                // Predict size based on history
+                const smallRatio = smallCount / history.length;
+                let predictedSize, confidence;
+                
+                if (smallRatio > 0.7) {
+                    predictedSize = 'small';
+                    confidence = Math.round(smallRatio * 100);
+                } else if (smallRatio < 0.3) {
+                    predictedSize = 'big';
+                    confidence = Math.round((1 - smallRatio) * 100);
+                } else {
+                    // If ratio is close to 50/50, use recent trend
+                    const recentTrend = lastSizes.slice(0, 3).filter(size => size === 'small').length;
+                    if (recentTrend >= 2) {
+                        predictedSize = 'big'; // Assuming alternation
+                        confidence = 60;
+                    } else {
+                        predictedSize = 'small'; // Assuming alternation
+                        confidence = 60;
+                    }
+                }
+                
+                // Update prediction display
+                predictedNumberElem.textContent = predictedNumber;
+                predictedSizeElem.textContent = predictedSize.toUpperCase();
+                predictedSizeElem.className = `predicted-size ${predictedSize}`;
+                confidenceLevelElem.textContent = `Confidence Level: ${confidence}%`;
+                
+                // Generate pattern info
+                let patternInfo = '';
+                if (history.length >= 5) {
+                    const recentPattern = lastSizes.slice(0, 5).join(', ');
+                    patternInfo = `Last 5 results: ${recentPattern}. `;
+                    
+                    if (smallRatio > 0.6) {
+                        patternInfo += 'Recent results show more SMALL numbers. ';
+                    } else if (smallRatio < 0.4) {
+                        patternInfo += 'Recent results show more BIG numbers. ';
+                    } else {
+                        patternInfo += 'No strong pattern detected in recent results. ';
+                    }
+                    
+                    patternInfo += `Based on pattern analysis, next number is likely to be ${predictedSize.toUpperCase()}.`;
+                } else {
+                    patternInfo = 'Enter more results (at least 5) for better pattern analysis.';
+                }
+                
+                patternInfoElem.textContent = patternInfo;
             }
         });
     </script>
