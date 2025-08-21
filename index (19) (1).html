@@ -1,133 +1,459 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>BIG-SMALL Prediction Tool</title>
-<style>
-    body {
-        background-color: black;
-        color: red;
-        font-family: monospace;
-        text-align: center;
-        padding-top: 30px;
-    }
-    h1 {
-        font-size: 28px;
-        text-shadow: 0 0 20px red;
-    }
-    .container {
-        margin: auto;
-        width: 500px;
-        background: rgba(255, 0, 0, 0.1);
-        padding: 20px;
-        border: 2px solid red;
-        border-radius: 10px;
-        box-shadow: 0 0 20px red;
-    }
-    input {
-        width: 60px;
-        padding: 8px;
-        font-size: 18px;
-        text-align: center;
-        margin: 5px;
-        background-color: black;
-        border: 2px solid red;
-        color: white;
-    }
-    button {
-        padding: 10px 20px;
-        font-size: 16px;
-        background-color: red;
-        color: black;
-        border: none;
-        margin: 5px;
-        cursor: pointer;
-        transition: 0.3s;
-        font-weight: bold;
-    }
-    button:hover {
-        background-color: darkred;
-        color: white;
-    }
-    #result {
-        margin-top: 20px;
-        font-size: 24px;
-        min-height: 40px;
-        animation: blink 1s infinite;
-    }
-    @keyframes blink {
-        0%, 100% { color: red; }
-        50% { color: yellow; }
-    }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lottery Result Tracker</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            margin: 20px 0;
+        }
+        
+        header {
+            background: linear-gradient(to right, #2c3e50, #4a6491);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+        }
+        
+        h1 {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .subtitle {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+        
+        .main-content {
+            display: flex;
+            flex-wrap: wrap;
+            padding: 20px;
+        }
+        
+        .input-section {
+            flex: 1;
+            min-width: 300px;
+            padding: 20px;
+            border-right: 1px dashed #ccc;
+        }
+        
+        .history-section {
+            flex: 1;
+            min-width: 300px;
+            padding: 20px;
+        }
+        
+        .section-title {
+            font-size: 1.4rem;
+            margin-bottom: 15px;
+            color: #2c3e50;
+            padding-bottom: 5px;
+            border-bottom: 2px solid #fdbb2d;
+        }
+        
+        .input-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #34495e;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus, select:focus {
+            border-color: #3498db;
+            outline: none;
+        }
+        
+        .buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        
+        button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .btn-submit {
+            background: linear-gradient(to right, #27ae60, #2ecc71);
+            color: white;
+            flex: 1;
+        }
+        
+        .btn-submit:hover {
+            background: linear-gradient(to right, #219653, #27ae60);
+            transform: translateY(-2px);
+        }
+        
+        .btn-clear {
+            background: linear-gradient(to right, #e74c3c, #ff6b6b);
+            color: white;
+            flex: 1;
+        }
+        
+        .btn-clear:hover {
+            background: linear-gradient(to right, #c0392b, #e74c3c);
+            transform: translateY(-2px);
+        }
+        
+        .history-list {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            padding: 10px;
+        }
+        
+        .history-item {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .history-item:last-child {
+            border-bottom: none;
+        }
+        
+        .history-number {
+            font-weight: bold;
+            font-size: 1.2rem;
+            color: #2c3e50;
+        }
+        
+        .history-size {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+        
+        .small {
+            background-color: #d5f5e3;
+            color: #27ae60;
+        }
+        
+        .big {
+            background-color: #fdebd0;
+            color: #e67e22;
+        }
+        
+        .stats {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .stats-title {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+        
+        .stat-item {
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: white;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        @media (max-width: 768px) {
+            .input-section {
+                border-right: none;
+                border-bottom: 1px dashed #ccc;
+            }
+            
+            .main-content {
+                flex-direction: column;
+            }
+        }
+    </style>
 </head>
 <body>
-
-<h1>🔥 BIG-SMALL Prediction Tool 🔥</h1>
-<div class="container">
-    <p>Enter Last 6 Results (Example: 7 BIG):</p>
-    <div>
-        <input type="text" id="in1" placeholder="No. BIG/SMALL">
-        <input type="text" id="in2" placeholder="No. BIG/SMALL">
-        <input type="text" id="in3" placeholder="No. BIG/SMALL">
-        <input type="text" id="in4" placeholder="No. BIG/SMALL">
-        <input type="text" id="in5" placeholder="No. BIG/SMALL">
-        <input type="text" id="in6" placeholder="No. BIG/SMALL">
+    <div class="container">
+        <header>
+            <h1>Lottery Result Tracker</h1>
+            <p class="subtitle">Track your lottery results with ease and analyze patterns</p>
+        </header>
+        
+        <div class="main-content">
+            <div class="input-section">
+                <h2 class="section-title">Enter New Result</h2>
+                
+                <div class="input-group">
+                    <label for="number">Number</label>
+                    <input type="number" id="number" min="0" max="100" placeholder="Enter a number (0-100)">
+                </div>
+                
+                <div class="input-group">
+                    <label for="size">Size</label>
+                    <select id="size">
+                        <option value="">Select Size</option>
+                        <option value="small">Small</option>
+                        <option value="big">Big</option>
+                    </select>
+                </div>
+                
+                <div class="buttons">
+                    <button class="btn-submit" id="submitBtn">
+                        <i class="fas fa-check-circle"></i> Submit Result
+                    </button>
+                    <button class="btn-clear" id="clearBtn">
+                        <i class="fas fa-trash"></i> Clear
+                    </button>
+                </div>
+                
+                <div class="stats">
+                    <h3 class="stats-title">Statistics</h3>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-value" id="totalCount">0</div>
+                            <div class="stat-label">Total Entries</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="smallCount">0</div>
+                            <div class="stat-label">Small</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="bigCount">0</div>
+                            <div class="stat-label">Big</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="lastNumber">-</div>
+                            <div class="stat-label">Last Number</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="history-section">
+                <h2 class="section-title">Result History (Last 10)</h2>
+                
+                <div class="history-list" id="historyList">
+                    <!-- History items will be added here dynamically -->
+                    <div class="history-item">
+                        <span class="history-number">No entries yet</span>
+                        <span class="history-size"></span>
+                    </div>
+                </div>
+                
+                <div class="buttons">
+                    <button class="btn-clear" id="clearHistoryBtn">
+                        <i class="fas fa-history"></i> Clear History
+                    </button>
+                </div>
+                
+                <div class="stats">
+                    <h3 class="stats-title">Tips</h3>
+                    <p>• Always verify your numbers twice before submitting</p>
+                    <p>• Look for patterns in the history to make informed choices</p>
+                    <p>• Set a budget and stick to it</p>
+                </div>
+            </div>
+        </div>
     </div>
-    <div>
-        <button onclick="predict()">Predict</button>
-        <button onclick="clearInputs()">Clear</button>
-    </div>
-    <div id="result"></div>
-</div>
+    
+    <footer>
+        <p>© 2023 Lottery Result Tracker | Designed for educational purposes</p>
+    </footer>
 
-<script>
-    // Your full dataset here (only a sample added for demo, you will need to paste all sequences in the same format)
-    let data = [
-        "6 BIG","2 SMALL","3 SMALL","1 SMALL","1 SMALL","6 BIG","5 BIG","6 BIG","2 SMALL","2 SMALL",
-        "2 SMALL","4 SMALL","6 BIG","2 SMALL","3 SMALL","0 SMALL","7 BIG","7 BIG","0 SMALL","7 BIG",
-        "4 SMALL","8 BIG","0 SMALL","1 SMALL","9 BIG","5 BIG","4 SMALL","5 BIG","2 SMALL","3 SMALL",
-        // ⚡ Paste all results here in same format ⚡
-    ];
-
-    function predict() {
-        let inputs = [];
-        for (let i = 1; i <= 6; i++) {
-            let val = document.getElementById("in"+i).value.trim().toUpperCase();
-            if(val === "") {
-                alert("Please fill all 6 inputs!");
-                return;
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const numberInput = document.getElementById('number');
+            const sizeSelect = document.getElementById('size');
+            const submitBtn = document.getElementById('submitBtn');
+            const clearBtn = document.getElementById('clearBtn');
+            const clearHistoryBtn = document.getElementById('clearHistoryBtn');
+            const historyList = document.getElementById('historyList');
+            const totalCountElem = document.getElementById('totalCount');
+            const smallCountElem = document.getElementById('smallCount');
+            const bigCountElem = document.getElementById('bigCount');
+            const lastNumberElem = document.getElementById('lastNumber');
+            
+            let history = JSON.parse(localStorage.getItem('lotteryHistory')) || [];
+            let smallCount = 0;
+            let bigCount = 0;
+            
+            updateHistoryDisplay();
+            updateStats();
+            
+            // Submit button event
+            submitBtn.addEventListener('click', function() {
+                const number = numberInput.value.trim();
+                const size = sizeSelect.value;
+                
+                if (!number || number < 0 || number > 100) {
+                    alert('Please enter a valid number between 0 and 100');
+                    return;
+                }
+                
+                if (!size) {
+                    alert('Please select a size');
+                    return;
+                }
+                
+                // Add to history
+                const entry = {
+                    number: number,
+                    size: size,
+                    timestamp: new Date().toLocaleString()
+                };
+                
+                history.unshift(entry);
+                
+                // Keep only last 10 entries
+                if (history.length > 10) {
+                    history = history.slice(0, 10);
+                }
+                
+                // Save to localStorage
+                localStorage.setItem('lotteryHistory', JSON.stringify(history));
+                
+                // Update display
+                updateHistoryDisplay();
+                updateStats();
+                
+                // Clear input fields
+                numberInput.value = '';
+                sizeSelect.value = '';
+            });
+            
+            // Clear input fields
+            clearBtn.addEventListener('click', function() {
+                numberInput.value = '';
+                sizeSelect.value = '';
+            });
+            
+            // Clear history
+            clearHistoryBtn.addEventListener('click', function() {
+                if (confirm('Are you sure you want to clear all history?')) {
+                    history = [];
+                    localStorage.removeItem('lotteryHistory');
+                    updateHistoryDisplay();
+                    updateStats();
+                }
+            });
+            
+            // Update history display
+            function updateHistoryDisplay() {
+                if (history.length === 0) {
+                    historyList.innerHTML = `
+                        <div class="history-item">
+                            <span class="history-number">No entries yet</span>
+                            <span class="history-size"></span>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                historyList.innerHTML = '';
+                history.forEach(entry => {
+                    const item = document.createElement('div');
+                    item.className = 'history-item';
+                    item.innerHTML = `
+                        <span class="history-number">${entry.number}</span>
+                        <span class="history-size ${entry.size}">${entry.size.toUpperCase()}</span>
+                        <span class="history-time">${entry.timestamp}</span>
+                    `;
+                    historyList.appendChild(item);
+                });
             }
-            inputs.push(val);
-        }
-
-        let lastIndex = -1;
-
-        // Pattern Matching Search
-        for (let i = 0; i <= data.length - 7; i++) { 
-            let sequence = data.slice(i, i + 6);
-            if (JSON.stringify(sequence) === JSON.stringify(inputs)) {
-                lastIndex = i;
+            
+            // Update statistics
+            function updateStats() {
+                totalCountElem.textContent = history.length;
+                
+                smallCount = history.filter(entry => entry.size === 'small').length;
+                bigCount = history.filter(entry => entry.size === 'big').length;
+                
+                smallCountElem.textContent = smallCount;
+                bigCountElem.textContent = bigCount;
+                
+                if (history.length > 0) {
+                    lastNumberElem.textContent = history[0].number;
+                } else {
+                    lastNumberElem.textContent = '-';
+                }
             }
-        }
-
-        let resultArea = document.getElementById("result");
-
-        if (lastIndex !== -1) {
-            let prediction = data[lastIndex + 6];
-            resultArea.innerHTML = `<span style="color:lime;">PREDICTION ➡ ${prediction}</span>`;
-        } else {
-            resultArea.innerHTML = `<span style="color:orange;">⚠ Pattern Not Found</span>`;
-        }
-    }
-
-    function clearInputs() {
-        for (let i = 1; i <= 6; i++) {
-            document.getElementById("in"+i).value = "";
-        }
-        document.getElementById("result").innerHTML = "";
-    }
-</script>
-
+        });
+    </script>
 </body>
 </html>
