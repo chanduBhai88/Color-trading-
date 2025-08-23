@@ -1,49 +1,83 @@
-# Apna initial data yahan daal do (agar hai toh)!
-data = []
-
-# Last kitne results dekhkar prediction karna hai (window size)
-window = 10
-
-print("BIG/SMALL Prediction Tool (Hindi)")
-print("Har round ka result daaliye, jaise: 5 BIG ya 2 SMALL")
-print("Exit karne ke liye 'exit' likhiye.\n")
-
-while True:
-    entry = input("Naya result daalo (jaise '5 BIG' ya '2 SMALL'): ").strip()
-    if entry.lower() == 'exit':
-        print("Tool band kiya gaya.")
-        break
-
-    # Basic format check:
-    try:
-        num, label = entry.split()
-        if label not in ['BIG', 'SMALL']:
-            print("Galat format! ONLY 'BIG' ya 'SMALL' likho. Dobara daalo.")
-            continue
-        data.append(entry)
-    except:
-        print("Galat format! Sahi tarike se daalo (jaise '8 BIG' ya '3 SMALL').")
-        continue
-
-    # BIG/SMALL only nikal lo
-    sequence = [d.split()[1] for d in data]
-    # WINDOW jitne last result ka data lo
-    recent = sequence[-window:]
-
-    big_count = recent.count("BIG")
-    small_count = recent.count("SMALL")
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <title>BIG/SMALL Prediction Tool (Hindi)</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 480px; margin: 20px auto; background: #f2f6fa; }
+        h2 { color: #225; }
+        #result { margin-top: 20px; padding: 14px 12px; background: #eef; border-radius: 8px; }
+        input, select, button { padding: 8px; font-size: 17px; margin: 2px 0; }
+        #history { margin-top: 12px; font-size: 15px; color: #444; }
+    </style>
+</head>
+<body>
+    <h2>BIG/SMALL Prediction Tool (Hindi)</h2>
+    <p>Har round ka result daaliye (e.g. <b>5 BIG</b> ya <b>2 SMALL</b>)</p>
+    <input type="text" id="entry" placeholder="Jaise: 7 BIG" autofocus>
+    <button onclick="addResult()">Add</button>
+    <br>
+    <label>Window size (last kitne result dekhein): 
+        <input type="number" id="window" value="10" min="2" max="50" style="width:60px">
+    </label>
+    <button onclick="resetAll()" style="margin-left:12px;color:red;">Reset All</button>
+    <div id="result"></div>
+    <div id="history"></div>
     
-    # PREDICTION logic
-    if big_count > small_count:
-        prediction = "Agle round me SMALL aane ki sambhavna zyada hai!"
-    elif small_count > big_count:
-        prediction = "Agle round me BIG aane ki sambhavna zyada hai!"
-    else:
-        prediction = "Dono ka chance barabar hai!"
+    <script>
+        let data = [];
+        function addResult() {
+            let entry = document.getElementById('entry').value.trim().toUpperCase();
+            if (entry === "") return;
+            let parts = entry.split(" ");
+            if (parts.length !== 2 || (parts[1] !== "BIG" && parts[1] !== "SMALL")) {
+                document.getElementById("result").innerHTML = "<b style='color:red'>Galat format! Sirf 'BIG' ya 'SMALL' likho.<br>Jaise: 7 BIG ya 2 SMALL.</b>";
+                return;
+            }
+            data.push(entry);
+            document.getElementById('entry').value = '';
+            updatePrediction();
+        }
 
-    # Display Information
-    print(f"Last {window} results:")
-    print(f"BIG: {big_count}, SMALL: {small_count}")
-    print("Prediction:", prediction)
-    print("-" * 40)
-    
+        function updatePrediction() {
+            let windowSize = parseInt(document.getElementById('window').value) || 10;
+            let sequence = data.map(d => d.split(" ")[1]);
+            let recent = sequence.slice(-windowSize);
+
+            let bigCount = recent.filter(x => x === "BIG").length;
+            let smallCount = recent.filter(x => x === "SMALL").length;
+
+            let prediction;
+            if (bigCount > smallCount)
+                prediction = "Agle round me <b>SMALL</b> aane ki sambhavna zyada hai!";
+            else if (smallCount > bigCount)
+                prediction = "Agle round me <b>BIG</b> aane ki sambhavna zyada hai!";
+            else
+                prediction = "Dono ka chance barabar hai!";
+
+            document.getElementById("result").innerHTML =
+                `Last <b>${windowSize}</b> result mein:<br/>
+                 BIG: <b style="color:blue">${bigCount}</b> &nbsp; SMALL: <b style="color:green">${smallCount}</b><br>
+                 <span style="font-size:17px;margin-top:8px;display:inline-block">${prediction}</span>`;
+
+            let showHistory = data.map((d, idx) =>
+                `<span style="padding:2px 6px;
+                    background:${d.includes('BIG')?'#d0e4fd':'#d2ffe5'};
+                    border-radius:5px; margin:2px;">
+                    <small>${idx+1}.</small> ${d}
+                 </span>`
+            ).join(" ");
+            document.getElementById('history').innerHTML = (data.length ? "<b>History:</b><br>" : "") + showHistory;
+        }
+
+        function resetAll() {
+            if(confirm("Kya aap sach mein sab reset karna chahte hain?")) {
+                data = [];
+                document.getElementById('result').innerHTML = '';
+                document.getElementById('history').innerHTML = '';
+                document.getElementById('entry').value = '';
+            }
+        }
+    </script>
+</body>
+</html>
