@@ -1,14 +1,49 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Instagram Username Form</title>
-</head>
-<body>
-  <h2>Enter Your Instagram Username</h2>
-  <form>
-    <input type="text" placeholder="Instagram Username" name="username">
-    <br><br>
-    <button type="submit">Submit</button>
-  </form>
-</body>
-</html>
+# Apna initial data yahan daal do (agar hai toh)!
+data = []
+
+# Last kitne results dekhkar prediction karna hai (window size)
+window = 10
+
+print("BIG/SMALL Prediction Tool (Hindi)")
+print("Har round ka result daaliye, jaise: 5 BIG ya 2 SMALL")
+print("Exit karne ke liye 'exit' likhiye.\n")
+
+while True:
+    entry = input("Naya result daalo (jaise '5 BIG' ya '2 SMALL'): ").strip()
+    if entry.lower() == 'exit':
+        print("Tool band kiya gaya.")
+        break
+
+    # Basic format check:
+    try:
+        num, label = entry.split()
+        if label not in ['BIG', 'SMALL']:
+            print("Galat format! ONLY 'BIG' ya 'SMALL' likho. Dobara daalo.")
+            continue
+        data.append(entry)
+    except:
+        print("Galat format! Sahi tarike se daalo (jaise '8 BIG' ya '3 SMALL').")
+        continue
+
+    # BIG/SMALL only nikal lo
+    sequence = [d.split()[1] for d in data]
+    # WINDOW jitne last result ka data lo
+    recent = sequence[-window:]
+
+    big_count = recent.count("BIG")
+    small_count = recent.count("SMALL")
+    
+    # PREDICTION logic
+    if big_count > small_count:
+        prediction = "Agle round me SMALL aane ki sambhavna zyada hai!"
+    elif small_count > big_count:
+        prediction = "Agle round me BIG aane ki sambhavna zyada hai!"
+    else:
+        prediction = "Dono ka chance barabar hai!"
+
+    # Display Information
+    print(f"Last {window} results:")
+    print(f"BIG: {big_count}, SMALL: {small_count}")
+    print("Prediction:", prediction)
+    print("-" * 40)
+    
