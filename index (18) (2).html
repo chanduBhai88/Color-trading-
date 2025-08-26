@@ -1,237 +1,538 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Raja Luck Game Pattern Predictor</title>
-<style>
-  body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #0b3d91, #071029);
-    color: #eee;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 30px;
-    min-height: 100vh;
-    margin: 0;
-  }
-  h1 {
-    margin-bottom: 10px;
-    text-shadow: 0 0 8px #2196f3;
-  }
-  .input-container {
-    display: flex;
-    justify-content: center;
-    gap: 15px;
-    margin-bottom: 15px;
-  }
-  .bs-button {
-    width: 40px;
-    height: 40px;
-    border-radius: 6px;
-    border: none;
-    font-weight: bold;
-    font-size: 20px;
-    cursor: pointer;
-    color: white;
-    transition: background-color 0.3s ease;
-    user-select: none;
-  }
-  /* B button style - blue */
-  .bs-button.b {
-    background-color: #1e88e5; /* Blue */
-    box-shadow: 0 4px 8px #1565c0;
-  }
-  /* S button style - green */
-  .bs-button.s {
-    background-color: #43a047; /* Green */
-    box-shadow: 0 4px 8px #2e7d32;
-  }
-  .buttons {
-    margin: 15px 0;
-    display: flex;
-    gap: 15px;
-  }
-  button#predict, button#clear {
-    font-size: 16px;
-    padding: 10px 18px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-weight: bold;
-    color: white;
-    background-color: #2196f3;
-    box-shadow: 0 4px 8px #0d47a1;
-    transition: background-color 0.3s ease;
-  }
-  button#clear {
-    background-color: #f44336;
-    box-shadow: 0 4px 8px #b71c1c;
-  }
-  button#predict:hover {
-    background-color: #0d47a1;
-  }
-  button#clear:hover {
-    background-color: #b71c1c;
-  }
-  #result {
-    font-size: 22px;
-    margin-top: 20px;
-    min-height: 28px;
-    font-weight: 700;
-    text-shadow: 0 0 6px #00e676;
-  }
-  footer {
-    margin-top: auto;
-    font-size: 12px;
-    color: #777;
-  }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Big/Small Game Calculator</title>
+    <style>
+        :root {
+            --primary: #1a1a2e;
+            --secondary: #16213e;
+            --accent: #0f3460;
+            --highlight: #e94560;
+            --text: #f0f0f0;
+            --card-bg: #1e2a47;
+            --button-bg: #0f3460;
+            --button-hover: #133b74;
+            --success: #4caf50;
+            --danger: #f44336;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: var(--text);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: var(--card-bg);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            color: var(--highlight);
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.8;
+        }
+        
+        .calculator-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .card-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--highlight);
+            color: var(--highlight);
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 12px 15px;
+            border-radius: 8px;
+            border: 2px solid var(--accent);
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text);
+            font-size: 1rem;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--highlight);
+        }
+        
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        button {
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            background: var(--button-bg);
+            color: var(--text);
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.1rem;
+        }
+        
+        button:hover {
+            background: var(--button-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .btn-calculate {
+            background: var(--highlight);
+        }
+        
+        .btn-clear {
+            background: var(--danger);
+        }
+        
+        .result-area {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            min-height: 150px;
+        }
+        
+        .result-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--highlight);
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--highlight);
+            margin: 10px 0;
+        }
+        
+        .pattern-display {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+        }
+        
+        .pattern-title {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            color: var(--highlight);
+        }
+        
+        .pattern-items {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .pattern-item {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        
+        .pattern-big {
+            background: rgba(76, 175, 80, 0.2);
+            color: #4caf50;
+            border: 2px solid #4caf50;
+        }
+        
+        .pattern-small {
+            background: rgba(244, 67, 54, 0.2);
+            color: #f44336;
+            border: 2px solid #f44336;
+        }
+        
+        .history-list {
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 20px;
+        }
+        
+        .history-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .history-number {
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+        
+        .history-big {
+            color: #4caf50;
+        }
+        
+        .history-small {
+            color: #f44336;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            opacity: 0.7;
+        }
+        
+        .calculator-mode {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .mode-btn {
+            flex: 1;
+            padding: 10px;
+            text-align: center;
+            background: var(--accent);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .mode-btn.active {
+            background: var(--highlight);
+            box-shadow: 0 0 15px rgba(233, 69, 96, 0.5);
+        }
+    </style>
 </head>
 <body>
+    <div class="container">
+        <header>
+            <h1>Big/Small Game Calculator</h1>
+            <p class="subtitle">Advanced calculation mod with pattern recognition and statistical analysis</p>
+        </header>
+        
+        <div class="calculator-mode">
+            <div class="mode-btn active" id="basic-mode">Basic Calculator</div>
+            <div class="mode-btn" id="advanced-mode">Advanced Analysis</div>
+        </div>
+        
+        <div class="calculator-grid">
+            <div class="card">
+                <h2 class="card-title">Input Data</h2>
+                
+                <div class="input-group">
+                    <label for="period">Period</label>
+                    <input type="text" id="period" placeholder="e.g., 2025082610434">
+                </div>
+                
+                <div class="input-group">
+                    <label for="number">Number (0-9)</label>
+                    <input type="number" id="number" min="0" max="9" placeholder="0-9">
+                </div>
+                
+                <div class="input-group">
+                    <label for="size">Size</label>
+                    <select id="size">
+                        <option value="big">Big (5-9)</option>
+                        <option value="small">Small (0-4)</option>
+                    </select>
+                </div>
+                
+                <div class="buttons">
+                    <button class="btn-calculate" onclick="calculate()">Calculate</button>
+                    <button class="btn-clear" onclick="clearInputs()">Clear</button>
+                </div>
+                
+                <div class="result-area">
+                    <h3 class="result-title">Calculation Result</h3>
+                    <div id="result">
+                        <p>Enter data and click Calculate to see results</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2 class="card-title">Statistics & Analysis</h2>
+                
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div>Big Count</div>
+                        <div class="stat-value" id="big-count">0</div>
+                        <div>Percentage: <span id="big-percent">0%</span></div>
+                    </div>
+                    
+                    <div class="stat-item">
+                        <div>Small Count</div>
+                        <div class="stat-value" id="small-count">0</div>
+                        <div>Percentage: <span id="small-percent">0%</span></div>
+                    </div>
+                </div>
+                
+                <div class="pattern-display">
+                    <h3 class="pattern-title">Recent Pattern (Last 10)</h3>
+                    <div class="pattern-items" id="pattern-container">
+                        <!-- Pattern will be generated here -->
+                    </div>
+                </div>
+                
+                <button onclick="analyzePatterns()" style="width: 100%; margin-top: 20px;">Analyze Patterns</button>
+                
+                <div class="history-list">
+                    <h3 class="card-title">Game History</h3>
+                    <div id="history-container">
+                        <!-- History will be generated here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Big/Small Game Calculator &copy; 2025 - Advanced Calculation Mod</p>
+        </footer>
+    </div>
 
-<h1>Raja Luck Game Predictor</h1>
-
-<p>Click 8 times to input pattern (B or S). Then press Predict.</p>
-
-<div class="input-container" id="inputContainer">
-  <!-- 8 buttons will appear here -->
-</div>
-
-<div class="buttons">
-  <button id="predict">Predict</button>
-  <button id="clear">Clear</button>
-</div>
-
-<div id="result"></div>
-
-<footer>Created by ChatGPT for Raja Luck Game</footer>
-
-<script>
-  // Pattern data: first 8 are input, 9th is prediction result
-  const rawData = `
-B,S,S,B,B,B,B,S,B
-S,B,S,S,B,S,S,S,B
-B,S,S,S,B,S,B,B,S
-B,S,B,S,B,B,B,S,B
-S,B,B,B,S,B,B,B,B
-B,S,S,B,S,B,B,S,S
-B,S,B,B,S,B,B,B,B
-S,B,B,B,B,B,S,B,S
-B,S,S,B,B,B,S,B,B
-S,B,S,B,B,S,B,S,S
-B,B,S,B,S,B,B,S,B
-S,B,S,B,S,B,B,S,B
-B,S,B,B,B,S,B,S,S
-S,B,S,S,B,S,B,S,S
-B,S,B,S,B,B,S,B,S
-B,S,S,B,B,S,B,S,S
-S,B,S,B,B,S,B,S,S
-B,S,B,B,S,B,B,B,B
-B,S,B,B,B,S,B,S,S
-B,S,B,S,B,B,B,S,B
-B,B,B,S,B,B,B,B,B
-B,S,B,B,S,B,S,S,B
-B,B,S,B,B,S,B,B,B
-B,B,S,B,B,S,B,S,S
-S,S,B,S,B,B,B,S,S
-B,S,B,B,S,B,B,S,S
-S,B,B,S,B,B,B,S,B
-B,S,B,S,B,B,B,B,B
-B,S,S,B,B,B,S,B,S
-B,B,S,B,B,S,B,B,B
-B,B,S,S,S,B,B,B,S
-S,B,S,B,B,B,S,B,B
-B,S,B,B,S,B,B,B,B
-B,S,B,S,B,S,B,B,B
-B,S,S,B,B,B,B,B,B
-B,S,S,S,S,S,B,S,S
-S,B,B,B,S,B,B,S,B
-B,S,S,B,S,B,B,B,B
-B,S,B,S,B,B,B,S,B
-B,B,S,B,B,S,B,B,B
-B,S,B,B,S,B,B,B,B
-S,B,S,B,B,S,B,S,S
-B,S,S,B,B,B,S,B,S
-B,S,B,S,B,B,S,B,S
-S,B,S,B,S,B,B,B,B
-
-S,B,B,B,B,S,S,S,S
-B,B,S,B,S,S,S,S,S
-S,B,B,S,B,B,B,B,S
-S,S,B,S,B,S,B,S,S
-B,B,S,S,B,S,B,B,B
-B,S,B,S,B,B,S,B,S
-B,S,S,B,B,S,B,S,S
-`;
-
-  // Parse rawData into patternDB with trim to avoid spaces issue
-  const patternDB = [];
-  rawData.trim().split('\n').forEach(line => {
-    const parts = line.trim().split(',');
-    if(parts.length >= 9){
-      const patternParts = parts.slice(0,8).map(x => x.trim());
-      const pattern = patternParts.join(',');
-      const result = parts[8].trim();
-      patternDB.push({pattern, result});
-    }
-  });
-
-  const inputContainer = document.getElementById('inputContainer');
-  const predictBtn = document.getElementById('predict');
-  const clearBtn = document.getElementById('clear');
-  const resultDiv = document.getElementById('result');
-
-  // Initialize user input with all 'B'
-  let userInput = Array(8).fill('B');
-
-  // Create 8 input buttons with initial 'B' and classes
-  for(let i=0; i<8; i++){
-    const btn = document.createElement('button');
-    btn.classList.add('bs-button', 'b'); // initially 'B'
-    btn.textContent = 'B';
-    btn.dataset.index = i;
-    btn.addEventListener('click', () => {
-      if(btn.textContent === 'B'){
-        btn.textContent = 'S';
-        btn.classList.remove('b');
-        btn.classList.add('s');
-      } else {
-        btn.textContent = 'B';
-        btn.classList.remove('s');
-        btn.classList.add('b');
-      }
-      userInput[btn.dataset.index] = btn.textContent;
-      resultDiv.textContent = '';
-    });
-    inputContainer.appendChild(btn);
-  }
-
-  predictBtn.addEventListener('click', () => {
-    if(userInput.length < 8){
-      resultDiv.textContent = "Please input all 8 digits.";
-      return;
-    }
-    const inputPattern = userInput.join(',');
-    const found = patternDB.find(p => p.pattern === inputPattern);
-    if(found){
-      resultDiv.textContent = `Prediction: ${found.result}`;
-    } else {
-      resultDiv.textContent = "No Match Found";
-    }
-  });
-
-  clearBtn.addEventListener('click', () => {
-    userInput = Array(8).fill('B');
-    Array.from(inputContainer.children).forEach(btn => {
-      btn.textContent = 'B';
-      btn.classList.remove('s');
-      btn.classList.add('b');
-    });
-    resultDiv.textContent = '';
-  });
-</script>
-
+    <script>
+        // Initialize with empty history
+        let history = [];
+        
+        // Initialize the UI
+        updateHistoryDisplay();
+        updateStats();
+        
+        function calculate() {
+            const period = document.getElementById('period').value;
+            const number = parseInt(document.getElementById('number').value);
+            const size = document.getElementById('size').value;
+            
+            if (!period || isNaN(number)) {
+                document.getElementById('result').innerHTML = '<p class="error">Please enter valid Period and Number</p>';
+                return;
+            }
+            
+            // Determine if the number matches the selected size
+            let actualSize = (number >= 5) ? 'big' : 'small';
+            let isCorrect = (size === actualSize);
+            
+            // Add to history
+            history.unshift({ period, number, size: actualSize });
+            
+            // Keep only last 20 records
+            if (history.length > 20) {
+                history = history.slice(0, 20);
+            }
+            
+            // Update displays
+            updateHistoryDisplay();
+            updateStats();
+            
+            // Calculate probability for next result
+            let bigCount = history.filter(item => item.size === 'big').length;
+            let smallCount = history.filter(item => item.size === 'small').length;
+            let total = history.length;
+            
+            let bigProbability = total > 0 ? (bigCount / total * 100).toFixed(2) : 50;
+            let smallProbability = total > 0 ? (smallCount / total * 100).toFixed(2) : 50;
+            
+            // Generate analysis
+            let analysis = '';
+            if (bigProbability > 60) {
+                analysis = 'STRONG probability of NEXT being BIG';
+            } else if (smallProbability > 60) {
+                analysis = 'STRONG probability of NEXT being SMALL';
+            } else {
+                analysis = 'No strong trend detected';
+            }
+            
+            // Display result
+            document.getElementById('result').innerHTML = `
+                <p>Period: <strong>${period}</strong></p>
+                <p>Number: <strong>${number}</strong></p>
+                <p>Selected Size: <strong>${size.toUpperCase()}</strong></p>
+                <p>Actual Size: <strong class="${isCorrect ? 'success' : 'error'}">${actualSize.toUpperCase()}</strong></p>
+                <p>Match: <strong>${isCorrect ? 'YES' : 'NO'}</strong></p>
+                <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1)">
+                    <p>Big Probability: <strong>${bigProbability}%</strong></p>
+                    <p>Small Probability: <strong>${smallProbability}%</strong></p>
+                    <p style="margin-top: 10px; color: var(--highlight)">Analysis: ${analysis}</p>
+                </div>
+            `;
+        }
+        
+        function clearInputs() {
+            document.getElementById('period').value = '';
+            document.getElementById('number').value = '';
+            document.getElementById('size').selectedIndex = 0;
+            document.getElementById('result').innerHTML = '<p>Enter data and click Calculate to see results</p>';
+        }
+        
+        function analyzePatterns() {
+            if (history.length === 0) {
+                document.getElementById('result').innerHTML = '<p>No data available for analysis. Add some data first.</p>';
+                return;
+            }
+            
+            // Count occurrences
+            let bigCount = history.filter(item => item.size === 'big').length;
+            let smallCount = history.filter(item => item.size === 'small').length;
+            let total = history.length;
+            
+            // Calculate percentages
+            let bigPercent = total > 0 ? (bigCount / total * 100).toFixed(2) : 0;
+            let smallPercent = total > 0 ? (smallCount / total * 100).toFixed(2) : 0;
+            
+            // Get last 10 results
+            let lastTen = history.slice(0, 10);
+            let lastTenBig = lastTen.filter(item => item.size === 'big').length;
+            let lastTenSmall = lastTen.filter(item => item.size === 'small').length;
+            
+            // Determine trends
+            let bigTrend = lastTenBig >= 6 ? 'UPWARD' : (lastTenBig <= 4 ? 'DOWNWARD' : 'NEUTRAL');
+            let smallTrend = lastTenSmall >= 6 ? 'UPWARD' : (lastTenSmall <= 4 ? 'DOWNWARD' : 'NEUTRAL');
+            
+            // Update stats
+            document.getElementById('big-count').textContent = bigCount;
+            document.getElementById('small-count').textContent = smallCount;
+            document.getElementById('big-percent').textContent = bigPercent + '%';
+            document.getElementById('small-percent').textContent = smallPercent + '%';
+            
+            // Update pattern display
+            let patternHtml = '';
+            lastTen.forEach(item => {
+                patternHtml += `<div class="pattern-item ${item.size === 'big' ? 'pattern-big' : 'pattern-small'}">${item.size === 'big' ? 'B' : 'S'}</div>`;
+            });
+            document.getElementById('pattern-container').innerHTML = patternHtml;
+            
+            // Show analysis in result area
+            document.getElementById('result').innerHTML = `
+                <p><strong>Pattern Analysis Complete</strong></p>
+                <p>Based on ${total} historical records:</p>
+                <p>Big occurrences: ${bigCount} (${bigPercent}%)</p>
+                <p>Small occurrences: ${smallCount} (${smallPercent}%)</p>
+                <p>Last 10 results: ${lastTenBig} Big, ${lastTenSmall} Small</p>
+                <p style="margin-top: 15px; color: var(--highlight)">Big trend: ${bigTrend}</p>
+                <p style="color: var(--highlight)">Small trend: ${smallTrend}</p>
+            `;
+        }
+        
+        function updateHistoryDisplay() {
+            let historyHtml = '';
+            
+            if (history.length === 0) {
+                historyHtml = '<p>No history yet. Add some data first.</p>';
+            } else {
+                history.forEach(item => {
+                    historyHtml += `
+                        <div class="history-item">
+                            <div class="history-number">${item.period}</div>
+                            <div class="${item.size === 'big' ? 'history-big' : 'history-small'}">${item.number} (${item.size.charAt(0).toUpperCase() + item.size.slice(1)})</div>
+                        </div>
+                    `;
+                });
+            }
+            
+            document.getElementById('history-container').innerHTML = historyHtml;
+        }
+        
+        function updateStats() {
+            let bigCount = history.filter(item => item.size === 'big').length;
+            let smallCount = history.filter(item => item.size === 'small').length;
+            let total = history.length;
+            
+            let bigPercent = total > 0 ? (bigCount / total * 100).toFixed(2) : 0;
+            let smallPercent = total > 0 ? (smallCount / total * 100).toFixed(2) : 0;
+            
+            document.getElementById('big-count').textContent = bigCount;
+            document.getElementById('small-count').textContent = smallCount;
+            document.getElementById('big-percent').textContent = bigPercent + '%';
+            document.getElementById('small-percent').textContent = smallPercent + '%';
+        }
+        
+        // Mode switching functionality
+        document.getElementById('basic-mode').addEventListener('click', function() {
+            this.classList.add('active');
+            document.getElementById('advanced-mode').classList.remove('active');
+            // Hide advanced features
+            document.querySelectorAll('.stat-item, .pattern-display').forEach(el => {
+                el.style.display = 'block';
+            });
+        });
+        
+        document.getElementById('advanced-mode').addEventListener('click', function() {
+            this.classList.add('active');
+            document.getElementById('basic-mode').classList.remove('active');
+            // Show advanced features
+            document.querySelectorAll('.stat-item, .pattern-display').forEach(el => {
+                el.style.display = 'block';
+            });
+        });
+    </script>
 </body>
 </html>
