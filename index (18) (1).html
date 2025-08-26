@@ -67,6 +67,24 @@
       background: #e94560;
       box-shadow: 0 0 10px rgba(233,69,96,0.8);
     }
+    .show-result-btn {
+      display: block;
+      margin: 0 auto;
+      margin-top: 20px;
+      padding: 12px 25px;
+      font-size: 1.1rem;
+      font-weight: bold;
+      border: none;
+      border-radius: 10px;
+      background: #e94560;
+      color: #fff;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+    .show-result-btn:hover {
+      background: #c2334b;
+      transform: translateY(-2px);
+    }
     .result-area {
       background: rgba(255,255,255,0.05);
       padding: 20px;
@@ -107,16 +125,18 @@
 <body>
   <header>
     <h1>Big/Small Predictor (6 Inputs)</h1>
-    <p>Select 0–9 for each input, then get automatic analysis.</p>
+    <p>Select 0–9 for each input, then press the button to see result.</p>
   </header>
 
   <div class="inputs" id="inputs-container">
     <!-- 6 input boxes dynamically generated -->
   </div>
 
+  <button class="show-result-btn" onclick="showResult()">Show Result</button>
+
   <div class="result-area">
     <h3 class="result-title">Calculation Result</h3>
-    <div id="result">Select all 6 numbers to see result</div>
+    <div id="result">Select all 6 numbers and press "Show Result"</div>
     <div style="margin-top:20px">
       <h3 class="result-title">Recent Pattern</h3>
       <div class="pattern-items" id="pattern-container"></div>
@@ -147,14 +167,17 @@
 
   function selectNumber(index,num,btn){
     selectedNumbers[index] = num;
-
     // reset active state
     document.querySelectorAll(`#btns-${index} button`).forEach(b=>b.classList.remove("active"));
     btn.classList.add("active");
+  }
 
-    if(selectedNumbers.every(v => v!==null)){
-      analyze();
+  function showResult(){
+    if(!selectedNumbers.every(v => v!==null)){
+      alert("⚠️ Please select all 6 numbers first!");
+      return;
     }
+    analyze();
   }
 
   function analyze(){
