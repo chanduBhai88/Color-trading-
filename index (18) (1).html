@@ -1,88 +1,198 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Big/Small Predictor</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            margin: 20px;
-            background-color: #f0f0f0;
-        }
-        .container {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            max-width: 500px;
-            margin: 0 auto;
-        }
-        input {
-            padding: 10px;
-            width: 200px;
-            margin: 10px 0;
-        }
-        button {
-            padding: 10px 20px;
-            background: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        .result {
-            margin: 20px 0;
-            font-size: 18px;
-        }
-        .big {
-            color: green;
-            font-weight: bold;
-        }
-        .small {
-            color: red;
-            font-weight: bold;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Big/Small Predictor - 6 Inputs</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #1a1a2e, #16213e);
+      color: #f0f0f0;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    header {
+      text-align: center;
+      margin-bottom: 20px;
+      padding: 20px;
+      background: #1e2a47;
+      border-radius: 15px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+    }
+    h1 {
+      color: #e94560;
+      font-size: 2rem;
+    }
+    .inputs {
+      display: grid;
+      grid-template-columns: repeat(auto-fit,minmax(150px,1fr));
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+    .input-box {
+      background: #1e2a47;
+      border-radius: 12px;
+      padding: 15px;
+      text-align: center;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.3);
+    }
+    .input-box h3 {
+      margin-bottom: 10px;
+      font-size: 1.1rem;
+      color: #e94560;
+    }
+    .number-buttons {
+      display: grid;
+      grid-template-columns: repeat(5,1fr);
+      gap: 8px;
+    }
+    .number-buttons button {
+      padding: 10px;
+      border: none;
+      border-radius: 8px;
+      background: #0f3460;
+      color: #fff;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all .2s ease;
+    }
+    .number-buttons button:hover {
+      background: #133b74;
+      transform: translateY(-2px);
+    }
+    .number-buttons button.active {
+      background: #e94560;
+      box-shadow: 0 0 10px rgba(233,69,96,0.8);
+    }
+    .result-area {
+      background: rgba(255,255,255,0.05);
+      padding: 20px;
+      border-radius: 12px;
+      margin-top: 20px;
+    }
+    .result-title {
+      font-size: 1.3rem;
+      margin-bottom: 15px;
+      color: #e94560;
+    }
+    .pattern-items {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .pattern-item {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+    }
+    .pattern-big {
+      background: rgba(76,175,80,0.2);
+      color: #4caf50;
+      border: 2px solid #4caf50;
+    }
+    .pattern-small {
+      background: rgba(244,67,54,0.2);
+      color: #f44336;
+      border: 2px solid #f44336;
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Big/Small Predictor</h1>
-        <p>Enter 8-digit number:</p>
-        <input type="text" id="userInput" maxlength="8" placeholder="12345678">
-        <br>
-        <button onclick="predict()">Predict</button>
-        
-        <div class="result" id="result">
-            <p>Prediction will appear here</p>
-        </div>
-    </div>
+  <header>
+    <h1>Big/Small Predictor (6 Inputs)</h1>
+    <p>Select 0–9 for each input, then get automatic analysis.</p>
+  </header>
 
-    <script>
-        function predict() {
-            const input = document.getElementById('userInput').value;
-            
-            if (input.length !== 8 || isNaN(input)) {
-                alert("Please enter exactly 8 digits");
-                return;
-            }
-            
-            // First fixed result (always 9 - Big)
-            const result1 = { number: 9, type: "Big" };
-            
-            // Second result based on last digit
-            const lastDigit = parseInt(input.slice(-1));
-            const result2 = {
-                number: lastDigit,
-                type: lastDigit >= 5 ? "Big" : "Small"
-            };
-            
-            // Display results
-            document.getElementById('result').innerHTML = `
-                <h3>Prediction Results:</h3>
-                <p>1. Fixed Result: <span class="${result1.type.toLowerCase()}">${result1.number} (${result1.type})</span></p>
-                <p>2. Calculated Result: <span class="${result2.type.toLowerCase()}">${result2.number} (${result2.type})</span></p>
-            `;
-        }
-    </script>
+  <div class="inputs" id="inputs-container">
+    <!-- 6 input boxes dynamically generated -->
+  </div>
+
+  <div class="result-area">
+    <h3 class="result-title">Calculation Result</h3>
+    <div id="result">Select all 6 numbers to see result</div>
+    <div style="margin-top:20px">
+      <h3 class="result-title">Recent Pattern</h3>
+      <div class="pattern-items" id="pattern-container"></div>
+    </div>
+  </div>
+
+<script>
+  const inputsContainer = document.getElementById("inputs-container");
+  let selectedNumbers = new Array(6).fill(null);
+  let history = [];
+
+  // Generate 6 inputs with number buttons
+  for(let i=0;i<6;i++){
+    const box = document.createElement("div");
+    box.className = "input-box";
+    box.innerHTML = `<h3>Input ${i+1}</h3>
+      <div class="number-buttons" id="btns-${i}"></div>`;
+    inputsContainer.appendChild(box);
+
+    const btnsDiv = box.querySelector(`#btns-${i}`);
+    for(let n=0;n<=9;n++){
+      const btn = document.createElement("button");
+      btn.textContent = n;
+      btn.onclick = () => selectNumber(i,n,btn);
+      btnsDiv.appendChild(btn);
+    }
+  }
+
+  function selectNumber(index,num,btn){
+    selectedNumbers[index] = num;
+
+    // reset active state
+    document.querySelectorAll(`#btns-${index} button`).forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+
+    if(selectedNumbers.every(v => v!==null)){
+      analyze();
+    }
+  }
+
+  function analyze(){
+    // Convert numbers to Big/Small
+    let sizes = selectedNumbers.map(n => n>=5?"Big":"Small");
+
+    // Save in history
+    history.unshift(sizes);
+    if(history.length>10) history = history.slice(0,10);
+
+    // Count stats
+    let bigCount = sizes.filter(s=>s==="Big").length;
+    let smallCount = sizes.filter(s=>s==="Small").length;
+
+    let analysis="";
+    if(bigCount>smallCount){
+      analysis="More BIG numbers → Higher BIG trend";
+    } else if(smallCount>bigCount){
+      analysis="More SMALL numbers → Higher SMALL trend";
+    } else {
+      analysis="Equal BIG and SMALL → Neutral trend";
+    }
+
+    // Display result
+    document.getElementById("result").innerHTML = `
+      <p>Selected Numbers: <strong>${selectedNumbers.join(", ")}</strong></p>
+      <p>Sizes: <strong>${sizes.join(", ")}</strong></p>
+      <p>Big Count: <strong>${bigCount}</strong>, Small Count: <strong>${smallCount}</strong></p>
+      <p style="color:#e94560;margin-top:10px"><strong>Analysis:</strong> ${analysis}</p>
+    `;
+
+    // Show pattern
+    let patternHtml="";
+    sizes.forEach(s=>{
+      patternHtml+=`<div class="pattern-item ${s==="Big"?"pattern-big":"pattern-small"}">${s==="Big"?"B":"S"}</div>`;
+    });
+    document.getElementById("pattern-container").innerHTML=patternHtml;
+  }
+</script>
 </body>
 </html>
