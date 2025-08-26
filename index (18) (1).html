@@ -1,221 +1,150 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Big/Small Predictor - 6 Inputs</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>❤️ RajaGame Predictor</title>
   <style>
     body {
       margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(135deg, #1a1a2e, #16213e);
-      color: #f0f0f0;
+      font-family: "Courier New", monospace;
+      background: radial-gradient(circle at center, #0f2027, #203a43, #2c5364);
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: start;
       min-height: 100vh;
       padding: 20px;
     }
-    header {
-      text-align: center;
-      margin-bottom: 20px;
-      padding: 20px;
-      background: #1e2a47;
-      border-radius: 15px;
-      box-shadow: 0 8px 25px rgba(0,0,0,0.3);
-    }
+
     h1 {
-      color: #e94560;
-      font-size: 2rem;
-    }
-    .inputs {
-      display: grid;
-      grid-template-columns: repeat(auto-fit,minmax(150px,1fr));
-      gap: 20px;
-      margin-bottom: 20px;
-    }
-    .input-box {
-      background: #1e2a47;
-      border-radius: 12px;
-      padding: 15px;
       text-align: center;
-      box-shadow: 0 6px 15px rgba(0,0,0,0.3);
+      font-size: 2rem;
+      margin-bottom: 20px;
+      text-shadow: 0 0 20px #ff0055, 0 0 30px #ff0055;
     }
-    .input-box h3 {
-      margin-bottom: 10px;
-      font-size: 1.1rem;
-      color: #e94560;
-    }
-    .number-buttons {
-      display: grid;
-      grid-template-columns: repeat(5,1fr);
-      gap: 8px;
-    }
-    .number-buttons button {
-      padding: 10px;
-      border: none;
-      border-radius: 8px;
-      background: #0f3460;
-      color: #fff;
-      font-size: 1rem;
-      font-weight: bold;
-      cursor: pointer;
-      transition: all .2s ease;
-    }
-    .number-buttons button:hover {
-      background: #133b74;
-      transform: translateY(-2px);
-    }
-    .number-buttons button.active {
-      background: #e94560;
-      box-shadow: 0 0 10px rgba(233,69,96,0.8);
-    }
-    .show-result-btn {
-      display: block;
-      margin: 0 auto;
-      margin-top: 20px;
-      padding: 12px 25px;
-      font-size: 1.1rem;
-      font-weight: bold;
-      border: none;
-      border-radius: 10px;
-      background: #e94560;
-      color: #fff;
-      cursor: pointer;
-      transition: 0.2s ease;
-    }
-    .show-result-btn:hover {
-      background: #c2334b;
-      transform: translateY(-2px);
-    }
-    .result-area {
-      background: rgba(255,255,255,0.05);
+
+    .container {
+      background: rgba(0, 0, 0, 0.7);
+      border: 2px solid #ff0055;
+      border-radius: 15px;
       padding: 20px;
-      border-radius: 12px;
-      margin-top: 20px;
+      box-shadow: 0 0 25px #00ffea;
+      width: 90%;
+      max-width: 400px;
+      text-align: center;
     }
-    .result-title {
-      font-size: 1.3rem;
-      margin-bottom: 15px;
-      color: #e94560;
+
+    textarea {
+      width: 100%;
+      height: 80px;
+      font-size: 1rem;
+      padding: 10px;
+      border-radius: 8px;
+      border: none;
+      outline: none;
+      background: #111;
+      color: #00ffea;
+      resize: none;
     }
-    .pattern-items {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-    .pattern-item {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+
+    button {
+      background: linear-gradient(45deg, #ff0055, #00ffea);
+      border: none;
+      padding: 12px 20px;
+      margin-top: 15px;
+      border-radius: 10px;
+      font-size: 1.1rem;
       font-weight: bold;
+      cursor: pointer;
+      color: #fff;
+      box-shadow: 0 0 15px #00ffea;
+      transition: transform 0.2s;
     }
-    .pattern-big {
-      background: rgba(76,175,80,0.2);
-      color: #4caf50;
-      border: 2px solid #4caf50;
+
+    button:hover {
+      transform: scale(1.1);
     }
-    .pattern-small {
-      background: rgba(244,67,54,0.2);
-      color: #f44336;
-      border: 2px solid #f44336;
+
+    .result {
+      margin-top: 20px;
+      font-size: 2rem;
+      font-weight: bold;
+      text-shadow: 0 0 10px #00ffea, 0 0 20px #ff0055;
+      display: none;
+    }
+
+    /* Hacker typing animation */
+    @keyframes hacker {
+      0% { opacity: 0; transform: scale(0.5) rotateX(90deg); }
+      50% { opacity: 1; transform: scale(1.2) rotateX(0deg); }
+      100% { opacity: 1; transform: scale(1) rotateX(0deg); }
+    }
+
+    .animate {
+      display: block !important;
+      animation: hacker 1s ease forwards;
+    }
+
+    .history {
+      margin-top: 20px;
+      padding: 10px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 10px;
+      text-align: left;
+      font-size: 1rem;
+    }
+
+    .history h3 {
+      margin-bottom: 8px;
+      color: #ff0055;
+      text-shadow: 0 0 8px #ff0055;
+    }
+
+    .history p {
+      margin: 4px 0;
+      color: #00ffea;
     }
   </style>
 </head>
 <body>
-  <header>
-    <h1>Big/Small Predictor (6 Inputs)</h1>
-    <p>Select 0–9 for each input, then press the button to see result.</p>
-  </header>
-
-  <div class="inputs" id="inputs-container">
-    <!-- 6 input boxes dynamically generated -->
-  </div>
-
-  <button class="show-result-btn" onclick="showResult()">Show Result</button>
-
-  <div class="result-area">
-    <h3 class="result-title">Calculation Result</h3>
-    <div id="result">Select all 6 numbers and press "Show Result"</div>
-    <div style="margin-top:20px">
-      <h3 class="result-title">Recent Pattern</h3>
-      <div class="pattern-items" id="pattern-container"></div>
+  <h1>❤️ RajaGame Predictor</h1>
+  <div class="container">
+    <textarea id="userInput" placeholder="Enter numbers or Big/Small history here..."></textarea>
+    <button onclick="predict()">🔮 Predict Next</button>
+    <div id="result" class="result"></div>
+    <div class="history">
+      <h3>🧠 Last 10 Predictions:</h3>
+      <div id="historyList"></div>
     </div>
   </div>
 
-<script>
-  const inputsContainer = document.getElementById("inputs-container");
-  let selectedNumbers = new Array(6).fill(null);
-  let history = [];
+  <script>
+    let history = [];
 
-  // Generate 6 inputs with number buttons
-  for(let i=0;i<6;i++){
-    const box = document.createElement("div");
-    box.className = "input-box";
-    box.innerHTML = `<h3>Input ${i+1}</h3>
-      <div class="number-buttons" id="btns-${i}"></div>`;
-    inputsContainer.appendChild(box);
+    function predict() {
+      const input = document.getElementById("userInput").value.trim();
 
-    const btnsDiv = box.querySelector(`#btns-${i}`);
-    for(let n=0;n<=9;n++){
-      const btn = document.createElement("button");
-      btn.textContent = n;
-      btn.onclick = () => selectNumber(i,n,btn);
-      btnsDiv.appendChild(btn);
+      // Fake simple prediction logic (random Big/Small or number)
+      let options = ["BIG", "SMALL", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
+      let prediction = options[Math.floor(Math.random() * options.length)];
+
+      // Show animated result
+      const resultDiv = document.getElementById("result");
+      resultDiv.textContent = "👉 " + prediction;
+      resultDiv.classList.remove("animate");
+      void resultDiv.offsetWidth; // re-trigger animation
+      resultDiv.classList.add("animate");
+
+      // Save in history (max 10)
+      history.unshift(prediction);
+      if (history.length > 10) history.pop();
+
+      // Display history
+      const historyList = document.getElementById("historyList");
+      historyList.innerHTML = history.map((h, i) => `<p>${i+1}. ${h}</p>`).join("");
     }
-  }
-
-  function selectNumber(index,num,btn){
-    selectedNumbers[index] = num;
-    // reset active state
-    document.querySelectorAll(`#btns-${index} button`).forEach(b=>b.classList.remove("active"));
-    btn.classList.add("active");
-  }
-
-  function showResult(){
-    if(!selectedNumbers.every(v => v!==null)){
-      alert("⚠️ Please select all 6 numbers first!");
-      return;
-    }
-    analyze();
-  }
-
-  function analyze(){
-    // Convert numbers to Big/Small
-    let sizes = selectedNumbers.map(n => n>=5?"Big":"Small");
-
-    // Save in history
-    history.unshift(sizes);
-    if(history.length>10) history = history.slice(0,10);
-
-    // Count stats
-    let bigCount = sizes.filter(s=>s==="Big").length;
-    let smallCount = sizes.filter(s=>s==="Small").length;
-
-    let analysis="";
-    if(bigCount>smallCount){
-      analysis="More BIG numbers → Higher BIG trend";
-    } else if(smallCount>bigCount){
-      analysis="More SMALL numbers → Higher SMALL trend";
-    } else {
-      analysis="Equal BIG and SMALL → Neutral trend";
-    }
-
-    // Display result
-    document.getElementById("result").innerHTML = `
-      <p>Selected Numbers: <strong>${selectedNumbers.join(", ")}</strong></p>
-      <p>Sizes: <strong>${sizes.join(", ")}</strong></p>
-      <p>Big Count: <strong>${bigCount}</strong>, Small Count: <strong>${smallCount}</strong></p>
-      <p style="color:#e94560;margin-top:10px"><strong>Analysis:</strong> ${analysis}</p>
-    `;
-
-    // Show pattern
-    let patternHtml="";
-    sizes.forEach(s=>{
-      patternHtml+=`<div class="pattern-item ${s==="Big"?"pattern-big":"pattern-small"}">${s==="Big"?"B":"S"}</div>`;
-    });
-    document.getElementById("pattern-container").innerHTML=patternHtml;
-  }
-</script>
+  </script>
 </body>
 </html>
