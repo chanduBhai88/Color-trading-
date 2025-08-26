@@ -1,778 +1,555 @@
 <!DOCTYPE html>
-<html lang="hi">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>TC Game Predictor Pro</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Production Tool: Big/Small Game Analyzer</title>
     <style>
-        body {
-            font-family: 'Courier New', monospace;
-            background-color: #0a0a0a;
-            color: #0f0;
+        :root {
+            --primary: #1a1a2e;
+            --secondary: #16213e;
+            --accent: #0f3460;
+            --highlight: #e94560;
+            --text: #f0f0f0;
+            --card-bg: #1e2a47;
+            --button-bg: #0f3460;
+            --button-hover: #133b74;
+            --success: #4caf50;
+            --danger: #f44336;
+        }
+        
+        * {
             margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: var(--text);
+            min-height: 100vh;
             padding: 20px;
-            background-image: 
-                radial-gradient(circle at 25% 25%, rgba(30, 30, 30, 0.8) 0%, rgba(0,0,0,0.9) 100%),
-                url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect fill="%23121212" width="50" height="50" x="0" y="0"/><rect fill="%23121212" width="50" height="50" x="50" y="50"/></svg>');
-            background-size: 100px 100px, auto;
-            text-shadow: 0 0 5px #0f0;
         }
         
         .container {
-            max-width: 900px;
+            max-width: 1200px;
             margin: 0 auto;
-            background-color: rgba(10, 10, 10, 0.9);
-            border-radius: 5px;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: var(--card-bg);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            color: var(--highlight);
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.8;
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        @media (max-width: 900px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .card {
+            background: var(--card-bg);
+            border-radius: 15px;
             padding: 25px;
-            box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
-            border: 1px solid rgba(0, 255, 0, 0.2);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
         }
         
-        h1, h2, h3 {
-            color: #0f0;
-            text-align: center;
+        .card-title {
+            font-size: 1.5rem;
             margin-bottom: 20px;
-            border-bottom: 1px dashed #0f0;
             padding-bottom: 10px;
+            border-bottom: 2px solid var(--highlight);
+            color: var(--highlight);
         }
         
-        .input-section {
-            background-color: rgba(0, 20, 0, 0.3);
-            padding: 20px;
-            border-radius: 5px;
-            margin-bottom: 25px;
-            border: 1px solid #0f0;
-        }
-        
-        .number-selector {
-            position: relative;
-            display: inline-block;
-            width: 60px;
-            height: 60px;
-            margin: 5px;
-        }
-        
-        .number-display {
-            width: 100%;
-            height: 100%;
-            font-size: 24px;
-            text-align: center;
-            background-color: black;
-            color: #0f0;
-            border: 2px solid #0f0;
-            border-radius: 5px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        .number-display:hover {
-            box-shadow: 0 0 10px #0f0;
-            transform: scale(1.05);
-        }
-        
-        .number-options {
-            display: none;
-            position: absolute;
-            z-index: 100;
-            background-color: rgba(0, 15, 0, 0.95);
-            border: 1px solid #0f0;
-            border-radius: 5px;
-            width: 100%;
-            max-height: 200px;
-            overflow-y: auto;
-            box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
-        }
-        
-        .number-option {
-            padding: 10px;
-            text-align: center;
-            cursor: pointer;
-            transition: background-color 0.2s;
-            border-bottom: 1px dashed rgba(0, 255, 0, 0.2);
-        }
-        
-        .number-option:last-child {
-            border-bottom: none;
-        }
-        
-        .number-option:hover {
-            background-color: rgba(0, 255, 0, 0.2);
-        }
-        
-        .button-group {
-            display: flex;
-            justify-content: center;
+        .input-area {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
             gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .input-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        label {
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        input, select {
+            padding: 12px 15px;
+            border-radius: 8px;
+            border: 2px solid var(--accent);
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text);
+            font-size: 1rem;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--highlight);
+        }
+        
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        button {
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            background: var(--button-bg);
+            color: var(--text);
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.1rem;
+        }
+        
+        button:hover {
+            background: var(--button-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .btn-calculate {
+            background: var(--highlight);
+        }
+        
+        .btn-clear {
+            background: var(--danger);
+        }
+        
+        .btn-history {
+            background: var(--accent);
+        }
+        
+        .result-area {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 20px;
             margin-top: 20px;
-            flex-wrap: wrap;
+            min-height: 150px;
         }
         
-        .btn {
-            padding: 12px 25px;
-            font-size: 16px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: all 0.3s;
-            border: 1px solid #0f0;
-            background-color: black;
-            color: #0f0;
-            font-family: 'Courier New', monospace;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
+        .result-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--highlight);
         }
         
-        .btn:hover {
-            background-color: #0f0;
-            color: black;
-            box-shadow: 0 0 15px #0f0;
-        }
-        
-        .result-section {
-            background-color: rgba(0, 15, 0, 0.3);
-            padding: 20px;
-            border-radius: 5px;
-            margin-bottom: 25px;
-            border: 1px solid #0f0;
-            display: none;
-        }
-        
-        .prediction-number {
-            font-size: 3em;
-            font-weight: bold;
-            color: #0f0;
-            margin: 10px 0;
-            text-shadow: 0 0 10px #0f0;
-        }
-        
-        .prediction-type {
-            font-size: 1.5em;
-            margin: 10px 0;
-        }
-        
-        .small-type {
-            color: #0f0;
-        }
-        
-        .big-type {
-            color: #ff5252;
-        }
-        
-        .win-rate {
-            font-size: 1.2em;
-            color: #ffee58;
-            margin: 10px 0;
-        }
-        
-        .pattern-info {
-            font-style: italic;
-            color: #b388ff;
-            margin-top: 15px;
-        }
-        
-        .stats-section {
-            display: flex;
-            flex-wrap: wrap;
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
             gap: 15px;
-            margin-bottom: 25px;
-            justify-content: center;
         }
         
-        .stat-box {
-            flex: 1;
-            min-width: 200px;
-            background-color: rgba(0, 15, 0, 0.3);
+        .stat-item {
+            background: rgba(255, 255, 255, 0.1);
             padding: 15px;
-            border-radius: 5px;
-            border: 1px solid #0f0;
+            border-radius: 10px;
             text-align: center;
         }
         
-        .hot-number {
-            color: #ff5252;
+        .stat-value {
+            font-size: 1.8rem;
             font-weight: bold;
+            color: var(--highlight);
+            margin: 10px 0;
         }
         
-        .cold-number {
-            color: #40c4ff;
-            font-weight: bold;
+        .history-list {
+            max-height: 300px;
+            overflow-y: auto;
         }
         
-        .chart-container {
-            width: 100%;
-            height: 300px;
-            margin-bottom: 25px;
-            background-color: rgba(0, 15, 0, 0.3);
-            border-radius: 5px;
+        .history-item {
+            background: rgba(255, 255, 255, 0.05);
             padding: 15px;
-            border: 1px solid #0f0;
-        }
-        
-        .history-section {
-            margin-bottom: 25px;
-        }
-        
-        .history-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 15px;
-        }
-        
-        .history-table th, .history-table td {
-            padding: 12px;
-            text-align: center;
-            border: 1px solid #0f0;
-        }
-        
-        .history-table th {
-            background-color: rgba(0, 20, 0, 0.5);
-            color: #0f0;
-        }
-        
-        .small-row {
-            background-color: rgba(0, 30, 0, 0.3);
-        }
-        
-        .big-row {
-            background-color: rgba(30, 0, 0, 0.3);
-        }
-        
-        .memory-section {
-            background-color: rgba(0, 15, 0, 0.3);
-            padding: 20px;
-            border-radius: 5px;
-            border: 1px solid #0f0;
-        }
-        
-        .memory-list {
-            margin-top: 15px;
-        }
-        
-        .memory-item {
-            padding: 10px;
-            border-bottom: 1px dashed rgba(0, 255, 0, 0.3);
+            border-radius: 10px;
+            margin-bottom: 10px;
             display: flex;
             justify-content: space-between;
-            flex-wrap: wrap;
+            align-items: center;
         }
         
-        .memory-item:last-child {
-            border-bottom: none;
-        }
-        
-        .memory-input {
-            color: #0f0;
-        }
-        
-        .memory-prediction {
-            color: #0f0;
+        .history-number {
+            font-size: 1.5rem;
             font-weight: bold;
         }
         
-        .memory-wins {
-            color: #ffee58;
+        .history-big {
+            color: #4caf50;
         }
         
-        @media (max-width: 768px) {
-            .number-selector {
-                width: 50px;
-                height: 50px;
-            }
-            
-            .container {
-                padding: 15px;
-            }
-            
-            .stat-box {
-                min-width: 100%;
-            }
+        .history-small {
+            color: #f44336;
+        }
+        
+        .pattern-display {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+        }
+        
+        .pattern-title {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            color: var(--highlight);
+        }
+        
+        .pattern-items {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .pattern-item {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        
+        .pattern-big {
+            background: rgba(76, 175, 80, 0.2);
+            color: #4caf50;
+        }
+        
+        .pattern-small {
+            background: rgba(244, 67, 54, 0.2);
+            color: #f44336;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            opacity: 0.7;
         }
     </style>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <div class="container">
-        <h1>TC Game Predictor Pro</h1>
-        <h3>Big (5-9) / Small (0-4) Analysis Tool</h3>
+        <header>
+            <h1>Production Tool: Big/Small Game Analyzer</h1>
+            <p class="subtitle">Advanced calculation mod with pattern recognition and statistical analysis</p>
+        </header>
         
-        <div class="input-section">
-            <h2>Enter Last 5 Numbers</h2>
-            <div style="text-align: center;">
-                <div class="number-selector" id="num1-selector">
-                    <div class="number-display" onclick="showNumberOptions('num1-selector')">0</div>
-                    <div class="number-options" id="num1-options"></div>
+        <div class="main-content">
+            <div class="card">
+                <h2 class="card-title">Calculator Mode</h2>
+                
+                <div class="input-area">
+                    <div class="input-group">
+                        <label for="period">Period</label>
+                        <input type="text" id="period" placeholder="e.g., 2025082610434">
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="number">Number (0-9)</label>
+                        <input type="number" id="number" min="0" max="9" placeholder="0-9">
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="size">Size</label>
+                        <select id="size">
+                            <option value="big">Big (5-9)</option>
+                            <option value="small">Small (0-4)</option>
+                        </select>
+                    </div>
                 </div>
-                <div class="number-selector" id="num2-selector">
-                    <div class="number-display" onclick="showNumberOptions('num2-selector')">0</div>
-                    <div class="number-options" id="num2-options"></div>
+                
+                <div class="buttons">
+                    <button class="btn-calculate" onclick="calculate()">Calculate</button>
+                    <button class="btn-clear" onclick="clearInputs()">Clear</button>
+                    <button onclick="addToHistory()">Add to History</button>
+                    <button class="btn-history" onclick="analyzePatterns()">Analyze Patterns</button>
                 </div>
-                <div class="number-selector" id="num3-selector">
-                    <div class="number-display" onclick="showNumberOptions('num3-selector')">0</div>
-                    <div class="number-options" id="num3-options"></div>
-                </div>
-                <div class="number-selector" id="num4-selector">
-                    <div class="number-display" onclick="showNumberOptions('num4-selector')">0</div>
-                    <div class="number-options" id="num4-options"></div>
-                </div>
-                <div class="number-selector" id="num5-selector">
-                    <div class="number-display" onclick="showNumberOptions('num5-selector')">0</div>
-                    <div class="number-options" id="num5-options"></div>
+                
+                <div class="result-area">
+                    <h3 class="result-title">Calculation Result</h3>
+                    <div id="result">
+                        <p>Enter data and click Calculate to see results</p>
+                    </div>
                 </div>
             </div>
-            <div class="button-group">
-                <button class="btn" onclick="calculate()">
-                    <span>🔮 Predict Next Number</span>
-                </button>
-                <button class="btn" onclick="clearInputs()">
-                    <span>❌ Clear Inputs</span>
-                </button>
+            
+            <div class="card">
+                <h2 class="card-title">Statistics & Analysis</h2>
+                
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div>Big Count</div>
+                        <div class="stat-value" id="big-count">0</div>
+                        <div>Percentage: <span id="big-percent">0%</span></div>
+                    </div>
+                    
+                    <div class="stat-item">
+                        <div>Small Count</div>
+                        <div class="stat-value" id="small-count">0</div>
+                        <div>Percentage: <span id="small-percent">0%</span></div>
+                    </div>
+                    
+                    <div class="stat-item">
+                        <div>Last 10 Big</div>
+                        <div class="stat-value" id="last-big">0</div>
+                        <div>Trend: <span id="big-trend">-</span></div>
+                    </div>
+                    
+                    <div class="stat-item">
+                        <div>Last 10 Small</div>
+                        <div class="stat-value" id="last-small">0</div>
+                        <div>Trend: <span id="small-trend">-</span></div>
+                    </div>
+                </div>
+                
+                <div class="pattern-display">
+                    <h3 class="pattern-title">Recent Pattern (Last 10)</h3>
+                    <div class="pattern-items" id="pattern-container">
+                        <div class="pattern-item pattern-big">B</div>
+                        <div class="pattern-item pattern-small">S</div>
+                        <div class="pattern-item pattern-big">B</div>
+                        <div class="pattern-item pattern-big">B</div>
+                        <div class="pattern-item pattern-small">S</div>
+                        <div class="pattern-item pattern-big">B</div>
+                        <div class="pattern-item pattern-small">S</div>
+                        <div class="pattern-item pattern-small">S</div>
+                        <div class="pattern-item pattern-big">B</div>
+                        <div class="pattern-item pattern-big">B</div>
+                    </div>
+                </div>
+                
+                <div class="history-list">
+                    <h3 class="card-title">Game History</h3>
+                    <div id="history-container">
+                        <div class="history-item">
+                            <div class="history-number">2025082610434</div>
+                            <div class="history-small">Number: 4 (Small)</div>
+                        </div>
+                        <div class="history-item">
+                            <div class="history-number">2025082610433</div>
+                            <div class="history-small">Number: 0 (Small)</div>
+                        </div>
+                        <div class="history-item">
+                            <div class="history-number">2025082610432</div>
+                            <div class="history-big">Number: 5 (Big)</div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
         
-        <div id="result-section" class="result-section">
-            <div style="text-align: center;">
-                <h2>Prediction Result</h2>
-                <div class="prediction-number" id="prediction-number">?</div>
-                <div class="prediction-type" id="prediction-type"></div>
-                <div class="win-rate" id="win-rate"></div>
-                <div class="pattern-info" id="pattern-info"></div>
-            </div>
-        </div>
-        
-        <div class="stats-section">
-            <div class="stat-box">
-                <h3>🔥 Hot Numbers</h3>
-                <div id="hot-numbers">Loading...</div>
-            </div>
-            <div class="stat-box">
-                <h3>❄️ Cold Numbers</h3>
-                <div id="cold-numbers">Loading...</div>
-            </div>
-            <div class="stat-box">
-                <h3>📈 Current Trend</h3>
-                <div id="current-trend">Loading...</div>
-            </div>
-        </div>
-        
-        <div class="chart-container">
-            <canvas id="trend-chart"></canvas>
-        </div>
-        
-        <div class="memory-section">
-            <h2>💾 Prediction Memory (Last 10)</h2>
-            <div class="memory-list" id="memory-list">
-                <div>No predictions made yet</div>
-            </div>
-        </div>
-        
-        <div class="history-section">
-            <h2>📜 Game History</h2>
-            <p>Total Numbers: <span id="total-numbers">0</span> | 
-               Small (0-4): <span id="small-count">0</span> | 
-               Big (5-9): <span id="big-count">0</span></p>
-            <div style="overflow-x: auto;">
-                <table class="history-table" id="history-table">
-                    <thead>
-                        <tr>
-                            <th>Period</th>
-                            <th>Number</th>
-                            <th>Type</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- Will be populated by JavaScript -->
-                    </tbody>
-                </table>
-            </div>
-        </div>
+        <footer>
+            <p>Production Tool &copy; 2025 - Advanced Calculation Mod</p>
+        </footer>
     </div>
 
     <script>
-        // Game history data
-        const gameHistory = [
-            {period: "2508170530", number: 2, type: "Small"},
-            {period: "2508170529", number: 1, type: "Small"},
-            {period: "2508170528", number: 4, type: "Small"},
-            {period: "2508170527", number: 2, type: "Small"},
-            {period: "2508170526", number: 0, type: "Small"},
-            {period: "2508170525", number: 5, type: "Big"},
-            {period: "2508170524", number: 5, type: "Big"},
-            {period: "2508170523", number: 3, type: "Small"},
-            {period: "2508170522", number: 2, type: "Small"},
-            {period: "2508170521", number: 0, type: "Small"},
-            {period: "2508170520", number: 8, type: "Big"},
-            {period: "2508170519", number: 3, type: "Small"},
-            {period: "2508170518", number: 2, type: "Small"},
-            {period: "2508170517", number: 8, type: "Big"},
-            {period: "2508170516", number: 4, type: "Small"},
-            {period: "2508170515", number: 8, type: "Big"},
-            {period: "2508170514", number: 2, type: "Small"},
-            {period: "2508170513", number: 5, type: "Big"},
-            {period: "2508170512", number: 5, type: "Big"},
-            {period: "2508170511", number: 5, type: "Big"},
+        // Initialize with some sample data
+        let history = [
+            { period: '2025082610434', number: 4, size: 'small' },
+            { period: '2025082610433', number: 0, size: 'small' },
+            { period: '2025082610432', number: 5, size: 'big' },
+            { period: '2025082610431', number: 9, size: 'big' },
+            { period: '2025082610430', number: 0, size: 'small' },
+            { period: '2025082610429', number: 5, size: 'big' },
+            { period: '2025082610428', number: 9, size: 'big' },
+            { period: '2025082610427', number: 6, size: 'big' },
+            { period: '2025082610426', number: 8, size: 'big' },
+            { period: '2025082610425', number: 6, size: 'big' }
         ];
-
-        // Prediction memory
-        let predictionMemory = [];
-        let trendChart = null;
-
-        // Initialize number selectors
-        function initializeNumberSelectors() {
-            for (let i = 1; i <= 5; i++) {
-                const optionsContainer = document.getElementById(`num${i}-options`);
-                for (let num = 0; num <= 9; num++) {
-                    const option = document.createElement('div');
-                    option.className = 'number-option';
-                    option.textContent = num;
-                    option.onclick = function() {
-                        selectNumber(`num${i}`, num);
-                    };
-                    optionsContainer.appendChild(option);
-                }
-            }
-            
-            // Close options when clicking outside
-            document.addEventListener('click', function(e) {
-                if (!e.target.closest('.number-selector')) {
-                    document.querySelectorAll('.number-options').forEach(opt => {
-                        opt.style.display = 'none';
-                    });
-                }
-            });
-        }
         
-        function showNumberOptions(selectorId) {
-            // Hide all other options first
-            document.querySelectorAll('.number-options').forEach(opt => {
-                opt.style.display = 'none';
-            });
-            
-            // Show selected options
-            const options = document.getElementById(selectorId.replace('selector', 'options'));
-            options.style.display = 'block';
-        }
+        // Update UI with initial data
+        updateHistoryDisplay();
+        updateStats();
         
-        function selectNumber(inputId, number) {
-            // Update display
-            document.getElementById(inputId + '-selector').querySelector('.number-display').textContent = number;
-            
-            // Hide options
-            document.getElementById(inputId + '-options').style.display = 'none';
-        }
-        
-        // Clear input fields
-        function clearInputs() {
-            for (let i = 1; i <= 5; i++) {
-                document.getElementById(`num${i}-selector`).querySelector('.number-display').textContent = '0';
-            }
-            document.getElementById('result-section').style.display = 'none';
-        }
-
-        // Calculate prediction
         function calculate() {
-            const nums = [];
-            for (let i = 1; i <= 5; i++) {
-                const num = parseInt(document.getElementById(`num${i}-selector`).querySelector('.number-display').textContent);
-                nums.push(num);
-            }
+            const period = document.getElementById('period').value;
+            const number = parseInt(document.getElementById('number').value);
+            const size = document.getElementById('size').value;
             
-            // Count small/big in input
-            const smallCount = nums.filter(n => n <= 4).length;
-            const bigCount = nums.filter(n => n >= 5).length;
-            
-            // Pattern recognition
-            let prediction, type, confidence, patternInfo = "";
-            
-            // Strategy 1: Opposite of current trend
-            if (bigCount > smallCount) {
-                prediction = getRandomNumber(0, 4); // Predict small
-                type = "Small";
-                confidence = (70 - (bigCount * 10)).toFixed(2);
-                patternInfo = "Opposite trend prediction (more Big numbers in input)";
-            } else {
-                prediction = getRandomNumber(5, 9); // Predict big
-                type = "Big";
-                confidence = (70 - (smallCount * 10)).toFixed(2);
-                patternInfo = "Opposite trend prediction (more Small numbers in input)";
-            }
-            
-            // Strategy 2: Check for repeating numbers
-            const repeatingNum = findRepeatingNumber(nums);
-            if (repeatingNum !== null) {
-                if (repeatingNum <= 4) {
-                    prediction = getRandomNumber(5, 9); // If small repeating, predict big
-                    type = "Big";
-                    patternInfo = "Repeating small number pattern detected";
-                } else {
-                    prediction = getRandomNumber(0, 4); // If big repeating, predict small
-                    type = "Small";
-                    patternInfo = "Repeating big number pattern detected";
-                }
-                confidence = (parseFloat(confidence) * 1.2).toFixed(2);
-            }
-            
-            // Strategy 3: Check history patterns
-            const lastPattern = nums.join('');
-            const patternMatch = findPatternInHistory(lastPattern);
-            if (patternMatch) {
-                prediction = patternMatch.nextNumber;
-                type = patternMatch.nextNumber <= 4 ? "Small" : "Big";
-                patternInfo = `Historical pattern matched: ${patternMatch.pattern} → ${patternMatch.nextNumber}`;
-                confidence = (parseFloat(confidence) + 15).toFixed(2);
-            }
-            
-            // Ensure confidence is within bounds
-            confidence = Math.min(95, Math.max(60, parseFloat(confidence))).toFixed(2);
-            
-            // Add to memory
-            predictionMemory.unshift({
-                input: [...nums],
-                prediction: prediction,
-                type: type,
-                confidence: confidence,
-                timestamp: new Date().toLocaleTimeString(),
-                patternInfo: patternInfo
-            });
-            
-            // Keep only last 10 predictions
-            if (predictionMemory.length > 10) {
-                predictionMemory.pop();
-            }
-            
-            // Display results
-            document.getElementById('prediction-number').textContent = prediction;
-            document.getElementById('prediction-type').textContent = type;
-            document.getElementById('prediction-type').className = `prediction-type ${type.toLowerCase()}-type`;
-            document.getElementById('win-rate').textContent = `${confidence}% confidence`;
-            document.getElementById('pattern-info').textContent = patternInfo;
-            document.getElementById('result-section').style.display = 'block';
-            
-            // Update memory display
-            updateMemoryList();
-        }
-
-        // Update history table
-        function updateHistoryTable() {
-            const tableBody = document.querySelector('#history-table tbody');
-            tableBody.innerHTML = '';
-            
-            let smallCount = 0;
-            let bigCount = 0;
-            
-            gameHistory.forEach(item => {
-                const row = document.createElement('tr');
-                row.className = `${item.type.toLowerCase()}-row`;
-                
-                row.innerHTML = `
-                    <td>${item.period}</td>
-                    <td>${item.number}</td>
-                    <td>${item.type}</td>
-                `;
-                tableBody.appendChild(row);
-                
-                if (item.type === 'Small') smallCount++;
-                else bigCount++;
-            });
-            
-            document.getElementById('total-numbers').textContent = gameHistory.length;
-            document.getElementById('small-count').textContent = smallCount;
-            document.getElementById('big-count').textContent = bigCount;
-        }
-
-        // Update hot and cold numbers
-        function updateHotColdNumbers() {
-            const numberCounts = {};
-            
-            // Count occurrences of each number
-            gameHistory.forEach(item => {
-                if (!numberCounts[item.number]) {
-                    numberCounts[item.number] = 0;
-                }
-                numberCounts[item.number]++;
-            });
-            
-            // Convert to array and sort
-            const numbers = Object.keys(numberCounts).map(num => ({
-                number: num,
-                count: numberCounts[num]
-            }));
-            
-            numbers.sort((a, b) => b.count - a.count);
-            
-            // Get top 3 hot and cold numbers
-            const hotNumbers = numbers.slice(0, 3);
-            const coldNumbers = numbers.slice(-3).reverse();
-            
-            document.getElementById('hot-numbers').innerHTML = hotNumbers.map(num => 
-                `<span class="hot-number">${num.number}</span> (${num.count} times)`
-            ).join(', ');
-            
-            document.getElementById('cold-numbers').innerHTML = coldNumbers.map(num => 
-                `<span class="cold-number">${num.number}</span> (${num.count} times)`
-            ).join(', ');
-        }
-
-        // Update current trend
-        function updateCurrentTrend() {
-            const last10 = gameHistory.slice(0, 10);
-            const last10Small = last10.filter(item => item.type === 'Small').length;
-            const last10Big = last10.filter(item => item.type === 'Big').length;
-            
-            let trendText;
-            if (last10Small > last10Big) {
-                trendText = "Small numbers (0-4) trending";
-            } else if (last10Big > last10Small) {
-                trendText = "Big numbers (5-9) trending";
-            } else {
-                trendText = "Balanced trend";
-            }
-            
-            document.getElementById('current-trend').textContent = trendText;
-        }
-
-        // Update trend chart
-        function updateTrendChart() {
-            const ctx = document.getElementById('trend-chart').getContext('2d');
-            
-            // Prepare data for last 20 results
-            const recentHistory = gameHistory.slice(0, 20).reverse();
-            const labels = recentHistory.map(item => item.period.substring(6));
-            const data = recentHistory.map(item => item.number);
-            const bgColors = recentHistory.map(item => 
-                item.type === 'Small' ? 'rgba(0, 255, 0, 0.7)' : 'rgba(255, 0, 0, 0.7)'
-            );
-            
-            // Destroy previous chart if exists
-            if (trendChart) {
-                trendChart.destroy();
-            }
-            
-            trendChart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Number',
-                        data: data,
-                        backgroundColor: bgColors,
-                        borderColor: bgColors.map(c => c.replace('0.7', '1')),
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            max: 9,
-                            ticks: {
-                                stepSize: 1
-                            },
-                            grid: {
-                                color: 'rgba(0, 255, 0, 0.1)'
-                            }
-                        },
-                        x: {
-                            grid: {
-                                display: false
-                            }
-                        }
-                    },
-                    plugins: {
-                        legend: {
-                            display: false
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    const item = recentHistory[context.dataIndex];
-                                    return `Number: ${item.number} (${item.type})`;
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        // Update memory list
-        function updateMemoryList() {
-            const memoryList = document.getElementById('memory-list');
-            memoryList.innerHTML = '';
-            
-            if (predictionMemory.length === 0) {
-                memoryList.innerHTML = '<div>No predictions made yet</div>';
+            if (!period || isNaN(number)) {
+                document.getElementById('result').innerHTML = '<p class="error">Please enter valid Period and Number</p>';
                 return;
             }
             
-            predictionMemory.forEach((item, index) => {
-                const memItem = document.createElement('div');
-                memItem.className = 'memory-item';
-                
-                memItem.innerHTML = `
-                    <div><strong>#${index+1}</strong> [${item.timestamp}]</div>
-                    <div class="memory-input">Input: ${item.input.join(', ')}</div>
-                    <div class="memory-prediction">Predicted: ${item.prediction} (${item.type})</div>
-                    <div class="memory-wins">Confidence: ${item.confidence}%</div>
-                `;
-                
-                memoryList.appendChild(memItem);
-            });
-        }
-
-        // Helper functions
-        function getRandomNumber(min, max) {
-            return Math.floor(Math.random() * (max - min + 1)) + min;
-        }
-        
-        function findRepeatingNumber(nums) {
-            const count = {};
-            nums.forEach(num => {
-                count[num] = (count[num] || 0) + 1;
-            });
+            // Determine if the number matches the selected size
+            let actualSize = (number >= 5) ? 'big' : 'small';
+            let isCorrect = (size === actualSize);
             
-            for (const num in count) {
-                if (count[num] >= 3) { // If a number repeats 3+ times
-                    return parseInt(num);
-                }
+            // Calculate probability for next result
+            let bigCount = history.filter(item => item.size === 'big').length;
+            let smallCount = history.filter(item => item.size === 'small').length;
+            let total = history.length;
+            
+            let bigProbability = total > 0 ? (bigCount / total * 100).toFixed(2) : 50;
+            let smallProbability = total > 0 ? (smallCount / total * 100).toFixed(2) : 50;
+            
+            // Generate analysis
+            let analysis = '';
+            if (bigProbability > 60) {
+                analysis = 'STRONG probability of NEXT being BIG';
+            } else if (smallProbability > 60) {
+                analysis = 'STRONG probability of NEXT being SMALL';
+            } else {
+                analysis = 'No strong trend detected';
             }
-            return null;
+            
+            // Display result
+            document.getElementById('result').innerHTML = `
+                <p>Period: <strong>${period}</strong></p>
+                <p>Number: <strong>${number}</strong></p>
+                <p>Selected Size: <strong>${size.toUpperCase()}</strong></p>
+                <p>Actual Size: <strong class="${isCorrect ? 'success' : 'error'}">${actualSize.toUpperCase()}</strong></p>
+                <p>Match: <strong>${isCorrect ? 'YES' : 'NO'}</strong></p>
+                <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1)">
+                    <p>Big Probability: <strong>${bigProbability}%</strong></p>
+                    <p>Small Probability: <strong>${smallProbability}%</strong></p>
+                    <p style="margin-top: 10px; color: var(--highlight)">Analysis: ${analysis}</p>
+                </div>
+            `;
         }
         
-        function findPatternInHistory(pattern) {
-            // Check if this sequence of 5 numbers appeared before
-            for (let i = 0; i < gameHistory.length - 6; i++) {
-                const currentPattern = [
-                    gameHistory[i].number,
-                    gameHistory[i+1].number,
-                    gameHistory[i+2].number,
-                    gameHistory[i+3].number,
-                    gameHistory[i+4].number
-                ].join('');
-                
-                if (currentPattern === pattern) {
-                    return {
-                        pattern: pattern,
-                        nextNumber: gameHistory[i+5].number
-                    };
-                }
+        function addToHistory() {
+            const period = document.getElementById('period').value;
+            const number = parseInt(document.getElementById('number').value);
+            const size = document.getElementById('size').value;
+            
+            if (!period || isNaN(number)) {
+                alert('Please enter valid Period and Number');
+                return;
             }
-            return null;
+            
+            // Add to history
+            history.unshift({ period, number, size });
+            
+            // Keep only last 50 records
+            if (history.length > 50) {
+                history = history.slice(0, 50);
+            }
+            
+            // Update displays
+            updateHistoryDisplay();
+            updateStats();
+            
+            alert('Added to history successfully!');
         }
-
-        // Initialize the page
-        window.onload = function() {
-            initializeNumberSelectors();
-            updateHistoryTable();
-            updateHotColdNumbers();
-            updateCurrentTrend();
-            updateTrendChart();
-        };
+        
+        function clearInputs() {
+            document.getElementById('period').value = '';
+            document.getElementById('number').value = '';
+            document.getElementById('size').selectedIndex = 0;
+            document.getElementById('result').innerHTML = '<p>Enter data and click Calculate to see results</p>';
+        }
+        
+        function analyzePatterns() {
+            // Count occurrences
+            let bigCount = history.filter(item => item.size === 'big').length;
+            let smallCount = history.filter(item => item.size === 'small').length;
+            let total = history.length;
+            
+            // Calculate percentages
+            let bigPercent = total > 0 ? (bigCount / total * 100).toFixed(2) : 0;
+            let smallPercent = total > 0 ? (smallCount / total * 100).toFixed(2) : 0;
+            
+            // Get last 10 results
+            let lastTen = history.slice(0, 10);
+            let lastTenBig = lastTen.filter(item => item.size === 'big').length;
+            let lastTenSmall = lastTen.filter(item => item.size === 'small').length;
+            
+            // Determine trends
+            let bigTrend = lastTenBig >= 6 ? 'UPWARD' : (lastTenBig <= 4 ? 'DOWNWARD' : 'NEUTRAL');
+            let smallTrend = lastTenSmall >= 6 ? 'UPWARD' : (lastTenSmall <= 4 ? 'DOWNWARD' : 'NEUTRAL');
+            
+            // Update stats
+            document.getElementById('big-count').textContent = bigCount;
+            document.getElementById('small-count').textContent = smallCount;
+            document.getElementById('big-percent').textContent = bigPercent + '%';
+            document.getElementById('small-percent').textContent = smallPercent + '%';
+            document.getElementById('last-big').textContent = lastTenBig;
+            document.getElementById('last-small').textContent = lastTenSmall;
+            document.getElementById('big-trend').textContent = bigTrend;
+            document.getElementById('small-trend').textContent = smallTrend;
+            
+            // Update pattern display
+            let patternHtml = '';
+            lastTen.forEach(item => {
+                patternHtml += `<div class="pattern-item ${item.size === 'big' ? 'pattern-big' : 'pattern-small'}">${item.size === 'big' ? 'B' : 'S'}</div>`;
+            });
+            document.getElementById('pattern-container').innerHTML = patternHtml;
+            
+            // Show analysis in result area
+            document.getElementById('result').innerHTML = `
+                <p><strong>Pattern Analysis Complete</strong></p>
+                <p>Based on ${total} historical records:</p>
+                <p>Big occurrences: ${bigCount} (${bigPercent}%)</p>
+                <p>Small occurrences: ${smallCount} (${smallPercent}%)</p>
+                <p>Last 10 results: ${lastTenBig} Big, ${lastTenSmall} Small</p>
+                <p style="margin-top: 15px; color: var(--highlight)">Big trend: ${bigTrend}</p>
+                <p style="color: var(--highlight)">Small trend: ${smallTrend}</p>
+            `;
+        }
+        
+        function updateHistoryDisplay() {
+            let historyHtml = '';
+            history.slice(0, 10).forEach(item => {
+                historyHtml += `
+                    <div class="history-item">
+                        <div class="history-number">${item.period}</div>
+                        <div class="${item.size === 'big' ? 'history-big' : 'history-small'}">Number: ${item.number} (${item.size.charAt(0).toUpperCase() + item.size.slice(1)})</div>
+                    </div>
+                `;
+            });
+            document.getElementById('history-container').innerHTML = historyHtml;
+        }
+        
+        function updateStats() {
+            let bigCount = history.filter(item => item.size === 'big').length;
+            let smallCount = history.filter(item => item.size === 'small').length;
+            let total = history.length;
+            
+            let bigPercent = total > 0 ? (bigCount / total * 100).toFixed(2) : 0;
+            let smallPercent = total > 0 ? (smallCount / total * 100).toFixed(2) : 0;
+            
+            document.getElementById('big-count').textContent = bigCount;
+            document.getElementById('small-count').textContent = smallCount;
+            document.getElementById('big-percent').textContent = bigPercent + '%';
+            document.getElementById('small-percent').textContent = smallPercent + '%';
+        }
     </script>
 </body>
 </html>
