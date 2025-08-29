@@ -1,555 +1,128 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Production Tool: Big/Small Game Analyzer</title>
-    <style>
-        :root {
-            --primary: #1a1a2e;
-            --secondary: #16213e;
-            --accent: #0f3460;
-            --highlight: #e94560;
-            --text: #f0f0f0;
-            --card-bg: #1e2a47;
-            --button-bg: #0f3460;
-            --button-hover: #133b74;
-            --success: #4caf50;
-            --danger: #f44336;
-        }
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        
-        body {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: var(--text);
-            min-height: 100vh;
-            padding: 20px;
-        }
-        
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-        
-        header {
-            text-align: center;
-            margin-bottom: 30px;
-            padding: 20px;
-            background: var(--card-bg);
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-        }
-        
-        h1 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-            color: var(--highlight);
-            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
-        }
-        
-        .subtitle {
-            font-size: 1.2rem;
-            opacity: 0.8;
-        }
-        
-        .main-content {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
-        
-        @media (max-width: 900px) {
-            .main-content {
-                grid-template-columns: 1fr;
-            }
-        }
-        
-        .card {
-            background: var(--card-bg);
-            border-radius: 15px;
-            padding: 25px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-        }
-        
-        .card-title {
-            font-size: 1.5rem;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid var(--highlight);
-            color: var(--highlight);
-        }
-        
-        .input-area {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-        
-        .input-group {
-            display: flex;
-            flex-direction: column;
-        }
-        
-        label {
-            margin-bottom: 8px;
-            font-weight: 500;
-        }
-        
-        input, select {
-            padding: 12px 15px;
-            border-radius: 8px;
-            border: 2px solid var(--accent);
-            background: rgba(255, 255, 255, 0.1);
-            color: var(--text);
-            font-size: 1rem;
-        }
-        
-        input:focus, select:focus {
-            outline: none;
-            border-color: var(--highlight);
-        }
-        
-        .buttons {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-        
-        button {
-            padding: 15px;
-            border: none;
-            border-radius: 8px;
-            background: var(--button-bg);
-            color: var(--text);
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 1.1rem;
-        }
-        
-        button:hover {
-            background: var(--button-hover);
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-        }
-        
-        .btn-calculate {
-            background: var(--highlight);
-        }
-        
-        .btn-clear {
-            background: var(--danger);
-        }
-        
-        .btn-history {
-            background: var(--accent);
-        }
-        
-        .result-area {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 10px;
-            padding: 20px;
-            margin-top: 20px;
-            min-height: 150px;
-        }
-        
-        .result-title {
-            font-size: 1.2rem;
-            margin-bottom: 15px;
-            color: var(--highlight);
-        }
-        
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-        }
-        
-        .stat-item {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 15px;
-            border-radius: 10px;
-            text-align: center;
-        }
-        
-        .stat-value {
-            font-size: 1.8rem;
-            font-weight: bold;
-            color: var(--highlight);
-            margin: 10px 0;
-        }
-        
-        .history-list {
-            max-height: 300px;
-            overflow-y: auto;
-        }
-        
-        .history-item {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .history-number {
-            font-size: 1.5rem;
-            font-weight: bold;
-        }
-        
-        .history-big {
-            color: #4caf50;
-        }
-        
-        .history-small {
-            color: #f44336;
-        }
-        
-        .pattern-display {
-            margin-top: 20px;
-            padding: 15px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 10px;
-        }
-        
-        .pattern-title {
-            font-size: 1.2rem;
-            margin-bottom: 10px;
-            color: var(--highlight);
-        }
-        
-        .pattern-items {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-        
-        .pattern-item {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-        }
-        
-        .pattern-big {
-            background: rgba(76, 175, 80, 0.2);
-            color: #4caf50;
-        }
-        
-        .pattern-small {
-            background: rgba(244, 67, 54, 0.2);
-            color: #f44336;
-        }
-        
-        footer {
-            text-align: center;
-            margin-top: 40px;
-            padding: 20px;
-            opacity: 0.7;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Multi-Level Big/Small Predictor</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #0d0d0d;
+      color: #f5f5f5;
+      text-align: center;
+      padding: 20px;
+    }
+    h1 {
+      color: #ffcc00;
+      margin-bottom: 20px;
+    }
+    .btn {
+      padding: 10px 20px;
+      margin: 5px;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+      border-radius: 8px;
+      transition: 0.3s;
+    }
+    .big-btn { background: #ff4444; color: white; }
+    .small-btn { background: #448aff; color: white; }
+    .clear-btn { background: #777; color: white; }
+    .btn:hover { opacity: 0.8; }
+
+    .history {
+      margin: 20px auto;
+      max-width: 400px;
+      background: #1a1a1a;
+      padding: 15px;
+      border-radius: 10px;
+    }
+    .card {
+      background: #1a1a1a;
+      margin: 10px auto;
+      padding: 15px;
+      border-radius: 12px;
+      max-width: 400px;
+      box-shadow: 0px 0px 15px rgba(255,255,255,0.1);
+    }
+    .big { color: #ff4444; font-weight: bold; }
+    .small { color: #448aff; font-weight: bold; }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>Production Tool: Big/Small Game Analyzer</h1>
-            <p class="subtitle">Advanced calculation mod with pattern recognition and statistical analysis</p>
-        </header>
-        
-        <div class="main-content">
-            <div class="card">
-                <h2 class="card-title">Calculator Mode</h2>
-                
-                <div class="input-area">
-                    <div class="input-group">
-                        <label for="period">Period</label>
-                        <input type="text" id="period" placeholder="e.g., 2025082610434">
-                    </div>
-                    
-                    <div class="input-group">
-                        <label for="number">Number (0-9)</label>
-                        <input type="number" id="number" min="0" max="9" placeholder="0-9">
-                    </div>
-                    
-                    <div class="input-group">
-                        <label for="size">Size</label>
-                        <select id="size">
-                            <option value="big">Big (5-9)</option>
-                            <option value="small">Small (0-4)</option>
-                        </select>
-                    </div>
-                </div>
-                
-                <div class="buttons">
-                    <button class="btn-calculate" onclick="calculate()">Calculate</button>
-                    <button class="btn-clear" onclick="clearInputs()">Clear</button>
-                    <button onclick="addToHistory()">Add to History</button>
-                    <button class="btn-history" onclick="analyzePatterns()">Analyze Patterns</button>
-                </div>
-                
-                <div class="result-area">
-                    <h3 class="result-title">Calculation Result</h3>
-                    <div id="result">
-                        <p>Enter data and click Calculate to see results</p>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="card">
-                <h2 class="card-title">Statistics & Analysis</h2>
-                
-                <div class="stats-grid">
-                    <div class="stat-item">
-                        <div>Big Count</div>
-                        <div class="stat-value" id="big-count">0</div>
-                        <div>Percentage: <span id="big-percent">0%</span></div>
-                    </div>
-                    
-                    <div class="stat-item">
-                        <div>Small Count</div>
-                        <div class="stat-value" id="small-count">0</div>
-                        <div>Percentage: <span id="small-percent">0%</span></div>
-                    </div>
-                    
-                    <div class="stat-item">
-                        <div>Last 10 Big</div>
-                        <div class="stat-value" id="last-big">0</div>
-                        <div>Trend: <span id="big-trend">-</span></div>
-                    </div>
-                    
-                    <div class="stat-item">
-                        <div>Last 10 Small</div>
-                        <div class="stat-value" id="last-small">0</div>
-                        <div>Trend: <span id="small-trend">-</span></div>
-                    </div>
-                </div>
-                
-                <div class="pattern-display">
-                    <h3 class="pattern-title">Recent Pattern (Last 10)</h3>
-                    <div class="pattern-items" id="pattern-container">
-                        <div class="pattern-item pattern-big">B</div>
-                        <div class="pattern-item pattern-small">S</div>
-                        <div class="pattern-item pattern-big">B</div>
-                        <div class="pattern-item pattern-big">B</div>
-                        <div class="pattern-item pattern-small">S</div>
-                        <div class="pattern-item pattern-big">B</div>
-                        <div class="pattern-item pattern-small">S</div>
-                        <div class="pattern-item pattern-small">S</div>
-                        <div class="pattern-item pattern-big">B</div>
-                        <div class="pattern-item pattern-big">B</div>
-                    </div>
-                </div>
-                
-                <div class="history-list">
-                    <h3 class="card-title">Game History</h3>
-                    <div id="history-container">
-                        <div class="history-item">
-                            <div class="history-number">2025082610434</div>
-                            <div class="history-small">Number: 4 (Small)</div>
-                        </div>
-                        <div class="history-item">
-                            <div class="history-number">2025082610433</div>
-                            <div class="history-small">Number: 0 (Small)</div>
-                        </div>
-                        <div class="history-item">
-                            <div class="history-number">2025082610432</div>
-                            <div class="history-big">Number: 5 (Big)</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <footer>
-            <p>Production Tool &copy; 2025 - Advanced Calculation Mod</p>
-        </footer>
-    </div>
+  <h1>🎲 Multi-Level Big/Small Predictor</h1>
 
-    <script>
-        // Initialize with some sample data
-        let history = [
-            { period: '2025082610434', number: 4, size: 'small' },
-            { period: '2025082610433', number: 0, size: 'small' },
-            { period: '2025082610432', number: 5, size: 'big' },
-            { period: '2025082610431', number: 9, size: 'big' },
-            { period: '2025082610430', number: 0, size: 'small' },
-            { period: '2025082610429', number: 5, size: 'big' },
-            { period: '2025082610428', number: 9, size: 'big' },
-            { period: '2025082610427', number: 6, size: 'big' },
-            { period: '2025082610426', number: 8, size: 'big' },
-            { period: '2025082610425', number: 6, size: 'big' }
-        ];
-        
-        // Update UI with initial data
-        updateHistoryDisplay();
-        updateStats();
-        
-        function calculate() {
-            const period = document.getElementById('period').value;
-            const number = parseInt(document.getElementById('number').value);
-            const size = document.getElementById('size').value;
-            
-            if (!period || isNaN(number)) {
-                document.getElementById('result').innerHTML = '<p class="error">Please enter valid Period and Number</p>';
-                return;
-            }
-            
-            // Determine if the number matches the selected size
-            let actualSize = (number >= 5) ? 'big' : 'small';
-            let isCorrect = (size === actualSize);
-            
-            // Calculate probability for next result
-            let bigCount = history.filter(item => item.size === 'big').length;
-            let smallCount = history.filter(item => item.size === 'small').length;
-            let total = history.length;
-            
-            let bigProbability = total > 0 ? (bigCount / total * 100).toFixed(2) : 50;
-            let smallProbability = total > 0 ? (smallCount / total * 100).toFixed(2) : 50;
-            
-            // Generate analysis
-            let analysis = '';
-            if (bigProbability > 60) {
-                analysis = 'STRONG probability of NEXT being BIG';
-            } else if (smallProbability > 60) {
-                analysis = 'STRONG probability of NEXT being SMALL';
-            } else {
-                analysis = 'No strong trend detected';
-            }
-            
-            // Display result
-            document.getElementById('result').innerHTML = `
-                <p>Period: <strong>${period}</strong></p>
-                <p>Number: <strong>${number}</strong></p>
-                <p>Selected Size: <strong>${size.toUpperCase()}</strong></p>
-                <p>Actual Size: <strong class="${isCorrect ? 'success' : 'error'}">${actualSize.toUpperCase()}</strong></p>
-                <p>Match: <strong>${isCorrect ? 'YES' : 'NO'}</strong></p>
-                <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1)">
-                    <p>Big Probability: <strong>${bigProbability}%</strong></p>
-                    <p>Small Probability: <strong>${smallProbability}%</strong></p>
-                    <p style="margin-top: 10px; color: var(--highlight)">Analysis: ${analysis}</p>
-                </div>
-            `;
-        }
-        
-        function addToHistory() {
-            const period = document.getElementById('period').value;
-            const number = parseInt(document.getElementById('number').value);
-            const size = document.getElementById('size').value;
-            
-            if (!period || isNaN(number)) {
-                alert('Please enter valid Period and Number');
-                return;
-            }
-            
-            // Add to history
-            history.unshift({ period, number, size });
-            
-            // Keep only last 50 records
-            if (history.length > 50) {
-                history = history.slice(0, 50);
-            }
-            
-            // Update displays
-            updateHistoryDisplay();
-            updateStats();
-            
-            alert('Added to history successfully!');
-        }
-        
-        function clearInputs() {
-            document.getElementById('period').value = '';
-            document.getElementById('number').value = '';
-            document.getElementById('size').selectedIndex = 0;
-            document.getElementById('result').innerHTML = '<p>Enter data and click Calculate to see results</p>';
-        }
-        
-        function analyzePatterns() {
-            // Count occurrences
-            let bigCount = history.filter(item => item.size === 'big').length;
-            let smallCount = history.filter(item => item.size === 'small').length;
-            let total = history.length;
-            
-            // Calculate percentages
-            let bigPercent = total > 0 ? (bigCount / total * 100).toFixed(2) : 0;
-            let smallPercent = total > 0 ? (smallCount / total * 100).toFixed(2) : 0;
-            
-            // Get last 10 results
-            let lastTen = history.slice(0, 10);
-            let lastTenBig = lastTen.filter(item => item.size === 'big').length;
-            let lastTenSmall = lastTen.filter(item => item.size === 'small').length;
-            
-            // Determine trends
-            let bigTrend = lastTenBig >= 6 ? 'UPWARD' : (lastTenBig <= 4 ? 'DOWNWARD' : 'NEUTRAL');
-            let smallTrend = lastTenSmall >= 6 ? 'UPWARD' : (lastTenSmall <= 4 ? 'DOWNWARD' : 'NEUTRAL');
-            
-            // Update stats
-            document.getElementById('big-count').textContent = bigCount;
-            document.getElementById('small-count').textContent = smallCount;
-            document.getElementById('big-percent').textContent = bigPercent + '%';
-            document.getElementById('small-percent').textContent = smallPercent + '%';
-            document.getElementById('last-big').textContent = lastTenBig;
-            document.getElementById('last-small').textContent = lastTenSmall;
-            document.getElementById('big-trend').textContent = bigTrend;
-            document.getElementById('small-trend').textContent = smallTrend;
-            
-            // Update pattern display
-            let patternHtml = '';
-            lastTen.forEach(item => {
-                patternHtml += `<div class="pattern-item ${item.size === 'big' ? 'pattern-big' : 'pattern-small'}">${item.size === 'big' ? 'B' : 'S'}</div>`;
-            });
-            document.getElementById('pattern-container').innerHTML = patternHtml;
-            
-            // Show analysis in result area
-            document.getElementById('result').innerHTML = `
-                <p><strong>Pattern Analysis Complete</strong></p>
-                <p>Based on ${total} historical records:</p>
-                <p>Big occurrences: ${bigCount} (${bigPercent}%)</p>
-                <p>Small occurrences: ${smallCount} (${smallPercent}%)</p>
-                <p>Last 10 results: ${lastTenBig} Big, ${lastTenSmall} Small</p>
-                <p style="margin-top: 15px; color: var(--highlight)">Big trend: ${bigTrend}</p>
-                <p style="color: var(--highlight)">Small trend: ${smallTrend}</p>
-            `;
-        }
-        
-        function updateHistoryDisplay() {
-            let historyHtml = '';
-            history.slice(0, 10).forEach(item => {
-                historyHtml += `
-                    <div class="history-item">
-                        <div class="history-number">${item.period}</div>
-                        <div class="${item.size === 'big' ? 'history-big' : 'history-small'}">Number: ${item.number} (${item.size.charAt(0).toUpperCase() + item.size.slice(1)})</div>
-                    </div>
-                `;
-            });
-            document.getElementById('history-container').innerHTML = historyHtml;
-        }
-        
-        function updateStats() {
-            let bigCount = history.filter(item => item.size === 'big').length;
-            let smallCount = history.filter(item => item.size === 'small').length;
-            let total = history.length;
-            
-            let bigPercent = total > 0 ? (bigCount / total * 100).toFixed(2) : 0;
-            let smallPercent = total > 0 ? (smallCount / total * 100).toFixed(2) : 0;
-            
-            document.getElementById('big-count').textContent = bigCount;
-            document.getElementById('small-count').textContent = smallCount;
-            document.getElementById('big-percent').textContent = bigPercent + '%';
-            document.getElementById('small-percent').textContent = smallPercent + '%';
-        }
-    </script>
+  <div>
+    <button class="btn big-btn" onclick="addResult('Big')">Add Big</button>
+    <button class="btn small-btn" onclick="addResult('Small')">Add Small</button>
+    <button class="btn clear-btn" onclick="clearHistory()">Clear</button>
+  </div>
+
+  <div class="history">
+    <h3>History</h3>
+    <p id="historyList">No results yet...</p>
+  </div>
+
+  <div class="card" id="prediction1"></div>
+  <div class="card" id="prediction2"></div>
+  <div class="card" id="prediction3"></div>
+
+  <script>
+    let history = [];
+
+    function addResult(result) {
+      history.unshift(result); // latest on top
+      if (history.length > 20) history.pop(); // keep last 20
+      updateHistory();
+      makePrediction();
+    }
+
+    function clearHistory() {
+      history = [];
+      document.getElementById("historyList").innerHTML = "No results yet...";
+      document.getElementById("prediction1").innerHTML = "";
+      document.getElementById("prediction2").innerHTML = "";
+      document.getElementById("prediction3").innerHTML = "";
+    }
+
+    function updateHistory() {
+      document.getElementById("historyList").innerHTML = history.join(" , ");
+    }
+
+    function makePrediction() {
+      if (history.length < 3) {
+        document.getElementById("prediction1").innerHTML = "Add more results to see predictions.";
+        document.getElementById("prediction2").innerHTML = "";
+        document.getElementById("prediction3").innerHTML = "";
+        return;
+      }
+
+      // Level 1: Frequency Method
+      let bigCount = history.filter(r => r === "Big").length;
+      let smallCount = history.filter(r => r === "Small").length;
+      let freqPrediction = bigCount > smallCount ? "Big" : "Small";
+      document.getElementById("prediction1").innerHTML = 
+        `<h3>Level 1 (Frequency)</h3> Prediction: <span class="${freqPrediction.toLowerCase()}">${freqPrediction}</span>`;
+
+      // Level 2: Streak Breaker
+      let streakPrediction = history[0]; // current streak start
+      let streakLength = 1;
+      for (let i = 1; i < history.length; i++) {
+        if (history[i] === history[0]) streakLength++;
+        else break;
+      }
+      let opp = (streakPrediction === "Big") ? "Small" : "Big";
+      let streakPredict = streakLength >= 3 ? opp : streakPrediction;
+      document.getElementById("prediction2").innerHTML = 
+        `<h3>Level 2 (Streak Breaker)</h3> Prediction: <span class="${streakPredict.toLowerCase()}">${streakPredict}</span>`;
+
+      // Level 3: Weighted Mix
+      let weighted = (bigCount - smallCount) + (streakPredict === "Big" ? 1 : -1);
+      let finalPredict = weighted >= 0 ? "Big" : "Small";
+      let confidence = Math.min(100, Math.abs(weighted) * 15 + 50);
+      document.getElementById("prediction3").innerHTML = 
+        `<h3>Level 3 (Weighted Mix)</h3> Prediction: <span class="${finalPredict.toLowerCase()}">${finalPredict}</span> <br>Confidence: ${confidence.toFixed(0)}%`;
+    }
+  </script>
 </body>
 </html>
