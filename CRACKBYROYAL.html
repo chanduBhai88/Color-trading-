@@ -2,202 +2,148 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>RAJA THE BOSS Predictor</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🔥 RajaGame Predictor (Dual Mode)</title>
   <style>
     body {
       margin: 0;
       font-family: 'Segoe UI', sans-serif;
-      background: url('https://images.unsplash.com/photo-1604014237800-1b7c5d2af5e4?auto=format&fit=crop&w=1920&q=80') no-repeat center center fixed;
-      background-size: cover;
-      color: #fff;
+      background: url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e')
+        no-repeat center center/cover;
+      height: 100vh;
       display: flex;
-      flex-direction: column;
+      justify-content: center;
       align-items: center;
-      padding: 30px;
+      color: white;
     }
-
-    h1 {
-      text-shadow: 2px 2px 4px #000;
-    }
-
     .container {
-      background: rgba(0, 0, 0, 0.6);
+      background: rgba(0,0,0,0.7);
       padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 0 10px #000;
-      width: 90%;
-      max-width: 600px;
+      border-radius: 20px;
+      text-align: center;
+      box-shadow: 0 0 20px rgba(255,255,255,0.3);
+      width: 350px;
     }
-
+    h2 {
+      margin-bottom: 15px;
+      color: #ffcc00;
+    }
     .inputs {
       display: flex;
-      justify-content: space-between;
-      margin-bottom: 15px;
-      gap: 10px;
       flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      margin-bottom: 15px;
     }
-
-    .input-group {
-      flex: 1;
-      min-width: 100px;
-    }
-
-    label {
-      font-weight: bold;
-    }
-
-    select, input {
-      width: 100%;
+    input {
       padding: 8px;
+      border-radius: 8px;
       border: none;
-      border-radius: 6px;
-      margin-top: 5px;
-      font-size: 16px;
+      width: 100px;
+      text-align: center;
     }
-
     button {
-      padding: 10px 20px;
-      margin-top: 10px;
-      font-size: 16px;
+      padding: 10px 15px;
       border: none;
-      border-radius: 6px;
+      border-radius: 10px;
+      margin: 5px;
+      background: linear-gradient(45deg, #ff5722, #ff9800);
+      color: white;
+      font-weight: bold;
       cursor: pointer;
-      margin-right: 10px;
       transition: 0.3s;
     }
-
     button:hover {
       transform: scale(1.05);
     }
-
-    #addBtn {
-      background: #28a745;
-      color: white;
-    }
-
-    #clearBtn {
-      background: #dc3545;
-      color: white;
-    }
-
-    .results {
-      margin-top: 20px;
-      max-height: 300px;
-      overflow-y: auto;
-    }
-
     .result {
-      background: #17a2b8;
-      padding: 10px;
-      margin-bottom: 10px;
-      border-radius: 6px;
-      animation: slideDown 0.5s ease forwards;
-    }
-
-    @keyframes slideDown {
-      from {
-        opacity: 0;
-        transform: translateY(-20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 15px;
+      font-size: 18px;
+      font-weight: bold;
+      background: linear-gradient(45deg, #4caf50, #8bc34a);
     }
   </style>
 </head>
 <body>
-
-  <h1>RAJA THE BOSS 🔮 Predictor</h1>
-
   <div class="container">
-    <div class="inputs" id="inputsContainer">
-      <!-- Input groups will be injected here -->
+    <h2>🔥 RajaGame Predictor</h2>
+    <div class="inputs">
+      <input type="text" id="in1" placeholder="e.g. 7-small">
+      <input type="text" id="in2" placeholder="e.g. 6-small">
+      <input type="text" id="in3" placeholder="e.g. 5-small">
     </div>
-
-    <button id="addBtn">Add Result</button>
-    <button id="clearBtn">Clear</button>
-
-    <div class="results" id="results"></div>
+    <div>
+      <button onclick="historyMode()">History Match</button>
+      <button onclick="calcMode()">Calculation Mode</button>
+    </div>
+    <div id="result" class="result">⚡ Result will appear here</div>
   </div>
 
   <script>
-    const inputsContainer = document.getElementById('inputsContainer');
-    const resultsDiv = document.getElementById('results');
-    const addBtn = document.getElementById('addBtn');
-    const clearBtn = document.getElementById('clearBtn');
+    // Sample history (aap apna full list yahan add kar dena)
+    const historyData = [
+      "1-small","0-Big","9-Big","8-Big","7-small",
+      "6-small","5-small","4-Big","3-small","2-small",
+      "1-small","0-small","9-Big","8-small","7-Big"
+    ];
 
-    let dataLog = [];
+    // History Match Mode
+    function historyMode() {
+      let inputs = [
+        document.getElementById("in1").value.trim(),
+        document.getElementById("in2").value.trim(),
+        document.getElementById("in3").value.trim()
+      ];
+      let prediction = null;
 
-    // Create 3 input groups
-    function createInputs() {
-      for (let i = 0; i < 3; i++) {
-        const group = document.createElement('div');
-        group.classList.add('input-group');
-
-        group.innerHTML = `
-          <label>Number ${i + 1}</label>
-          <input type="number" min="0" max="9" id="num${i}" placeholder="Enter number" required>
-          <select id="type${i}">
-            <option value="BIG">BIG</option>
-            <option value="SMALL">SMALL</option>
-          </select>
-        `;
-
-        inputsContainer.appendChild(group);
+      for (let i = 0; i < historyData.length - inputs.length; i++) {
+        let slice = historyData.slice(i, i + inputs.length);
+        if (JSON.stringify(slice) === JSON.stringify(inputs)) {
+          prediction = historyData[i + inputs.length];
+          break;
+        }
       }
+      document.getElementById("result").innerText = prediction 
+        ? "🎯 History Prediction: " + prediction 
+        : "⚠️ No Match Found!";
     }
 
-    createInputs();
+    // Calculation Mode
+    function calcMode() {
+      let nums = [];
+      let inputs = [
+        document.getElementById("in1").value.trim(),
+        document.getElementById("in2").value.trim(),
+        document.getElementById("in3").value.trim()
+      ];
 
-    // Handle Add Result
-    addBtn.addEventListener('click', () => {
-      const nums = [];
-      const types = [];
-
-      for (let i = 0; i < 3; i++) {
-        const num = document.getElementById(`num${i}`).value;
-        const type = document.getElementById(`type${i}`).value;
-
-        if (num === '' || isNaN(num) || num < 0 || num > 9) {
-          alert('Please enter valid numbers between 0-9.');
-          return;
-        }
-
-        nums.push(parseInt(num));
-        types.push(type);
-      }
-
-      // Store the input in log
-      dataLog.push({
-        numbers: nums,
-        types: types
+      inputs.forEach(item => {
+        let num = parseInt(item.split("-")[0]);
+        if (!isNaN(num)) nums.push(num);
       });
 
-      // For this demo, next result is random, you can modify logic
-      const nextNumber = Math.floor(Math.random() * 10);
-      const nextType = nextNumber >= 5 ? 'BIG' : 'SMALL';
-
-      const resultDiv = document.createElement('div');
-      resultDiv.classList.add('result');
-      resultDiv.innerHTML = `<strong>Next Result:</strong> ${nextNumber} <strong>${nextType}</strong>`;
-
-      // Prepend result
-      resultsDiv.prepend(resultDiv);
-
-      // Clear inputs
-      for (let i = 0; i < 3; i++) {
-        document.getElementById(`num${i}`).value = '';
-        document.getElementById(`type${i}`).value = 'BIG';
+      if (nums.length < 3) {
+        document.getElementById("result").innerText = "⚠️ Please enter 3 valid inputs!";
+        return;
       }
-    });
 
-    // Clear all
-    clearBtn.addEventListener('click', () => {
-      resultsDiv.innerHTML = '';
-      dataLog = [];
-    });
+      // Trend check (last 10)
+      let last10 = historyData.slice(-10);
+      let bigCount = last10.filter(r => r.includes("Big")).length;
+      let smallCount = last10.length - bigCount;
+      let trend = bigCount > smallCount ? "Big" : "Small";
+
+      // Calculation (sum mod 10)
+      let sum = nums.reduce((a,b)=>a+b,0);
+      let nextNum = sum % 10;
+      let size = nextNum >= 6 ? "Big" : "Small";
+      let calc = `${nextNum}-${size}`;
+
+      document.getElementById("result").innerText =
+        "📊 Trend says: " + trend + "\n🧮 Calc says: " + calc;
+    }
   </script>
-
 </body>
 </html>
