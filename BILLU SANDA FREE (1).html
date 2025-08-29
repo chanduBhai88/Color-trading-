@@ -1,494 +1,193 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RAJA LUCK Game Analyzer</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        
-        body {
-            background: linear-gradient(135deg, #1a1a2e, #16213e);
-            color: #fff;
-            min-height: 100vh;
-            padding: 20px;
-        }
-        
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-        
-        header {
-            text-align: center;
-            margin-bottom: 30px;
-            padding: 20px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 15px;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
-        }
-        
-        h1 {
-            font-size: 2.5rem;
-            color: #ffce5c;
-            text-shadow: 0 0 10px rgba(255, 206, 92, 0.5);
-            margin-bottom: 10px;
-        }
-        
-        .subtitle {
-            color: #a9e4f9;
-            font-size: 1.2rem;
-        }
-        
-        .main-content {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-        
-        .input-section {
-            flex: 1;
-            min-width: 300px;
-            background: rgba(255, 255, 255, 0.05);
-            padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
-        }
-        
-        .result-section {
-            flex: 2;
-            min-width: 300px;
-            background: rgba(255, 255, 255, 0.05);
-            padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .section-title {
-            font-size: 1.5rem;
-            color: #ffce5c;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid rgba(255, 206, 92, 0.3);
-        }
-        
-        .input-group {
-            margin-bottom: 15px;
-        }
-        
-        label {
-            display: block;
-            margin-bottom: 8px;
-            color: #a9e4f9;
-        }
-        
-        input, select {
-            width: 100%;
-            padding: 12px;
-            border-radius: 8px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            background: rgba(0, 0, 0, 0.2);
-            color: white;
-            font-size: 1rem;
-        }
-        
-        .bet-options {
-            display: flex;
-            gap: 10px;
-            margin-top: 20px;
-        }
-        
-        .bet-btn {
-            flex: 1;
-            padding: 12px;
-            border: none;
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        .big-btn {
-            background: linear-gradient(to right, #ff416c, #ff4b2b);
-            color: white;
-        }
-        
-        .small-btn {
-            background: linear-gradient(to right, #1e9bff, #0971f1);
-            color: white;
-        }
-        
-        .action-buttons {
-            display: flex;
-            gap: 10px;
-            margin-top: 20px;
-        }
-        
-        .action-btn {
-            flex: 1;
-            padding: 15px;
-            border: none;
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        .analyze-btn {
-            background: linear-gradient(to right, #00b09b, #96c93d);
-            color: white;
-        }
-        
-        .clear-btn {
-            background: linear-gradient(to right, #8e2de2, #4a00e0);
-            color: white;
-        }
-        
-        .result-display {
-            flex: 1;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 5rem;
-            font-weight: bold;
-            position: relative;
-            overflow: hidden;
-            min-height: 200px;
-            border-radius: 10px;
-            background: rgba(0, 0, 0, 0.2);
-        }
-        
-        .result-text {
-            z-index: 2;
-            text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
-        }
-        
-        .history-section {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
-            margin-bottom: 30px;
-        }
-        
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 15px;
-        }
-        
-        th, td {
-            padding: 12px 15px;
-            text-align: center;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        th {
-            background: rgba(0, 0, 0, 0.2);
-            color: #ffce5c;
-        }
-        
-        tr:hover {
-            background: rgba(255, 255, 255, 0.03);
-        }
-        
-        .win {
-            color: #7fff00;
-        }
-        
-        .lose {
-            color: #ff4b2b;
-        }
-        
-        .animation-circle {
-            position: absolute;
-            border-radius: 50%;
-            opacity: 0;
-            animation: pulse 2s infinite;
-        }
-        
-        @keyframes pulse {
-            0% {
-                transform: scale(0.5);
-                opacity: 0.8;
-            }
-            100% {
-                transform: scale(3);
-                opacity: 0;
-            }
-        }
-        
-        @keyframes resultAnimation {
-            0% {
-                transform: scale(0);
-                opacity: 0;
-            }
-            50% {
-                transform: scale(1.2);
-                opacity: 1;
-            }
-            100% {
-                transform: scale(1);
-                opacity: 1;
-            }
-        }
-        
-        .animate-result {
-            animation: resultAnimation 1s ease-out;
-        }
-        
-        footer {
-            text-align: center;
-            padding: 20px;
-            color: #a9e4f9;
-            font-size: 0.9rem;
-        }
-        
-        @media (max-width: 768px) {
-            .main-content {
-                flex-direction: column;
-            }
-            
-            h1 {
-                font-size: 2rem;
-            }
-            
-            .result-display {
-                font-size: 3rem;
-                min-height: 150px;
-            }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>🔥 Big Small Predictor 🔥</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      color: white;
+      text-align: center;
+      padding: 20px;
+    }
+    h1 {
+      margin-bottom: 20px;
+      color: #ffcc00;
+    }
+    .inputs {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    input, select {
+      padding: 10px;
+      border-radius: 8px;
+      border: none;
+      font-size: 16px;
+      width: 80px;
+      text-align: center;
+    }
+    button {
+      padding: 12px 20px;
+      margin: 10px;
+      border: none;
+      border-radius: 10px;
+      background: #ffcc00;
+      color: #000;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 16px;
+      transition: transform 0.2s;
+    }
+    button:hover {
+      transform: scale(1.1);
+      background: #ff9900;
+    }
+    #result {
+      margin: 20px 0;
+      font-size: 22px;
+      font-weight: bold;
+      min-height: 40px;
+    }
+    .flash {
+      animation: flash 0.8s ease-in-out;
+    }
+    @keyframes flash {
+      0% { color: white; transform: scale(1); }
+      50% { color: lime; transform: scale(1.5); }
+      100% { color: white; transform: scale(1); }
+    }
+    .history {
+      margin-top: 20px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 10px;
+      padding: 10px;
+      max-width: 400px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .history h3 {
+      margin: 5px 0;
+      color: #00ffff;
+    }
+    .history-item {
+      padding: 5px;
+      border-bottom: 1px solid rgba(255,255,255,0.3);
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>RAJA LUCK</h1>
-            <p class="subtitle">Game Analyzer & Prediction System</p>
-        </header>
-        
-        <div class="main-content">
-            <div class="input-section">
-                <h2 class="section-title">Input Details</h2>
-                
-                <div class="input-group">
-                    <label for="period">Period Number (Last 2 Digits)</label>
-                    <input type="text" id="period" placeholder="Enter last 2 digits of period">
-                </div>
-                
-                <div class="input-group">
-                    <label for="number">Number (0-9)</label>
-                    <input type="number" id="number" min="0" max="9" placeholder="Enter number (0-9)">
-                </div>
-                
-                <div class="input-group">
-                    <label for="size">Size</label>
-                    <select id="size">
-                        <option value="">Select Size</option>
-                        <option value="Big">Big</option>
-                        <option value="Small">Small</option>
-                    </select>
-                </div>
-                
-                <div class="bet-options">
-                    <button class="bet-btn big-btn" onclick="setSize('Big')">BIG</button>
-                    <button class="bet-btn small-btn" onclick="setSize('Small')">SMALL</button>
-                </div>
-                
-                <div class="action-buttons">
-                    <button class="action-btn analyze-btn" onclick="analyze()">ANALYZE</button>
-                    <button class="action-btn clear-btn" onclick="clearInputs()">CLEAR</button>
-                </div>
-            </div>
-            
-            <div class="result-section">
-                <h2 class="section-title">Analysis Result</h2>
-                <div class="result-display">
-                    <div class="result-text" id="result">-</div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="history-section">
-            <h2 class="section-title">Game History</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Period</th>
-                        <th>Number</th>
-                        <th>Size</th>
-                        <th>Color</th>
-                        <th>Result</th>
-                    </tr>
-                </thead>
-                <tbody id="history-body">
-                    <!-- History will be populated here -->
-                </tbody>
-            </table>
-        </div>
-        
-        <footer>
-            <p>RAJA LUCK Game Analyzer | For entertainment purposes only</p>
-        </footer>
-    </div>
+  <h1>🔥 Big Small Predictor 🔥</h1>
+  
+  <div class="inputs">
+    <input type="number" id="num1" placeholder="Num1">
+    <input type="number" id="num2" placeholder="Num2">
+    <input type="number" id="num3" placeholder="Num3">
+    <select id="bs1">
+      <option value="">B/S</option>
+      <option value="Big">Big</option>
+      <option value="small">Small</option>
+    </select>
+    <select id="bs2">
+      <option value="">B/S</option>
+      <option value="Big">Big</option>
+      <option value="small">Small</option>
+    </select>
+    <select id="bs3">
+      <option value="">B/S</option>
+      <option value="Big">Big</option>
+      <option value="small">Small</option>
+    </select>
+  </div>
+  
+  <button onclick="checkResult()">Result</button>
+  <button onclick="clearInputs()">Clear</button>
+  
+  <div id="result"></div>
+  
+  <div class="history">
+    <h3>📝 Last 10 Results</h3>
+    <div id="history-list"></div>
+  </div>
 
-    <script>
-        // Sample game history data
-        const gameHistory = [
-            { period: "2025082611221", number: 4, size: "Small", color: "●" },
-            { period: "2025082611220", number: 7, size: "Big", color: "●" },
-            { period: "2025082611219", number: 1, size: "Small", color: "●" },
-            { period: "2025082611218", number: 5, size: "Big", color: "●" },
-            { period: "2025082611217", number: 2, size: "Small", color: "●" },
-            { period: "2025082611216", number: 9, size: "Big", color: "●" },
-            { period: "2025082611215", number: 7, size: "Big", color: "●" },
-            { period: "2025082611214", number: 3, size: "Small", color: "●" },
-            { period: "2025082611213", number: 3, size: "Small", color: "●" },
-            { period: "2025082611212", number: 2, size: "Small", color: "●" }
-        ];
-        
-        // Populate history table
-        const historyBody = document.getElementById('history-body');
-        gameHistory.forEach(game => {
-            const row = document.createElement('tr');
-            
-            // Extract last 2 digits of period
-            const periodShort = game.period.slice(-2);
-            
-            row.innerHTML = `
-                <td>${periodShort}</td>
-                <td>${game.number}</td>
-                <td>${game.size}</td>
-                <td>${game.color}</td>
-                <td class="${game.size === 'Big' ? 'win' : 'lose'}">${game.size}</td>
-            `;
-            
-            historyBody.appendChild(row);
-        });
-        
-        // Set size based on button click
-        function setSize(size) {
-            document.getElementById('size').value = size;
-        }
-        
-        // Clear all input fields
-        function clearInputs() {
-            document.getElementById('period').value = '';
-            document.getElementById('number').value = '';
-            document.getElementById('size').value = '';
-            document.getElementById('result').textContent = '-';
-            document.getElementById('result').className = 'result-text';
-        }
-        
-        // Analyze the input
-        function analyze() {
-            const period = document.getElementById('period').value;
-            const number = document.getElementById('number').value;
-            const size = document.getElementById('size').value;
-            
-            // Input validation
-            if (!period || !number || !size) {
-                alert('Please fill all fields');
-                return;
-            }
-            
-            if (period.length !== 2 || isNaN(period)) {
-                alert('Please enter exactly 2 digits for period');
-                return;
-            }
-            
-            if (number < 0 || number > 9) {
-                alert('Please enter a number between 0 and 9');
-                return;
-            }
-            
-            // Create animation circles
-            createAnimation();
-            
-            // Simulate analysis delay
-            setTimeout(() => {
-                // Determine result based on some logic
-                // For demo purposes, we'll use a simple algorithm
-                let result;
-                if (size === "Big") {
-                    result = (number > 4 && number < 10) ? "WIN" : "LOSE";
-                } else {
-                    result = (number >= 0 && number < 5) ? "WIN" : "LOSE";
-                }
-                
-                // Display result with animation
-                const resultElement = document.getElementById('result');
-                resultElement.textContent = result;
-                resultElement.classList.add('animate-result');
-                
-                // Add to history
-                addToHistory(period, number, size, result);
-                
-                // Remove animation class after animation completes
-                setTimeout(() => {
-                    resultElement.classList.remove('animate-result');
-                }, 1000);
-                
-            }, 2000);
-        }
-        
-        // Create pulse animation circles
-        function createAnimation() {
-            const resultDisplay = document.querySelector('.result-display');
-            
-            // Remove any existing circles
-            const existingCircles = document.querySelectorAll('.animation-circle');
-            existingCircles.forEach(circle => circle.remove());
-            
-            // Create new circles with different colors and sizes
-            const colors = ['#ffce5c', '#1e9bff', '#ff416c', '#00b09b'];
-            
-            for (let i = 0; i < 12; i++) {
-                const circle = document.createElement('div');
-                circle.className = 'animation-circle';
-                
-                // Random properties
-                const size = Math.random() * 100 + 20;
-                const color = colors[Math.floor(Math.random() * colors.length)];
-                
-                circle.style.width = `${size}px`;
-                circle.style.height = `${size}px`;
-                circle.style.background = color;
-                circle.style.top = `${Math.random() * 100}%`;
-                circle.style.left = `${Math.random() * 100}%`;
-                circle.style.animationDelay = `${i * 0.2}s`;
-                
-                resultDisplay.appendChild(circle);
-            }
-        }
-        
-        // Add current result to history
-        function addToHistory(period, number, size, result) {
-            const row = document.createElement('tr');
-            
-            row.innerHTML = `
-                <td>${period}</td>
-                <td>${number}</td>
-                <td>${size}</td>
-                <td>●</td>
-                <td class="${result === 'WIN' ? 'win' : 'lose'}">${result}</td>
-            `;
-            
-            historyBody.insertBefore(row, historyBody.firstChild);
-            
-            // Keep only 10 rows in history
-            if (historyBody.children.length > 10) {
-                historyBody.removeChild(historyBody.lastChild);
-            }
-        }
-    </script>
+<script>
+const data = `
+81-small 80-Big 79-Big 78-Big 77-small 76-small 75-small 74-Big 73-small 72-small
+91-small 90-small 89-small 88-small 87-Big 86-Big 85-Big 84-Big 83-Big 82-Big
+01-Big 00-Big 99-small 98-small 97-Big 96-small 95-Big 94-small 93-Big 92-small
+11-Big 10-Big 09-Big 08-Big 07-small 06-Big 05-small 04-small 03-Big 02-Big
+21-small 20-small 19-Big 18-Big 17-small 16-small 15-small 14-small 13-Big 12-small
+31-small 30-small 29-small 28-Big 27-small 26-Big 25-small 24-Big 23-small 22-small
+41-small 40-Big 39-small 38-small 37-small 36-Big 35-Big 34-small 33-small 32-Big
+50-small 49-Big 48-small 47-Big 46-Big 45-small 44-Big 43-Big 42-Big 41-small
+60-small 59-small 58-small 57-Big 56-small 55-Big 54-Big 53-Big 52-Big 51-small
+99-Big 98-small 97-Big 96-Big 95-Big 94-Big 93-small 92-small 91-Big 90-small
+99-Big 98-small 97-Big 96-Big 95-Big 94-Big 93-small 92-small 91-Big 90-small
+29-Big 28-Big 27-Big 26-small 25-Big 24-Big 23-small 22-Big 21-small 20-small
+38-Big 37-Big 36-small 35-Big 34-small 33-Big 32-Big 31-small 30-Big 29-Big
+48-small 47-Big 46-small 45-Big 44-Big 43-small 42-Big 41-Big 40-Big 39-small
+58-small 57-Big 56-Big 55-Big 54-Big 53-small 52-Big 51-Big 50-Big 49-small
+68-Big 67-small 66-small 65-small 64-Big 63-Big 62-Big 61-Big 60-Big 59-small
+73-small 72-Big 71-Big 70-Big 69-Big 68-Big 67-Big 66-Big 65-small 64-small
+21-small 20-Big 19-small 18-Big 17-small 16-Big 15-Big 14-small 13-small 12-small
+11-Big 10-Big 09-small 08-Big 07-Big 06-small 05-small 04-small 03-small 02-small
+91-Big 90-Big 89-small 88-Big 87-Big 86-Big 85-Big 84-small 83-small 82-small
+81-small 80-Big 79-small 78-small 77-small 76-Big 75-Big 74-Big 73-small 72-Big
+71-Big 70-Big 69-Big 68-small 67-Big 66-small 65-Big 64-Big 63-Big 62-small
+61-small 60-Big 59-small 58-Big 57-small 56-Big 55-Big 54-Big 53-small 52-small
+51-small 50-small 49-small 48-Big 47-Big 46-Big 45-Big 44-small 43-small 42-small
+41-small 40-small 39-Big 38-small 37-Big 36-small 35-Big 34-small 33-small 32-small
+31-small 30-small 29-Big 28-Big 27-Big 26-small 25-Big 24-Big 23-small 22-Big
+21-small 20-small 11-small 10-small 09-small 08-Big 07-Big 06-small 05-Big 04-small
+03-Big 02-Big 01-small 00-small 99-Big 98-small 97-Big 96-Big 95-Big 94-Big
+93-small 92-small 91-Big 90-small 21-small 20-Big 19-small 18-Big 17-small 16-Big
+15-Big 14-small 13-small 12-small 04-small 03-small 02-small 01-small 00-Big
+99-small 98-Big 97-small 96-small 95-small 44-Big 43-Big 42-small 41-small 40-Big
+39-small 38-small 37-Big 36-Big 35-small 63-Big 62-Big 61-small 60-small 59-Big
+58-Big 57-small 56-small 55-Big 54-small
+`;
+
+let history = [];
+
+function checkResult(){
+  let n1 = document.getElementById('num1').value;
+  let n2 = document.getElementById('num2').value;
+  let n3 = document.getElementById('num3').value;
+  let b1 = document.getElementById('bs1').value;
+  let b2 = document.getElementById('bs2').value;
+  let b3 = document.getElementById('bs3').value;
+
+  let searchPattern = `${n1}-${b1} ${n2}-${b2} ${n3}-${b3}`;
+  
+  let resultBox = document.getElementById('result');
+  if(data.includes(searchPattern)){
+    resultBox.innerHTML = "✅ Match Found: " + searchPattern;
+    resultBox.classList.add("flash");
+    setTimeout(()=> resultBox.classList.remove("flash"), 1000);
+    addToHistory(searchPattern);
+  } else {
+    resultBox.innerHTML = "❌ Match Nahin Ho Raha Hai!";
+  }
+}
+
+function addToHistory(item){
+  history.unshift(item);
+  if(history.length > 10) history.pop();
+  document.getElementById('history-list').innerHTML = history.map(h => `<div class="history-item">${h}</div>`).join('');
+}
+
+function clearInputs(){
+  document.getElementById('num1').value = "";
+  document.getElementById('num2').value = "";
+  document.getElementById('num3').value = "";
+  document.getElementById('bs1').value = "";
+  document.getElementById('bs2').value = "";
+  document.getElementById('bs3').value = "";
+  document.getElementById('result').innerHTML = "";
+}
+</script>
 </body>
 </html>
