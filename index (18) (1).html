@@ -3,147 +3,92 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>❤️ RajaGame Predictor</title>
+  <title>Big/Small Predictor</title>
   <style>
     body {
-      margin: 0;
-      font-family: "Courier New", monospace;
-      background: radial-gradient(circle at center, #0f2027, #203a43, #2c5364);
-      color: #fff;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #1a1a2e, #16213e);
+      color: white;
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: start;
-      min-height: 100vh;
-      padding: 20px;
+      justify-content: center;
+      height: 100vh;
     }
-
-    h1 {
-      text-align: center;
-      font-size: 2rem;
-      margin-bottom: 20px;
-      text-shadow: 0 0 20px #ff0055, 0 0 30px #ff0055;
-    }
-
     .container {
-      background: rgba(0, 0, 0, 0.7);
-      border: 2px solid #ff0055;
-      border-radius: 15px;
+      background: #0f3460;
       padding: 20px;
-      box-shadow: 0 0 25px #00ffea;
-      width: 90%;
-      max-width: 400px;
+      border-radius: 15px;
+      box-shadow: 0px 0px 15px rgba(0,0,0,0.5);
       text-align: center;
+      width: 400px;
     }
-
-    textarea {
-      width: 100%;
-      height: 80px;
-      font-size: 1rem;
+    select, button {
+      margin: 5px;
       padding: 10px;
-      border-radius: 8px;
-      border: none;
-      outline: none;
-      background: #111;
-      color: #00ffea;
-      resize: none;
-    }
-
-    button {
-      background: linear-gradient(45deg, #ff0055, #00ffea);
-      border: none;
-      padding: 12px 20px;
-      margin-top: 15px;
       border-radius: 10px;
-      font-size: 1.1rem;
-      font-weight: bold;
+      border: none;
+      font-size: 16px;
+    }
+    button {
+      background: #e94560;
+      color: white;
       cursor: pointer;
-      color: #fff;
-      box-shadow: 0 0 15px #00ffea;
-      transition: transform 0.2s;
+      width: 100%;
     }
-
     button:hover {
-      transform: scale(1.1);
+      background: #ff2e63;
     }
-
     .result {
       margin-top: 20px;
-      font-size: 2rem;
+      font-size: 28px;
       font-weight: bold;
-      text-shadow: 0 0 10px #00ffea, 0 0 20px #ff0055;
-      display: none;
-    }
-
-    /* Hacker typing animation */
-    @keyframes hacker {
-      0% { opacity: 0; transform: scale(0.5) rotateX(90deg); }
-      50% { opacity: 1; transform: scale(1.2) rotateX(0deg); }
-      100% { opacity: 1; transform: scale(1) rotateX(0deg); }
-    }
-
-    .animate {
-      display: block !important;
-      animation: hacker 1s ease forwards;
-    }
-
-    .history {
-      margin-top: 20px;
-      padding: 10px;
-      background: rgba(255,255,255,0.05);
-      border-radius: 10px;
-      text-align: left;
-      font-size: 1rem;
-    }
-
-    .history h3 {
-      margin-bottom: 8px;
-      color: #ff0055;
-      text-shadow: 0 0 8px #ff0055;
-    }
-
-    .history p {
-      margin: 4px 0;
-      color: #00ffea;
+      padding: 20px;
+      border-radius: 12px;
+      background: #16213e;
+      border: 2px solid #e94560;
+      color: #ffde59;
+      text-transform: uppercase;
     }
   </style>
 </head>
 <body>
-  <h1>❤️ RajaGame Predictor</h1>
   <div class="container">
-    <textarea id="userInput" placeholder="Enter numbers or Big/Small history here..."></textarea>
-    <button onclick="predict()">🔮 Predict Next</button>
-    <div id="result" class="result"></div>
-    <div class="history">
-      <h3>🧠 Last 10 Predictions:</h3>
-      <div id="historyList"></div>
+    <h2>Big/Small Predictor</h2>
+    <p>Select last 7 results:</p>
+    
+    <div>
+      <select id="r1"><option value="1">Big</option><option value="0">Small</option></select>
+      <select id="r2"><option value="1">Big</option><option value="0">Small</option></select>
+      <select id="r3"><option value="1">Big</option><option value="0">Small</option></select>
+      <select id="r4"><option value="1">Big</option><option value="0">Small</option></select>
+      <select id="r5"><option value="1">Big</option><option value="0">Small</option></select>
+      <select id="r6"><option value="1">Big</option><option value="0">Small</option></select>
+      <select id="r7"><option value="1">Big</option><option value="0">Small</option></select>
     </div>
+
+    <br>
+    <button onclick="predict()">Predict</button>
+
+    <div class="result" id="resultBox">Prediction will appear here</div>
   </div>
 
   <script>
-    let history = [];
-
     function predict() {
-      const input = document.getElementById("userInput").value.trim();
+      let values = [];
+      for (let i = 1; i <= 7; i++) {
+        values.push(parseInt(document.getElementById("r1".replace("1", i)).value));
+      }
 
-      // Fake simple prediction logic (random Big/Small or number)
-      let options = ["BIG", "SMALL", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
-      let prediction = options[Math.floor(Math.random() * options.length)];
+      // Simple logic → count Big vs Small
+      let score = values.reduce((a,b) => a+b, 0);
+      let prediction = score >= 4 ? "Big" : "Small";
 
-      // Show animated result
-      const resultDiv = document.getElementById("result");
-      resultDiv.textContent = "👉 " + prediction;
-      resultDiv.classList.remove("animate");
-      void resultDiv.offsetWidth; // re-trigger animation
-      resultDiv.classList.add("animate");
+      let box = document.getElementById("resultBox");
+      box.innerText = "Predicted: " + prediction;
 
-      // Save in history (max 10)
-      history.unshift(prediction);
-      if (history.length > 10) history.pop();
-
-      // Display history
-      const historyList = document.getElementById("historyList");
-      historyList.innerHTML = history.map((h, i) => `<p>${i+1}. ${h}</p>`).join("");
+      // Color highlight
+      box.style.color = (prediction === "Big") ? "#4caf50" : "#ff5252";
     }
   </script>
 </body>
