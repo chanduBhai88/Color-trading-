@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Multi-Level Big/Small Predictor</title>
+  <title>Perfect Multi-Level Big/Small Predictor</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -15,47 +15,51 @@
     h1 {
       color: #ffcc00;
       margin-bottom: 20px;
+      text-shadow: 0px 0px 8px #ffcc00;
     }
     .btn {
-      padding: 10px 20px;
-      margin: 5px;
+      padding: 12px 20px;
+      margin: 6px;
       border: none;
       cursor: pointer;
       font-weight: bold;
-      border-radius: 8px;
+      border-radius: 10px;
       transition: 0.3s;
+      font-size: 16px;
     }
     .big-btn { background: #ff4444; color: white; }
     .small-btn { background: #448aff; color: white; }
     .clear-btn { background: #777; color: white; }
-    .btn:hover { opacity: 0.8; }
+    .btn:hover { opacity: 0.85; transform: scale(1.05); }
 
     .history {
       margin: 20px auto;
-      max-width: 400px;
+      max-width: 420px;
       background: #1a1a1a;
       padding: 15px;
       border-radius: 10px;
     }
     .card {
       background: #1a1a1a;
-      margin: 10px auto;
+      margin: 12px auto;
       padding: 15px;
-      border-radius: 12px;
-      max-width: 400px;
+      border-radius: 14px;
+      max-width: 420px;
       box-shadow: 0px 0px 15px rgba(255,255,255,0.1);
+      transition: 0.3s;
     }
+    .card:hover { box-shadow: 0px 0px 20px rgba(255,255,255,0.25); }
     .big { color: #ff4444; font-weight: bold; }
     .small { color: #448aff; font-weight: bold; }
   </style>
 </head>
 <body>
-  <h1>🎲 Multi-Level Big/Small Predictor</h1>
+  <h1>🎲 Perfect 5-Level Big/Small Predictor</h1>
 
   <div>
-    <button class="btn big-btn" onclick="addResult('Big')">Add Big</button>
-    <button class="btn small-btn" onclick="addResult('Small')">Add Small</button>
-    <button class="btn clear-btn" onclick="clearHistory()">Clear</button>
+    <button class="btn big-btn" onclick="addResult('Big')">➕ Big</button>
+    <button class="btn small-btn" onclick="addResult('Small')">➕ Small</button>
+    <button class="btn clear-btn" onclick="clearHistory()">🗑 Clear</button>
   </div>
 
   <div class="history">
@@ -66,13 +70,15 @@
   <div class="card" id="prediction1"></div>
   <div class="card" id="prediction2"></div>
   <div class="card" id="prediction3"></div>
+  <div class="card" id="prediction4"></div>
+  <div class="card" id="prediction5"></div>
 
   <script>
     let history = [];
 
     function addResult(result) {
       history.unshift(result); // latest on top
-      if (history.length > 20) history.pop(); // keep last 20
+      if (history.length > 30) history.pop(); // keep last 30
       updateHistory();
       makePrediction();
     }
@@ -80,9 +86,9 @@
     function clearHistory() {
       history = [];
       document.getElementById("historyList").innerHTML = "No results yet...";
-      document.getElementById("prediction1").innerHTML = "";
-      document.getElementById("prediction2").innerHTML = "";
-      document.getElementById("prediction3").innerHTML = "";
+      for (let i = 1; i <= 5; i++) {
+        document.getElementById("prediction" + i).innerHTML = "";
+      }
     }
 
     function updateHistory() {
@@ -91,13 +97,13 @@
 
     function makePrediction() {
       if (history.length < 3) {
-        document.getElementById("prediction1").innerHTML = "Add more results to see predictions.";
-        document.getElementById("prediction2").innerHTML = "";
-        document.getElementById("prediction3").innerHTML = "";
+        for (let i = 1; i <= 5; i++) {
+          document.getElementById("prediction" + i).innerHTML = "Add more results to see predictions.";
+        }
         return;
       }
 
-      // Level 1: Frequency Method
+      // Level 1: Frequency
       let bigCount = history.filter(r => r === "Big").length;
       let smallCount = history.filter(r => r === "Small").length;
       let freqPrediction = bigCount > smallCount ? "Big" : "Small";
@@ -105,7 +111,7 @@
         `<h3>Level 1 (Frequency)</h3> Prediction: <span class="${freqPrediction.toLowerCase()}">${freqPrediction}</span>`;
 
       // Level 2: Streak Breaker
-      let streakPrediction = history[0]; // current streak start
+      let streakPrediction = history[0];
       let streakLength = 1;
       for (let i = 1; i < history.length; i++) {
         if (history[i] === history[0]) streakLength++;
@@ -116,12 +122,35 @@
       document.getElementById("prediction2").innerHTML = 
         `<h3>Level 2 (Streak Breaker)</h3> Prediction: <span class="${streakPredict.toLowerCase()}">${streakPredict}</span>`;
 
-      // Level 3: Weighted Mix
-      let weighted = (bigCount - smallCount) + (streakPredict === "Big" ? 1 : -1);
-      let finalPredict = weighted >= 0 ? "Big" : "Small";
-      let confidence = Math.min(100, Math.abs(weighted) * 15 + 50);
+      // Level 3: Pattern Detector (last 4 results repeat or opposite)
+      let patternPredict = history[1];
+      if (history.length >= 4) {
+        let last4 = history.slice(0, 4).reverse().join("-");
+        if (last4 === "Big-Small-Big-Small" || last4 === "Small-Big-Small-Big") {
+          patternPredict = history[0] === "Big" ? "Small" : "Big"; // break alternate
+        }
+      }
       document.getElementById("prediction3").innerHTML = 
-        `<h3>Level 3 (Weighted Mix)</h3> Prediction: <span class="${finalPredict.toLowerCase()}">${finalPredict}</span> <br>Confidence: ${confidence.toFixed(0)}%`;
+        `<h3>Level 3 (Pattern)</h3> Prediction: <span class="${patternPredict.toLowerCase()}">${patternPredict}</span>`;
+
+      // Level 4: Alternating Trend
+      let altPredict = history[0] === "Big" ? "Small" : "Big";
+      if (history.length >= 3 && history[0] !== history[1] && history[1] !== history[2]) {
+        altPredict = history[0]; // continue alternate
+      }
+      document.getElementById("prediction4").innerHTML = 
+        `<h3>Level 4 (Alternating)</h3> Prediction: <span class="${altPredict.toLowerCase()}">${altPredict}</span>`;
+
+      // Level 5: Weighted Mix
+      let weighted = 0;
+      weighted += (freqPrediction === "Big" ? 1 : -1);
+      weighted += (streakPredict === "Big" ? 1 : -1);
+      weighted += (patternPredict === "Big" ? 1 : -1);
+      weighted += (altPredict === "Big" ? 1 : -1);
+      let finalPredict = weighted >= 0 ? "Big" : "Small";
+      let confidence = Math.min(100, Math.abs(weighted) * 20 + 50);
+      document.getElementById("prediction5").innerHTML = 
+        `<h3>Level 5 (Final Mix)</h3> Prediction: <span class="${finalPredict.toLowerCase()}">${finalPredict}</span> <br>Confidence: ${confidence.toFixed(0)}%`;
     }
   </script>
 </body>
