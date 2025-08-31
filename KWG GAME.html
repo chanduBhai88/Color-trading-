@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>4-Level Big/Small Predictor</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #0d0d0d;
+      color: #f5f5f5;
+      text-align: center;
+      padding: 20px;
+    }
+    h1 {
+      color: #ffcc00;
+      margin-bottom: 20px;
+      text-shadow: 0px 0px 8px #ffcc00;
+    }
+    .btn {
+      padding: 12px 20px;
+      margin: 6px;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+      border-radius: 10px;
+      transition: 0.3s;
+      font-size: 16px;
+    }
+    .big-btn { background: #ff4444; color: white; }
+    .small-btn { background: #448aff; color: white; }
+    .clear-btn { background: #777; color: white; }
+    .btn:hover { opacity: 0.85; transform: scale(1.05); }
+
+    .history {
+      margin: 20px auto;
+      max-width: 420px;
+      background: #1a1a1a;
+      padding: 15px;
+      border-radius: 10px;
+    }
+    .card {
+      background: #1a1a1a;
+      margin: 12px auto;
+      padding: 15px;
+      border-radius: 14px;
+      max-width: 420px;
+      box-shadow: 0px 0px 15px rgba(255,255,255,0.1);
+      transition: 0.3s;
+    }
+    .card:hover { box-shadow: 0px 0px 20px rgba(255,255,255,0.25); }
+    .big { color: #ff4444; font-weight: bold; }
+    .small { color: #448aff; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <h1>🎲 4-Level Big/Small Predictor</h1>
+
+  <div>
+    <button class="btn big-btn" onclick="addResult('Big')">➕ Big</button>
+    <button class="btn small-btn" onclick="addResult('Small')">➕ Small</button>
+    <button class="btn clear-btn" onclick="clearHistory()">🗑 Clear</button>
+  </div>
+
+  <div class="history">
+    <h3>History</h3>
+    <p id="historyList">No results yet...</p>
+  </div>
+
+  <div class="card" id="prediction1"></div>
+  <div class="card" id="prediction2"></div>
+  <div class="card" id="prediction3"></div>
+  <div class="card" id="prediction4"></div>
+
+  <script>
+    let history = [];
+
+    function addResult(result) {
+      history.unshift(result); // latest on top
+      if (history.length > 30) history.pop(); // keep last 30
+      updateHistory();
+      makePrediction();
+    }
+
+    function clearHistory() {
+      history = [];
+      document.getElementById("historyList").innerHTML = "No results yet...";
+      for (let i = 1; i <= 4; i++) {
+        document.getElementById("prediction" + i).innerHTML = "";
+      }
+    }
+
+    function updateHistory() {
+      document.getElementById("historyList").innerHTML = history.join(" , ");
+    }
+
+    function makePrediction() {
+      if (history.length < 5) {
+        for (let i = 1; i <= 4; i++) {
+          document.getElementById("prediction" + i).innerHTML = "Add at least 5 results to see prediction.";
+        }
+        return;
+      }
+
+      // Level 1: Frequency
+      let bigCount = history.filter(r => r === "Big").length;
+      let smallCount = history.filter(r => r === "Small").length;
+      let freqPrediction = bigCount > smallCount ? "Big" : "Small";
+      document.getElementById("prediction1").innerHTML = 
+        `<h3>Level 1 (Frequency)</h3> Prediction: <span class="${freqPrediction.toLowerCase()}">${freqPrediction}</span>`;
+
+      // Level 2: Streak Breaker
+      let streakPrediction = history[0];
+      let streakLength = 1;
+      for (let i = 1; i < history.length; i++) {
+        if (history[i] === history[0]) streakLength++;
+        else break;
+      }
+      let opp = (streakPrediction === "Big") ? "Small" : "Big";
+      let streakPredict = streakLength >= 3 ? opp : streakPrediction;
+      document.getElementById("prediction2").innerHTML = 
+        `<h3>Level 2 (Streak Breaker)</h3> Prediction: <span class="${streakPredict.toLowerCase()}">${streakPredict}</span>`;
+
+      // Level 3: Pattern Detector
+      let patternPredict = history[1];
+      if (history.length >= 5) {
+        let last4 = history.slice(0, 4).reverse().join("-");
+        if (last4 === "Big-Small-Big-Small" || last4 === "Small-Big-Small-Big") {
+          patternPredict = history[0] === "Big" ? "Small" : "Big"; 
+        }
+      }
+      document.getElementById("prediction3").innerHTML = 
+        `<h3>Level 3 (Pattern)</h3> Prediction: <span class="${patternPredict.toLowerCase()}">${patternPredict}</span>`;
+
+      // Level 4: Weighted Final Mix
+      let weighted = 0;
+      weighted += (freqPrediction === "Big" ? 1 : -1);
+      weighted += (streakPredict === "Big" ? 1 : -1);
+      weighted += (patternPredict === "Big" ? 1 : -1);
+      let finalPredict = weighted >= 0 ? "Big" : "Small";
+      let confidence = Math.min(100, Math.abs(weighted) * 20 + 50);
+      document.getElementById("prediction4").innerHTML = 
+        `<h3>Level 4 (Final Mix)</h3> Prediction: <span class="${finalPredict.toLowerCase()}">${finalPredict}</span> <br>Confidence: ${confidence.toFixed(0)}%`;
+    }
+  </script>
+</body>
+</html>
