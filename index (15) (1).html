@@ -1,132 +1,122 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Big Small Pattern Tracker</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            background-color: #f4f4f9;
-        }
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-        .input-section {
-            margin-bottom: 20px;
-        }
-        .input-section input {
-            padding: 10px;
-            font-size: 16px;
-            width: 100%;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            margin-bottom: 10px;
-        }
-        .input-section button {
-            padding: 10px 15px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        .input-section button:disabled {
-            background-color: #ddd;
-            cursor: not-allowed;
-        }
-        .result-section {
-            margin-top: 20px;
-        }
-        .result-section ul {
-            list-style-type: none;
-            padding: 0;
-        }
-        .result-section ul li {
-            background-color: #f0f0f0;
-            margin: 5px 0;
-            padding: 10px;
-            border-radius: 5px;
-        }
-        .status {
-            font-size: 18px;
-            margin-top: 20px;
-            font-weight: bold;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>2-Level Big/Small Predictor</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #0d0d0d;
+      color: #f5f5f5;
+      text-align: center;
+      padding: 20px;
+    }
+    h1 {
+      color: #ffcc00;
+      margin-bottom: 20px;
+      text-shadow: 0px 0px 8px #ffcc00;
+    }
+    .btn {
+      padding: 12px 20px;
+      margin: 6px;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+      border-radius: 10px;
+      transition: 0.3s;
+      font-size: 16px;
+    }
+    .big-btn { background: #ff4444; color: white; }
+    .small-btn { background: #448aff; color: white; }
+    .clear-btn { background: #777; color: white; }
+    .btn:hover { opacity: 0.85; transform: scale(1.05); }
+
+    .history {
+      margin: 20px auto;
+      max-width: 420px;
+      background: #1a1a1a;
+      padding: 15px;
+      border-radius: 10px;
+    }
+    .card {
+      background: #1a1a1a;
+      margin: 12px auto;
+      padding: 15px;
+      border-radius: 14px;
+      max-width: 420px;
+      box-shadow: 0px 0px 15px rgba(255,255,255,0.1);
+      transition: 0.3s;
+    }
+    .card:hover { box-shadow: 0px 0px 20px rgba(255,255,255,0.25); }
+    .big { color: #ff4444; font-weight: bold; }
+    .small { color: #448aff; font-weight: bold; }
+  </style>
 </head>
 <body>
+  <h1>🎲 2-Level Big/Small Predictor</h1>
 
-<div class="container">
-    <h2>Big Small Pattern Tracker</h2>
-    <div class="input-section">
-        <label for="inputValue">Enter Big/Small (e.g., Big or Small):</label>
-        <input type="text" id="inputValue" placeholder="Type 'Big' or 'Small'">
-        <button id="submitBtn" onclick="addToHistory()" disabled>Add</button>
-    </div>
+  <div>
+    <button class="btn big-btn" onclick="addResult('Big')">➕ Big</button>
+    <button class="btn small-btn" onclick="addResult('Small')">➕ Small</button>
+    <button class="btn clear-btn" onclick="clearHistory()">🗑 Clear</button>
+  </div>
 
-    <div class="result-section">
-        <h3>Game History (Last 6 Digits)</h3>
-        <ul id="historyList">
-            <!-- Game history will be listed here -->
-        </ul>
-        <div class="status" id="statusMessage">Please add at least 6 results.</div>
-    </div>
-</div>
+  <div class="history">
+    <h3>History</h3>
+    <p id="historyList">No results yet...</p>
+  </div>
 
-<script>
-    // Array to store the Big/Small results
-    let results = [];
+  <div class="card" id="prediction1"></div>
+  <div class="card" id="prediction2"></div>
 
-    // Function to enable/disable the add button based on input
-    document.getElementById('inputValue').addEventListener('input', function() {
-        const value = this.value.toLowerCase().trim();
-        const button = document.getElementById('submitBtn');
-        if (value === 'big' || value === 'small') {
-            button.disabled = false;
-        } else {
-            button.disabled = true;
-        }
-    });
+  <script>
+    let history = [];
 
-    // Function to add input to history and display result
-    function addToHistory() {
-        const inputValue = document.getElementById('inputValue').value.toLowerCase().trim();
-        results.push(inputValue);
-        displayHistory();
-        checkStatus();
-        document.getElementById('inputValue').value = '';  // Clear input field
-        document.getElementById('submitBtn').disabled = true;  // Disable button after click
+    function addResult(result) {
+      history.unshift(result); 
+      if (history.length > 30) history.pop(); 
+      updateHistory();
+      makePrediction();
     }
 
-    // Function to display history
-    function displayHistory() {
-        const historyList = document.getElementById('historyList');
-        historyList.innerHTML = '';
-        // Loop through the results and display the last 6 values
-        for (let i = Math.max(0, results.length - 6); i < results.length; i++) {
-            const li = document.createElement('li');
-            li.textContent = `Period ${i + 1}: ${results[i]}`;
-            historyList.appendChild(li);
-        }
+    function clearHistory() {
+      history = [];
+      document.getElementById("historyList").innerHTML = "No results yet...";
+      document.getElementById("prediction1").innerHTML = "";
+      document.getElementById("prediction2").innerHTML = "";
     }
 
-    // Function to check if we have at least 6 digits for a valid sequence
-    function checkStatus() {
-        const statusMessage = document.getElementById('statusMessage');
-        if (results.length < 6) {
-            statusMessage.textContent = 'Please add at least 6 results.';
-        } else {
-            statusMessage.textContent = 'You can now check the 6-digit sequence.';
-        }
+    function updateHistory() {
+      document.getElementById("historyList").innerHTML = history.join(" , ");
     }
-</script>
 
+    function makePrediction() {
+      if (history.length < 6) {
+        document.getElementById("prediction1").innerHTML = "Add 6 results to unlock predictions.";
+        document.getElementById("prediction2").innerHTML = "";
+        return;
+      }
+
+      // Level 1: Frequency logic
+      let bigCount = history.filter(r => r === "Big").length;
+      let smallCount = history.filter(r => r === "Small").length;
+      let level1 = bigCount > smallCount ? "Big" : "Small";
+      document.getElementById("prediction1").innerHTML = 
+        `<h3>Level 1</h3> Prediction: <span class="${level1.toLowerCase()}">${level1}</span>`;
+
+      // Level 2: Smart streak breaker (last 3 same => opposite)
+      let streakPredict = history[0];
+      let streakLength = 1;
+      for (let i = 1; i < history.length; i++) {
+        if (history[i] === history[0]) streakLength++;
+        else break;
+      }
+      let opp = (streakPredict === "Big") ? "Small" : "Big";
+      let level2 = streakLength >= 3 ? opp : level1;
+      document.getElementById("prediction2").innerHTML = 
+        `<h3>Level 2</h3> Prediction: <span class="${level2.toLowerCase()}">${level2}</span>`;
+    }
+  </script>
 </body>
 </html>
