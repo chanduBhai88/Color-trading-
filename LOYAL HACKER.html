@@ -2,107 +2,113 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>3-Level Big/Small Predictor</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #111;
-      color: #fff;
+      background: #0d0d0d;
+      color: #f5f5f5;
       text-align: center;
       padding: 20px;
     }
     h1 {
-      color: #0f0;
+      color: #ffcc00;
+    }
+    .inputs {
+      margin: 20px 0;
     }
     button {
-      padding: 12px 20px;
-      margin: 10px;
-      font-size: 18px;
+      padding: 10px 20px;
+      margin: 5px;
       border: none;
-      border-radius: 10px;
+      border-radius: 8px;
+      background: #1e90ff;
+      color: white;
       cursor: pointer;
-      transition: 0.3s;
+      font-size: 16px;
     }
-    .big { background: #007bff; color: #fff; }
-    .small { background: #ff5733; color: #fff; }
-    .clear { background: #444; color: #fff; }
-    #inputs { margin: 20px; font-size: 20px; }
+    button:hover {
+      background: #ff6600;
+    }
     .result {
       margin-top: 20px;
-      font-size: 22px;
+      font-size: 20px;
       font-weight: bold;
-      color: #0ff;
+      color: #00ff99;
     }
   </style>
 </head>
 <body>
   <h1>3-Level Big/Small Predictor</h1>
-  <div>
-    <button class="big" onclick="addInput('Big')">Big</button>
-    <button class="small" onclick="addInput('Small')">Small</button>
-    <button class="clear" onclick="clearInputs()">Clear</button>
-  </div>
-  <div id="inputs">Inputs: </div>
+  <p>7 input do → Result automatic aayega</p>
+
+  <div class="inputs" id="inputs"></div>
   <div class="result" id="result"></div>
 
   <script>
-    // 🔹 Master Dataset (tumhara diya hua pattern yaha dalna hai)
-    const dataset = [
-      "91-Small","90-Small","89-Small","88-Small","87-Big","86-Big","85-Big","84-Big","83-Big","82-Big",
-      "81-Small","80-Big","79-Big","78-Big","77-Small","76-Small","75-Small","74-Big","73-Small","72-Small",
-      "71-Big","70-Big","69-Small","68-Small","67-Big","66-Small","65-Big","64-Small","63-Big","62-Small",
-      "61-Small","60-Big","59-Small","58-Small","57-Small","56-Small","55-Big","54-Big","53-Big","52-Small",
-      "51-Small","50-Small","49-Big","48-Small","47-Small","46-Small","45-Small","44-Big","43-Small","42-Small",
-      "41-Small","40-Big","39-Big","38-Big","37-Small","36-Big","35-Big","34-Big","33-Big","32-Big",
-      "31-Big","30-Big","29-Big","28-Big","27-Big","26-Small","25-Small","24-Small","23-Small","22-Big",
-      "21-Big","20-Small","19-Small","18-Big","17-Big","16-Small","15-Small","14-Small","13-Big","12-Small",
-      "11-Small","10-Small","09-Big","08-Small","07-Big","06-Small","05-Small","04-Big","03-Small","02-Big","01-Big","00-Big"
-    ];
-
     let inputs = [];
+    const inputDiv = document.getElementById("inputs");
+    const resultDiv = document.getElementById("result");
 
-    function addInput(choice) {
-      if (inputs.length < 7) {
-        inputs.push(choice);
-        document.getElementById("inputs").innerText = "Inputs: " + inputs.join(", ");
-      }
-      if (inputs.length === 7) {
+    // 7 input ke liye buttons banaye
+    for (let i = 0; i < 7; i++) {
+      let btnBig = document.createElement("button");
+      btnBig.textContent = "Big";
+      btnBig.onclick = () => addInput("Big", i);
+      let btnSmall = document.createElement("button");
+      btnSmall.textContent = "Small";
+      btnSmall.onclick = () => addInput("Small", i);
+
+      let wrapper = document.createElement("div");
+      wrapper.appendChild(btnBig);
+      wrapper.appendChild(btnSmall);
+      inputDiv.appendChild(wrapper);
+    }
+
+    function addInput(value, index) {
+      inputs[index] = value;
+
+      // agar 7 input complete ho gaye to calculate
+      if (inputs.filter(Boolean).length === 7) {
         calculateResult();
       }
     }
 
-    function clearInputs() {
-      inputs = [];
-      document.getElementById("inputs").innerText = "Inputs: ";
-      document.getElementById("result").innerText = "";
-    }
-
     function calculateResult() {
-      // sequence convert: sirf Big/Small part nikalo
-      let sequence = inputs;
-      let foundIndex = -1;
+      let result = [];
 
-      for (let i = 0; i < dataset.length - 7; i++) {
-        let window = dataset.slice(i, i + 7).map(item => item.split("-")[1]);
-        if (JSON.stringify(window) === JSON.stringify(sequence)) {
-          foundIndex = i;
-          break;
+      // streak calculation
+      function nextValue(seq) {
+        let last = seq[seq.length - 1];
+        let streak = 1;
+
+        // streak count
+        for (let i = seq.length - 2; i >= 0; i--) {
+          if (seq[i] === last) streak++;
+          else break;
+        }
+
+        // Rule based on dataset analysis
+        if (last === "Small" && streak >= 3) {
+          return "Big"; // Small streak 3+ → Big
+        } else if (last === "Big" && streak >= 5) {
+          return "Small"; // Big streak 5+ → Small
+        } else {
+          return last; // otherwise continue same
         }
       }
 
-      if (foundIndex !== -1 && foundIndex + 7 < dataset.length) {
-        let level1 = dataset[foundIndex + 7] || "N/A";
-        let level2 = dataset[foundIndex + 8] || "N/A";
-        let level3 = dataset[foundIndex + 9] || "N/A";
-
-        document.getElementById("result").innerHTML = `
-          Level 1 → ${level1}<br>
-          Level 2 → ${level2}<br>
-          Level 3 → ${level3}
-        `;
-      } else {
-        document.getElementById("result").innerText = "No Match Found!";
+      let seq = [...inputs];
+      for (let i = 0; i < 3; i++) {
+        let next = nextValue(seq);
+        result.push(next);
+        seq.push(next);
+        seq.shift(); // sliding window
       }
+
+      resultDiv.textContent = 
+        `Level 1: ${result[0]} | Level 2: ${result[1]} | Level 3: ${result[2]}`;
     }
   </script>
 </body>
