@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>3-Level Big/Small Predictor</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #0d0d0d;
+      color: #f5f5f5;
+      text-align: center;
+      padding: 20px;
+    }
+    h1 {
+      color: #00ffcc;
+    }
+    .input-box {
+      margin: 10px;
+    }
+    input {
+      padding: 8px;
+      font-size: 16px;
+      border-radius: 8px;
+      border: none;
+      outline: none;
+      text-align: center;
+    }
+    button {
+      margin-top: 15px;
+      padding: 10px 20px;
+      font-size: 16px;
+      background: #00ffcc;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    button:hover {
+      background: #00cc99;
+    }
+    .result {
+      margin-top: 20px;
+      font-size: 20px;
+      font-weight: bold;
+      color: #ffcc00;
+    }
+    .level-box {
+      margin: 10px 0;
+      padding: 10px;
+      border: 1px solid #333;
+      border-radius: 10px;
+      background: #1a1a1a;
+    }
+  </style>
+</head>
+<body>
+  <h1>🔥 3-Level Big/Small Predictor 🔥</h1>
+
+  <div class="input-box">
+    <input type="text" id="input1" placeholder="Enter Input 1">
+    <input type="text" id="input2" placeholder="Enter Input 2">
+    <input type="text" id="input3" placeholder="Enter Input 3">
+  </div>
+
+  <button onclick="predict()">Predict</button>
+  <button onclick="clearInputs()">Clear</button>
+
+  <div class="result" id="result"></div>
+
+  <script>
+    function predict() {
+      let val1 = document.getElementById("input1").value.trim().toLowerCase();
+      let val2 = document.getElementById("input2").value.trim().toLowerCase();
+      let val3 = document.getElementById("input3").value.trim().toLowerCase();
+
+      if (!val1 || !val2 || !val3) {
+        document.getElementById("result").innerHTML = "⚠️ Please fill all 3 inputs!";
+        return;
+      }
+
+      let levels = [];
+      // Simple logic: count "big" vs "small"
+      let arr = [val1, val2, val3];
+      let bigCount = arr.filter(x => x === "big").length;
+      let smallCount = arr.filter(x => x === "small").length;
+
+      // Level 1
+      levels.push("Level 1: " + (bigCount > smallCount ? "Big" : "Small"));
+      // Level 2
+      levels.push("Level 2: " + (bigCount % 2 === 0 ? "Small" : "Big"));
+      // Level 3
+      levels.push("Level 3: " + (smallCount % 2 === 0 ? "Big" : "Small"));
+
+      document.getElementById("result").innerHTML = levels.join("<br>");
+    }
+
+    function clearInputs() {
+      document.getElementById("input1").value = "";
+      document.getElementById("input2").value = "";
+      document.getElementById("input3").value = "";
+      document.getElementById("result").innerHTML = "";
+    }
+  </script>
+</body>
+</html>
