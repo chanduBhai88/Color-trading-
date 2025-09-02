@@ -31,11 +31,20 @@
     button:hover {
       background: #ff6600;
     }
+    .chosen {
+      margin: 10px 0;
+      font-size: 18px;
+      color: #00ccff;
+    }
     .result {
       margin-top: 20px;
       font-size: 20px;
       font-weight: bold;
       color: #00ff99;
+    }
+    .clear-btn {
+      background: red;
+      margin-top: 20px;
     }
   </style>
 </head>
@@ -44,11 +53,14 @@
   <p>7 input do → Result automatic aayega</p>
 
   <div class="inputs" id="inputs"></div>
+  <div class="chosen" id="chosen"></div>
   <div class="result" id="result"></div>
+  <button class="clear-btn" onclick="clearAll()">Clear</button>
 
   <script>
     let inputs = [];
     const inputDiv = document.getElementById("inputs");
+    const chosenDiv = document.getElementById("chosen");
     const resultDiv = document.getElementById("result");
 
     // 7 input ke liye buttons banaye
@@ -68,6 +80,7 @@
 
     function addInput(value, index) {
       inputs[index] = value;
+      showChosen();
 
       // agar 7 input complete ho gaye to calculate
       if (inputs.filter(Boolean).length === 7) {
@@ -75,27 +88,28 @@
       }
     }
 
+    function showChosen() {
+      chosenDiv.textContent = "Your Inputs: " + inputs.filter(Boolean).join(" - ");
+    }
+
     function calculateResult() {
       let result = [];
 
-      // streak calculation
       function nextValue(seq) {
         let last = seq[seq.length - 1];
         let streak = 1;
 
-        // streak count
         for (let i = seq.length - 2; i >= 0; i--) {
           if (seq[i] === last) streak++;
           else break;
         }
 
-        // Rule based on dataset analysis
         if (last === "Small" && streak >= 3) {
-          return "Big"; // Small streak 3+ → Big
+          return "Big";
         } else if (last === "Big" && streak >= 5) {
-          return "Small"; // Big streak 5+ → Small
+          return "Small";
         } else {
-          return last; // otherwise continue same
+          return last;
         }
       }
 
@@ -104,11 +118,17 @@
         let next = nextValue(seq);
         result.push(next);
         seq.push(next);
-        seq.shift(); // sliding window
+        seq.shift();
       }
 
-      resultDiv.textContent = 
+      resultDiv.textContent =
         `Level 1: ${result[0]} | Level 2: ${result[1]} | Level 3: ${result[2]}`;
+    }
+
+    function clearAll() {
+      inputs = [];
+      chosenDiv.textContent = "";
+      resultDiv.textContent = "";
     }
   </script>
 </body>
