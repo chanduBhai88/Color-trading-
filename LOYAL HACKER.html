@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>3-Level Big/Small Predictor</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #111;
+      color: #fff;
+      text-align: center;
+      padding: 20px;
+    }
+    h1 {
+      color: #0f0;
+    }
+    button {
+      padding: 12px 20px;
+      margin: 10px;
+      font-size: 18px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    .big { background: #007bff; color: #fff; }
+    .small { background: #ff5733; color: #fff; }
+    .clear { background: #444; color: #fff; }
+    #inputs { margin: 20px; font-size: 20px; }
+    .result {
+      margin-top: 20px;
+      font-size: 22px;
+      font-weight: bold;
+      color: #0ff;
+    }
+  </style>
+</head>
+<body>
+  <h1>3-Level Big/Small Predictor</h1>
+  <div>
+    <button class="big" onclick="addInput('Big')">Big</button>
+    <button class="small" onclick="addInput('Small')">Small</button>
+    <button class="clear" onclick="clearInputs()">Clear</button>
+  </div>
+  <div id="inputs">Inputs: </div>
+  <div class="result" id="result"></div>
+
+  <script>
+    // 🔹 Master Dataset (tumhara diya hua pattern yaha dalna hai)
+    const dataset = [
+      "91-Small","90-Small","89-Small","88-Small","87-Big","86-Big","85-Big","84-Big","83-Big","82-Big",
+      "81-Small","80-Big","79-Big","78-Big","77-Small","76-Small","75-Small","74-Big","73-Small","72-Small",
+      "71-Big","70-Big","69-Small","68-Small","67-Big","66-Small","65-Big","64-Small","63-Big","62-Small",
+      "61-Small","60-Big","59-Small","58-Small","57-Small","56-Small","55-Big","54-Big","53-Big","52-Small",
+      "51-Small","50-Small","49-Big","48-Small","47-Small","46-Small","45-Small","44-Big","43-Small","42-Small",
+      "41-Small","40-Big","39-Big","38-Big","37-Small","36-Big","35-Big","34-Big","33-Big","32-Big",
+      "31-Big","30-Big","29-Big","28-Big","27-Big","26-Small","25-Small","24-Small","23-Small","22-Big",
+      "21-Big","20-Small","19-Small","18-Big","17-Big","16-Small","15-Small","14-Small","13-Big","12-Small",
+      "11-Small","10-Small","09-Big","08-Small","07-Big","06-Small","05-Small","04-Big","03-Small","02-Big","01-Big","00-Big"
+    ];
+
+    let inputs = [];
+
+    function addInput(choice) {
+      if (inputs.length < 7) {
+        inputs.push(choice);
+        document.getElementById("inputs").innerText = "Inputs: " + inputs.join(", ");
+      }
+      if (inputs.length === 7) {
+        calculateResult();
+      }
+    }
+
+    function clearInputs() {
+      inputs = [];
+      document.getElementById("inputs").innerText = "Inputs: ";
+      document.getElementById("result").innerText = "";
+    }
+
+    function calculateResult() {
+      // sequence convert: sirf Big/Small part nikalo
+      let sequence = inputs;
+      let foundIndex = -1;
+
+      for (let i = 0; i < dataset.length - 7; i++) {
+        let window = dataset.slice(i, i + 7).map(item => item.split("-")[1]);
+        if (JSON.stringify(window) === JSON.stringify(sequence)) {
+          foundIndex = i;
+          break;
+        }
+      }
+
+      if (foundIndex !== -1 && foundIndex + 7 < dataset.length) {
+        let level1 = dataset[foundIndex + 7] || "N/A";
+        let level2 = dataset[foundIndex + 8] || "N/A";
+        let level3 = dataset[foundIndex + 9] || "N/A";
+
+        document.getElementById("result").innerHTML = `
+          Level 1 → ${level1}<br>
+          Level 2 → ${level2}<br>
+          Level 3 → ${level3}
+        `;
+      } else {
+        document.getElementById("result").innerText = "No Match Found!";
+      }
+    }
+  </script>
+</body>
+</html>
