@@ -2,74 +2,27 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>91Club Wingo 1Min Demo</title>
+  <title>91Club Wingo Live Demo</title>
   <style>
-    body {
-      background: #f5f5f5;
-      font-family: Arial, sans-serif;
-      text-align: center;
-      margin: 0;
-      padding: 0;
-    }
-    header {
-      background: #ff4d4d;
-      color: white;
-      padding: 15px;
-      font-size: 22px;
-      font-weight: bold;
-    }
-    .box {
-      background: white;
-      border-radius: 12px;
-      padding: 20px;
-      width: 360px;
-      margin: 20px auto;
-      box-shadow: 0 0 10px rgba(0,0,0,0.2);
-    }
-    .label {
-      font-size: 18px;
-      margin: 10px 0;
-    }
-    #timer {
-      font-size: 28px;
-      font-weight: bold;
-      color: red;
-    }
-    #currentNumber {
-      font-size: 60px;
-      font-weight: bold;
-      color: #ff3333;
-      margin: 10px 0;
-    }
-    #result {
-      font-size: 22px;
-      font-weight: bold;
-      margin: 10px 0;
-    }
-    table {
-      width: 90%;
-      margin: 20px auto;
-      border-collapse: collapse;
-    }
-    table, th, td {
-      border: 1px solid #ccc;
-    }
-    th, td {
-      padding: 8px;
-      text-align: center;
-      font-size: 14px;
-    }
-    th {
-      background: #eee;
-    }
+    body { font-family: Arial, sans-serif; background: #f2f2f2; text-align: center; }
+    header { background: #ff4d4d; color: white; padding: 12px; font-size: 22px; font-weight: bold; }
+    .box { background: #fff; width: 360px; margin: 20px auto; padding: 20px;
+           border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.2); }
+    #timer { font-size: 28px; color: red; font-weight: bold; }
+    #period { font-size: 18px; margin: 10px 0; }
+    #result { font-size: 24px; margin-top: 10px; font-weight: bold; }
+    #currentNumber { font-size: 50px; font-weight: bold; margin: 10px 0; }
+    table { width: 90%; margin: 20px auto; border-collapse: collapse; }
+    th, td { border: 1px solid #ccc; padding: 8px; font-size: 14px; }
+    th { background: #eee; }
   </style>
 </head>
 <body>
-  <header>91CLUB WINGO 1 MIN DEMO</header>
+  <header>91CLUB WINGO - 1 MIN</header>
 
   <div class="box">
-    <div class="label"><b>Period:</b> <span id="period">--</span></div>
-    <div class="label">Time Remaining: <span id="timer">60</span> sec</div>
+    <div id="period">Period: --</div>
+    <div>Time Remaining: <span id="timer">--</span> sec</div>
     <div id="currentNumber">--</div>
     <div id="result">WAIT...</div>
   </div>
@@ -77,67 +30,53 @@
   <h3>Game History</h3>
   <table>
     <thead>
-      <tr>
-        <th>Period</th>
-        <th>Number</th>
-        <th>Big / Small</th>
-      </tr>
+      <tr><th>Period</th><th>Number</th><th>Big/Small</th></tr>
     </thead>
     <tbody id="history"></tbody>
   </table>
 
   <script>
-    let basePeriod = 20250903100010000; // demo base
-    let currentPeriod = basePeriod;
-    let countdown = 60;
-    let timer;
-
-    function startGame() {
-      updatePeriod();
-      timer = setInterval(() => {
-        countdown--;
-        document.getElementById("timer").textContent = countdown;
-
-        if (countdown <= 0) {
-          finishRound();
-          startNewRound();
-        }
-      }, 1000);
+    function getPeriodNumber() {
+      let now = new Date();
+      let y = now.getFullYear();
+      let m = String(now.getMonth() + 1).padStart(2, "0");
+      let d = String(now.getDate()).padStart(2, "0");
+      let hh = String(now.getHours()).padStart(2, "0");
+      let mm = String(now.getMinutes()).padStart(2, "0");
+      let ss = String(now.getSeconds()).padStart(2, "0");
+      return `${y}${m}${d}${hh}${mm}`; // period = YYYYMMDDHHMM
     }
 
-    function updatePeriod() {
-      currentPeriod++;
-      document.getElementById("period").textContent = currentPeriod;
-      document.getElementById("currentNumber").textContent = "--";
-      document.getElementById("result").textContent = "WAIT...";
+    function updateTimer() {
+      let now = new Date();
+      let sec = now.getSeconds();
+      let remaining = 60 - sec;
+      if (remaining === 60) remaining = 0;
+
+      document.getElementById("timer").textContent = remaining;
+      document.getElementById("period").textContent = "Period: " + getPeriodNumber();
+
+      if (remaining === 0) {
+        finishRound();
+      }
     }
 
     function finishRound() {
-      // Random 0–9 number
-      let num = Math.floor(Math.random() * 10);
+      let num = Math.floor(Math.random() * 10); // demo only
       document.getElementById("currentNumber").textContent = num;
-
       let res = (num <= 4) ? "Small" : "Big";
       document.getElementById("result").textContent = res;
 
-      // Add to history
+      // Add history
       let row = `<tr>
-        <td>${currentPeriod}</td>
+        <td>${getPeriodNumber()}</td>
         <td>${num}</td>
         <td>${res}</td>
       </tr>`;
       document.getElementById("history").insertAdjacentHTML("afterbegin", row);
     }
 
-    function startNewRound() {
-      clearInterval(timer);
-      countdown = 60;
-      updatePeriod();
-      startGame();
-    }
-
-    // Auto start
-    startGame();
+    setInterval(updateTimer, 1000);
   </script>
 </body>
 </html>
