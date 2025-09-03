@@ -1,137 +1,244 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="hi">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Period-Server Predictor</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Smart Period-Server Predictor</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #0d0d0d;
-      color: #f5f5f5;
-      text-align: center;
-      padding: 30px;
+    :root { --bg:#0d0d0d; --panel:#141414; --accent:#00ff99; --muted:#999; --card:#1e1e1e; }
+    body{
+      margin:0; font-family:Inter,Arial,sans-serif; background:var(--bg); color:#eee;
+      display:flex; align-items:flex-start; justify-content:center; min-height:100vh; padding:30px;
     }
-    h1 {
-      color: #00ff99;
+    .app { width:420px; background:var(--panel); padding:18px; border-radius:14px; box-shadow:0 8px 30px rgba(0,255,153,0.06); }
+    h1 { margin:0 0 10px; color:var(--accent); font-size:20px; text-align:center; }
+    label { display:block; font-size:12px; color:var(--muted); margin-top:10px; }
+    input[type="number"], textarea, select {
+      width:100%; padding:10px 12px; margin-top:6px; border-radius:8px; border:1px solid #222; background:#0f0f0f; color:#eee;
+      box-sizing:border-box; font-size:14px;
     }
-    .container {
-      background: #1a1a1a;
-      padding: 20px;
-      border-radius: 15px;
-      width: 380px;
-      margin: auto;
-      box-shadow: 0 0 15px #00ff99;
-    }
-    input {
-      padding: 10px;
-      margin: 8px;
-      border-radius: 8px;
-      border: none;
-      width: 80%;
-      text-align: center;
-      font-size: 16px;
-    }
+    textarea { min-height:90px; resize:vertical; }
+    .row { display:flex; gap:8px; margin-top:12px; }
     button {
-      padding: 12px 20px;
-      margin-top: 15px;
-      border: none;
-      border-radius: 10px;
-      background: #00ff99;
-      color: #000;
-      font-size: 16px;
-      cursor: pointer;
-      transition: 0.3s;
+      flex:1; padding:10px; border-radius:10px; border:none; cursor:pointer; font-weight:600;
+      background:var(--accent); color:#000;
     }
-    button:hover {
-      background: #00cc77;
+    .mutebtn { background:#333; color:#ddd; }
+    .output {
+      margin-top:16px; padding:12px; background:var(--card); border-radius:10px; text-align:center;
+      min-height:72px; display:flex; flex-direction:column; justify-content:center;
     }
-    .result {
-      margin-top: 20px;
-      font-size: 20px;
-      font-weight: bold;
-      color: #ffcc00;
-      animation: fadeIn 0.7s ease-in-out;
+    .prediction { font-size:20px; font-weight:700; }
+    .nums { font-size:16px; margin-top:8px; color:#ffdd57; font-weight:600; }
+    .history { margin-top:14px; max-height:220px; overflow:auto; padding-right:6px; }
+    .hist-item {
+      background:#0f0f0f; border-radius:8px; padding:8px; margin-bottom:8px; display:flex; justify-content:space-between;
+      align-items:center; transform-origin:left center; animation:pop .35s ease;
     }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: scale(0.8); }
-      to { opacity: 1; transform: scale(1); }
-    }
-    .history {
-      margin-top: 25px;
-      text-align: left;
-      max-height: 220px;
-      overflow-y: auto;
-      font-size: 15px;
-    }
-    .history div {
-      background: #262626;
-      padding: 8px;
-      margin: 5px 0;
-      border-radius: 8px;
-      animation: fadeIn 0.5s ease-in-out;
-    }
+    @keyframes pop { from{opacity:0; transform:translateX(-8px) scale(.98)} to{opacity:1; transform:none} }
+    .tag-big { color:#001f00; background:#66ffb0; padding:6px 10px; border-radius:999px; font-weight:700; }
+    .tag-small { color:#2a1a00; background:#ffd28a; padding:6px 10px; border-radius:999px; font-weight:700; }
+    .note { margin-top:10px; font-size:12px; color:var(--muted); text-align:center; }
+    .method-row { display:flex; gap:8px; margin-top:8px; align-items:center; }
+    .small { font-size:12px; color:var(--muted); }
   </style>
 </head>
 <body>
-  <h1>🔐 Period + Server Predictor</h1>
-  <div class="container">
-    <input type="number" id="period" placeholder="Enter Period Number"><br>
-    <input type="number" id="server" placeholder="Enter Server Number"><br>
-    <button onclick="predict()">Predict</button>
-    <button onclick="clearFields()">Clear</button>
-    <div class="result" id="output"></div>
-    <div class="history" id="history"></div>
+  <div class="app">
+    <h1>🔮 Smart Period-Server Predictor</h1>
+
+    <label>Period Number</label>
+    <input id="period" type="number" placeholder="Enter period (e.g. 12345)" />
+
+    <label>Server Number</label>
+    <input id="server" type="number" placeholder="Enter server (e.g. 67)" />
+
+    <div class="method-row">
+      <label style="margin:0;">
+        <input type="radio" name="method" id="methodPattern" checked /> Pattern Analyzer
+      </label>
+      <label style="margin:0;">
+        <input type="radio" name="method" id="methodFormula" /> Formula Fallback
+      </label>
+      <span class="small" style="margin-left:auto;">(if unsure, use Pattern)</span>
+    </div>
+
+    <label>Past Results (one per line — use BIG or SMALL; most recent at bottom)</label>
+    <textarea id="historyText" placeholder="Example:
+BIG
+SMALL
+BIG
+BIG"></textarea>
+
+    <div class="row">
+      <button onclick="runPredict()">Predict</button>
+      <button class="mutebtn" onclick="clearAll()">Clear</button>
+    </div>
+
+    <div class="output" id="outputArea">
+      <div class="prediction" id="prediction">Prediction will appear here</div>
+      <div class="nums" id="numbers"></div>
+    </div>
+
+    <div class="note">
+      Result logic: <strong>Pattern Analyzer</strong> uses transitions in your pasted history (most-recent sequence). If not enough data, it falls back to parity formula (period+server even → BIG). Numbers shown are deterministic (same input → same numbers). No guarantees on game outcome.
+    </div>
+
+    <div class="history" id="historyList"></div>
   </div>
 
   <script>
-    let historyData = [];
+    // Keep last 10 displayed entries
+    let displayHistory = [];
 
-    function predict() {
-      let period = document.getElementById("period").value;
-      let server = document.getElementById("server").value;
-      let output = document.getElementById("output");
+    function parseHistoryText(text) {
+      return text.split(/\r?\n/).map(s => s.trim().toUpperCase()).filter(s => s === 'BIG' || s === 'SMALL');
+    }
 
-      if (period === "" || server === "") {
-        output.innerHTML = "⚠️ Please enter both values!";
+    // Pattern analyzer: build transition counts and also patterns of length 2 (prev-prev -> next)
+    function predictFromPattern(seq) {
+      if (!seq || seq.length === 0) return null;
+      // Build transition counts: from X -> Y
+      const trans = { 'BIG': { 'BIG':0, 'SMALL':0 }, 'SMALL': { 'BIG':0, 'SMALL':0 } };
+      for (let i=0;i<seq.length-1;i++){
+        const a = seq[i], b = seq[i+1];
+        trans[a][b] = (trans[a][b]||0) + 1;
+      }
+      const last = seq[seq.length-1];
+      // If we have transitions from last, pick most likely
+      const candA = trans[last]['BIG'], candB = trans[last]['SMALL'];
+      if (candA + candB > 0) {
+        return candA >= candB ? 'BIG' : 'SMALL';
+      }
+      // If not enough, try pattern of last two -> next
+      if (seq.length >= 2) {
+        const last2 = seq.slice(-2).join('|'); // e.g. BIG|SMALL
+        // find occurrences of last2 and see what followed
+        const counts = { 'BIG':0, 'SMALL':0 };
+        for (let i=0;i<seq.length-2;i++){
+          if ((seq[i] + '|' + seq[i+1]) === last2) {
+            counts[seq[i+2]] = (counts[seq[i+2]]||0)+1;
+          }
+        }
+        if (counts.BIG + counts.SMALL > 0) {
+          return counts.BIG >= counts.SMALL ? 'BIG' : 'SMALL';
+        }
+      }
+      // Not enough pattern info
+      return null;
+    }
+
+    // Deterministic number generator (same input -> same output)
+    function generateNumbers(period, server, resultTag) {
+      // Normalize inputs to integers
+      const p = Math.abs(parseInt(period) || 0);
+      const s = Math.abs(parseInt(server) || 0);
+      if (resultTag === 'BIG') {
+        const n1 = ( (p * 3 + s * 7) % 100 );
+        const n2 = ( (p + s * 11) % 100 );
+        return [n1, n2];
+      } else {
+        const n1 = ( (p + s * 5) % 100 );
+        const n2 = ( (p * s + 13) % 100 );
+        return [n1, n2];
+      }
+    }
+
+    function parityRule(period, server) {
+      const p = Math.abs(parseInt(period) || 0);
+      const s = Math.abs(parseInt(server) || 0);
+      return ((p + s) % 2 === 0) ? 'BIG' : 'SMALL';
+    }
+
+    function runPredict() {
+      const period = document.getElementById('period').value.trim();
+      const server = document.getElementById('server').value.trim();
+      const historyText = document.getElementById('historyText').value;
+      const usePattern = document.getElementById('methodPattern').checked;
+
+      if (period === '' || server === '') {
+        showOutput('⚠️ Period aur Server dono daalo!', null);
         return;
       }
 
-      // Strategy: add both and check odd/even
-      let calc = (parseInt(period) + parseInt(server));
-      let result = calc % 2 === 0 ? "BIG" : "SMALL";
+      const seq = parseHistoryText(historyText);
 
-      // Generate 2 random numbers for prediction
-      let num1 = Math.floor(Math.random() * 100);
-      let num2 = Math.floor(Math.random() * 100);
+      let prediction = null;
+      if (usePattern) {
+        prediction = predictFromPattern(seq);
+      }
+      // If pattern failed or user chose formula, use parity fallback
+      if (!prediction) {
+        prediction = parityRule(period, server);
+      }
 
-      let finalResult = `Prediction: <span style="color:#00ff99">${result}</span> 
-        → Numbers: <span style="color:#ffcc00">${num1}, ${num2}</span>`;
+      const nums = generateNumbers(period, server, prediction);
 
-      output.innerHTML = finalResult;
+      // Save to display history (prepend)
+      const timeLabel = new Date().toLocaleTimeString();
+      const histText = `${prediction}  •  ${nums[0]}, ${nums[1]}  •  p:${period} s:${server}  — ${timeLabel}`;
+      displayHistory.unshift({ tag: prediction, text: histText });
+      if (displayHistory.length > 10) displayHistory.pop();
 
-      // Save in history (max 10)
-      historyData.unshift(finalResult);
-      if (historyData.length > 10) historyData.pop();
-
-      displayHistory();
+      // Update UI
+      showOutput(prediction, nums);
+      renderHistoryList();
     }
 
-    function displayHistory() {
-      let historyDiv = document.getElementById("history");
-      historyDiv.innerHTML = "<h3>📝 Last 10 Results</h3>";
-      historyData.forEach(item => {
-        historyDiv.innerHTML += `<div>${item}</div>`;
-      });
+    function showOutput(prediction, nums) {
+      const predDiv = document.getElementById('prediction');
+      const numDiv = document.getElementById('numbers');
+      if (!prediction) {
+        predDiv.innerHTML = '—';
+        numDiv.innerHTML = '';
+        return;
+      }
+      const colored = prediction === 'BIG'
+        ? `<span style="padding:6px 12px;border-radius:999px;background:#66ffb0;color:#003000">BIG</span>`
+        : `<span style="padding:6px 12px;border-radius:999px;background:#ffd28a;color:#2a1a00">SMALL</span>`;
+
+      predDiv.innerHTML = `Prediction: ${colored}`;
+      if (nums && nums.length === 2) {
+        numDiv.innerHTML = `Numbers: <strong>${nums[0]}</strong> , <strong>${nums[1]}</strong>`;
+      } else {
+        numDiv.innerHTML = '';
+      }
+      // small animation flash
+      const out = document.getElementById('outputArea');
+      out.animate([{ transform:'scale(.98)', opacity:0.85 }, { transform:'scale(1)', opacity:1 }], { duration:240, easing:'ease-out' });
     }
 
-    function clearFields() {
-      document.getElementById("period").value = "";
-      document.getElementById("server").value = "";
-      document.getElementById("output").innerHTML = "";
-      document.getElementById("history").innerHTML = "";
-      historyData = [];
+    function renderHistoryList() {
+      const list = document.getElementById('historyList');
+      list.innerHTML = '';
+      for (let item of displayHistory) {
+        const el = document.createElement('div');
+        el.className = 'hist-item';
+        const tag = document.createElement('div');
+        tag.innerHTML = item.tag === 'BIG' ? `<span class="tag-big">BIG</span>` : `<span class="tag-small">SMALL</span>`;
+        const txt = document.createElement('div');
+        txt.style.marginLeft = '10px';
+        txt.style.fontSize = '13px';
+        txt.style.color = '#ddd';
+        txt.innerText = item.text;
+        el.appendChild(tag);
+        el.appendChild(txt);
+        list.appendChild(el);
+      }
     }
+
+    function clearAll() {
+      document.getElementById('period').value = '';
+      document.getElementById('server').value = '';
+      document.getElementById('historyText').value = '';
+      document.getElementById('prediction').innerText = 'Prediction will appear here';
+      document.getElementById('numbers').innerText = '';
+      displayHistory = [];
+      renderHistoryList();
+    }
+
+    // Optional: quick demo data (comment out if not wanted)
+    // document.getElementById('historyText').value = 'BIG\nSMALL\nBIG\nBIG\nSMALL\nBIG';
   </script>
 </body>
 </html>
