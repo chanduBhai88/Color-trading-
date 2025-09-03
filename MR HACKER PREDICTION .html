@@ -2,107 +2,142 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>91Club Live Predictor</title>
+  <title>91Club Wingo 1Min Demo</title>
   <style>
     body {
-      background: #000;
-      color: #fff;
+      background: #f5f5f5;
       font-family: Arial, sans-serif;
       text-align: center;
       margin: 0;
-      padding: 20px;
+      padding: 0;
+    }
+    header {
+      background: #ff4d4d;
+      color: white;
+      padding: 15px;
+      font-size: 22px;
+      font-weight: bold;
     }
     .box {
-      border: 2px solid cyan;
+      background: white;
       border-radius: 12px;
       padding: 20px;
-      width: 340px;
-      margin: 40px auto;
-      background: #111;
-      box-shadow: 0 0 15px cyan;
-    }
-    h2 {
-      margin-bottom: 20px;
-      color: yellow;
+      width: 360px;
+      margin: 20px auto;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
     }
     .label {
       font-size: 18px;
       margin: 10px 0;
     }
-    #result {
+    #timer {
       font-size: 28px;
       font-weight: bold;
-      margin: 20px 0;
-      color: lime;
+      color: red;
     }
-    button {
-      background: yellow;
-      border: none;
-      padding: 12px 30px;
-      font-size: 16px;
-      border-radius: 8px;
-      cursor: pointer;
+    #currentNumber {
+      font-size: 60px;
+      font-weight: bold;
+      color: #ff3333;
+      margin: 10px 0;
     }
-    button:hover {
-      background: orange;
+    #result {
+      font-size: 22px;
+      font-weight: bold;
+      margin: 10px 0;
+    }
+    table {
+      width: 90%;
+      margin: 20px auto;
+      border-collapse: collapse;
+    }
+    table, th, td {
+      border: 1px solid #ccc;
+    }
+    th, td {
+      padding: 8px;
+      text-align: center;
+      font-size: 14px;
+    }
+    th {
+      background: #eee;
     }
   </style>
 </head>
 <body>
-  <h2>91CLUB LIVE PREDICTOR</h2>
+  <header>91CLUB WINGO 1 MIN DEMO</header>
+
   <div class="box">
     <div class="label"><b>Period:</b> <span id="period">--</span></div>
-    <div class="label"><b>Timer:</b> <span id="timer">--</span> sec</div>
+    <div class="label">Time Remaining: <span id="timer">60</span> sec</div>
+    <div id="currentNumber">--</div>
     <div id="result">WAIT...</div>
-    <button id="startBtn">START</button>
   </div>
 
+  <h3>Game History</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Period</th>
+        <th>Number</th>
+        <th>Big / Small</th>
+      </tr>
+    </thead>
+    <tbody id="history"></tbody>
+  </table>
+
   <script>
-    let running = false;
-    let baseRound = 1000000000; // dummy base for unique period
-    let lastPeriod = null;
+    let basePeriod = 20250903100010000; // demo base
+    let currentPeriod = basePeriod;
+    let countdown = 60;
+    let timer;
 
-    // Generate 91Club style Period Number
-    function getPeriodNumber() {
-      let now = new Date();
-      let y = now.getFullYear();
-      let m = String(now.getMonth() + 1).padStart(2, '0');
-      let d = String(now.getDate()).padStart(2, '0');
-      let round = baseRound + Math.floor(now.getTime() / 60000); 
-      // unique id increases every minute
-      return `${y}${m}${d}${round}`;
-    }
+    function startGame() {
+      updatePeriod();
+      timer = setInterval(() => {
+        countdown--;
+        document.getElementById("timer").textContent = countdown;
 
-    // BIG / SMALL random result
-    function getResult() {
-      return Math.random() > 0.5 ? "BIG" : "SMALL";
-    }
-
-    // Start live updater
-    function startLive() {
-      running = true;
-      setInterval(() => {
-        if (!running) return;
-
-        let now = new Date();
-        let sec = now.getSeconds();
-        let left = 60 - sec; // seconds left in round
-
-        let period = getPeriodNumber();
-        document.getElementById("timer").textContent = left;
-        document.getElementById("period").textContent = period;
-
-        // At end of round → show result
-        if (sec === 59 || lastPeriod !== period) {
-          document.getElementById("result").textContent = getResult();
-          lastPeriod = period;
+        if (countdown <= 0) {
+          finishRound();
+          startNewRound();
         }
       }, 1000);
     }
 
-    document.getElementById("startBtn").addEventListener("click", () => {
-      if (!running) startLive();
-    });
+    function updatePeriod() {
+      currentPeriod++;
+      document.getElementById("period").textContent = currentPeriod;
+      document.getElementById("currentNumber").textContent = "--";
+      document.getElementById("result").textContent = "WAIT...";
+    }
+
+    function finishRound() {
+      // Random 0–9 number
+      let num = Math.floor(Math.random() * 10);
+      document.getElementById("currentNumber").textContent = num;
+
+      let res = (num <= 4) ? "Small" : "Big";
+      document.getElementById("result").textContent = res;
+
+      // Add to history
+      let row = `<tr>
+        <td>${currentPeriod}</td>
+        <td>${num}</td>
+        <td>${res}</td>
+      </tr>`;
+      document.getElementById("history").insertAdjacentHTML("afterbegin", row);
+    }
+
+    function startNewRound() {
+      clearInterval(timer);
+      countdown = 60;
+      updatePeriod();
+      startGame();
+    }
+
+    // Auto start
+    startGame();
   </script>
 </body>
 </html>
