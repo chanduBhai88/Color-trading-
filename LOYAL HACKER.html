@@ -7,93 +7,87 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #0d0d0d;
-      color: #f5f5f5;
+      background: #111;
+      color: #fff;
       text-align: center;
       padding: 20px;
     }
     h1 {
-      color: #ffcc00;
+      color: #0ff;
+      margin-bottom: 20px;
     }
-    .level {
-      margin: 15px 0;
-    }
-    input {
-      padding: 8px;
-      font-size: 16px;
-      width: 150px;
-      border-radius: 5px;
+    .btn {
+      padding: 12px 20px;
+      margin: 8px;
+      font-size: 18px;
       border: none;
-      text-align: center;
-    }
-    button {
-      padding: 10px 20px;
-      font-size: 16px;
-      background: #ff6600;
-      color: #fff;
-      border: none;
-      border-radius: 8px;
+      border-radius: 10px;
       cursor: pointer;
-      margin: 10px;
-    }
-    button:hover {
-      background: #e65c00;
-    }
-    #result {
-      margin-top: 20px;
-      font-size: 20px;
       font-weight: bold;
-      color: #00ff99;
+    }
+    .big { background: #ff4444; color: #fff; }
+    .small { background: #44aa44; color: #fff; }
+    .clear { background: #4444ff; color: #fff; }
+    .result {
+      margin-top: 25px;
+      font-size: 20px;
+      color: #0f0;
+    }
+    .levels {
+      margin-top: 15px;
+      font-size: 18px;
+      color: #ff0;
     }
   </style>
 </head>
 <body>
   <h1>3-Level Big/Small Predictor</h1>
 
-  <div class="level">
-    <label>Level 1 Input:</label><br>
-    <input type="text" id="level1" placeholder="Big / Small">
-  </div>
+  <button class="btn big" onclick="addInput('Big')">Big</button>
+  <button class="btn small" onclick="addInput('Small')">Small</button>
+  <button class="btn clear" onclick="clearAll()">Clear</button>
 
-  <div class="level">
-    <label>Level 2 Input:</label><br>
-    <input type="text" id="level2" placeholder="Big / Small">
-  </div>
-
-  <div class="level">
-    <label>Level 3 Input:</label><br>
-    <input type="text" id="level3" placeholder="Big / Small">
-  </div>
-
-  <button onclick="predict()">Predict</button>
-  <button onclick="clearAll()">Clear</button>
-
-  <div id="result"></div>
+  <div class="result" id="inputs">Your Inputs: None</div>
+  <div class="levels" id="level1">Level 1: -</div>
+  <div class="levels" id="level2">Level 2: -</div>
+  <div class="levels" id="level3">Level 3: -</div>
 
   <script>
-    function predict() {
-      let l1 = document.getElementById("level1").value.trim().toLowerCase();
-      let l2 = document.getElementById("level2").value.trim().toLowerCase();
-      let l3 = document.getElementById("level3").value.trim().toLowerCase();
+    let inputs = [];
 
-      if(!l1 || !l2 || !l3) {
-        document.getElementById("result").innerText = "⚠️ Please fill all 3 levels!";
-        return;
-      }
-
-      // Simple demo logic
-      if(l1 === l2 && l2 === l3) {
-        document.getElementById("result").innerText = "Prediction: BIG";
+    function addInput(choice) {
+      if (inputs.length < 3) {
+        inputs.push(choice);
+        document.getElementById("inputs").innerText = "Your Inputs: " + inputs.join(", ");
+        calculateLevels();
       } else {
-        document.getElementById("result").innerText = "Prediction: SMALL";
+        alert("3 inputs complete. Press Clear to restart.");
+      }
+    }
+
+    function calculateLevels() {
+      // Strategy: alternate + mirror logic for variety
+      if (inputs.length >= 1) {
+        let l1 = (inputs[0] === "Big") ? "Small" : "Big";
+        document.getElementById("level1").innerText = "Level 1: " + l1;
+      }
+      if (inputs.length >= 2) {
+        let l2 = (inputs[1] === inputs[0]) ? "Big" : "Small";
+        document.getElementById("level2").innerText = "Level 2: " + l2;
+      }
+      if (inputs.length === 3) {
+        let countBig = inputs.filter(x => x === "Big").length;
+        let l3 = (countBig >= 2) ? "Big" : "Small";
+        document.getElementById("level3").innerText = "Level 3: " + l3;
       }
     }
 
     function clearAll() {
-      document.getElementById("level1").value = "";
-      document.getElementById("level2").value = "";
-      document.getElementById("level3").value = "";
-      document.getElementById("result").innerText = "";
+      inputs = [];
+      document.getElementById("inputs").innerText = "Your Inputs: None";
+      document.getElementById("level1").innerText = "Level 1: -";
+      document.getElementById("level2").innerText = "Level 2: -";
+      document.getElementById("level3").innerText = "Level 3: -";
     }
   </script>
 </body>
