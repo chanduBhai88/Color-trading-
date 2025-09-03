@@ -3,67 +3,68 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>3-Level Big/Small Predictor</title>
+  <title>3-Input 3-Level Predictor</title>
   <style>
     body {
       font-family: Arial, sans-serif;
       background: #0d0d0d;
       color: #f5f5f5;
       text-align: center;
-      padding: 30px;
+      padding: 20px;
     }
     h1 {
-      color: #00ffcc;
+      color: #00e5ff;
       margin-bottom: 20px;
+      text-shadow: 0px 0px 8px #00e5ff;
     }
-    .input-box {
-      margin: 10px;
+    input {
       padding: 10px;
-      font-size: 18px;
+      margin: 8px;
+      font-size: 16px;
       border-radius: 8px;
       border: none;
-      outline: none;
       text-align: center;
+      width: 200px;
     }
     .btn {
-      margin: 10px;
       padding: 10px 20px;
-      font-size: 18px;
+      margin: 10px;
       border: none;
-      border-radius: 10px;
       cursor: pointer;
-    }
-    .predict {
-      background: #00cc66;
-      color: white;
-    }
-    .clear {
-      background: #ff3333;
-      color: white;
-    }
-    .result {
-      margin-top: 20px;
-      padding: 15px;
-      border-radius: 12px;
-      background: #1a1a1a;
-      font-size: 20px;
       font-weight: bold;
-      color: #00ff99;
+      border-radius: 8px;
+      transition: 0.3s;
+      font-size: 16px;
     }
+    .predict-btn { background: #00c853; color: white; }
+    .clear-btn { background: #d50000; color: white; }
+    .btn:hover { opacity: 0.85; transform: scale(1.05); }
+    .result {
+      margin-top: 15px;
+      padding: 12px;
+      border-radius: 10px;
+      background: #1a1a1a;
+      max-width: 400px;
+      margin-left: auto;
+      margin-right: auto;
+      font-size: 18px;
+    }
+    .big { color: #ff4444; font-weight: bold; }
+    .small { color: #448aff; font-weight: bold; }
   </style>
 </head>
 <body>
   <h1>🔥 3-Level Big/Small Predictor 🔥</h1>
-  
+
   <div>
-    <input id="input1" class="input-box" type="text" placeholder="Enter Big/Small">
-    <input id="input2" class="input-box" type="text" placeholder="Enter Big/Small">
-    <input id="input3" class="input-box" type="text" placeholder="Enter Big/Small">
+    <input type="text" id="input1" placeholder="Enter Big/Small">
+    <input type="text" id="input2" placeholder="Enter Big/Small">
+    <input type="text" id="input3" placeholder="Enter Big/Small">
   </div>
-  
+
   <div>
-    <button class="btn predict" onclick="predict()">Predict</button>
-    <button class="btn clear" onclick="clearInputs()">Clear</button>
+    <button class="btn predict-btn" onclick="predict()">Predict</button>
+    <button class="btn clear-btn" onclick="clearInputs()">Clear</button>
   </div>
 
   <div id="level1" class="result"></div>
@@ -72,41 +73,38 @@
 
   <script>
     function predict() {
-      let val1 = document.getElementById("input1").value.trim().toLowerCase();
-      let val2 = document.getElementById("input2").value.trim().toLowerCase();
-      let val3 = document.getElementById("input3").value.trim().toLowerCase();
+      let inputs = [
+        document.getElementById("input1").value.trim(),
+        document.getElementById("input2").value.trim(),
+        document.getElementById("input3").value.trim()
+      ].map(x => x.toLowerCase());
 
-      if(!val1 || !val2 || !val3){
-        alert("⚠️ Please enter all 3 inputs (Big/Small)");
+      if (!inputs.every(v => v === "big" || v === "small")) {
+        alert("Please enter only 'Big' or 'Small'");
         return;
       }
 
-      // Level 1 → Combine first two
-      let level1 = (val1 === val2) ? val1 : "Mix";
+      // Level 1: Majority count
+      let bigCount = inputs.filter(x => x === "big").length;
+      let smallCount = inputs.filter(x => x === "small").length;
+      let level1 = bigCount > smallCount ? "Big" : "Small";
 
-      // Level 2 → Combine second + third
-      let level2 = (val2 === val3) ? val2 : "Mix";
+      // Level 2: Streak breaker (if all 3 same, predict opposite)
+      let level2 = (inputs[0] === inputs[1] && inputs[1] === inputs[2]) 
+                    ? (inputs[0] === "big" ? "Small" : "Big") 
+                    : level1;
 
-      // Level 3 → Final prediction
-      let level3;
-      if(level1 === level2 && level1 !== "Mix"){
-        level3 = level1;
-      } else {
-        level3 = (Math.random() > 0.5) ? "Big" : "Small"; // random if not match
-      }
+      // Level 3: Pattern check (if last two same → predict same, else majority)
+      let level3 = (inputs[1] === inputs[2]) ? inputs[2].charAt(0).toUpperCase() + inputs[2].slice(1) : level1;
 
-      document.getElementById("level1").innerText = "Level 1 Result: " + level1.toUpperCase();
-      document.getElementById("level2").innerText = "Level 2 Result: " + level2.toUpperCase();
-      document.getElementById("level3").innerText = "Final Prediction: " + level3.toUpperCase();
+      document.getElementById("level1").innerHTML = `Level 1 Result: <span class="${level1.toLowerCase()}">${level1}</span>`;
+      document.getElementById("level2").innerHTML = `Level 2 Result: <span class="${level2.toLowerCase()}">${level2}</span>`;
+      document.getElementById("level3").innerHTML = `Final Prediction: <span class="${level3.toLowerCase()}">${level3}</span>`;
     }
 
-    function clearInputs(){
-      document.getElementById("input1").value = "";
-      document.getElementById("input2").value = "";
-      document.getElementById("input3").value = "";
-      document.getElementById("level1").innerText = "";
-      document.getElementById("level2").innerText = "";
-      document.getElementById("level3").innerText = "";
+    function clearInputs() {
+      ["input1","input2","input3"].forEach(id => document.getElementById(id).value = "");
+      ["level1","level2","level3"].forEach(id => document.getElementById(id).innerHTML = "");
     }
   </script>
 </body>
