@@ -15,120 +15,85 @@
     h1 {
       color: #ffcc00;
     }
-    .inputs {
-      margin: 20px 0;
+    .level {
+      margin: 15px 0;
+    }
+    input {
+      padding: 8px;
+      font-size: 16px;
+      width: 150px;
+      border-radius: 5px;
+      border: none;
+      text-align: center;
     }
     button {
       padding: 10px 20px;
-      margin: 5px;
+      font-size: 16px;
+      background: #ff6600;
+      color: #fff;
       border: none;
       border-radius: 8px;
-      background: #1e90ff;
-      color: white;
       cursor: pointer;
-      font-size: 16px;
+      margin: 10px;
     }
     button:hover {
-      background: #ff6600;
+      background: #e65c00;
     }
-    .chosen {
-      margin: 10px 0;
-      font-size: 18px;
-      color: #00ccff;
-    }
-    .result {
+    #result {
       margin-top: 20px;
       font-size: 20px;
       font-weight: bold;
       color: #00ff99;
     }
-    .clear-btn {
-      background: red;
-      margin-top: 20px;
-    }
   </style>
 </head>
 <body>
   <h1>3-Level Big/Small Predictor</h1>
-  <p>7 input do → Result automatic aayega</p>
 
-  <div class="inputs" id="inputs"></div>
-  <div class="chosen" id="chosen"></div>
-  <div class="result" id="result"></div>
-  <button class="clear-btn" onclick="clearAll()">Clear</button>
+  <div class="level">
+    <label>Level 1 Input:</label><br>
+    <input type="text" id="level1" placeholder="Big / Small">
+  </div>
+
+  <div class="level">
+    <label>Level 2 Input:</label><br>
+    <input type="text" id="level2" placeholder="Big / Small">
+  </div>
+
+  <div class="level">
+    <label>Level 3 Input:</label><br>
+    <input type="text" id="level3" placeholder="Big / Small">
+  </div>
+
+  <button onclick="predict()">Predict</button>
+  <button onclick="clearAll()">Clear</button>
+
+  <div id="result"></div>
 
   <script>
-    let inputs = [];
-    const inputDiv = document.getElementById("inputs");
-    const chosenDiv = document.getElementById("chosen");
-    const resultDiv = document.getElementById("result");
+    function predict() {
+      let l1 = document.getElementById("level1").value.trim().toLowerCase();
+      let l2 = document.getElementById("level2").value.trim().toLowerCase();
+      let l3 = document.getElementById("level3").value.trim().toLowerCase();
 
-    // 7 input ke liye buttons banaye
-    for (let i = 0; i < 7; i++) {
-      let btnBig = document.createElement("button");
-      btnBig.textContent = "Big";
-      btnBig.onclick = () => addInput("Big", i);
-      let btnSmall = document.createElement("button");
-      btnSmall.textContent = "Small";
-      btnSmall.onclick = () => addInput("Small", i);
-
-      let wrapper = document.createElement("div");
-      wrapper.appendChild(btnBig);
-      wrapper.appendChild(btnSmall);
-      inputDiv.appendChild(wrapper);
-    }
-
-    function addInput(value, index) {
-      inputs[index] = value;
-      showChosen();
-
-      // agar 7 input complete ho gaye to calculate
-      if (inputs.filter(Boolean).length === 7) {
-        calculateResult();
-      }
-    }
-
-    function showChosen() {
-      chosenDiv.textContent = "Your Inputs: " + inputs.filter(Boolean).join(" - ");
-    }
-
-    function calculateResult() {
-      let result = [];
-
-      function nextValue(seq) {
-        let last = seq[seq.length - 1];
-        let streak = 1;
-
-        for (let i = seq.length - 2; i >= 0; i--) {
-          if (seq[i] === last) streak++;
-          else break;
-        }
-
-        if (last === "Small" && streak >= 3) {
-          return "Big";
-        } else if (last === "Big" && streak >= 5) {
-          return "Small";
-        } else {
-          return last;
-        }
+      if(!l1 || !l2 || !l3) {
+        document.getElementById("result").innerText = "⚠️ Please fill all 3 levels!";
+        return;
       }
 
-      let seq = [...inputs];
-      for (let i = 0; i < 3; i++) {
-        let next = nextValue(seq);
-        result.push(next);
-        seq.push(next);
-        seq.shift();
+      // Simple demo logic
+      if(l1 === l2 && l2 === l3) {
+        document.getElementById("result").innerText = "Prediction: BIG";
+      } else {
+        document.getElementById("result").innerText = "Prediction: SMALL";
       }
-
-      resultDiv.textContent =
-        `Level 1: ${result[0]} | Level 2: ${result[1]} | Level 3: ${result[2]}`;
     }
 
     function clearAll() {
-      inputs = [];
-      chosenDiv.textContent = "";
-      resultDiv.textContent = "";
+      document.getElementById("level1").value = "";
+      document.getElementById("level2").value = "";
+      document.getElementById("level3").value = "";
+      document.getElementById("result").innerText = "";
     }
   </script>
 </body>
