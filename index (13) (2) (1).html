@@ -1,83 +1,113 @@
 <!DOCTYPE html>
-<html lang="hi">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>BIG/SMALL Prediction Tool (Hindi)</title>
-    <style>
-        body { font-family: Arial, sans-serif; max-width: 480px; margin: 20px auto; background: #f2f6fa; }
-        h2 { color: #225; }
-        #result { margin-top: 20px; padding: 14px 12px; background: #eef; border-radius: 8px; }
-        input, select, button { padding: 8px; font-size: 17px; margin: 2px 0; }
-        #history { margin-top: 12px; font-size: 15px; color: #444; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>3-Level Big/Small Predictor</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #0d0d0d;
+      color: #f5f5f5;
+      text-align: center;
+      padding: 30px;
+    }
+    h1 {
+      color: #00ffcc;
+      margin-bottom: 20px;
+    }
+    .input-box {
+      margin: 10px;
+      padding: 10px;
+      font-size: 18px;
+      border-radius: 8px;
+      border: none;
+      outline: none;
+      text-align: center;
+    }
+    .btn {
+      margin: 10px;
+      padding: 10px 20px;
+      font-size: 18px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+    .predict {
+      background: #00cc66;
+      color: white;
+    }
+    .clear {
+      background: #ff3333;
+      color: white;
+    }
+    .result {
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 12px;
+      background: #1a1a1a;
+      font-size: 20px;
+      font-weight: bold;
+      color: #00ff99;
+    }
+  </style>
 </head>
 <body>
-    <h2>BIG/SMALL Prediction Tool (Hindi)</h2>
-    <p>Har round ka result daaliye (e.g. <b>5 BIG</b> ya <b>2 SMALL</b>)</p>
-    <input type="text" id="entry" placeholder="Jaise: 7 BIG" autofocus>
-    <button onclick="addResult()">Add</button>
-    <br>
-    <label>Window size (last kitne result dekhein): 
-        <input type="number" id="window" value="10" min="2" max="50" style="width:60px">
-    </label>
-    <button onclick="resetAll()" style="margin-left:12px;color:red;">Reset All</button>
-    <div id="result"></div>
-    <div id="history"></div>
-    
-    <script>
-        let data = [];
-        function addResult() {
-            let entry = document.getElementById('entry').value.trim().toUpperCase();
-            if (entry === "") return;
-            let parts = entry.split(" ");
-            if (parts.length !== 2 || (parts[1] !== "BIG" && parts[1] !== "SMALL")) {
-                document.getElementById("result").innerHTML = "<b style='color:red'>Galat format! Sirf 'BIG' ya 'SMALL' likho.<br>Jaise: 7 BIG ya 2 SMALL.</b>";
-                return;
-            }
-            data.push(entry);
-            document.getElementById('entry').value = '';
-            updatePrediction();
-        }
+  <h1>🔥 3-Level Big/Small Predictor 🔥</h1>
+  
+  <div>
+    <input id="input1" class="input-box" type="text" placeholder="Enter Big/Small">
+    <input id="input2" class="input-box" type="text" placeholder="Enter Big/Small">
+    <input id="input3" class="input-box" type="text" placeholder="Enter Big/Small">
+  </div>
+  
+  <div>
+    <button class="btn predict" onclick="predict()">Predict</button>
+    <button class="btn clear" onclick="clearInputs()">Clear</button>
+  </div>
 
-        function updatePrediction() {
-            let windowSize = parseInt(document.getElementById('window').value) || 10;
-            let sequence = data.map(d => d.split(" ")[1]);
-            let recent = sequence.slice(-windowSize);
+  <div id="level1" class="result"></div>
+  <div id="level2" class="result"></div>
+  <div id="level3" class="result"></div>
 
-            let bigCount = recent.filter(x => x === "BIG").length;
-            let smallCount = recent.filter(x => x === "SMALL").length;
+  <script>
+    function predict() {
+      let val1 = document.getElementById("input1").value.trim().toLowerCase();
+      let val2 = document.getElementById("input2").value.trim().toLowerCase();
+      let val3 = document.getElementById("input3").value.trim().toLowerCase();
 
-            let prediction;
-            if (bigCount > smallCount)
-                prediction = "Agle round me <b>SMALL</b> aane ki sambhavna zyada hai!";
-            else if (smallCount > bigCount)
-                prediction = "Agle round me <b>BIG</b> aane ki sambhavna zyada hai!";
-            else
-                prediction = "Dono ka chance barabar hai!";
+      if(!val1 || !val2 || !val3){
+        alert("⚠️ Please enter all 3 inputs (Big/Small)");
+        return;
+      }
 
-            document.getElementById("result").innerHTML =
-                `Last <b>${windowSize}</b> result mein:<br/>
-                 BIG: <b style="color:blue">${bigCount}</b> &nbsp; SMALL: <b style="color:green">${smallCount}</b><br>
-                 <span style="font-size:17px;margin-top:8px;display:inline-block">${prediction}</span>`;
+      // Level 1 → Combine first two
+      let level1 = (val1 === val2) ? val1 : "Mix";
 
-            let showHistory = data.map((d, idx) =>
-                `<span style="padding:2px 6px;
-                    background:${d.includes('BIG')?'#d0e4fd':'#d2ffe5'};
-                    border-radius:5px; margin:2px;">
-                    <small>${idx+1}.</small> ${d}
-                 </span>`
-            ).join(" ");
-            document.getElementById('history').innerHTML = (data.length ? "<b>History:</b><br>" : "") + showHistory;
-        }
+      // Level 2 → Combine second + third
+      let level2 = (val2 === val3) ? val2 : "Mix";
 
-        function resetAll() {
-            if(confirm("Kya aap sach mein sab reset karna chahte hain?")) {
-                data = [];
-                document.getElementById('result').innerHTML = '';
-                document.getElementById('history').innerHTML = '';
-                document.getElementById('entry').value = '';
-            }
-        }
-    </script>
+      // Level 3 → Final prediction
+      let level3;
+      if(level1 === level2 && level1 !== "Mix"){
+        level3 = level1;
+      } else {
+        level3 = (Math.random() > 0.5) ? "Big" : "Small"; // random if not match
+      }
+
+      document.getElementById("level1").innerText = "Level 1 Result: " + level1.toUpperCase();
+      document.getElementById("level2").innerText = "Level 2 Result: " + level2.toUpperCase();
+      document.getElementById("level3").innerText = "Final Prediction: " + level3.toUpperCase();
+    }
+
+    function clearInputs(){
+      document.getElementById("input1").value = "";
+      document.getElementById("input2").value = "";
+      document.getElementById("input3").value = "";
+      document.getElementById("level1").innerText = "";
+      document.getElementById("level2").innerText = "";
+      document.getElementById("level3").innerText = "";
+    }
+  </script>
 </body>
 </html>
