@@ -2,98 +2,77 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>7-Input 3-Level Predictor</title>
+  <title>Auto Predictor</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background: #111;
-      color: #f5f5f5;
+      background: black;
+      color: white;
       text-align: center;
-      padding: 20px;
+      font-family: Arial, sans-serif;
     }
-    h1 { color: #00e676; }
-    .buttons button {
-      font-size: 18px;
-      padding: 12px 25px;
-      margin: 10px;
-      border: none;
+    .box {
+      border: 2px solid cyan;
+      margin: 20px auto;
+      width: 300px;
+      padding: 15px;
       border-radius: 10px;
-      cursor: pointer;
-      font-weight: bold;
-      transition: 0.3s;
     }
-    .big-btn { background: #2196f3; color: white; }
-    .small-btn { background: #ff5722; color: white; }
-    .reset-btn { background: #9c27b0; color: white; }
-    #sequence { margin: 20px 0; font-size: 20px; }
-    #result { margin-top: 20px; font-size: 22px; font-weight: bold; color: #ffeb3b; }
+    .result {
+      font-size: 24px;
+      margin-top: 20px;
+    }
+    button {
+      background: yellow;
+      padding: 10px 20px;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
-  <h1>7-Input → 3-Level Predictor</h1>
-
-  <div class="buttons">
-    <button class="big-btn" onclick="addInput('Big')">Big</button>
-    <button class="small-btn" onclick="addInput('Small')">Small</button>
-    <button class="reset-btn" onclick="resetGame()">Reset</button>
+  <h2>AUTO PREDICTOR DEMO</h2>
+  <div class="box">
+    <p><b>Period:</b> <span id="period">202509031000010001</span></p>
+    <p><b>Timer:</b> <span id="timer">60</span> sec</p>
+    <div class="result" id="result">--</div>
+    <button id="startBtn">START</button>
   </div>
 
-  <div id="sequence">Your Sequence: </div>
-  <div id="result"></div>
-
   <script>
-    let inputs = [];
+    let period = 202509031000010001;
+    let countdown;
+    let timeLeft = 60;
 
-    // 🟢 Sample dataset (aap apna bada pattern yaha paste kar sakte ho)
-    const dataset = [
-      "Big","Big","Small","Small","Big","Big","Small","Small","Big","Small","Small","Big",
-      "Small","Small","Small","Big","Big","Big","Big","Big","Big","Small","Big","Small"
-    ];
-
-    function addInput(choice) {
-      if (inputs.length < 7) {
-        inputs.push(choice);
-        document.getElementById("sequence").innerText = "Your Sequence: " + inputs.join(" - ");
-      }
-
-      // 🟢 7 inputs hone ke baad result check karo
-      if (inputs.length === 7) {
-        checkPattern();
-      }
+    function randomResult() {
+      return Math.random() > 0.5 ? "BIG" : "SMALL";
     }
 
-    function checkPattern() {
-      let found = false;
+    function startRound() {
+      document.getElementById("result").textContent = "--";
+      timeLeft = 60;
+      document.getElementById("timer").textContent = timeLeft;
 
-      for (let i = 0; i <= dataset.length - 10; i++) {
-        let seq = dataset.slice(i, i + 7);
+      countdown = setInterval(() => {
+        timeLeft--;
+        document.getElementById("timer").textContent = timeLeft;
 
-        if (arraysEqual(seq, inputs)) {
-          let next3 = dataset.slice(i + 7, i + 10);
-          document.getElementById("result").innerHTML =
-            "Level 1: " + (next3[0] || "N/A") + "<br>" +
-            "Level 2: " + (next3[1] || "N/A") + "<br>" +
-            "Level 3: " + (next3[2] || "N/A");
-          found = true;
-          break;
+        if (timeLeft <= 0) {
+          clearInterval(countdown);
+          // Show result
+          document.getElementById("result").textContent = randomResult();
+          // Next period
+          period++;
+          document.getElementById("period").textContent = period;
+          // Start again
+          setTimeout(startRound, 2000); // 2 sec pause then next round
         }
-      }
-
-      if (!found) {
-        document.getElementById("result").innerText = "❌ No Match Found!";
-      }
+      }, 1000);
     }
 
-    function arraysEqual(a, b) {
-      return JSON.stringify(a) === JSON.stringify(b);
-    }
-
-    function resetGame() {
-      inputs = [];
-      document.getElementById("sequence").innerText = "Your Sequence: ";
-      document.getElementById("result").innerText = "";
-    }
+    document.getElementById("startBtn").addEventListener("click", () => {
+      startRound();
+    });
   </script>
 </body>
 </html>
