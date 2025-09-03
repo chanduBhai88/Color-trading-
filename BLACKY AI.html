@@ -1,292 +1,92 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hacker Pattern Predictor</title>
-    <style>
-        body {
-            background-color: #000;
-            color: #0f0;
-            font-family: 'Courier New', monospace;
-            text-align: center;
-            background-image: linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8)), 
-                              url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="1" height="1" x="20" y="20" fill="%2300ff00" opacity="0.1"/></svg>');
-            padding: 20px;
-        }
-        
-        .container {
-            max-width: 400px;
-            margin: 0 auto;
-            border: 1px solid #0f0;
-            padding: 20px;
-            box-shadow: 0 0 10px #0f0;
-        }
-        
-        h1 {
-            margin-top: 0;
-            text-shadow: 0 0 5px #0f0;
-        }
-        
-        .display {
-            font-size: 2em;
-            margin: 20px 0;
-            padding: 10px;
-            background-color: #111;
-            border: 1px solid #0f0;
-            min-height: 1.2em;
-        }
-        
-        .buttons {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-        
-        button {
-            background-color: #111;
-            color: #0f0;
-            border: 1px solid #0f0;
-            padding: 15px;
-            font-size: 1.2em;
-            cursor: pointer;
-            font-family: 'Courier New', monospace;
-            transition: all 0.2s;
-        }
-        
-        button:hover {
-            background-color: #0f0;
-            color: #000;
-            box-shadow: 0 0 10px #0f0;
-        }
-        
-        .action-buttons {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 20px;
-        }
-        
-        .action-buttons button {
-            flex: 1;
-            margin: 0 5px;
-        }
-        
-        .result-buttons {
-            display: flex;
-            justify-content: space-between;
-            margin: 20px 0;
-        }
-        
-        .result-buttons button {
-            flex: 1;
-            margin: 0 5px;
-            padding: 15px;
-        }
-        
-        .big {
-            background-color: #0f0;
-            color: #000;
-            font-weight: bold;
-        }
-        
-        .small {
-            background-color: #000;
-            color: #0f0;
-            font-weight: bold;
-        }
-        
-        .history {
-            margin-top: 20px;
-            text-align: left;
-            max-height: 150px;
-            overflow-y: auto;
-            border: 1px solid #0f0;
-            padding: 10px;
-        }
-        
-        .history-item {
-            margin: 5px 0;
-            padding: 5px;
-            border-bottom: 1px dashed #0f0;
-        }
-
-        .prediction {
-            margin: 10px 0;
-            padding: 10px;
-            border: 1px solid #0f0;
-            font-weight: bold;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Period-Server Predictor</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #0d0d0d;
+      color: #f5f5f5;
+      text-align: center;
+      padding: 30px;
+    }
+    h1 {
+      color: #00ff99;
+    }
+    .container {
+      background: #1a1a1a;
+      padding: 20px;
+      border-radius: 15px;
+      width: 350px;
+      margin: auto;
+      box-shadow: 0 0 15px #00ff99;
+    }
+    input {
+      padding: 10px;
+      margin: 8px;
+      border-radius: 8px;
+      border: none;
+      width: 80%;
+      text-align: center;
+      font-size: 16px;
+    }
+    button {
+      padding: 12px 20px;
+      margin-top: 15px;
+      border: none;
+      border-radius: 10px;
+      background: #00ff99;
+      color: #000;
+      font-size: 16px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    button:hover {
+      background: #00cc77;
+    }
+    .result {
+      margin-top: 20px;
+      font-size: 20px;
+      font-weight: bold;
+      color: #ffcc00;
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Hacker Pattern Predictor</h1>
-        
-        <div class="display" id="display">0</div>
-        
-        <!-- Prediction Result (New Addition) -->
-        <div class="prediction" id="prediction">Enter a number to check pattern</div>
-        
-        <div class="result-buttons">
-            <button id="small-btn" class="small">SMALL</button>
-            <button id="big-btn" class="big">BIG</button>
-        </div>
-        
-        <div class="buttons">
-            <button onclick="appendDigit(1)">1</button>
-            <button onclick="appendDigit(2)">2</button>
-            <button onclick="appendDigit(3)">3</button>
-            <button onclick="appendDigit(4)">4</button>
-            <button onclick="appendDigit(5)">5</button>
-            <button onclick="appendDigit(6)">6</button>
-            <button onclick="appendDigit(7)">7</button>
-            <button onclick="appendDigit(8)">8</button>
-            <button onclick="appendDigit(9)">9</button>
-            <button onclick="appendDigit(0)">0</button>
-        </div>
-        
-        <div class="action-buttons">
-            <button id="clear-btn" onclick="clearDisplay()">CLEAR</button>
-            <button id="sound-btn" onclick="toggleSound()">SOUND OFF</button>
-        </div>
-        
-        <div class="history" id="history">
-            <div class="history-item">Pattern history will appear here</div>
-        </div>
-    </div>
-    
-    <audio id="beep" src="data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU..."></audio>
-    
-    <script>
-        let currentInput = '0';
-        let soundEnabled = false;
-        const display = document.getElementById('display');
-        const historyDiv = document.getElementById('history');
-        const predictionDiv = document.getElementById('prediction');
-        const beepSound = document.getElementById('beep');
-        
-        // Pattern Database (Your Given Data)
-        const patternData = [
-            { input: 37, result: 'small' },
-            { input: 36, result: 'big' },
-            { input: 29, result: 'big' },
-            { input: 26, result: 'small' },
-            { input: 21, result: 'small' },
-            { input: 14, result: 'big' },
-            { input: 20, result: 'big' },
-            { input: 30, result: 'big' },
-            { input: 38, result: 'small' },
-            { input: 32, result: 'big' },
-            { input: 34, result: 'big' },
-            { input: 26, result: 'small' },
-            { input: 25, result: 'small' },
-            { input: 24, result: 'big' },
-            { input: 35, result: 'big' }
-        ];
+  <h1>🔐 Period + Server Predictor</h1>
+  <div class="container">
+    <input type="number" id="period" placeholder="Enter Period Number"><br>
+    <input type="number" id="server" placeholder="Enter Server Number"><br>
+    <button onclick="predict()">Predict</button>
+    <button onclick="clearFields()">Clear</button>
+    <div class="result" id="output"></div>
+  </div>
 
-        // Check if input matches any pattern
-        function checkPattern(inputNum) {
-            const matchedPattern = patternData.find(item => item.input === inputNum);
-            if (matchedPattern) {
-                return matchedPattern.result;
-            } else {
-                return null; // No pattern found
-            }
-        }
+  <script>
+    function predict() {
+      let period = document.getElementById("period").value;
+      let server = document.getElementById("server").value;
+      let output = document.getElementById("output");
 
-        // Update Prediction Display
-        function updatePrediction() {
-            const inputNum = parseInt(currentInput);
-            if (isNaN(inputNum)) {
-                predictionDiv.textContent = "Enter a number to check pattern";
-                return;
-            }
+      if (period === "" || server === "") {
+        output.innerHTML = "⚠️ Please enter both values!";
+        return;
+      }
 
-            const result = checkPattern(inputNum);
-            if (result) {
-                predictionDiv.textContent = `PATTERN FOUND: ${result.toUpperCase()} (Expected)`;
-                predictionDiv.style.color = result === 'big' ? '#0f0' : '#f00';
-            } else {
-                predictionDiv.textContent = "NO PATTERN FOUND FOR THIS NUMBER";
-                predictionDiv.style.color = '#0f0';
-            }
-        }
+      // Simple demo strategy: add both and check odd/even
+      let calc = (parseInt(period) + parseInt(server));
+      let result = calc % 2 === 0 ? "BIG" : "SMALL";
 
-        function appendDigit(digit) {
-            if (soundEnabled) beepSound.play();
-            
-            if (currentInput === '0') {
-                currentInput = digit.toString();
-            } else {
-                currentInput += digit.toString();
-            }
-            updateDisplay();
-            updatePrediction(); // Check pattern on input change
-        }
-        
-        function clearDisplay() {
-            if (soundEnabled) beepSound.play();
-            currentInput = '0';
-            updateDisplay();
-            predictionDiv.textContent = "Enter a number to check pattern";
-            predictionDiv.style.color = '#0f0';
-        }
-        
-        function toggleSound() {
-            soundEnabled = !soundEnabled;
-            document.getElementById('sound-btn').textContent = soundEnabled ? 'SOUND ON' : 'SOUND OFF';
-            if (soundEnabled) beepSound.play();
-        }
-        
-        function updateDisplay() {
-            display.textContent = currentInput;
-        }
-        
-        // Initialize with history
-        function initHistory() {
-            historyDiv.innerHTML = '';
-            patternData.forEach(item => {
-                addToHistory(item.input, item.result);
-            });
-        }
+      output.innerHTML = "Prediction: <span style='color:#00ff99'>" + result + "</span>";
+    }
 
-        // Add to History
-        function addToHistory(inputNum, result) {
-            const historyItem = document.createElement('div');
-            historyItem.className = 'history-item';
-            historyItem.textContent = `Pattern result is ${result} and input ${inputNum}`;
-            historyDiv.insertBefore(historyItem, historyDiv.firstChild);
-            if (historyDiv.children.length > 15) {
-                historyDiv.removeChild(historyDiv.lastChild);
-            }
-        }
-
-        // Initialize
-        initHistory();
-
-        // Result Buttons Logic
-        document.getElementById('small-btn').addEventListener('click', function() {
-            if (soundEnabled) beepSound.play();
-            const inputValue = parseInt(currentInput);
-            if (!isNaN(inputValue)) {
-                addToHistory(inputValue, 'small');
-                currentInput = '0';
-                updateDisplay();
-                updatePrediction();
-            }
-        });
-        
-        document.getElementById('big-btn').addEventListener('click', function() {
-            if (soundEnabled) beepSound.play();
-            const inputValue = parseInt(currentInput);
-            if (!isNaN(inputValue)) {
-                addToHistory(inputValue, 'big');
-                currentInput = '0';
-                updateDisplay();
-                updatePrediction();
-            }
-        });
-    </script>
+    function clearFields() {
+      document.getElementById("period").value = "";
+      document.getElementById("server").value = "";
+      document.getElementById("output").innerHTML = "";
+    }
+  </script>
 </body>
 </html>
