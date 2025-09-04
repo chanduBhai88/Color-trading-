@@ -1,616 +1,310 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Big/Small Game Calculator</title>
-    <style>
-        :root {
-            --primary: #1a1a2e;
-            --secondary: #16213e;
-            --accent: #0f3460;
-            --highlight: #e94560;
-            --text: #f0f0f0;
-            --card-bg: #1e2a47;
-            --button-bg: #0f3460;
-            --button-hover: #133b74;
-            --success: #4caf50;
-            --danger: #f44336;
-        }
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        
-        body {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: var(--text);
-            min-height: 100vh;
-            padding: 20px;
-        }
-        
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-        
-        header {
-            text-align: center;
-            margin-bottom: 30px;
-            padding: 20px;
-            background: var(--card-bg);
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-        }
-        
-        h1 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-            color: var(--highlight);
-            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
-        }
-        
-        .subtitle {
-            font-size: 1.2rem;
-            opacity: 0.8;
-        }
-        
-        .calculator-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-        
-        .card {
-            background: var(--card-bg);
-            border-radius: 15px;
-            padding: 25px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-        }
-        
-        .card-title {
-            font-size: 1.5rem;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid var(--highlight);
-            color: var(--highlight);
-        }
-        
-        .input-group {
-            margin-bottom: 20px;
-        }
-        
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-        }
-        
-        input, select {
-            width: 100%;
-            padding: 12px 15px;
-            border-radius: 8px;
-            border: 2px solid var(--accent);
-            background: rgba(255, 255, 255, 0.1);
-            color: var(--text);
-            font-size: 1rem;
-        }
-        
-        input:focus, select:focus {
-            outline: none;
-            border-color: var(--highlight);
-        }
-        
-        .number-buttons {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-        
-        .number-btn {
-            padding: 15px;
-            border: none;
-            border-radius: 8px;
-            background: var(--button-bg);
-            color: var(--text);
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 1.2rem;
-        }
-        
-        .number-btn:hover {
-            background: var(--button-hover);
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-        }
-        
-        .number-btn.selected {
-            background: var(--highlight);
-            box-shadow: 0 0 15px rgba(233, 69, 96, 0.5);
-        }
-        
-        .buttons {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-        
-        button {
-            padding: 15px;
-            border: none;
-            border-radius: 8px;
-            background: var(--button-bg);
-            color: var(--text);
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 1.1rem;
-        }
-        
-        button:hover {
-            background: var(--button-hover);
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-        }
-        
-        .btn-calculate {
-            background: var(--highlight);
-        }
-        
-        .btn-clear {
-            background: var(--danger);
-        }
-        
-        .result-area {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 10px;
-            padding: 20px;
-            margin-top: 20px;
-            min-height: 150px;
-        }
-        
-        .result-title {
-            font-size: 1.2rem;
-            margin-bottom: 15px;
-            color: var(--highlight);
-        }
-        
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-        
-        .stat-item {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 15px;
-            border-radius: 10px;
-            text-align: center;
-        }
-        
-        .stat-value {
-            font-size: 1.8rem;
-            font-weight: bold;
-            color: var(--highlight);
-            margin: 10px 0;
-        }
-        
-        .pattern-display {
-            margin-top: 20px;
-            padding: 15px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 10px;
-        }
-        
-        .pattern-title {
-            font-size: 1.2rem;
-            margin-bottom: 10px;
-            color: var(--highlight);
-        }
-        
-        .pattern-items {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-        
-        .pattern-item {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-        }
-        
-        .pattern-big {
-            background: rgba(76, 175, 80, 0.2);
-            color: #4caf50;
-            border: 2px solid #4caf50;
-        }
-        
-        .pattern-small {
-            background: rgba(244, 67, 54, 0.2);
-            color: #f44336;
-            border: 2px solid #f44336;
-        }
-        
-        .history-list {
-            max-height: 300px;
-            overflow-y: auto;
-            margin-top: 20px;
-        }
-        
-        .history-item {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .history-number {
-            font-size: 1.2rem;
-            font-weight: bold;
-        }
-        
-        .history-big {
-            color: #4caf50;
-        }
-        
-        .history-small {
-            color: #f44336;
-        }
-        
-        footer {
-            text-align: center;
-            margin-top: 40px;
-            padding: 20px;
-            opacity: 0.7;
-        }
-        
-        .calculator-mode {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-        
-        .mode-btn {
-            flex: 1;
-            padding: 10px;
-            text-align: center;
-            background: var(--accent);
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .mode-btn.active {
-            background: var(--highlight);
-            box-shadow: 0 0 15px rgba(233, 69, 96, 0.5);
-        }
-        
-        .success {
-            color: var(--success);
-        }
-        
-        .error {
-            color: var(--danger);
-        }
-        
-        .auto-gen {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-        
-        .auto-checkbox {
-            width: 20px;
-            height: 20px;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VIP Mod Panel</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      background: url("https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1920&q=80") no-repeat center center fixed;
+      background-size: cover;
+      color: #00ff00;
+      font-family: 'Orbitron', sans-serif;
+      margin: 0;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    h1 {
+      position: absolute;
+      top: 20px;
+      text-align: center;
+      font-size: 3em;
+      text-shadow: 0 0 10px #00ff00, 0 0 20px #00ff00;
+      animation: glitch 1s linear infinite;
+    }
+
+    button {
+      padding: 15px 30px;
+      font-size: 1.2em;
+      background: none;
+      border: 2px solid #00ff00;
+      color: #00ff00;
+      cursor: pointer;
+      border-radius: 5px;
+      text-shadow: 0 0 5px #00ff00;
+      box-shadow: 0 0 10px #00ff00;
+      transition: all 0.3s;
+      font-family: 'Orbitron', sans-serif;
+      margin: 10px;
+    }
+    button:hover {
+      background: #00ff00;
+      color: #000;
+      box-shadow: 0 0 20px #00ff00;
+    }
+
+    #timerBox {
+      display: none;
+      position: fixed;
+      background: rgba(0, 0, 0, 0.85);
+      padding: 20px;
+      border: 2px solid #00ff00;
+      border-radius: 15px;
+      box-shadow: 0 0 20px #00ff00, 0 0 40px rgba(0, 255, 0, 0.5);
+      cursor: move;
+      user-select: none;
+      width: 400px;
+      height: 420px;
+      text-align: center;
+      backdrop-filter: blur(8px);
+      animation: fadeIn 0.5s ease-in-out;
+      z-index: 10;
+    }
+    #timerBox h3 {
+      margin: 0 0 15px;
+      color: #00ff00;
+      text-shadow: 0 0 5px #00ff00;
+      font-size: 1.5em;
+    }
+
+    /* Align period number + result */
+    #period1m {
+      font-family: monospace;
+      font-size: 1.5em;
+      margin: 10px 0;
+      color: #00ffcc;
+      text-shadow: 0 0 8px #00ffcc;
+    }
+    #randomWord {
+      font-size: 2.2em;
+      color: #ff0000;
+      text-shadow: 0 0 10px #ff0000;
+      margin: 15px 0;
+      animation: pulse 1s infinite;
+    }
+    #timer1m {
+      font-family: monospace;
+      font-size: 1.3em;
+      margin: 15px 0;
+      color: #00ff00;
+      text-shadow: 0 0 5px #00ff00;
+    }
+
+    #historyBox {
+      margin-top: 15px;
+      text-align: left;
+      font-size: 1em;
+      color: #00ffcc;
+      max-height: 120px;
+      overflow-y: auto;
+      border-top: 1px solid #00ff00;
+      padding-top: 10px;
+    }
+
+    #closeButton {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: none;
+      border: none;
+      color: #ff0000;
+      font-size: 1.2em;
+      cursor: pointer;
+      text-shadow: 0 0 5px #ff0000;
+      transition: transform 0.2s;
+    }
+    #closeButton:hover {
+      transform: scale(1.2);
+    }
+
+    /* Login Page with separate wallpaper */
+    #loginPage {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: url("https://images.unsplash.com/photo-1605902711622-cfb43c4437d2?auto=format&fit=crop&w=1920&q=80") no-repeat center center;
+      background-size: cover;
+      padding: 40px;
+      border: 2px solid #00ff00;
+      border-radius: 15px;
+      box-shadow: 0 0 25px #00ff00, 0 0 50px rgba(0, 255, 0, 0.5);
+      animation: fadeIn 0.5s ease-in-out;
+      z-index: 10;
+    }
+    #loginPage h2 {
+      font-size: 2em;
+      text-shadow: 0 0 10px #00ff00;
+      margin-bottom: 20px;
+      color: #00ff00;
+    }
+    #keyInput {
+      padding: 10px;
+      font-size: 1em;
+      background: rgba(0, 0, 0, 0.8);
+      border: 2px solid #00ff00;
+      color: #00ff00;
+      border-radius: 5px;
+      width: 200px;
+      text-align: center;
+      font-family: 'Orbitron', sans-serif;
+      margin-bottom: 15px;
+      text-shadow: 0 0 5px #00ff00;
+    }
+    #keyInput:focus {
+      outline: none;
+      box-shadow: 0 0 15px #00ff00;
+    }
+    #errorMessage {
+      color: #ff0000;
+      font-size: 1em;
+      text-shadow: 0 0 5px #ff0000;
+      margin-top: 10px;
+      display: none;
+    }
+
+    @keyframes glitch {
+      2%, 64% { transform: translate(2px, 0) skew(0deg); }
+      4%, 60% { transform: translate(-2px, 0) skew(0deg); }
+      62% { transform: translate(0, 0) skew(5deg); }
+    }
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+      100% { transform: scale(1); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.8); }
+      to { opacity: 1; transform: scale(1); }
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>Big/Small Game Calculator</h1>
-            <p class="subtitle">Advanced calculation mod with pattern recognition and statistical analysis</p>
-        </header>
+  <div id="loginPage">
+    <h2>𝐑𝐑𝐑〆𝐓𝐑𝐄𝐃𝐄𝐑 LOGIN</h2>
+    <input type="text" id="keyInput" placeholder="Enter Access Key" />
+    <button onclick="checkKey()">Submit</button>
+    <button onclick="buyKey()">Buy Key</button>
+    <div id="errorMessage">Please enter correct key</div>
+  </div>
 
-        <div class="calculator-mode">
-            <div class="mode-btn active" id="basic-mode">Basic Calculator</div>
-            <div class="mode-btn" id="advanced-mode">Advanced Analysis</div>
-        </div>
+  <h1 style="display: none;">SERVER RUNNING</h1>
+  <button style="display: none;" onclick="toggleTimerBox()">Start Hack</button>
 
-        <div class="calculator-grid">
-            <div class="card">
-                <h2 class="card-title">Input Data</h2>
-                
-                <div class="input-group">
-                    <label>Select Number (0-9)</label>
-                    <div class="number-buttons" id="number-buttons">
-                        <button class="number-btn" data-number="0">0</button>
-                        <button class="number-btn" data-number="1">1</button>
-                        <button class="number-btn" data-number="2">2</button>
-                        <button class="number-btn" data-number="3">3</button>
-                        <button class="number-btn" data-number="4">4</button>
-                        <button class="number-btn" data-number="5">5</button>
-                        <button class="number-btn" data-number="6">6</button>
-                        <button class="number-btn" data-number="7">7</button>
-                        <button class="number-btn" data-number="8">8</button>
-                        <button class="number-btn" data-number="9">9</button>
-                    </div>
-                </div>
-                
-                <div class="auto-gen">
-                    <input type="checkbox" id="auto-generate" class="auto-checkbox" checked>
-                    <label for="auto-generate">Auto-generate period number</label>
-                </div>
-                
-                <div class="input-group">
-                    <label for="period">Period (Auto-generated if enabled)</label>
-                    <input type="text" id="period" placeholder="Will be auto-generated">
-                </div>
-                
-                <div class="buttons">
-                    <button class="btn-calculate" onclick="calculate()">Calculate & Analyze</button>
-                    <button class="btn-clear" onclick="clearInputs()">Clear</button>
-                </div>
-                
-                <div class="result-area">
-                    <h3 class="result-title">Calculation Result</h3>
-                    <div id="result">
-                        <p>Select a number to see analysis</p>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="card">
-                <h2 class="card-title">Statistics & Analysis</h2>
-                
-                <div class="stats-grid">
-                    <div class="stat-item">
-                        <div>Big Count</div>
-                        <div class="stat-value" id="big-count">0</div>
-                        <div>Percentage: <span id="big-percent">0%</span></div>
-                    </div>
-                    
-                    <div class="stat-item">
-                        <div>Small Count</div>
-                        <div class="stat-value" id="small-count">0</div>
-                        <div>Percentage: <span id="small-percent">0%</span></div>
-                    </div>
-                </div>
-                
-                <div class="pattern-display">
-                    <h3 class="pattern-title">Recent Pattern (Last 10)</h3>
-                    <div class="pattern-items" id="pattern-container">
-                        <!-- Pattern will be generated here -->
-                    </div>
-                </div>
-                
-                <div class="history-list">
-                    <h3 class="card-title">Game History</h3>
-                    <div id="history-container">
-                        <!-- History will be generated here -->
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <footer>
-            <p>Big/Small Game Calculator &copy; 2025 - Advanced Calculation Mod</p>
-        </footer>
-    </div>
+  <div id="timerBox">
+    <button id="closeButton" onclick="toggleTimerBox()">X</button>
+    <h3>𝐑𝐑𝐑〆𝐓𝐑𝐄𝐃𝐄𝐑 PANEL</h3>
+    <div id="period1m"></div>
+    <div id="randomWord"></div>
+    <div id="timer1m"></div>
+    <div id="historyBox"><b>Last 10 Results:</b><br></div>
+  </div>
 
-    <script>
-        // Initialize with empty history
-        let history = [];
-        let selectedNumber = null;
-        
-        // Initialize the UI
-        updateHistoryDisplay();
-        updateStats();
-        
-        // Add event listeners to number buttons
-        document.querySelectorAll('.number-btn').forEach(button => {
-            button.addEventListener('click', function() {
-                // Remove selected class from all buttons
-                document.querySelectorAll('.number-btn').forEach(btn => {
-                    btn.classList.remove('selected');
-                });
-                
-                // Add selected class to clicked button
-                this.classList.add('selected');
-                
-                // Set the selected number
-                selectedNumber = parseInt(this.getAttribute('data-number'));
-                
-                // Auto-generate period if enabled
-                if (document.getElementById('auto-generate').checked) {
-                    const now = new Date();
-                    const period = now.getFullYear().toString() + 
-                                  (now.getMonth() + 1).toString().padStart(2, '0') + 
-                                  now.getDate().toString().padStart(2, '0') + 
-                                  now.getHours().toString().padStart(2, '0') + 
-                                  now.getMinutes().toString().padStart(2, '0') + 
-                                  now.getSeconds().toString().padStart(2, '0') + 
-                                  now.getMilliseconds().toString().padStart(3, '0');
-                    document.getElementById('period').value = period;
-                }
-                
-                // Automatically calculate
-                calculate();
-            });
-        });
-        
-        function calculate() {
-            if (selectedNumber === null) {
-                document.getElementById('result').innerHTML = '<p class="error">Please select a number first</p>';
-                return;
-            }
-            
-            const period = document.getElementById('period').value;
-            const number = selectedNumber;
-            const actualSize = (number >= 5) ? 'big' : 'small';
-            
-            // Add to history
-            history.unshift({ period, number, size: actualSize });
-            
-            // Keep only last 20 records
-            if (history.length > 20) {
-                history = history.slice(0, 20);
-            }
-            
-            // Update displays
-            updateHistoryDisplay();
-            updateStats();
-            
-            // Calculate probability for next result
-            let bigCount = history.filter(item => item.size === 'big').length;
-            let smallCount = history.filter(item => item.size === 'small').length;
-            let total = history.length;
-            
-            let bigProbability = total > 0 ? (bigCount / total * 100).toFixed(2) : 50;
-            let smallProbability = total > 0 ? (smallCount / total * 100).toFixed(2) : 50;
-            
-            // Generate analysis
-            let analysis = '';
-            let analysisClass = '';
-            
-            if (bigProbability > 60) {
-                analysis = 'STRONG probability of NEXT being BIG';
-                analysisClass = 'success';
-            } else if (smallProbability > 60) {
-                analysis = 'STRONG probability of NEXT being SMALL';
-                analysisClass = 'success';
-            } else if (bigProbability > 55) {
-                analysis = 'MODERATE probability of NEXT being BIG';
-                analysisClass = 'success';
-            } else if (smallProbability > 55) {
-                analysis = 'MODERATE probability of NEXT being SMALL';
-                analysisClass = 'success';
-            } else {
-                analysis = 'No strong trend detected';
-                analysisClass = '';
-            }
-            
-            // Get last 10 results for pattern
-            let lastTen = history.slice(0, Math.min(10, history.length));
-            
-            // Display result
-            document.getElementById('result').innerHTML = `    
-                <p>Period: <strong>${period}</strong></p>    
-                <p>Number: <strong>${number}</strong></p>    
-                <p>Size: <strong class="${actualSize === 'big' ? 'success' : 'error'}">${actualSize.toUpperCase()}</strong></p>    
-                <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1)">    
-                    <p>Big Probability: <strong>${bigProbability}%</strong></p>    
-                    <p>Small Probability: <strong>${smallProbability}%</strong></p>    
-                    <p style="margin-top: 10px; color: var(--${analysisClass === 'success' ? 'success' : 'highlight'})">Analysis: ${analysis}</p>    
-                </div>    
-            `;
-            
-            // Update pattern display
-            updatePatternDisplay();
+  <script>
+    function checkKey() {
+      const keyInput = document.getElementById('keyInput').value;
+      const errorMessage = document.getElementById('errorMessage');
+      if (keyInput === 'CHANDU') {
+        document.getElementById('loginPage').style.display = 'none';
+        document.querySelector('h1').style.display = 'block';
+        document.querySelector('button[onclick="toggleTimerBox()"]').style.display = 'block';
+        errorMessage.style.display = 'none';
+      } else {
+        errorMessage.style.display = 'block';
+      }
+    }
+
+    function buyKey() {
+      window.location.href = 'https://t.me/+bcfXRMfU9ppiODhl';
+    }
+
+    let timerInterval = null;
+    let history = [];
+
+    function toggleTimerBox() {
+      const timerBox = document.getElementById('timerBox');
+      if (timerBox.style.display === 'none') {
+        timerBox.style.display = 'block';
+        const windowWidth = window.innerWidth;
+        const windowHeight = window.innerHeight;
+        const boxWidth = timerBox.offsetWidth;
+        const boxHeight = timerBox.offsetHeight;
+        currentX = (windowWidth - boxWidth) / 2;
+        currentY = (windowHeight - boxHeight) / 2;
+        timerBox.style.left = currentX + 'px';
+        timerBox.style.top = currentY + 'px';
+        if (!timerInterval) startTimer();
+      } else {
+        timerBox.style.display = 'none';
+      }
+    }
+
+    function startTimer() {
+      let lastMinute = -1;
+      timerInterval = setInterval(() => {
+        const now = new Date();
+        const seconds = now.getUTCSeconds();
+        const remainingSeconds = 60 - seconds;
+        const minutes = now.getUTCMinutes();
+        const hours = now.getUTCHours();
+        const totalMinutes = hours * 60 + minutes;
+
+        if (seconds === 0 && lastMinute !== minutes) {
+          const words = ['Big', 'Small'];
+          const result = words[Math.floor(Math.random() * 2)];
+          document.getElementById('randomWord').textContent = result;
+
+          history.unshift(result);
+          if (history.length > 10) history.pop();
+
+          document.getElementById('historyBox').innerHTML = "<b>Last 10 Results:</b><br>" + history.join(" , ");
+          lastMinute = minutes;
         }
-        
-        function clearInputs() {
-            selectedNumber = null;
-            document.querySelectorAll('.number-btn').forEach(btn => {
-                btn.classList.remove('selected');
-            });
-            document.getElementById('period').value = '';
-            document.getElementById('result').innerHTML = '<p>Select a number to see analysis</p>';
-        }
-        
-        function updatePatternDisplay() {
-            // Get last 10 results
-            let lastTen = history.slice(0, 10);
-            let patternHtml = '';
-            
-            lastTen.forEach(item => {
-                patternHtml += `<div class="pattern-item ${item.size === 'big' ? 'pattern-big' : 'pattern-small'}">${item.number}</div>`;
-            });
-            
-            document.getElementById('pattern-container').innerHTML = patternHtml;
-        }
-        
-        function updateHistoryDisplay() {
-            let historyHtml = '';
-            
-            if (history.length === 0) {
-                historyHtml = '<p>No history yet. Add some data first.</p>';
-            } else {
-                history.forEach(item => {
-                    historyHtml += `    
-                        <div class="history-item">    
-                            <div class="history-number">${item.period}</div>    
-                            <div class="${item.size === 'big' ? 'history-big' : 'history-small'}">${item.number} (${item.size.charAt(0).toUpperCase() + item.size.slice(1)})</div>    
-                        </div>    
-                    `;
-                });
-            }
-            
-            document.getElementById('history-container').innerHTML = historyHtml;
-        }
-        
-        function updateStats() {
-            let bigCount = history.filter(item => item.size === 'big').length;
-            let smallCount = history.filter(item => item.size === 'small').length;
-            let total = history.length;
-            
-            let bigPercent = total > 0 ? (bigCount / total * 100).toFixed(2) : 0;
-            let smallPercent = total > 0 ? (smallCount / total * 100).toFixed(2) : 0;
-            
-            document.getElementById('big-count').textContent = bigCount;
-            document.getElementById('small-count').textContent = smallCount;
-            document.getElementById('big-percent').textContent = bigPercent + '%';
-            document.getElementById('small-percent').textContent = smallPercent + '%';
-        }
-        
-        // Mode switching functionality
-        document.getElementById('basic-mode').addEventListener('click', function() {
-            this.classList.add('active');
-            document.getElementById('advanced-mode').classList.remove('active');
-            // For basic mode, we might simplify the interface
-            document.querySelector('.stats-grid').style.display = 'grid';
-            document.querySelector('.pattern-display').style.display = 'block';
-        });
-        
-        document.getElementById('advanced-mode').addEventListener('click', function() {
-            this.classList.add('active');
-            document.getElementById('basic-mode').classList.remove('active');
-            // Show all advanced features
-            document.querySelector('.stats-grid').style.display = 'grid';
-            document.querySelector('.pattern-display').style.display = 'block';
-        });
-        
-        // Auto-generate period on page load if checked
-        window.onload = function() {
-            if (document.getElementById('auto-generate').checked) {
-                const now = new Date();
-                const period = now.getFullYear().toString() + 
-                              (now.getMonth() + 1).toString().padStart(2, '0') + 
-                              now.getDate().toString().padStart(2, '0') + 
-                              now.getHours().toString().padStart(2, '0') + 
-                              now.getMinutes().toString().padStart(2, '0') + 
-                              now.getSeconds().toString().padStart(2, '0') + 
-                              now.getMilliseconds().toString().padStart(3, '0');
-                document.getElementById('period').value = period;
-            }
-        };
-    </script>
+
+        const year = now.getUTCFullYear();
+        const month = String(now.getUTCMonth() + 1).padStart(2, '0');
+        const day = String(now.getUTCDate()).padStart(2, '0');
+        const dateStr = `${year}${month}${day}`;
+        const periodNumber = dateStr + '1000' + String(10001 + totalMinutes);
+        document.getElementById('period1m').textContent = "Period: " + periodNumber;
+
+        const formattedTime = `   00 : ${String(remainingSeconds).padStart(2, '0')}`;
+        document.getElementById('timer1m').textContent = formattedTime;
+      }, 1000);
+    }
+
+    const timerBox = document.getElementById('timerBox');
+    let isDragging = false;
+    let currentX = 0;
+    let currentY = 0;
+    let initialX, initialY;
+
+    timerBox.addEventListener('mousedown', startDragging);
+    document.addEventListener('mousemove', drag);
+    document.addEventListener('mouseup', stopDragging);
+
+    function startDragging(e) {
+      if (e.target.id === 'closeButton') return;
+      initialX = e.clientX - currentX;
+      initialY = e.clientY - currentY;
+      isDragging = true;
+    }
+    function drag(e) {
+      if (isDragging) {
+        e.preventDefault();
+        currentX = e.clientX - initialX;
+        currentY = e.clientY - initialY;
+        timerBox.style.left = currentX + 'px';
+        timerBox.style.top = currentY + 'px';
+      }
+    }
+    function stopDragging() {
+      isDragging = false;
+    }
+  </script>
 </body>
 </html>
