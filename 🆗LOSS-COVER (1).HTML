@@ -1,224 +1,124 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Raja Luck Game Pattern Predictor</title>
-<style>
-  body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #0b3d91, #071029);
-    color: #eee;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 30px;
-    min-height: 100vh;
-    margin: 0;
-  }
-  h1 {
-    margin-bottom: 10px;
-    text-shadow: 0 0 8px #2196f3;
-  }
-  .input-container {
-    display: flex;
-    justify-content: center;
-    gap: 15px;
-    margin-bottom: 15px;
-  }
-  .bs-button {
-    width: 40px;
-    height: 40px;
-    border-radius: 6px;
-    border: none;
-    font-weight: bold;
-    font-size: 20px;
-    cursor: pointer;
-    background-color: #1144cc;
-    color: white;
-    transition: background-color 0.3s ease;
-    user-select: none;
-  }
-  .bs-button.active {
-    background-color: #00c853;
-    color: #fff;
-  }
-  .buttons {
-    margin: 15px 0;
-    display: flex;
-    gap: 15px;
-  }
-  button#predict, button#clear {
-    font-size: 16px;
-    padding: 10px 18px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-weight: bold;
-    color: white;
-    background-color: #2196f3;
-    box-shadow: 0 4px 8px #0d47a1;
-    transition: background-color 0.3s ease;
-  }
-  button#clear {
-    background-color: #f44336;
-    box-shadow: 0 4px 8px #b71c1c;
-  }
-  button#predict:hover {
-    background-color: #0d47a1;
-  }
-  button#clear:hover {
-    background-color: #b71c1c;
-  }
-  #result {
-    font-size: 22px;
-    margin-top: 20px;
-    min-height: 28px;
-    font-weight: 700;
-    text-shadow: 0 0 6px #00e676;
-  }
-  footer {
-    margin-top: auto;
-    font-size: 12px;
-    color: #777;
-  }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Game Panel</title>
+  <style>
+    body {
+      background: #000;
+      color: #0f0;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    #panel {
+      border: 3px solid #ff00ff;
+      padding: 15px;
+      text-align: center;
+      width: 350px;
+      background: #000;
+    }
+    #panel h2 {
+      margin: 0;
+      padding: 10px;
+      font-size: 1.5em;
+      font-weight: bold;
+      background: linear-gradient(90deg, #3498db, #e74c3c);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    #result {
+      margin: 40px 0;
+      font-size: 2em;
+      font-weight: bold;
+      color: lime;
+      display: none;
+    }
+    #period {
+      margin: 20px 0;
+      font-size: 1.1em;
+      color: yellow;
+    }
+    .btn-row {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 15px;
+    }
+    button {
+      flex: 1;
+      margin: 0 5px;
+      padding: 10px;
+      font-size: 1.2em;
+      font-weight: bold;
+      border: none;
+      cursor: pointer;
+      color: #fff;
+      border-radius: 5px;
+      background: linear-gradient(90deg, #3498db, #e74c3c);
+    }
+    button:hover {
+      opacity: 0.8;
+    }
+  </style>
 </head>
 <body>
+  <div id="panel">
+    <h2>ORC_BHAI_0009</h2>
+    <div id="result">BIG 5,8</div>
+    <div id="period">Game Period :</div>
+    <div class="btn-row">
+      <button onclick="exitPanel()">EXIT</button>
+      <button onclick="showResult()">SHOW</button>
+      <button onclick="hideResult()">HIDE</button>
+    </div>
+  </div>
 
-<h1>Raja Luck Game Predictor</h1>
+  <script>
+    let lastMinute = -1;
 
-<p>Click 8 times to input pattern (B or S). Then press Predict.</p>
+    function startTimer() {
+      setInterval(() => {
+        const now = new Date();
+        const seconds = now.getUTCSeconds();
+        const minutes = now.getUTCMinutes();
+        const hours = now.getUTCHours();
+        const year = now.getUTCFullYear();
+        const month = String(now.getUTCMonth() + 1).padStart(2, '0');
+        const day = String(now.getUTCDate()).padStart(2, '0');
+        const dateStr = `${year}${month}${day}`;
+        const totalMinutes = hours * 60 + minutes;
 
-<div class="input-container" id="inputContainer">
-  <!-- 8 buttons will appear here -->
-</div>
+        // period number
+        const periodNumber = dateStr + '1000' + String(10001 + totalMinutes);
+        document.getElementById('period').textContent = "Game Period : " + periodNumber;
 
-<div class="buttons">
-  <button id="predict">Predict</button>
-  <button id="clear">Clear</button>
-</div>
-
-<div id="result"></div>
-
-<footer>Created by ChatGPT for Raja Luck Game</footer>
-
-<script>
-  // Your pattern dataset: each item = {pattern: "B,S,B,S,B,S,B,S", result: "B"}
-  // The patterns are the first 8 items in each line from your data (I will parse below).
-  // The result can be the 9th item (or you can customize as needed).
-  
-  // Your raw data string (shortened here for example, add full data accordingly)
-  const rawData = `
-  B,S,S,B,B,B,B,S,B
-  S,B,S,S,B,S,S,S,B
-  B,S,S,S,B,S,B,B,S
-  B,S,B,S,B,B,B,S,B
-  S,B,B,B,S,B,B,B,B
-  B,S,S,B,S,B,B,S,S
-  B,S,B,B,S,B,B,B,B
-  S,B,B,B,B,B,S,B,S
-  B,S,S,B,B,B,S,B,B
-  S,B,S,B,B,S,B,S,S
-  B,B,S,B,S,B,B,S,B
-  S,B,S,B,S,B,B,S,B
-  B,S,B,B,B,S,B,S,S
-  S,B,S,S,B,S,B,S,S
-  B,S,B,S,B,B,S,B,S
-  B,S,S,B,B,S,B,S,S
-  S,B,S,B,B,S,B,S,S
-  B,S,B,B,S,B,B,B,B
-  B,S,B,B,B,S,B,S,S
-  B,S,B,S,B,B,B,S,B
-  B,B,B,S,B,B,B,B,B
-  B,S,B,B,S,B,S,S,B
-  B,B,S,B,B,S,B,B,B
-  B,B,S,B,B,S,B,S,S
-  S,S,B,S,B,B,B,S,S
-  B,S,B,B,S,B,B,S,S
-  S,B,B,S,B,B,B,S,B
-  B,S,B,S,B,B,B,B,B
-  B,S,S,B,B,B,S,B,S
-  B,B,S,B,B,S,B,B,B
-  B,B,S,S,S,B,B,B,S
-  S,B,S,B,B,B,S,B,B
-  B,S,B,B,S,B,B,B,B
-  B,S,B,S,B,S,B,B,B
-  B,S,S,B,B,B,B,B,B
-  B,S,S,S,S,S,B,S,S
-  S,B,B,B,S,B,B,S,B
-  B,S,S,B,S,B,B,B,B
-  B,S,B,S,B,B,B,S,B
-  B,B,S,B,B,S,B,B,B
-  B,S,B,B,S,B,B,B,B
-  S,B,S,B,B,S,B,S,S
-  B,S,S,B,B,B,S,B,S
-  B,S,B,S,B,B,S,B,S
-  S,B,S,B,S,B,B,B,B
-  `;
-
-  // Parse rawData into array of objects [{pattern: 'B,S,...', result: 'B'}]
-  // I assume the 9th element (index 8) is result
-  const patternDB = [];
-  rawData.trim().split('\n').forEach(line => {
-    const parts = line.trim().split(',');
-    if(parts.length >= 9){
-      const pattern = parts.slice(0,8).join(',');
-      const result = parts[8];
-      patternDB.push({pattern, result});
+        // update result only when new minute starts
+        if (seconds === 0 && lastMinute !== minutes) {
+          const words = ['BIG 5,8', 'SMALL 2,4'];
+          document.getElementById('result').textContent =
+            words[Math.floor(Math.random() * words.length)];
+          lastMinute = minutes;
+        }
+      }, 1000);
     }
-  });
 
-  // UI Elements
-  const inputContainer = document.getElementById('inputContainer');
-  const predictBtn = document.getElementById('predict');
-  const clearBtn = document.getElementById('clear');
-  const resultDiv = document.getElementById('result');
-
-  // Store user inputs, max 8
-  let userInput = [];
-
-  // Create 8 input buttons (click cycles B->S->B)
-  for(let i=0; i<8; i++){
-    const btn = document.createElement('button');
-    btn.classList.add('bs-button');
-    btn.textContent = 'B'; // default B
-    btn.dataset.index = i;
-    btn.addEventListener('click', () => {
-      // Cycle B -> S -> B
-      btn.textContent = btn.textContent === 'B' ? 'S' : 'B';
-      userInput[btn.dataset.index] = btn.textContent;
-      resultDiv.textContent = '';
-    });
-    inputContainer.appendChild(btn);
-    userInput.push('B'); // initialize all as B
-  }
-
-  predictBtn.addEventListener('click', () => {
-    if(userInput.length < 8){
-      resultDiv.textContent = "Please input all 8 digits.";
-      return;
+    function showResult() {
+      document.getElementById('result').style.display = 'block';
     }
-    const inputPattern = userInput.join(',');
-    // Search in patternDB
-    const found = patternDB.find(p => p.pattern === inputPattern);
-    if(found){
-      resultDiv.textContent = `Prediction: ${found.result}`;
-    } else {
-      resultDiv.textContent = "No Match Found";
+
+    function hideResult() {
+      document.getElementById('result').style.display = 'none';
     }
-  });
 
-  clearBtn.addEventListener('click', () => {
-    userInput = [];
-    // Reset all buttons to B
-    Array.from(inputContainer.children).forEach(btn => {
-      btn.textContent = 'B';
-      userInput.push('B');
-    });
-    resultDiv.textContent = '';
-  });
-</script>
+    function exitPanel() {
+      document.getElementById('panel').style.display = 'none';
+    }
 
+    startTimer();
+  </script>
 </body>
 </html>
