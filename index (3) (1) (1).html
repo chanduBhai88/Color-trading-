@@ -1,380 +1,227 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Number Prediction Tool</title>
-    <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
-            color: white;
-            margin: 0;
-            padding: 20px;
-            min-height: 100vh;
-            background-attachment: fixed;
-        }
-        
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-            background-color: rgba(0, 0, 0, 0.7);
-            padding: 25px;
-            border-radius: 15px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(5px);
-        }
-        
-        h1 {
-            text-align: center;
-            color: #f9ca24;
-            margin-bottom: 30px;
-            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-        }
-        
-        .input-section {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-        
-        .input-group {
-            flex: 1;
-            min-width: 120px;
-        }
-        
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: bold;
-            color: #f9ca24;
-        }
-        
-        input, select {
-            width: 100%;
-            padding: 12px;
-            border: none;
-            border-radius: 8px;
-            background-color: rgba(255, 255, 255, 0.9);
-            font-size: 16px;
-        }
-        
-        .button-group {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin-top: 25px;
-        }
-        
-        button {
-            padding: 12px 25px;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        #predictBtn {
-            background-color: #f9ca24;
-            color: #1a1a2e;
-        }
-        
-        #clearBtn {
-            background-color: #e74c3c;
-            color: white;
-        }
-        
-        button:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-        }
-        
-        .result-container {
-            margin-top: 30px;
-            text-align: center;
-            min-height: 100px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .result-box {
-            background-color: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            padding: 20px;
-            width: 80%;
-            max-width: 400px;
-            margin-top: 20px;
-            border: 1px solid #f9ca24;
-            display: none;
-        }
-        
-        .result-title {
-            font-size: 18px;
-            font-weight: bold;
-            margin-bottom: 10px;
-            color: #f9ca24;
-        }
-        
-        .result-value {
-            font-size: 24px;
-            font-weight: bold;
-            margin: 10px 0;
-        }
-        
-        .history {
-            margin-top: 30px;
-            padding: 15px;
-            background-color: rgba(0, 0, 0, 0.3);
-            border-radius: 10px;
-            max-height: 200px;
-            overflow-y: auto;
-        }
-        
-        .history-title {
-            text-align: center;
-            margin-bottom: 10px;
-            color: #f9ca24;
-        }
-        
-        .history-item {
-            padding: 8px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            display: flex;
-            justify-content: space-between;
-        }
-        
-        .history-item:last-child {
-            border-bottom: none;
-        }
-        
-        /* Animation classes */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .fade-in {
-            animation: fadeIn 0.8s ease-out forwards;
-        }
-        
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
-        
-        .pulse {
-            animation: pulse 0.5s ease-in-out;
-        }
-        
-        /* Responsive adjustments */
-        @media (max-width: 600px) {
-            .input-group {
-                min-width: 100%;
-            }
-            
-            .result-box {
-                width: 100%;
-            }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Number Prediction Tool</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+      color: white;
+      margin: 0;
+      padding: 20px;
+      min-height: 100vh;
+      background-attachment: fixed;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      background-color: rgba(0, 0, 0, 0.7);
+      padding: 25px;
+      border-radius: 15px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(5px);
+    }
+    h1 {
+      text-align: center;
+      color: #f9ca24;
+      margin-bottom: 30px;
+    }
+    .input-section {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+    .input-group {
+      flex: 1;
+      min-width: 120px;
+    }
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: bold;
+      color: #f9ca24;
+    }
+    input, select {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      background-color: rgba(255, 255, 255, 0.9);
+      font-size: 16px;
+    }
+    .button-group {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-top: 25px;
+    }
+    button {
+      padding: 12px 25px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    #predictBtn { background-color: #f9ca24; color: #1a1a2e; }
+    #clearBtn { background-color: #e74c3c; color: white; }
+    .result-container {
+      margin-top: 30px;
+      text-align: center;
+    }
+    .result-box {
+      background-color: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      padding: 20px;
+      width: 80%;
+      max-width: 400px;
+      margin: 20px auto;
+      border: 1px solid #f9ca24;
+      display: none;
+    }
+    .result-title { font-size: 18px; color: #f9ca24; margin-bottom: 10px; }
+    .result-value { font-size: 24px; font-weight: bold; }
+    .history {
+      margin-top: 30px;
+      padding: 15px;
+      background-color: rgba(0, 0, 0, 0.3);
+      border-radius: 10px;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+    .history-item {
+      padding: 8px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      justify-content: space-between;
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Number Prediction Tool</h1>
-        
-        <div class="input-section">
-            <div class="input-group">
-                <label for="num1">Number 1</label>
-                <input type="number" id="num1" min="0" max="9" placeholder="0-9">
-            </div>
-            
-            <div class="input-group">
-                <label for="size1">Big/Small</label>
-                <select id="size1">
-                    <option value="BIG">BIG</option>
-                    <option value="SMALL">SMALL</option>
-                </select>
-            </div>
-            
-            <div class="input-group">
-                <label for="num2">Number 2</label>
-                <input type="number" id="num2" min="0" max="9" placeholder="0-9">
-            </div>
-            
-            <div class="input-group">
-                <label for="size2">Big/Small</label>
-                <select id="size2">
-                    <option value="BIG">BIG</option>
-                    <option value="SMALL">SMALL</option>
-                </select>
-            </div>
-            
-            <div class="input-group">
-                <label for="num3">Number 3</label>
-                <input type="number" id="num3" min="0" max="9" placeholder="0-9">
-            </div>
-            
-            <div class="input-group">
-                <label for="size3">Big/Small</label>
-                <select id="size3">
-                    <option value="BIG">BIG</option>
-                    <option value="SMALL">SMALL</option>
-                </select>
-            </div>
-        </div>
-        
-        <div class="button-group">
-            <button id="predictBtn">Predict Result</button>
-            <button id="clearBtn">Clear</button>
-        </div>
-        
-        <div class="result-container">
-            <div id="resultBox" class="result-box">
-                <div class="result-title">Prediction Result</div>
-                <div id="resultValue" class="result-value"></div>
-            </div>
-        </div>
-        
-        <div class="history">
-            <div class="history-title">Prediction History</div>
-            <div id="historyList"></div>
-        </div>
+  <div class="container">
+    <h1>Number Prediction Tool</h1>
+    <div class="input-section">
+      <div class="input-group">
+        <label for="num1">Number 1</label>
+        <input type="number" id="num1" min="0" max="9">
+      </div>
+      <div class="input-group">
+        <label for="size1">Big/Small</label>
+        <select id="size1">
+          <option value="BIG">BIG</option>
+          <option value="SMALL">SMALL</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label for="num2">Number 2</label>
+        <input type="number" id="num2" min="0" max="9">
+      </div>
+      <div class="input-group">
+        <label for="size2">Big/Small</label>
+        <select id="size2">
+          <option value="BIG">BIG</option>
+          <option value="SMALL">SMALL</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label for="num3">Number 3</label>
+        <input type="number" id="num3" min="0" max="9">
+      </div>
+      <div class="input-group">
+        <label for="size3">Big/Small</label>
+        <select id="size3">
+          <option value="BIG">BIG</option>
+          <option value="SMALL">SMALL</option>
+        </select>
+      </div>
     </div>
-    
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const predictBtn = document.getElementById('predictBtn');
-            const clearBtn = document.getElementById('clearBtn');
-            const resultBox = document.getElementById('resultBox');
-            const resultValue = document.getElementById('resultValue');
-            const historyList = document.getElementById('historyList');
-            
-            // Sample prediction data (from your input)
-            const predictionData = [
-                "8 BIG", "0 SMALL", "9 BIG", "5 BIG", "4 SMALL", "6 BIG", "4 SMALL", "4 SMALL", "0 SMALL", "8 BIG",
-                "2 SMALL", "8 BIG", "7 BIG", "0 SMALL", "4 SMALL", "2 SMALL", "9 BIG", "5 BIG", "1 SMALL", "8 BIG",
-                "5 BIG", "5 BIG", "3 SMALL", "8 BIG", "4 SMALL", "0 SMALL", "1 SMALL", "8 BIG", "8 BIG", "1 SMALL",
-                "3 SMALL", "9 BIG", "1 SMALL", "0 SMALL", "4 SMALL", "3 SMALL", "8 BIG", "6 BIG", "0 SMALL", "1 SMALL",
-                "7 BIG", "4 SMALL", "7 BIG", "0 SMALL", "8 BIG", "2 SMALL", "8 BIG", "6 BIG", "9 BIG", "1 SMALL",
-                "6 BIG", "7 BIG", "1 SMALL", "0 SMALL", "2 SMALL", "1 SMALL", "0 SMALL", "6 BIG", "3 SMALL", "4 SMALL",
-                "2 SMALL", "5 BIG", "9 BIG", "0 SMALL", "3 SMALL", "1 SMALL", "9 BIG", "2 SMALL", "4 SMALL", "9 BIG",
-                "8 BIG", "0 SMALL", "9 BIG", "5 BIG", "6 BIG", "4 SMALL", "0 SMALL", "3 SMALL", "0 SMALL", "0 SMALL",
-                "2 SMALL", "4 SMALL", "0 SMALL", "1 SMALL", "5 BIG", "2 SMALL", "8 BIG", "0 SMALL", "9 BIG", "4 SMALL",
-                "9 BIG", "1 SMALL", "7 BIG", "9 BIG", "9 BIG", "4 SMALL", "8 BIG", "2 SMALL", "5 BIG", "9 BIG",
-                "4 SMALL", "1 SMALL", "1 SMALL", "1 SMALL", "5 BIG", "4 SMALL", "4 SMALL", "2 SMALL", "6 BIG", "8 BIG",
-                "4 SMALL", "0 SMALL", "6 BIG", "2 SMALL", "2 SMALL", "2 SMALL", "9 BIG", "9 BIG", "7 BIG", "4 SMALL",
-                "0 SMALL", "8 BIG", "4 SMALL", "4 SMALL", "7 BIG", "3 SMALL", "6 BIG", "0 SMALL", "0 SMALL", "3 SMALL",
-                "0 SMALL", "5 BIG", "3 SMALL", "2 SMALL", "6 BIG", "7 BIG", "1 SMALL", "8 BIG", "1 SMALL", "8 BIG",
-                "0 SMALL", "3 SMALL", "4 SMALL", "0 SMALL", "8 BIG", "2 SMALL", "0 SMALL", "1 SMALL", "5 BIG", "5 BIG",
-                "5 BIG", "1 SMALL", "6 BIG", "1 SMALL", "4 SMALL", "7 BIG", "8 BIG", "3 SMALL", "7 BIG", "4 SMALL",
-                "1 SMALL", "7 BIG", "6 BIG", "0 SMALL", "9 BIG", "3 SMALL", "8 BIG", "8 BIG", "6 BIG", "6 BIG",
-                "0 SMALL", "8 BIG", "6 BIG", "7 BIG", "2 SMALL", "5 BIG", "7 BIG", "8 BIG", "4 SMALL", "8 BIG",
-                "9 BIG", "9 BIG", "8 BIG", "0 SMALL", "8 BIG", "0 SMALL", "2 SMALL", "0 SMALL", "9 BIG", "1 SMALL",
-                "5 BIG", "1 SMALL", "0 SMALL", "9 BIG", "2 SMALL", "6 BIG", "9 BIG", "4 SMALL", "8 BIG", "9 BIG",
-                "1 SMALL", "5 BIG", "3 SMALL", "2 SMALL", "2 SMALL", "4 SMALL", "3 SMALL", "0 SMALL", "8 BIG", "4 SMALL",
-                "9 BIG", "7 BIG", "0 SMALL", "6 BIG", "4 SMALL", "4 SMALL", "3 SMALL", "5 BIG", "4 SMALL", "6 BIG",
-                "3 SMALL", "2 SMALL", "7 BIG", "4 SMALL", "6 BIG", "8 BIG", "4 SMALL", "6 BIG", "4 SMALL", "3 SMALL",
-                "7 BIG", "0 SMALL", "6 BIG", "7 BIG", "0 SMALL", "9 BIG", "6 BIG", "5 BIG", "1 SMALL", "0 SMALL",
-                "8 BIG", "5 BIG", "8 BIG", "2 SMALL", "0 SMALL", "3 SMALL", "2 SMALL", "2 SMALL", "5 BIG", "9 BIG",
-                "2 SMALL", "1 SMALL", "7 BIG", "0 SMALL", "0 SMALL", "7 BIG", "8 BIG", "2 SMALL", "7 BIG", "8 BIG",
-                "2 SMALL", "1 SMALL", "6 BIG", "9 BIG", "9 BIG", "8 BIG", "6 BIG", "6 BIG", "1 SMALL", "8 BIG",
-                "2 SMALL", "2 SMALL", "5 BIG", "1 SMALL", "5 BIG", "7 BIG", "5 BIG", "7 BIG", "8 BIG", "9 BIG",
-                "0 SMALL", "2 SMALL", "6 BIG", "2 SMALL", "4 SMALL", "0 SMALL", "1 SMALL", "0 SMALL", "1 SMALL", "8 BIG",
-                "4 SMALL", "0 SMALL", "8 BIG", "9 BIG", "6 BIG", "1 SMALL", "7 BIG", "7 BIG", "9 BIG", "9 BIG",
-                "0 SMALL", "9 BIG", "0 SMALL", "6 BIG", "6 BIG", "5 BIG", "9 BIG", "9 BIG", "3 SMALL", "4 SMALL",
-                "7 BIG", "3 SMALL", "5 BIG", "8 BIG", "9 BIG", "5 BIG", "2 SMALL", "6 BIG", "3 SMALL", "1 SMALL",
-                "8 BIG", "4 SMALL", "0 SMALL", "0 SMALL", "3 SMALL", "0 SMALL", "9 BIG", "0 SMALL", "9 BIG", "1 SMALL",
-                "9 BIG", "1 SMALL", "8 BIG", "8 BIG", "0 SMALL", "3 SMALL", "9 BIG", "7 BIG", "3 SMALL", "9 BIG",
-                "8 BIG", "3 SMALL", "3 SMALL", "3 SMALL", "8 BIG", "8 BIG", "5 BIG", "8 BIG", "9 BIG", "1 SMALL",
-                "1 SMALL", "9 BIG", "5 BIG", "6 BIG", "9 BIG", "3 SMALL", "3 SMALL", "1 SMALL", "9 BIG", "3 SMALL",
-                "1 SMALL", "7 BIG", "3 SMALL", "0 SMALL", "3 SMALL", "0 SMALL", "0 SMALL", "8 BIG", "3 SMALL", "1 SMALL",
-                "3 SMALL", "9 BIG", "4 SMALL", "0 SMALL", "3 SMALL", "8 BIG", "5 BIG", "6 BIG", "2 SMALL", "5 BIG",
-                "8 BIG", "5 BIG", "1 SMALL", "2 SMALL", "9 BIG", "8 BIG", "5 BIG", "2 SMALL", "3 SMALL", "8 BIG",
-                "7 BIG", "5 BIG", "5 BIG", "9 BIG", "0 SMALL", "5 BIG", "6 BIG", "9 BIG", "9 BIG", "7 BIG",
-                "1 SMALL", "6 BIG", "6 BIG", "6 BIG", "8 BIG", "7 BIG", "1 SMALL", "0 SMALL", "3 SMALL", "0 SMALL",
-                "0 SMALL", "4 SMALL", "5 BIG", "2 SMALL", "7 BIG", "3 SMALL", "0 SMALL", "5 BIG", "6 BIG",
-                "8 BIG", "7 BIG", "0 SMALL", "6 BIG", "3 SMALL", "1 SMALL", "0 SMALL", "4 SMALL", "6 BIG", "1 SMALL",
-                "3 SMALL", "4 SMALL", "6 BIG", "4 SMALL", "9 BIG", "9 BIG", "8 BIG", "7 BIG", "8 BIG", "0 SMALL",
-                "6 BIG", "0 SMALL", "9 BIG", "3 SMALL", "1 SMALL", "0 SMALL", "2 SMALL", "2 SMALL", "2 SMALL", "5 BIG",
-                "3 SMALL", "5 BIG", "5 BIG", "1 SMALL", "3 SMALL", "7 BIG", "3 SMALL", "7 BIG", "5 BIG", "0 SMALL",
-                "6 BIG", "1 SMALL", "3 SMALL", "7 BIG", "3 SMALL", "5 BIG", "9 BIG", "3 SMALL", "4 SMALL", "3 SMALL",
-                "5 BIG", "5 BIG", "2 SMALL", "5 BIG", "1 SMALL", "9 BIG", "0 SMALL", "3 SMALL", "1 SMALL", "2 SMALL",
-                "2 SMALL", "9 BIG", "4 SMALL", "4 SMALL", "9 BIG", "3 SMALL", "0 SMALL", "1 SMALL", "4 SMALL", "1 SMALL",
-                "6 BIG", "2 SMALL", "4 SMALL", "8 BIG", "7 BIG", "6 BIG", "7 BIG", "9 BIG", "0 SMALL", "7 BIG",
-                "4 SMALL", "7 BIG", "8 BIG", "5 BIG", "0 SMALL", "1 SMALL", "0 SMALL", "4 SMALL", "0 SMALL", "3 SMALL",
-                "4 SMALL", "3 SMALL", "6 BIG", "9 BIG", "4 SMALL", "8 BIG", "5 BIG", "4 SMALL", "3 SMALL", "2 SMALL",
-                "6 BIG", "5 BIG", "9 BIG", "6 BIG", "3 SMALL", "7 BIG", "8 BIG", "5 BIG", "4 SMALL", "2 SMALL",
-                "0 SMALL", "0 SMALL", "8 BIG", "1 SMALL", "7 BIG", "3 SMALL", "1 SMALL", "1 SMALL", "6 BIG", "8 BIG",
-                "7 BIG", "2 SMALL", "2 SMALL", "9 BIG", "1 SMALL", "4 SMALL", "6 BIG", "8 BIG", "2 SMALL", "6 BIG"
-            ];
-            
-            // Predict button click handler
-            predictBtn.addEventListener('click', function() {
-                const num1 = document.getElementById('num1').value;
-                const size1 = document.getElementById('size1').value;
-                const num2 = document.getElementById('num2').value;
-                const size2 = document.getElementById('size2').value;
-                const num3 = document.getElementById('num3').value;
-                const size3 = document.getElementById('size3').value;
-                
-                // Validate inputs
-                if (num1 === '' || num2 === '' || num3 === '') {
-                    alert('Please enter all three numbers (0-9)');
-                    return;
-                }
-                
-                if (num1 < 0 || num1 > 9 || num2 < 0 || num2 > 9 || num3 < 0 || num3 > 9) {
-                    alert('Numbers must be between 0 and 9');
-                    return;
-                }
-                
-                // Generate a random prediction from the data
-                const randomIndex = Math.floor(Math.random() * predictionData.length);
-                const prediction = predictionData[randomIndex];
-                
-                // Display result with animation
-                resultValue.textContent = prediction;
-                resultBox.style.display = 'block';
-                resultBox.classList.remove('fade-in', 'pulse');
-                void resultBox.offsetWidth; // Trigger reflow
-                resultBox.classList.add('fade-in');
-                
-                setTimeout(() => {
-                    resultBox.classList.add('pulse');
-                }, 800);
-                
-                // Add to history
-                const historyItem = document.createElement('div');
-                historyItem.className = 'history-item';
-                historyItem.innerHTML = `
-                    <span>${num1} ${size1}, ${num2} ${size2}, ${num3} ${size3}</span>
-                    <span>→ ${prediction}</span>
-                `;
-                historyList.insertBefore(historyItem, historyList.firstChild);
-                
-                // Limit history to 20 items
-                if (historyList.children.length > 20) {
-                    historyList.removeChild(historyList.lastChild);
-                }
-            });
-            
-            // Clear button click handler
-            clearBtn.addEventListener('click', function() {
-                document.getElementById('num1').value = '';
-                document.getElementById('num2').value = '';
-                document.getElementById('num3').value = '';
-                document.getElementById('size1').value = 'BIG';
-                document.getElementById('size2').value = 'BIG';
-                document.getElementById('size3').value = 'BIG';
-                resultBox.style.display = 'none';
-            });
-        });
-    </script>
+
+    <div class="button-group">
+      <button id="predictBtn">Predict Result</button>
+      <button id="clearBtn">Clear</button>
+    </div>
+
+    <div class="result-container">
+      <div id="resultBox" class="result-box">
+        <div class="result-title">Prediction Result</div>
+        <div id="resultValue" class="result-value"></div>
+      </div>
+    </div>
+
+    <div class="history">
+      <div class="history-title">Prediction History</div>
+      <div id="historyList"></div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const predictBtn = document.getElementById('predictBtn');
+      const clearBtn = document.getElementById('clearBtn');
+      const resultBox = document.getElementById('resultBox');
+      const resultValue = document.getElementById('resultValue');
+      const historyList = document.getElementById('historyList');
+
+      // Sample prediction sequence data
+      const predictionData = [
+        "8 BIG","0 SMALL","9 BIG","5 BIG","4 SMALL","6 BIG","4 SMALL","4 SMALL","0 SMALL","8 BIG",
+        "2 SMALL","8 BIG","7 BIG","0 SMALL","4 SMALL","2 SMALL","9 BIG","5 BIG","1 SMALL","8 BIG"
+      ];
+
+      // Predict function
+      predictBtn.addEventListener('click', function() {
+        const num1 = document.getElementById('num1').value;
+        const size1 = document.getElementById('size1').value;
+        const num2 = document.getElementById('num2').value;
+        const size2 = document.getElementById('size2').value;
+        const num3 = document.getElementById('num3').value;
+        const size3 = document.getElementById('size3').value;
+
+        if (num1===""||num2===""||num3==="") {
+          alert("Enter all three numbers");
+          return;
+        }
+
+        const inputSeq = [`${num1} ${size1}`,`${num2} ${size2}`,`${num3} ${size3}`];
+        let prediction = null;
+
+        // Match sequence inside dataset
+        for (let i=0;i<predictionData.length-3;i++) {
+          if (predictionData[i]===inputSeq[0] && predictionData[i+1]===inputSeq[1] && predictionData[i+2]===inputSeq[2]) {
+            prediction = predictionData[i+3]; 
+            break;
+          }
+        }
+
+        // If no match found → random fallback
+        if (!prediction) {
+          const randomIndex = Math.floor(Math.random()*predictionData.length);
+          prediction = predictionData[randomIndex];
+        }
+
+        resultValue.textContent = prediction;
+        resultBox.style.display = "block";
+
+        // Add to history
+        const historyItem = document.createElement("div");
+        historyItem.className = "history-item";
+        historyItem.innerHTML = `<span>${inputSeq.join(", ")}</span><span>→ ${prediction}</span>`;
+        historyList.insertBefore(historyItem, historyList.firstChild);
+      });
+
+      // Clear inputs
+      clearBtn.addEventListener('click', function() {
+        document.getElementById('num1').value="";
+        document.getElementById('num2').value="";
+        document.getElementById('num3').value="";
+        resultBox.style.display="none";
+        historyList.innerHTML="";
+      });
+    });
+  </script>
 </body>
 </html>
