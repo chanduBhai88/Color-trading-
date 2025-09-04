@@ -3,122 +3,103 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>3-Level Big/Small Predictor</title>
+  <title>BIG SMALL Predictor</title>
   <style>
     body {
+      margin: 0;
       font-family: Arial, sans-serif;
-      background: #0d0d0d;
-      color: #f5f5f5;
+      background: #000;
+      color: #fff;
       text-align: center;
-      padding: 20px;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
     }
-    h1 {
-      color: #ffcc00;
+
+    #box {
+      width: 300px;
+      height: 150px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+      margin-bottom: 20px;
+      transition: background 1s ease;
+      font-size: 20px;
+      font-weight: bold;
     }
-    .inputs {
-      margin: 20px 0;
-    }
+
     button {
-      padding: 12px 25px;
-      margin: 10px;
+      background: #ff0040;
+      color: #fff;
       border: none;
+      padding: 12px 25px;
       border-radius: 8px;
-      background: #1e90ff;
-      color: white;
+      font-size: 16px;
       cursor: pointer;
-      font-size: 18px;
+      transition: 0.3s;
     }
     button:hover {
-      background: #ff6600;
-    }
-    .chosen {
-      margin: 15px 0;
-      font-size: 18px;
-      color: #00ccff;
-    }
-    .result {
-      margin-top: 20px;
-      font-size: 22px;
-      font-weight: bold;
-      color: #00ff99;
-    }
-    .clear-btn {
-      background: red;
-      margin-top: 20px;
+      background: #d60035;
     }
   </style>
 </head>
 <body>
-  <h1>3-Level Big/Small Predictor</h1>
-  <p>7 baar click karke input do → Result automatic aayega</p>
 
-  <div class="inputs">
-    <button onclick="addInput('Big')">Big</button>
-    <button onclick="addInput('Small')">Small</button>
-  </div>
-
-  <div class="chosen" id="chosen"></div>
-  <div class="result" id="result"></div>
-  <button class="clear-btn" onclick="clearAll()">Clear</button>
+  <div id="box">WAIT...</div>
+  <button onclick="generateResult()">Show Result</button>
 
   <script>
-    let inputs = [];
-    const chosenDiv = document.getElementById("chosen");
-    const resultDiv = document.getElementById("result");
+    // Gradient colors cycle
+    const gradients = [
+      ["#FF4081", "#3F51B5"],
+      ["#303F9F", "#00E676"],
+      ["#7C4DFF", "#FFEB3B"],
+      ["#E91E63", "#9C27B0"],
+      ["#00E676", "#FF0000"]
+    ];
+    let gIndex = 0;
 
-    function addInput(value) {
-      if (inputs.length < 7) {
-        inputs.push(value);
-        showChosen();
-      }
-
-      if (inputs.length === 7) {
-        calculateResult();
-      }
+    function changeGradient() {
+      const box = document.getElementById("box");
+      let [c1, c2] = gradients[gIndex];
+      box.style.background = `linear-gradient(to top left, ${c1}, ${c2})`;
+      gIndex = (gIndex + 1) % gradients.length;
     }
 
-    function showChosen() {
-      chosenDiv.textContent = "Your Inputs: " + inputs.join(" - ");
-    }
+    setInterval(changeGradient, 2000); // har 2 sec me gradient badlega
+    changeGradient();
 
-    function calculateResult() {
-      let result = [];
+    // Random BIG-SMALL Result Generator
+    function generateResult() {
+      let type = Math.random() < 0.5 ? "BIG" : "SMALL";
+      let num1, num2;
 
-      function nextValue(seq) {
-        let last = seq[seq.length - 1];
-        let streak = 1;
+      if (type === "BIG") {
+        num1 = Math.floor(Math.random() * 5) + 5; // 5-9
+        num2 = Math.floor(Math.random() * 5) + 5; // 5-9
+      } else {
+        num1 = Math.floor(Math.random() * 4); // 0-3
+        num2 = Math.floor(Math.random() * 5); // 0-4
+      }
 
-        for (let i = seq.length - 2; i >= 0; i--) {
-          if (seq[i] === last) streak++;
-          else break;
-        }
-
-        if (last === "Small" && streak >= 3) {
-          return "Big";
-        } else if (last === "Big" && streak >= 5) {
-          return "Small";
+      while (num1 === num2) {
+        if (type === "BIG") {
+          num2 = Math.floor(Math.random() * 5) + 5;
         } else {
-          return last;
+          num2 = Math.floor(Math.random() * 5);
         }
       }
 
-      let seq = [...inputs];
-      for (let i = 0; i < 3; i++) {
-        let next = nextValue(seq);
-        result.push(next);
-        seq.push(next);
-        seq.shift();
-      }
+      let num3 = Math.floor(Math.random() * 10); // 0-9
+      let result = `${type} ${num1}.${num2}.${num3}`;
 
-      resultDiv.textContent =
-        `Level 1: ${result[0]} | Level 2: ${result[1]} | Level 3: ${result[2]}`;
-    }
-
-    function clearAll() {
-      inputs = [];
-      chosenDiv.textContent = "";
-      resultDiv.textContent = "";
+      document.getElementById("box").innerText = result;
     }
   </script>
+
 </body>
 </html>
