@@ -1,82 +1,398 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>91Club Wingo Live Demo</title>
-  <style>
-    body { font-family: Arial, sans-serif; background: #f2f2f2; text-align: center; }
-    header { background: #ff4d4d; color: white; padding: 12px; font-size: 22px; font-weight: bold; }
-    .box { background: #fff; width: 360px; margin: 20px auto; padding: 20px;
-           border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.2); }
-    #timer { font-size: 28px; color: red; font-weight: bold; }
-    #period { font-size: 18px; margin: 10px 0; }
-    #result { font-size: 24px; margin-top: 10px; font-weight: bold; }
-    #currentNumber { font-size: 50px; font-weight: bold; margin: 10px 0; }
-    table { width: 90%; margin: 20px auto; border-collapse: collapse; }
-    th, td { border: 1px solid #ccc; padding: 8px; font-size: 14px; }
-    th { background: #eee; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KWG Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            color: white;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            padding: 20px 0;
+            margin-bottom: 30px;
+            width: 100%;
+        }
+        
+        .logo {
+            font-size: 3rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+        
+        .tagline {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .game-area {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+            width: 100%;
+        }
+        
+        .game-board {
+            flex: 1;
+            min-width: 300px;
+            max-width: 600px;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .board {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-gap: 10px;
+            margin: 20px auto;
+            max-width: 400px;
+        }
+        
+        .cell {
+            aspect-ratio: 1;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .cell:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.05);
+        }
+        
+        .game-info {
+            flex: 1;
+            min-width: 300px;
+            max-width: 400px;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .score-board {
+            margin-bottom: 20px;
+        }
+        
+        .score {
+            display: flex;
+            justify-content: space-between;
+            margin: 10px 0;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+        }
+        
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            background: #fdbb2d;
+            color: #1a2a6c;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        button:hover {
+            background: #ffcc44;
+            transform: translateY(-2px);
+        }
+        
+        .status {
+            margin: 20px 0;
+            text-align: center;
+            font-size: 1.2rem;
+            min-height: 30px;
+        }
+        
+        .player-turn {
+            padding: 10px;
+            border-radius: 8px;
+            background: rgba(253, 187, 45, 0.2);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        footer {
+            margin-top: 40px;
+            text-align: center;
+            opacity: 0.7;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .game-area {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .game-board, .game-info {
+                width: 100%;
+            }
+        }
+    </style>
 </head>
 <body>
-  <header>91CLUB WINGO - 1 MIN</header>
+    <div class="container">
+        <header>
+            <div class="logo">KWG GAME</div>
+            <div class="tagline">The Ultimate Strategy Game Experience</div>
+        </header>
+        
+        <div class="game-area">
+            <div class="game-board">
+                <h2>Game Board</h2>
+                <div class="board">
+                    <div class="cell" data-cell-index="0"></div>
+                    <div class="cell" data-cell-index="1"></div>
+                    <div class="cell" data-cell-index="2"></div>
+                    <div class="cell" data-cell-index="3"></div>
+                    <div class="cell" data-cell-index="4"></div>
+                    <div class="cell" data-cell-index="5"></div>
+                    <div class="cell" data-cell-index="6"></div>
+                    <div class="cell" data-cell-index="7"></div>
+                    <div class="cell" data-cell-index="8"></div>
+                </div>
+                
+                <div class="status" id="status">
+                    Game is ready to start!
+                </div>
+            </div>
+            
+            <div class="game-info">
+                <div class="player-turn" id="player-turn">
+                    Player X's Turn
+                </div>
+                
+                <div class="score-board">
+                    <h2>Scores</h2>
+                    <div class="score">
+                        <span>Player X:</span>
+                        <span id="score-x">0</span>
+                    </div>
+                    <div class="score">
+                        <span>Player O:</span>
+                        <span id="score-o">0</span>
+                    </div>
+                    <div class="score">
+                        <span>Draws:</span>
+                        <span id="score-draw">0</span>
+                    </div>
+                </div>
+                
+                <div class="controls">
+                    <button id="new-game">New Game</button>
+                    <button id="reset-score">Reset Scores</button>
+                    <button id="change-mode">Switch to Single Player</button>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>© 2023 KWG Game Studios. All rights reserved.</p>
+        </footer>
+    </div>
 
-  <div class="box">
-    <div id="period">Period: --</div>
-    <div>Time Remaining: <span id="timer">--</span> sec</div>
-    <div id="currentNumber">--</div>
-    <div id="result">WAIT...</div>
-  </div>
-
-  <h3>Game History</h3>
-  <table>
-    <thead>
-      <tr><th>Period</th><th>Number</th><th>Big/Small</th></tr>
-    </thead>
-    <tbody id="history"></tbody>
-  </table>
-
-  <script>
-    function getPeriodNumber() {
-      let now = new Date();
-      let y = now.getFullYear();
-      let m = String(now.getMonth() + 1).padStart(2, "0");
-      let d = String(now.getDate()).padStart(2, "0");
-      let hh = String(now.getHours()).padStart(2, "0");
-      let mm = String(now.getMinutes()).padStart(2, "0");
-      let ss = String(now.getSeconds()).padStart(2, "0");
-      return `${y}${m}${d}${hh}${mm}`; // period = YYYYMMDDHHMM
-    }
-
-    function updateTimer() {
-      let now = new Date();
-      let sec = now.getSeconds();
-      let remaining = 60 - sec;
-      if (remaining === 60) remaining = 0;
-
-      document.getElementById("timer").textContent = remaining;
-      document.getElementById("period").textContent = "Period: " + getPeriodNumber();
-
-      if (remaining === 0) {
-        finishRound();
-      }
-    }
-
-    function finishRound() {
-      let num = Math.floor(Math.random() * 10); // demo only
-      document.getElementById("currentNumber").textContent = num;
-      let res = (num <= 4) ? "Small" : "Big";
-      document.getElementById("result").textContent = res;
-
-      // Add history
-      let row = `<tr>
-        <td>${getPeriodNumber()}</td>
-        <td>${num}</td>
-        <td>${res}</td>
-      </tr>`;
-      document.getElementById("history").insertAdjacentHTML("afterbegin", row);
-    }
-
-    setInterval(updateTimer, 1000);
-  </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Game state variables
+            let currentPlayer = 'X';
+            let gameBoard = ['', '', '', '', '', '', '', '', ''];
+            let gameActive = true;
+            let scores = { X: 0, O: 0, draw: 0 };
+            let isSinglePlayer = false;
+            
+            // Winning combinations
+            const winningConditions = [
+                [0, 1, 2], [3, 4, 5], [6, 7, 8], // rows
+                [0, 3, 6], [1, 4, 7], [2, 5, 8], // columns
+                [0, 4, 8], [2, 4, 6]             // diagonals
+            ];
+            
+            // DOM elements
+            const statusDisplay = document.getElementById('status');
+            const playerTurnDisplay = document.getElementById('player-turn');
+            const scoreX = document.getElementById('score-x');
+            const scoreO = document.getElementById('score-o');
+            const scoreDraw = document.getElementById('score-draw');
+            const cells = document.querySelectorAll('.cell');
+            const newGameBtn = document.getElementById('new-game');
+            const resetScoreBtn = document.getElementById('reset-score');
+            const changeModeBtn = document.getElementById('change-mode');
+            
+            // Functions
+            function handlePlayerChange() {
+                currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+                playerTurnDisplay.textContent = `Player ${currentPlayer}'s Turn`;
+            }
+            
+            function updateScore(winner) {
+                if (winner === 'draw') {
+                    scores.draw++;
+                    scoreDraw.textContent = scores.draw;
+                } else {
+                    scores[winner]++;
+                    if (winner === 'X') {
+                        scoreX.textContent = scores.X;
+                    } else {
+                        scoreO.textContent = scores.O;
+                    }
+                }
+            }
+            
+            function checkResult() {
+                let roundWon = false;
+                let winner = null;
+                
+                for (let i = 0; i < winningConditions.length; i++) {
+                    const [a, b, c] = winningConditions[i];
+                    if (gameBoard[a] && gameBoard[a] === gameBoard[b] && gameBoard[a] === gameBoard[c]) {
+                        roundWon = true;
+                        winner = gameBoard[a];
+                        break;
+                    }
+                }
+                
+                if (roundWon) {
+                    statusDisplay.textContent = `Player ${winner} wins!`;
+                    gameActive = false;
+                    updateScore(winner);
+                    return;
+                }
+                
+                const roundDraw = !gameBoard.includes('');
+                if (roundDraw) {
+                    statusDisplay.textContent = 'Game ended in a draw!';
+                    gameActive = false;
+                    updateScore('draw');
+                    return;
+                }
+                
+                handlePlayerChange();
+                
+                // If single player mode and it's computer's turn
+                if (isSinglePlayer && gameActive && currentPlayer === 'O') {
+                    setTimeout(makeComputerMove, 700);
+                }
+            }
+            
+            function makeComputerMove() {
+                if (!gameActive) return;
+                
+                // Find available cells
+                const availableCells = [];
+                for (let i = 0; i < gameBoard.length; i++) {
+                    if (gameBoard[i] === '') {
+                        availableCells.push(i);
+                    }
+                }
+                
+                // Random move for simplicity
+                if (availableCells.length > 0) {
+                    const randomIndex = Math.floor(Math.random() * availableCells.length);
+                    const cellIndex = availableCells[randomIndex];
+                    
+                    // Update UI and game board
+                    gameBoard[cellIndex] = 'O';
+                    cells[cellIndex].textContent = 'O';
+                    cells[cellIndex].classList.add('o');
+                    
+                    checkResult();
+                }
+            }
+            
+            function handleCellClick(e) {
+                const cell = e.target;
+                const cellIndex = parseInt(cell.getAttribute('data-cell-index'));
+                
+                if (gameBoard[cellIndex] !== '' || !gameActive) {
+                    return;
+                }
+                
+                // Update UI and game board
+                gameBoard[cellIndex] = currentPlayer;
+                cell.textContent = currentPlayer;
+                cell.classList.add(currentPlayer.toLowerCase());
+                
+                checkResult();
+            }
+            
+            function restartGame() {
+                gameBoard = ['', '', '', '', '', '', '', '', ''];
+                gameActive = true;
+                currentPlayer = 'X';
+                playerTurnDisplay.textContent = `Player ${currentPlayer}'s Turn`;
+                statusDisplay.textContent = 'Game in progress';
+                
+                cells.forEach(cell => {
+                    cell.textContent = '';
+                    cell.classList.remove('x', 'o');
+                });
+                
+                // If single player and computer starts (not in this case)
+            }
+            
+            function resetScores() {
+                scores = { X: 0, O: 0, draw: 0 };
+                scoreX.textContent = '0';
+                scoreO.textContent = '0';
+                scoreDraw.textContent = '0';
+            }
+            
+            function changeMode() {
+                isSinglePlayer = !isSinglePlayer;
+                changeModeBtn.textContent = isSinglePlayer ? 
+                    'Switch to Multiplayer' : 'Switch to Single Player';
+                
+                restartGame();
+            }
+            
+            // Event listeners
+            cells.forEach(cell => cell.addEventListener('click', handleCellClick));
+            newGameBtn.addEventListener('click', restartGame);
+            resetScoreBtn.addEventListener('click', resetScores);
+            changeModeBtn.addEventListener('click', changeMode);
+            
+            // Initialize game
+            playerTurnDisplay.textContent = `Player ${currentPlayer}'s Turn`;
+        });
+    </script>
 </body>
 </html>
