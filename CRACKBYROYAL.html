@@ -3,147 +3,100 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>🔥 RajaGame Predictor (Dual Mode)</title>
+  <title>Trend-Based Predictor</title>
   <style>
     body {
-      margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background: url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e')
-        no-repeat center center/cover;
-      height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      color: white;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      color: #fff;
+      text-align: center;
+      padding: 20px;
     }
     .container {
-      background: rgba(0,0,0,0.7);
+      max-width: 500px;
+      margin: auto;
+      background: rgba(0,0,0,0.6);
       padding: 20px;
-      border-radius: 20px;
-      text-align: center;
-      box-shadow: 0 0 20px rgba(255,255,255,0.3);
-      width: 350px;
+      border-radius: 15px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.6);
     }
-    h2 {
-      margin-bottom: 15px;
-      color: #ffcc00;
-    }
-    .inputs {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      justify-content: center;
-      margin-bottom: 15px;
-    }
-    input {
-      padding: 8px;
-      border-radius: 8px;
-      border: none;
-      width: 100px;
-      text-align: center;
-    }
-    button {
-      padding: 10px 15px;
-      border: none;
-      border-radius: 10px;
-      margin: 5px;
-      background: linear-gradient(45deg, #ff5722, #ff9800);
-      color: white;
-      font-weight: bold;
-      cursor: pointer;
-      transition: 0.3s;
-    }
-    button:hover {
-      transform: scale(1.05);
+    h1 {
+      color: #f9ca24;
+      margin-bottom: 20px;
     }
     .result {
-      margin-top: 20px;
-      padding: 15px;
-      border-radius: 15px;
-      font-size: 18px;
+      font-size: 28px;
       font-weight: bold;
-      background: linear-gradient(45deg, #4caf50, #8bc34a);
+      margin: 15px 0;
+    }
+    .timer, .period {
+      font-size: 20px;
+      margin: 10px 0;
+    }
+    button {
+      background: #f9ca24;
+      border: none;
+      padding: 12px 25px;
+      font-size: 18px;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-top: 15px;
+      font-weight: bold;
+      color: #222;
+    }
+    button:hover {
+      background: #f39c12;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h2>🔥 RajaGame Predictor</h2>
-    <div class="inputs">
-      <input type="text" id="in1" placeholder="e.g. 7-small">
-      <input type="text" id="in2" placeholder="e.g. 6-small">
-      <input type="text" id="in3" placeholder="e.g. 5-small">
-    </div>
-    <div>
-      <button onclick="historyMode()">History Match</button>
-      <button onclick="calcMode()">Calculation Mode</button>
-    </div>
-    <div id="result" class="result">⚡ Result will appear here</div>
+    <h1>Trend-Based Number Predictor</h1>
+    
+    <div id="result" class="result">Press "Predict" to Start</div>
+    <div id="period" class="period">Period: --</div>
+    <div id="timer" class="timer">00:00</div>
+    
+    <button onclick="generatePrediction()">Predict</button>
   </div>
 
   <script>
-    // Sample history (aap apna full list yahan add kar dena)
-    const historyData = [
-      "1-small","0-Big","9-Big","8-Big","7-small",
-      "6-small","5-small","4-Big","3-small","2-small",
-      "1-small","0-small","9-Big","8-small","7-Big"
-    ];
+    // Generate prediction
+    function generatePrediction() {
+      let trendValue = Math.floor(Math.random() * 10); // 0-9
+      let bigSmallPrediction = (trendValue % 2 === 0) ? "Big" : "Small";
 
-    // History Match Mode
-    function historyMode() {
-      let inputs = [
-        document.getElementById("in1").value.trim(),
-        document.getElementById("in2").value.trim(),
-        document.getElementById("in3").value.trim()
-      ];
-      let prediction = null;
-
-      for (let i = 0; i < historyData.length - inputs.length; i++) {
-        let slice = historyData.slice(i, i + inputs.length);
-        if (JSON.stringify(slice) === JSON.stringify(inputs)) {
-          prediction = historyData[i + inputs.length];
-          break;
-        }
-      }
-      document.getElementById("result").innerText = prediction 
-        ? "🎯 History Prediction: " + prediction 
-        : "⚠️ No Match Found!";
-    }
-
-    // Calculation Mode
-    function calcMode() {
-      let nums = [];
-      let inputs = [
-        document.getElementById("in1").value.trim(),
-        document.getElementById("in2").value.trim(),
-        document.getElementById("in3").value.trim()
-      ];
-
-      inputs.forEach(item => {
-        let num = parseInt(item.split("-")[0]);
-        if (!isNaN(num)) nums.push(num);
-      });
-
-      if (nums.length < 3) {
-        document.getElementById("result").innerText = "⚠️ Please enter 3 valid inputs!";
-        return;
+      let predictedNumber;
+      if (bigSmallPrediction === "Big") {
+        predictedNumber = Math.floor(Math.random() * 5) + 5; // 5-9
+      } else {
+        predictedNumber = Math.floor(Math.random() * 5); // 0-4
       }
 
-      // Trend check (last 10)
-      let last10 = historyData.slice(-10);
-      let bigCount = last10.filter(r => r.includes("Big")).length;
-      let smallCount = last10.length - bigCount;
-      let trend = bigCount > smallCount ? "Big" : "Small";
-
-      // Calculation (sum mod 10)
-      let sum = nums.reduce((a,b)=>a+b,0);
-      let nextNum = sum % 10;
-      let size = nextNum >= 6 ? "Big" : "Small";
-      let calc = `${nextNum}-${size}`;
-
-      document.getElementById("result").innerText =
-        "📊 Trend says: " + trend + "\n🧮 Calc says: " + calc;
+      document.getElementById("result").innerText = bigSmallPrediction + " " + predictedNumber;
     }
+
+    // Timer & Period updater
+    function updateTimerAndPeriod() {
+      let now = new Date();
+      let seconds = now.getSeconds();
+      let remainingSeconds = 60 - seconds;
+
+      // Period number (similar to Java code logic)
+      let yearMonthDay = now.getFullYear().toString() +
+                        ("0" + (now.getMonth()+1)).slice(-2) +
+                        ("0" + now.getDate()).slice(-2);
+      let totalMinutes = now.getHours() * 60 + now.getMinutes();
+      let periodNumber = yearMonthDay + "0" + (10001 + totalMinutes);
+
+      // Update in HTML
+      document.getElementById("timer").innerText = "00:" + ("0" + remainingSeconds).slice(-2);
+      document.getElementById("period").innerText = "Period: " + periodNumber;
+    }
+
+    // Update every second
+    setInterval(updateTimerAndPeriod, 1000);
+    updateTimerAndPeriod(); // initial call
   </script>
 </body>
 </html>
