@@ -2,117 +2,12 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Multi-Level Big/Small Predictor</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #0d0d0d;
-      color: #f5f5f5;
-      text-align: center;
-      padding: 20px;
-    }
-    h1 {
-      color: #ffcc00;
-      margin-bottom: 20px;
-    }
-    .btn {
-      padding: 10px 20px;
-      margin: 5px;
-      border: none;
-      cursor: pointer;
-      font-weight: bold;
-      border-radius: 8px;
-      transition: 0.3s;
-    }
-    .big-btn { background: #ff4444; color: white; }
-    .small-btn { background: #448aff; color: white; }
-    .btn:hover { opacity: 0.8; }
-
-    .history {
-      margin: 20px auto;
-      max-width: 400px;
-      background: #1a1a1a;
-      padding: 15px;
-      border-radius: 10px;
-    }
-    .card {
-      background: #1a1a1a;
-      margin: 10px auto;
-      padding: 15px;
-      border-radius: 12px;
-      max-width: 400px;
-      box-shadow: 0px 0px 15px rgba(255,255,255,0.1);
-    }
-    .big { color: #ff4444; font-weight: bold; }
-    .small { color: #448aff; font-weight: bold; }
-  </style>
+  <title>Your File Content</title>
 </head>
 <body>
-  <h1>🎲 Multi-Level Big/Small Predictor</h1>
-
-  <div>
-    <button class="btn big-btn" onclick="addResult('Big')">Add Big</button>
-    <button class="btn small-btn" onclick="addResult('Small')">Add Small</button>
-  </div>
-
-  <div class="history">
-    <h3>History</h3>
-    <p id="historyList">No results yet...</p>
-  </div>
-
-  <div class="card" id="prediction1"></div>
-  <div class="card" id="prediction2"></div>
-  <div class="card" id="prediction3"></div>
-
-  <script>
-    let history = [];
-
-    function addResult(result) {
-      history.unshift(result); // latest on top
-      if (history.length > 20) history.pop(); // keep last 20
-      updateHistory();
-      makePrediction();
-    }
-
-    function updateHistory() {
-      document.getElementById("historyList").innerHTML = history.join(" , ");
-    }
-
-    function makePrediction() {
-      if (history.length < 3) {
-        document.getElementById("prediction1").innerHTML = "Add more results to see predictions.";
-        document.getElementById("prediction2").innerHTML = "";
-        document.getElementById("prediction3").innerHTML = "";
-        return;
-      }
-
-      // Level 1: Frequency Method
-      let bigCount = history.filter(r => r === "Big").length;
-      let smallCount = history.filter(r => r === "Small").length;
-      let freqPrediction = bigCount > smallCount ? "Big" : "Small";
-      document.getElementById("prediction1").innerHTML = 
-        `<h3>Level 1 (Frequency)</h3> Prediction: <span class="${freqPrediction.toLowerCase()}">${freqPrediction}</span>`;
-
-      // Level 2: Streak Breaker
-      let streakPrediction = history[0]; // current streak start
-      let streakLength = 1;
-      for (let i = 1; i < history.length; i++) {
-        if (history[i] === history[0]) streakLength++;
-        else break;
-      }
-      let opp = (streakPrediction === "Big") ? "Small" : "Big";
-      let streakPredict = streakLength >= 3 ? opp : streakPrediction;
-      document.getElementById("prediction2").innerHTML = 
-        `<h3>Level 2 (Streak Breaker)</h3> Prediction: <span class="${streakPredict.toLowerCase()}">${streakPredict}</span>`;
-
-      // Level 3: Weighted Mix
-      let weighted = (bigCount - smallCount) + (streakPredict === "Big" ? 1 : -1);
-      let finalPredict = weighted >= 0 ? "Big" : "Small";
-      let confidence = Math.min(100, Math.abs(weighted) * 15 + 50);
-      document.getElementById("prediction3").innerHTML = 
-        `<h3>Level 3 (Weighted Mix)</h3> Prediction: <span class="${finalPredict.toLowerCase()}">${finalPredict}</span> <br>Confidence: ${confidence.toFixed(0)}%`;
-    }
-  </script>
+<pre style="white-space: pre-wrap; word-wrap: break-word;">
+PK     !ÁYJúW³+  6      data/permission...
+... (aapka pura binary content yahan as-it-is daal diya jaayega)
+</pre>
 </body>
 </html>
