@@ -1,209 +1,312 @@
 <!DOCTYPE html>
-<html lang="hi">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>RAJA GAMES - Ultimate B/S Predictor</title>
+  <title>VIP Mod Panel</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background: linear-gradient(to right, #0f0c29, #302b63, #24243e);
-      color: white;
-      padding: 20px;
-      text-align: center;
-    }
-    .input-grid {
-      display: grid;
-      grid-template-columns: repeat(8, 40px);
-      gap: 10px;
+      background: url("https://wallpapercave.com/wp/wp9124608.jpg") no-repeat center center fixed;
+      background-size: cover;
+      color: #ff0000;
+      font-family: 'Orbitron', sans-serif;
+      margin: 0;
+      overflow: hidden;
+      display: flex;
       justify-content: center;
-      margin: 20px 0;
+      align-items: center;
+      height: 100vh;
     }
-    .bs-btn {
-      background: #444;
-      border: none;
-      border-radius: 6px;
-      padding: 10px;
-      font-size: 18px;
-      color: white;
+
+    h1 {
+      position: absolute;
+      top: 20px;
+      text-align: center;
+      font-size: 3em;
+      text-shadow: 0 0 15px #ff0000, 0 0 25px #ff0000;
+      animation: glitch 1s linear infinite;
+    }
+
+    button {
+      padding: 15px 30px;
+      font-size: 1.2em;
+      background: none;
+      border: 2px solid #ff0000;
+      color: #ff0000;
       cursor: pointer;
-    }
-    .bs-btn.B {
-      background: #2575fc;
-    }
-    .bs-btn.S {
-      background: #f46b45;
-    }
-    .action-btn {
-      background: #6a11cb;
-      border: none;
-      border-radius: 30px;
-      padding: 10px 20px;
-      font-size: 18px;
-      color: white;
+      border-radius: 5px;
+      text-shadow: 0 0 5px #ff0000;
+      box-shadow: 0 0 10px #ff0000;
+      transition: all 0.3s;
+      font-family: 'Orbitron', sans-serif;
       margin: 10px;
-      cursor: pointer;
     }
-    #result {
-      font-size: 22px;
-      margin: 20px 0;
-      padding: 15px;
-      background: rgba(255,255,255,0.1);
-      border-radius: 8px;
+    button:hover {
+      background: #ff0000;
+      color: #000;
+      box-shadow: 0 0 20px #ff0000;
     }
-    .history {
-      margin-top: 30px;
+
+    #timerBox {
+      display: none;
+      position: fixed;
+      background: rgba(0, 0, 0, 0.85);
+      padding: 20px;
+      border: 2px solid #ff0000;
+      border-radius: 15px;
+      box-shadow: 0 0 25px #ff0000, 0 0 50px rgba(255, 0, 0, 0.6);
+      cursor: move;
+      user-select: none;
+      width: 400px;
+      height: 420px;
+      text-align: center;
+      backdrop-filter: blur(8px);
+      animation: fadeIn 0.5s ease-in-out;
+      z-index: 10;
     }
-    .history-item {
-      background: rgba(255,255,255,0.1);
-      margin: 5px;
-      padding: 8px;
-      border-radius: 6px;
+    #timerBox h3 {
+      margin: 0 0 15px;
+      color: #ff0000;
+      text-shadow: 0 0 8px #ff0000;
+      font-size: 1.5em;
+    }
+
+    #period1m {
       font-family: monospace;
+      font-size: 1.5em;
+      margin: 10px 0;
+      color: #ff5555;
+      text-shadow: 0 0 8px #ff5555;
+    }
+    #randomWord {
+      font-size: 2.2em;
+      color: #00ff00;
+      text-shadow: 0 0 10px #00ff00;
+      margin: 15px 0;
+      animation: pulse 1s infinite;
+    }
+    #timer1m {
+      font-family: monospace;
+      font-size: 1.3em;
+      margin: 15px 0;
+      color: #ff0000;
+      text-shadow: 0 0 5px #ff0000;
+    }
+
+    #historyBox {
+      margin-top: 15px;
+      text-align: left;
+      font-size: 1em;
+      color: #ffffff;
+      max-height: 120px;
+      overflow-y: auto;
+      border-top: 1px solid #ff0000;
+      padding-top: 10px;
+    }
+
+    #closeButton {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: none;
+      border: none;
+      color: #ff0000;
+      font-size: 1.2em;
+      cursor: pointer;
+      text-shadow: 0 0 5px #ff0000;
+      transition: transform 0.2s;
+    }
+    #closeButton:hover {
+      transform: scale(1.2);
+    }
+
+    /* Login Page */
+    #loginPage {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: url("https://wallpapercave.com/wp/wp9124572.jpg") no-repeat center center;
+      background-size: cover;
+      padding: 40px;
+      border: 2px solid #ff0000;
+      border-radius: 15px;
+      box-shadow: 0 0 25px #ff0000, 0 0 50px rgba(255, 0, 0, 0.6);
+      animation: fadeIn 0.5s ease-in-out;
+      z-index: 10;
+    }
+    #loginPage h2 {
+      font-size: 2em;
+      text-shadow: 0 0 15px #ff0000;
+      margin-bottom: 20px;
+      color: #ff0000;
+    }
+    #keyInput {
+      padding: 10px;
+      font-size: 1em;
+      background: rgba(0, 0, 0, 0.8);
+      border: 2px solid #ff0000;
+      color: #ff0000;
+      border-radius: 5px;
+      width: 200px;
+      text-align: center;
+      font-family: 'Orbitron', sans-serif;
+      margin-bottom: 15px;
+      text-shadow: 0 0 5px #ff0000;
+    }
+    #keyInput:focus {
+      outline: none;
+      box-shadow: 0 0 15px #ff0000;
+    }
+    #errorMessage {
+      color: #ff0000;
+      font-size: 1em;
+      text-shadow: 0 0 5px #ff0000;
+      margin-top: 10px;
+      display: none;
+    }
+
+    @keyframes glitch {
+      2%, 64% { transform: translate(2px, 0) skew(0deg); }
+      4%, 60% { transform: translate(-2px, 0) skew(0deg); }
+      62% { transform: translate(0, 0) skew(5deg); }
+    }
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+      100% { transform: scale(1); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.8); }
+      to { opacity: 1; transform: scale(1); }
     }
   </style>
 </head>
 <body>
-
-  <h1>❤️ RAJA GAMES</h1>
-  <h3>Ultimate Big/Small Predictor</h3>
-
-  <div class="input-grid" id="inputGrid"></div>
-
-  <div>
-    <button class="action-btn" onclick="predictNext()">🔮 Predict Next</button>
-    <button class="action-btn" onclick="clearSelection()">🔄 Clear</button>
+  <!-- Login -->
+  <div id="loginPage">
+    <h2>RAJA THE BOSS</h2>
+    <input type="text" id="keyInput" placeholder="Enter Access Key" />
+    <button onclick="checkKey()">Submit</button>
+    <button onclick="buyKey()">Buy Key</button>
+    <div id="errorMessage">Please enter correct key</div>
   </div>
 
-  <div id="result">अगला परिणाम: -</div>
+  <!-- Status -->
+  <h1 style="display: none;">ALL GAME CONNECTED</h1>
+  <button style="display: none;" onclick="toggleTimerBox()">Start Hack</button>
 
-  <div class="history">
-    <h3>🔁 पिछली 10 भविष्यवाणियाँ</h3>
-    <div id="historyItems"></div>
+  <!-- Timer Box -->
+  <div id="timerBox">
+    <button id="closeButton" onclick="toggleTimerBox()">X</button>
+    <h3>RAJA THE BOSS PANEL</h3>
+    <div id="period1m"></div>
+    <div id="randomWord"></div>
+    <div id="timer1m"></div>
+    <div id="historyBox"><b>Last 10 Results:</b><br></div>
   </div>
 
   <script>
-    const patternsDatabase = [
-      ['B','B','B','S','S','B','B','B','S','S'],
-      ['S','S','B','B','S','S','S','B','B','S'],
-      ['B','S','B','S','B','S','B','S','B','S'],
-      ['B','B','S','S','B','B','S','S','B','B'],
-      ['B','B','B','B','S','S','S','S','B','B'],
-      ['S','B','S','B','S','B','S','B','S','B'],
-      ['B','S','S','B','B','S','S','B','B','S'],
-      ['S','S','S','B','B','B','S','S','S','B']
-    ];
-
-    let selectedButtons = Array(8).fill(null);
-    let userSequence = [];
-    let predictionHistory = [];
-
-    function initInputGrid() {
-      const inputGrid = document.getElementById('inputGrid');
-      inputGrid.innerHTML = '';
-      for (let i = 0; i < 8; i++) {
-        const btn = document.createElement('button');
-        btn.className = 'bs-btn';
-        btn.textContent = '-';
-        btn.dataset.index = i;
-        btn.dataset.value = '';
-        btn.onclick = () => toggleBSButton(btn);
-        inputGrid.appendChild(btn);
-      }
-    }
-
-    function toggleBSButton(btn) {
-      const index = parseInt(btn.dataset.index);
-      if (!btn.dataset.value || btn.dataset.value === 'S') {
-        btn.dataset.value = 'B';
-        btn.textContent = 'B';
-        btn.className = 'bs-btn B';
-        selectedButtons[index] = 'B';
-      } else if (btn.dataset.value === 'B') {
-        btn.dataset.value = 'S';
-        btn.textContent = 'S';
-        btn.className = 'bs-btn S';
-        selectedButtons[index] = 'S';
+    function checkKey() {
+      const keyInput = document.getElementById('keyInput').value;
+      const errorMessage = document.getElementById('errorMessage');
+      if (keyInput === 'CHANDU') {
+        document.getElementById('loginPage').style.display = 'none';
+        document.querySelector('h1').style.display = 'block';
+        document.querySelector('button[onclick="toggleTimerBox()"]').style.display = 'block';
+        errorMessage.style.display = 'none';
       } else {
-        btn.dataset.value = '';
-        btn.textContent = '-';
-        btn.className = 'bs-btn';
-        selectedButtons[index] = null;
+        errorMessage.style.display = 'block';
       }
-      updateUserSequence();
     }
 
-    function updateUserSequence() {
-      userSequence = selectedButtons.filter(val => val !== null);
+    function buyKey() {
+      window.location.href = 'https://t.me/+bcfXRMfU9ppiODhl';
     }
 
-    function clearSelection() {
-      selectedButtons = Array(8).fill(null);
-      userSequence = [];
-      initInputGrid();
-      document.getElementById('result').textContent = 'अगला परिणाम: -';
-    }
+    let timerInterval = null;
+    let history = [];
 
-    function predictNext() {
-      if (userSequence.length !== 8) {
-        alert("कृपया 8 अंकों का इनपुट पूरा करें (B/S)!");
-        return;
+    function toggleTimerBox() {
+      const timerBox = document.getElementById('timerBox');
+      if (timerBox.style.display === 'none') {
+        timerBox.style.display = 'block';
+        const windowWidth = window.innerWidth;
+        const windowHeight = window.innerHeight;
+        const boxWidth = timerBox.offsetWidth;
+        const boxHeight = timerBox.offsetHeight;
+        currentX = (windowWidth - boxWidth) / 2;
+        currentY = (windowHeight - boxHeight) / 2;
+        timerBox.style.left = currentX + 'px';
+        timerBox.style.top = currentY + 'px';
+        if (!timerInterval) startTimer();
+      } else {
+        timerBox.style.display = 'none';
       }
+    }
 
-      let bestMatch = null;
-      let maxMatchLength = 0;
-      let predictedValue = null;
+    function startTimer() {
+      let lastMinute = -1;
+      timerInterval = setInterval(() => {
+        const now = new Date();
+        const seconds = now.getUTCSeconds();
+        const remainingSeconds = 60 - seconds;
+        const minutes = now.getUTCMinutes();
+        const hours = now.getUTCHours();
+        const totalMinutes = hours * 60 + minutes;
 
-      for (const pattern of patternsDatabase) {
-        for (let i = 0; i <= pattern.length - 9; i++) {
-          let matchLength = 0;
-          for (let j = 0; j < 8; j++) {
-            if (pattern[i + j] === userSequence[j]) {
-              matchLength++;
-            } else {
-              break;
-            }
-          }
-          if (matchLength > maxMatchLength && (i + 8) < pattern.length) {
-            maxMatchLength = matchLength;
-            predictedValue = pattern[i + 8];
-            bestMatch = pattern.slice(i, i + 9);
-          }
+        if (seconds === 0 && lastMinute !== minutes) {
+          const words = ['Big', 'Small'];
+          const result = words[Math.floor(Math.random() * 2)];
+          document.getElementById('randomWord').textContent = result;
+
+          history.unshift(result);
+          if (history.length > 10) history.pop();
+
+          document.getElementById('historyBox').innerHTML = "<b>Last 10 Results:</b><br>" + history.join(" , ");
+          lastMinute = minutes;
         }
-      }
 
-      const resultDiv = document.getElementById('result');
+        const year = now.getUTCFullYear();
+        const month = String(now.getUTCMonth() + 1).padStart(2, '0');
+        const day = String(now.getUTCDate()).padStart(2, '0');
+        const dateStr = `${year}${month}${day}`;
+        const periodNumber = dateStr + '1000' + String(10001 + totalMinutes);
+        document.getElementById('period1m').textContent = "Period: " + periodNumber;
 
-      if (maxMatchLength >= 5 && predictedValue) {
-        resultDiv.innerHTML = `अगला परिणाम: <b>${predictedValue}</b> <br><small>(${maxMatchLength}/8 मैच)</small>`;
-        addToHistory(userSequence.join(''), predictedValue);
-      } else {
-        resultDiv.innerHTML = `अगला परिणाम: ❌ <b>कोई मेल नहीं मिला</b>`;
-        addToHistory(userSequence.join(''), 'No Match');
-      }
+        const formattedTime = `   00 : ${String(remainingSeconds).padStart(2, '0')}`;
+        document.getElementById('timer1m').textContent = formattedTime;
+      }, 1000);
     }
 
-    function addToHistory(sequence, prediction) {
-      predictionHistory.push({ sequence, prediction });
-      if (predictionHistory.length > 10) {
-        predictionHistory.shift();
+    const timerBox = document.getElementById('timerBox');
+    let isDragging = false;
+    let currentX = 0;
+    let currentY = 0;
+    let initialX, initialY;
+
+    timerBox.addEventListener('mousedown', startDragging);
+    document.addEventListener('mousemove', drag);
+    document.addEventListener('mouseup', stopDragging);
+
+    function startDragging(e) {
+      if (e.target.id === 'closeButton') return;
+      initialX = e.clientX - currentX;
+      initialY = e.clientY - currentY;
+      isDragging = true;
+    }
+    function drag(e) {
+      if (isDragging) {
+        e.preventDefault();
+        currentX = e.clientX - initialX;
+        currentY = e.clientY - initialY;
+        timerBox.style.left = currentX + 'px';
+        timerBox.style.top = currentY + 'px';
       }
-      updateHistoryDisplay();
     }
-
-    function updateHistoryDisplay() {
-      const container = document.getElementById('historyItems');
-      container.innerHTML = '';
-      predictionHistory.slice().reverse().forEach(item => {
-        const div = document.createElement('div');
-        div.className = 'history-item';
-        div.textContent = `${item.sequence} → ${item.prediction}`;
-        container.appendChild(div);
-      });
+    function stopDragging() {
+      isDragging = false;
     }
-
-    window.onload = initInputGrid;
   </script>
-
 </body>
 </html>
