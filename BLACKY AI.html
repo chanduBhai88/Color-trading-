@@ -2,37 +2,35 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Advanced Big Small + Number Predictor</title>
+  <title>Big Small + Number Predictor</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
-    body { background:#111; color:#fff; font-family:sans-serif; text-align:center; }
-    .box { background:#222; padding:20px; margin:15px; border-radius:10px; display:inline-block; }
-    select, button { padding:10px; margin:5px; border-radius:5px; font-size:16px; }
-    #history, #prediction { margin-top:20px; text-align:left; max-width:700px; margin-left:auto; margin-right:auto; }
-    .vip { color:#0f0; font-weight:bold; }
-    .timer { font-size:22px; margin:15px; }
+    body { background:#0d0d0d; color:#fff; font-family:'Orbitron', sans-serif; text-align:center; }
+    h1 { color:#0ff; }
+    .box { background:#1a1a1a; padding:20px; margin:15px auto; border-radius:15px; width:80%; box-shadow:0 0 15px #0ff; }
+    select, button { padding:10px 15px; margin:8px; border-radius:10px; border:none; font-size:16px; cursor:pointer; transition:0.3s; }
+    button { background:#0ff; color:#000; font-weight:bold; }
+    button:hover { background:#00ccff; transform:scale(1.05); }
+    #predictionResult { font-size:18px; margin-top:10px; padding:15px; border-radius:10px; background:#111; animation: fadeIn 1s ease-in-out; }
+    @keyframes fadeIn { from{opacity:0;} to{opacity:1;} }
+    canvas { margin-top:20px; }
   </style>
 </head>
 <body>
 
-  <h1>🔮 Advanced Big Small + Number Predictor</h1>
-  <div class="timer">⏳ Next Auto Round in: <span id="timer">60</span> sec</div>
+  <h1>🔮 Big Small + Number Predictor</h1>
 
   <div class="box">
     <label>Choose Big/Small:</label>
     <select id="bsChoice">
       <option value="Big">Big (5–9)</option>
       <option value="Small">Small (0–4)</option>
-    </select><br>
-
-    <label>Choose Number (0–9):</label>
+    </select>
+    <label>Choose Number:</label>
     <select id="numChoice">
-      <option value="0">0</option><option value="1">1</option>
-      <option value="2">2</option><option value="3">3</option>
-      <option value="4">4</option><option value="5">5</option>
-      <option value="6">6</option><option value="7">7</option>
-      <option value="8">8</option><option value="9">9</option>
+      <option>0</option><option>1</option><option>2</option><option>3</option><option>4</option>
+      <option>5</option><option>6</option><option>7</option><option>8</option><option>9</option>
     </select><br>
-
     <button onclick="addInput()">Add Input</button>
     <button onclick="predict()">Predict Next</button>
     <button onclick="clearAll()">Clear All</button>
@@ -42,6 +40,7 @@
   <div id="history" class="box">
     <h2>📜 History</h2>
     <div id="historyList"></div>
+    <canvas id="chart" height="100"></canvas>
   </div>
 
   <div id="prediction" class="box">
@@ -52,34 +51,26 @@
   <script>
     let history = [];
     let vipMode = false;
-    let timer = 60;
-    let timerInterval;
+    let chart;
 
-    function addInput(auto=false) {
-      let bs, num;
-
-      if(auto){ 
-        // auto random input
-        num = Math.floor(Math.random()*10);
-        bs = num <=4 ? "Small":"Big";
-      } else {
-        bs = document.getElementById("bsChoice").value;
-        num = parseInt(document.getElementById("numChoice").value);
-      }
-
+    function addInput() {
+      let bs = document.getElementById("bsChoice").value;
+      let num = parseInt(document.getElementById("numChoice").value);
       history.push({ bs, num });
       updateHistory();
+      updateChart();
     }
 
     function updateHistory() {
-      let html = history.map((h,i)=>`#${i+1} → ${h.bs} (${h.num})`).join("<br>");
-      document.getElementById("historyList").innerHTML = html;
+      document.getElementById("historyList").innerHTML =
+        history.map((h,i)=>`#${i+1} → ${h.bs} (${h.num})`).join("<br>");
     }
 
     function clearAll() {
       history = [];
       updateHistory();
       document.getElementById("predictionResult").innerHTML = "No data yet";
+      updateChart();
     }
 
     function predict() {
@@ -100,10 +91,7 @@
       let hot = countNums.indexOf(Math.max(...countNums));
       let cold = countNums.indexOf(Math.min(...countNums));
       let likelyRange = bigCount>smallCount ? "Big (5–9)" : "Small (0–4)";
-
-      // Confidence calculation
-      let diff = Math.abs(bigCount-smallCount);
-      let confidence = Math.min(90, 50 + diff*5);
+      let confidence = Math.min(90, 50 + Math.abs(bigCount-smallCount)*5);
 
       let result = `
         🔥 Hot Number: ${hot}<br>
@@ -112,7 +100,6 @@
         ✅ Confidence: ${confidence}%
       `;
 
-      // VIP Mode Extra Analysis
       if(vipMode){
         let streak=1, last=last20[0].bs, maxStreak=1, streakSide=last;
         for(let i=1;i<last20.length;i++){
@@ -120,9 +107,9 @@
           else{ streak=1; last=last20[i].bs; }
         }
         if(maxStreak>=3){
-          result += `<br><span class="vip">VIP Trend → Long ${streakSide} streak (${maxStreak}) → Break Expected Soon!</span>`;
+          result += `<br><span style="color:#0f0">VIP → Long ${streakSide} streak (${maxStreak}) → Break Expected Soon!</span>`;
         } else {
-          result += `<br><span class="vip">VIP Trend → Mixed pattern, follow hot number strategy.</span>`;
+          result += `<br><span style="color:#0f0">VIP → Mixed pattern, follow hot number strategy.</span>`;
         }
       }
 
@@ -134,19 +121,31 @@
       alert(vipMode ? "✅ VIP Mode Activated" : "❌ VIP Mode Deactivated");
     }
 
-    // Auto Timer Function
-    function startTimer(){
-      timerInterval = setInterval(()=>{
-        timer--;
-        if(timer<=0){
-          timer=60;
-          addInput(true);
-          predict();
-        }
-        document.getElementById("timer").innerText = timer;
-      },1000);
+    // Chart.js Graph
+    function updateChart(){
+      let ctx = document.getElementById("chart").getContext("2d");
+      if(chart) chart.destroy();
+      let labels = history.map((_,i)=>"#"+(i+1));
+      let data = history.map(h=>h.num);
+
+      chart = new Chart(ctx, {
+        type:"line",
+        data:{
+          labels: labels,
+          datasets:[{
+            label:"Number History",
+            data: data,
+            borderColor:"#0ff",
+            backgroundColor:"rgba(0,255,255,0.2)",
+            tension:0.3,
+            fill:true,
+            pointRadius:5,
+            pointBackgroundColor:"#ff0"
+          }]
+        },
+        options:{ scales:{ y:{ beginAtZero:true, max:9 } } }
+      });
     }
-    startTimer();
   </script>
 </body>
 </html>
