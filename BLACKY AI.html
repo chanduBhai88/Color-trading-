@@ -2,90 +2,120 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Period-Server Predictor</title>
+  <title>Big Small + Number Predictor</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #0d0d0d;
-      color: #f5f5f5;
-      text-align: center;
-      padding: 30px;
-    }
-    h1 {
-      color: #00ff99;
-    }
-    .container {
-      background: #1a1a1a;
-      padding: 20px;
-      border-radius: 15px;
-      width: 350px;
-      margin: auto;
-      box-shadow: 0 0 15px #00ff99;
-    }
-    input {
-      padding: 10px;
-      margin: 8px;
-      border-radius: 8px;
-      border: none;
-      width: 80%;
-      text-align: center;
-      font-size: 16px;
-    }
-    button {
-      padding: 12px 20px;
-      margin-top: 15px;
-      border: none;
-      border-radius: 10px;
-      background: #00ff99;
-      color: #000;
-      font-size: 16px;
-      cursor: pointer;
-      transition: 0.3s;
-    }
-    button:hover {
-      background: #00cc77;
-    }
-    .result {
-      margin-top: 20px;
-      font-size: 20px;
-      font-weight: bold;
-      color: #ffcc00;
-    }
+    body { background:#111; color:#fff; font-family:sans-serif; text-align:center; }
+    .box { background:#222; padding:20px; margin:15px; border-radius:10px; display:inline-block; }
+    select, button { padding:10px; margin:5px; border-radius:5px; font-size:16px; }
+    #history, #prediction { margin-top:20px; text-align:left; max-width:600px; margin-left:auto; margin-right:auto; }
+    .vip { color:#0f0; font-weight:bold; }
   </style>
 </head>
 <body>
-  <h1>🔐 Period + Server Predictor</h1>
-  <div class="container">
-    <input type="number" id="period" placeholder="Enter Period Number"><br>
-    <input type="number" id="server" placeholder="Enter Server Number"><br>
-    <button onclick="predict()">Predict</button>
-    <button onclick="clearFields()">Clear</button>
-    <div class="result" id="output"></div>
+
+  <h1>🔮 Big Small + Number Predictor</h1>
+
+  <div class="box">
+    <label>Choose Big/Small:</label>
+    <select id="bsChoice">
+      <option value="Big">Big (5–9)</option>
+      <option value="Small">Small (0–4)</option>
+    </select><br>
+
+    <label>Choose Number (0–9):</label>
+    <select id="numChoice">
+      <option value="0">0</option><option value="1">1</option>
+      <option value="2">2</option><option value="3">3</option>
+      <option value="4">4</option><option value="5">5</option>
+      <option value="6">6</option><option value="7">7</option>
+      <option value="8">8</option><option value="9">9</option>
+    </select><br>
+
+    <button onclick="addInput()">Add Input</button>
+    <button onclick="predict()">Predict Next</button>
+    <button onclick="clearAll()">Clear All</button>
+    <button onclick="toggleVIP()">VIP Mode</button>
+  </div>
+
+  <div id="history" class="box">
+    <h2>📜 History</h2>
+    <div id="historyList"></div>
+  </div>
+
+  <div id="prediction" class="box">
+    <h2>📈 Prediction</h2>
+    <div id="predictionResult">No data yet</div>
   </div>
 
   <script>
-    function predict() {
-      let period = document.getElementById("period").value;
-      let server = document.getElementById("server").value;
-      let output = document.getElementById("output");
+    let history = [];
+    let vipMode = false;
 
-      if (period === "" || server === "") {
-        output.innerHTML = "⚠️ Please enter both values!";
+    function addInput() {
+      let bs = document.getElementById("bsChoice").value;
+      let num = parseInt(document.getElementById("numChoice").value);
+      history.push({ bs, num });
+      updateHistory();
+    }
+
+    function updateHistory() {
+      let html = history.map((h,i)=>`#${i+1} → ${h.bs} (${h.num})`).join("<br>");
+      document.getElementById("historyList").innerHTML = html;
+    }
+
+    function clearAll() {
+      history = [];
+      updateHistory();
+      document.getElementById("predictionResult").innerHTML = "No data yet";
+    }
+
+    function predict() {
+      if(history.length < 5){
+        document.getElementById("predictionResult").innerHTML = "⚠️ Add at least 5 inputs first!";
         return;
       }
 
-      // Simple demo strategy: add both and check odd/even
-      let calc = (parseInt(period) + parseInt(server));
-      let result = calc % 2 === 0 ? "BIG" : "SMALL";
+      let last20 = history.slice(-20);
+      let countNums = Array(10).fill(0);
+      let bigCount=0, smallCount=0;
 
-      output.innerHTML = "Prediction: <span style='color:#00ff99'>" + result + "</span>";
+      last20.forEach(h=>{
+        countNums[h.num]++;
+        if(h.num <= 4) smallCount++; else bigCount++;
+      });
+
+      let hot = countNums.indexOf(Math.max(...countNums));
+      let cold = countNums.indexOf(Math.min(...countNums));
+
+      let likelyRange = bigCount>smallCount ? "Big (5–9)" : "Small (0–4)";
+
+      let result = `
+        🔥 Hot Number: ${hot}<br>
+        ❄️ Cold Number: ${cold}<br>
+        📊 Likely Range: ${likelyRange}<br>
+      `;
+
+      // VIP mode logic
+      if(vipMode){
+        let streak = 1, last=last20[0].bs, maxStreak=1, trend="";
+        for(let i=1;i<last20.length;i++){
+          if(last20[i].bs===last){ streak++; maxStreak=Math.max(maxStreak,streak); }
+          else{ streak=1; last=last20[i].bs; }
+        }
+        if(maxStreak>=3){
+          trend = `VIP Trend → Long ${last} streak, break expected soon!`;
+        } else {
+          trend = `VIP Trend → No strong streak, follow hot number.`;
+        }
+        result += `<br><span class="vip">${trend}</span>`;
+      }
+
+      document.getElementById("predictionResult").innerHTML = result;
     }
 
-    function clearFields() {
-      document.getElementById("period").value = "";
-      document.getElementById("server").value = "";
-      document.getElementById("output").innerHTML = "";
+    function toggleVIP(){
+      vipMode = !vipMode;
+      alert(vipMode ? "✅ VIP Mode Activated" : "❌ VIP Mode Deactivated");
     }
   </script>
 </body>
