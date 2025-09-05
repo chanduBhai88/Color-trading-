@@ -2,172 +2,93 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Big Small Predictor</title>
+  <title>Prediction Bot – Big/Small</title>
   <style>
-    body { font-family: Arial, sans-serif; background: #111; color: #fff; text-align: center; padding: 20px; }
-    h1 { color: #ffce5c; }
-    button { margin: 10px; padding: 12px 20px; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.3s; }
-    #autoBtn { background: #4caf50; color: #fff; }
-    #manualBtn { background: #2196f3; color: #fff; }
-    #predictBtn { background: #9c27b0; color: #fff; }
-    #clearBtn { background: #f44336; color: #fff; }
-    .result-box { margin: 20px auto; padding: 20px; border-radius: 12px; width: 250px; font-size: 20px; font-weight: bold; }
-    .big { background: linear-gradient(135deg, #ff416c, #ff4b2b); }
-    .small { background: linear-gradient(135deg, #2ecc71, #27ae60); }
-    .history { margin-top: 20px; max-height: 200px; overflow-y: auto; text-align: left; padding: 10px; background: rgba(255,255,255,0.1); border-radius: 8px; }
-    .prediction { margin-top: 15px; padding: 12px; border-radius: 8px; font-size: 18px; display: none; background: rgba(255,255,255,0.1); }
-    .timer { font-size: 24px; margin: 15px; color: #00ffcc; }
-    #vipPanel { display: none; background: rgba(0,0,0,0.9); padding: 20px; border: 2px solid #00ff00; border-radius: 12px; width: 300px; margin: 20px auto; }
-    #vipPanel h2 { color: #00ff00; }
-    #vipPanel input { padding: 10px; width: 80%; margin: 10px 0; border: 2px solid #00ff00; background: black; color: #00ff00; border-radius: 5px; text-align: center; }
+    body {
+      font-family: Arial, sans-serif;
+      background: #000;
+      color: #0ff;
+      text-align: center;
+      padding: 20px;
+    }
+    h1 { font-size: 36px; }
+    select {
+      padding: 10px;
+      margin: 10px;
+      font-size: 18px;
+      border-radius: 10px;
+    }
+    button {
+      padding: 15px 30px;
+      font-size: 20px;
+      border-radius: 10px;
+      margin: 20px;
+      background: #0ff;
+      color: #000;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    #resultBox {
+      margin-top: 25px;
+      padding: 20px;
+      font-size: 28px;
+      border-radius: 15px;
+      background: #111;
+      box-shadow: 0 0 20px #0ff;
+    }
   </style>
 </head>
 <body>
-  <h1>BIG SMALL PREDICTOR</h1>
-  <div class="timer">Next auto result in: <span id="countdown">60</span>s</div>
+  <h1>🤖 Big/Small Prediction Bot</h1>
 
-  <button id="autoBtn" onclick="generateNumber()">Generate Now</button>
-  <button id="predictBtn" onclick="predictNext()" disabled>Predict Next</button>
-  <button id="clearBtn" onclick="clearAll()">Clear All</button>
-
-  <div style="margin-top:20px;">
-    <h2>Manual Input</h2>
-    <input type="number" id="manualNum" min="0" max="9" placeholder="Enter 0-9" style="padding:8px; width:80px;">
-    <select id="manualBS" style="padding:8px;">
-      <option value="Small">Small (0-4)</option>
-      <option value="Big">Big (5-9)</option>
+  <h2>Enter Last 3 Results</h2>
+  <div>
+    <select id="r1">
+      <option value="">--Select--</option>
+      <option>Big</option>
+      <option>Small</option>
     </select>
-    <button id="manualBtn" onclick="addManual()">Add Manual</button>
+    <select id="r2">
+      <option value="">--Select--</option>
+      <option>Big</option>
+      <option>Small</option>
+    </select>
+    <select id="r3">
+      <option value="">--Select--</option>
+      <option>Big</option>
+      <option>Small</option>
+    </select>
   </div>
 
-  <div id="currentResult" class="result-box">No result yet</div>
+  <button onclick="predict()">🔮 Predict</button>
 
-  <div class="prediction" id="predictionResult"></div>
-
-  <h2>Last 8 Inputs</h2>
-  <div id="last8" class="history"></div>
-
-  <h2>Full History</h2>
-  <div id="fullHistory" class="history"></div>
-
-  <br>
-  <button onclick="showVIP()" style="background:#00ffcc; color:#000;">VIP</button>
-
-  <div id="vipPanel">
-    <h2>VIP ACCESS</h2>
-    <input type="password" id="vipKey" placeholder="Enter VIP Key">
-    <br>
-    <button onclick="checkVIP()">Submit</button>
-    <button onclick="closeVIP()">Close</button>
-    <div id="errorMessage" style="color:red; display:none;">Invalid Key!</div>
-  </div>
+  <div id="resultBox">No Prediction Yet</div>
 
   <script>
-    let history = [];
-    let vipMode = false;
-    let timer = 60;
-    let interval;
+    function predict(){
+      let r1 = document.getElementById("r1").value;
+      let r2 = document.getElementById("r2").value;
+      let r3 = document.getElementById("r3").value;
 
-    // Auto countdown
-    function startTimer() {
-      interval = setInterval(() => {
-        timer--;
-        document.getElementById("countdown").textContent = timer;
-        if (timer <= 0) {
-          generateNumber();
-          timer = 60;
-        }
-      }, 1000);
-    }
-
-    // Auto generate 0–9 number
-    function generateNumber() {
-      const num = Math.floor(Math.random() * 10);
-      const result = num <= 4 ? "Small" : "Big";
-      history.push({ num, result });
-      updateDisplay();
-      if (history.length >= 8) document.getElementById("predictBtn").disabled = false;
-    }
-
-    // Add manual input
-    function addManual() {
-      const num = parseInt(document.getElementById("manualNum").value);
-      if (isNaN(num) || num < 0 || num > 9) {
-        alert("Enter valid number (0–9)");
+      if(!r1 || !r2 || !r3){
+        document.getElementById("resultBox").innerHTML = "⚠️ Please select all 3 results!";
         return;
       }
-      const result = document.getElementById("manualBS").value;
-      history.push({ num, result });
-      updateDisplay();
-      if (history.length >= 8) document.getElementById("predictBtn").disabled = false;
-    }
 
-    // Prediction
-    function predictNext() {
-      const last8 = history.slice(-8);
-      const bigCount = last8.filter(i => i.result === "Big").length;
-      const smallCount = last8.filter(i => i.result === "Small").length;
+      let arr = [r1,r2,r3];
+      let bigCount = arr.filter(x=>x==="Big").length;
+      let smallCount = arr.filter(x=>x==="Small").length;
 
       let prediction = "";
-      if (bigCount > smallCount) prediction = `Next likely <b>Small</b>`;
-      else if (smallCount > bigCount) prediction = `Next likely <b>Big</b>`;
-      else prediction = "No clear pattern";
 
-      // VIP streak logic
-      if (vipMode) {
-        let streak = 1;
-        let lastValue = history[history.length - 1].result;
-        for (let i = history.length - 2; i >= 0; i--) {
-          if (history[i].result === lastValue) streak++;
-          else break;
-        }
-        if (streak >= 3) prediction = `VIP: Long ${lastValue} streak → Next likely <b>${lastValue === "Big" ? "Small" : "Big"}</b>`;
-      }
+      if(bigCount >= 2) prediction = "SMALL Expected (Reverse)";
+      else if(smallCount >= 2) prediction = "BIG Expected (Reverse)";
+      else prediction = Math.random() > 0.5 ? "BIG Continue" : "SMALL Continue";
 
-      document.getElementById("predictionResult").innerHTML = prediction;
-      document.getElementById("predictionResult").style.display = "block";
+      document.getElementById("resultBox").innerHTML =
+        `📊 Last 3: ${r1}, ${r2}, ${r3}<br><br>
+         🎯 Prediction → <b>${prediction}</b>`;
     }
-
-    // Update display
-    function updateDisplay() {
-      const last = history[history.length - 1];
-      document.getElementById("currentResult").className = `result-box ${last.result.toLowerCase()}`;
-      document.getElementById("currentResult").innerHTML = `${last.num} → ${last.result}`;
-
-      document.getElementById("last8").innerHTML = history.slice(-8).map((h, i) =>
-        `<div>${h.num} → ${h.result} (#${history.length - 8 + i + 1})</div>`
-      ).join("");
-
-      document.getElementById("fullHistory").innerHTML = history.map((h, i) =>
-        `<div>${h.num} → ${h.result} (#${i + 1})</div>`
-      ).join("");
-    }
-
-    // Clear
-    function clearAll() {
-      history = [];
-      document.getElementById("currentResult").innerHTML = "No result yet";
-      document.getElementById("last8").innerHTML = "";
-      document.getElementById("fullHistory").innerHTML = "";
-      document.getElementById("predictionResult").style.display = "none";
-      document.getElementById("predictBtn").disabled = true;
-    }
-
-    // VIP
-    function showVIP() { document.getElementById("vipPanel").style.display = "block"; }
-    function closeVIP() { document.getElementById("vipPanel").style.display = "none"; document.getElementById("errorMessage").style.display = "none"; }
-    function checkVIP() {
-      const key = document.getElementById("vipKey").value;
-      if (key === "CHANDU" || key === "RRR〆TREDER PAPA") {
-        vipMode = true;
-        alert("✅ VIP Mode Activated!");
-        closeVIP();
-      } else document.getElementById("errorMessage").style.display = "block";
-    }
-
-    // Start auto-timer
-    startTimer();
   </script>
 </body>
 </html>
