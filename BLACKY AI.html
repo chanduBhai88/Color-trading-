@@ -2,18 +2,20 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Big Small + Number Predictor</title>
+  <title>Advanced Big Small + Number Predictor</title>
   <style>
     body { background:#111; color:#fff; font-family:sans-serif; text-align:center; }
     .box { background:#222; padding:20px; margin:15px; border-radius:10px; display:inline-block; }
     select, button { padding:10px; margin:5px; border-radius:5px; font-size:16px; }
-    #history, #prediction { margin-top:20px; text-align:left; max-width:600px; margin-left:auto; margin-right:auto; }
+    #history, #prediction { margin-top:20px; text-align:left; max-width:700px; margin-left:auto; margin-right:auto; }
     .vip { color:#0f0; font-weight:bold; }
+    .timer { font-size:22px; margin:15px; }
   </style>
 </head>
 <body>
 
-  <h1>🔮 Big Small + Number Predictor</h1>
+  <h1>🔮 Advanced Big Small + Number Predictor</h1>
+  <div class="timer">⏳ Next Auto Round in: <span id="timer">60</span> sec</div>
 
   <div class="box">
     <label>Choose Big/Small:</label>
@@ -50,10 +52,21 @@
   <script>
     let history = [];
     let vipMode = false;
+    let timer = 60;
+    let timerInterval;
 
-    function addInput() {
-      let bs = document.getElementById("bsChoice").value;
-      let num = parseInt(document.getElementById("numChoice").value);
+    function addInput(auto=false) {
+      let bs, num;
+
+      if(auto){ 
+        // auto random input
+        num = Math.floor(Math.random()*10);
+        bs = num <=4 ? "Small":"Big";
+      } else {
+        bs = document.getElementById("bsChoice").value;
+        num = parseInt(document.getElementById("numChoice").value);
+      }
+
       history.push({ bs, num });
       updateHistory();
     }
@@ -86,28 +99,31 @@
 
       let hot = countNums.indexOf(Math.max(...countNums));
       let cold = countNums.indexOf(Math.min(...countNums));
-
       let likelyRange = bigCount>smallCount ? "Big (5–9)" : "Small (0–4)";
+
+      // Confidence calculation
+      let diff = Math.abs(bigCount-smallCount);
+      let confidence = Math.min(90, 50 + diff*5);
 
       let result = `
         🔥 Hot Number: ${hot}<br>
         ❄️ Cold Number: ${cold}<br>
         📊 Likely Range: ${likelyRange}<br>
+        ✅ Confidence: ${confidence}%
       `;
 
-      // VIP mode logic
+      // VIP Mode Extra Analysis
       if(vipMode){
-        let streak = 1, last=last20[0].bs, maxStreak=1, trend="";
+        let streak=1, last=last20[0].bs, maxStreak=1, streakSide=last;
         for(let i=1;i<last20.length;i++){
-          if(last20[i].bs===last){ streak++; maxStreak=Math.max(maxStreak,streak); }
+          if(last20[i].bs===last){ streak++; if(streak>maxStreak){maxStreak=streak; streakSide=last;} }
           else{ streak=1; last=last20[i].bs; }
         }
         if(maxStreak>=3){
-          trend = `VIP Trend → Long ${last} streak, break expected soon!`;
+          result += `<br><span class="vip">VIP Trend → Long ${streakSide} streak (${maxStreak}) → Break Expected Soon!</span>`;
         } else {
-          trend = `VIP Trend → No strong streak, follow hot number.`;
+          result += `<br><span class="vip">VIP Trend → Mixed pattern, follow hot number strategy.</span>`;
         }
-        result += `<br><span class="vip">${trend}</span>`;
       }
 
       document.getElementById("predictionResult").innerHTML = result;
@@ -117,6 +133,20 @@
       vipMode = !vipMode;
       alert(vipMode ? "✅ VIP Mode Activated" : "❌ VIP Mode Deactivated");
     }
+
+    // Auto Timer Function
+    function startTimer(){
+      timerInterval = setInterval(()=>{
+        timer--;
+        if(timer<=0){
+          timer=60;
+          addInput(true);
+          predict();
+        }
+        document.getElementById("timer").innerText = timer;
+      },1000);
+    }
+    startTimer();
   </script>
 </body>
 </html>
