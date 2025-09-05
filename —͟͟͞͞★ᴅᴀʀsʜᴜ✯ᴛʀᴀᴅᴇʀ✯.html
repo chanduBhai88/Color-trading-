@@ -2,219 +2,91 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Big Small Predictor</title>
+  <title>Smart Prediction Bot</title>
   <style>
     body {
+      background: #000;
+      color: #0ff;
       font-family: Arial, sans-serif;
-      background: #111;
-      color: #fff;
       text-align: center;
       padding: 20px;
     }
-    h1 {
-      color: #ffce5c;
-    }
+    h1 { font-size: 38px; margin-bottom: 20px; }
     button {
-      margin: 10px;
-      padding: 12px 20px;
-      border: none;
-      border-radius: 8px;
-      font-size: 16px;
-      font-weight: bold;
+      padding: 15px 30px;
+      margin: 15px;
+      font-size: 20px;
+      border-radius: 10px;
       cursor: pointer;
+      font-weight: bold;
+      background: #0ff;
+      color: #000;
       transition: 0.3s;
     }
-    #generateBtn {
-      background: #4caf50;
-      color: #fff;
-    }
-    #predictBtn {
-      background: #9c27b0;
-      color: #fff;
-    }
-    #clearBtn {
-      background: #f44336;
-      color: #fff;
-    }
-    .result-box {
-      margin: 20px auto;
-      padding: 20px;
-      border-radius: 12px;
-      width: 250px;
-      font-size: 20px;
-      font-weight: bold;
-    }
-    .big {
-      background: linear-gradient(135deg, #ff416c, #ff4b2b);
-    }
-    .small {
-      background: linear-gradient(135deg, #2ecc71, #27ae60);
-    }
-    .history {
-      margin-top: 20px;
-      max-height: 200px;
-      overflow-y: auto;
-      text-align: left;
+    button:hover { background:#00ccff; transform:scale(1.1); }
+    input {
       padding: 10px;
-      background: rgba(255,255,255,0.1);
-      border-radius: 8px;
-    }
-    .prediction {
-      margin-top: 15px;
-      padding: 12px;
+      margin: 5px;
+      width: 120px;
+      text-align: center;
       border-radius: 8px;
       font-size: 18px;
-      display: none;
     }
-    #vipPanel {
-      display: none;
-      background: rgba(0,0,0,0.9);
+    #result {
+      margin-top: 25px;
+      font-size: 26px;
       padding: 20px;
-      border: 2px solid #00ff00;
-      border-radius: 12px;
-      width: 300px;
-      margin: 20px auto;
-    }
-    #vipPanel h2 {
-      color: #00ff00;
-    }
-    #vipPanel input {
-      padding: 10px;
-      width: 80%;
-      margin: 10px 0;
-      border: 2px solid #00ff00;
-      background: black;
-      color: #00ff00;
-      border-radius: 5px;
-      text-align: center;
+      border-radius: 15px;
+      background: #111;
+      box-shadow: 0 0 20px #0ff;
     }
   </style>
 </head>
 <body>
-  <h1>BIG SMALL PREDICTOR</h1>
-
-  <button id="generateBtn" onclick="generateNumber()">Generate Number</button>
-  <button id="predictBtn" onclick="predictNext()" disabled>Predict Next</button>
-  <button id="clearBtn" onclick="clearAll()">Clear All</button>
-
-  <div id="currentResult" class="result-box">No result yet</div>
-
-  <div class="prediction" id="predictionResult"></div>
-
-  <h2>Last 8 Inputs</h2>
-  <div id="last8" class="history"></div>
-
-  <h2>Full History</h2>
-  <div id="fullHistory" class="history"></div>
-
-  <br>
-  <button onclick="showVIP()" style="background:#00ffcc; color:#000;">VIP</button>
-
-  <div id="vipPanel">
-    <h2>VIP ACCESS</h2>
-    <input type="password" id="vipKey" placeholder="Enter VIP Key">
-    <br>
-    <button onclick="checkVIP()">Submit</button>
-    <button onclick="closeVIP()">Close</button>
-    <div id="errorMessage" style="color:red; display:none;">Invalid Key!</div>
+  <h1>🤖 Smart Big/Small Bot</h1>
+  <p>Enter last 6 results (Big/Small):</p>
+  
+  <div>
+    <input id="r1" placeholder="Result 1">
+    <input id="r2" placeholder="Result 2">
+    <input id="r3" placeholder="Result 3"><br>
+    <input id="r4" placeholder="Result 4">
+    <input id="r5" placeholder="Result 5">
+    <input id="r6" placeholder="Result 6">
   </div>
 
+  <button onclick="predict()">🔮 Predict Next</button>
+  <div id="result">No Prediction Yet</div>
+
   <script>
-    let history = [];
-    let vipMode = false;
-
-    // Generate random number (0–9) and decide Big/Small
-    function generateNumber() {
-      const num = Math.floor(Math.random() * 10); // 0–9
-      const result = num <= 4 ? "Small" : "Big";
-      history.push({ num, result });
-      updateDisplay();
-      if (history.length >= 8) {
-        document.getElementById("predictBtn").disabled = false;
-      }
-    }
-
-    // Predict next value
-    function predictNext() {
-      if (history.length < 8) {
-        alert("Please generate at least 8 numbers!");
-        return;
-      }
-
-      const last8 = history.slice(-8);
-      const bigCount = last8.filter(i => i.result === "Big").length;
-      const smallCount = last8.filter(i => i.result === "Small").length;
-
-      let prediction = "";
-      if (bigCount > smallCount) {
-        prediction = `Next is likely to be <span style="color:#2ecc71;font-weight:bold;">Small</span>`;
-      } else if (smallCount > bigCount) {
-        prediction = `Next is likely to be <span style="color:#ff4b2b;font-weight:bold;">Big</span>`;
-      } else {
-        prediction = "No clear pattern (4 Big & 4 Small)";
-      }
-
-      // VIP Advanced Logic
-      if (vipMode) {
-        let streak = 1;
-        let lastValue = history[history.length - 1].result;
-        for (let i = history.length - 2; i >= 0; i--) {
-          if (history[i].result === lastValue) streak++;
-          else break;
+    function predict(){
+      let results = [];
+      for(let i=1;i<=6;i++){
+        let val = document.getElementById("r"+i).value.trim();
+        if(val!=="Big" && val!=="Small"){
+          document.getElementById("result").innerHTML = "⚠️ Please enter only 'Big' or 'Small'";
+          return;
         }
-        if (streak >= 3) {
-          prediction = `VIP: Long ${lastValue} streak! Next likely <b>${lastValue === "Big" ? "Small" : "Big"}</b>`;
-        }
+        results.push(val);
       }
 
-      document.getElementById("predictionResult").innerHTML = prediction;
-      document.getElementById("predictionResult").style.display = "block";
-    }
+      let bigCount = results.filter(x=>x==="Big").length;
+      let smallCount = results.filter(x=>x==="Small").length;
 
-    // Update history display
-    function updateDisplay() {
-      const last = history[history.length - 1];
-      document.getElementById("currentResult").className = `result-box ${last.result.toLowerCase()}`;
-      document.getElementById("currentResult").innerHTML = `${last.num} → ${last.result}`;
+      let prediction;
 
-      document.getElementById("last8").innerHTML = history.slice(-8).map((h, i) =>
-        `<div>${h.num} → ${h.result} (#${history.length - 8 + i + 1})</div>`
-      ).join("");
-
-      document.getElementById("fullHistory").innerHTML = history.map((h, i) =>
-        `<div>${h.num} → ${h.result} (#${i + 1})</div>`
-      ).join("");
-    }
-
-    // Clear all history
-    function clearAll() {
-      history = [];
-      document.getElementById("currentResult").innerHTML = "No result yet";
-      document.getElementById("last8").innerHTML = "";
-      document.getElementById("fullHistory").innerHTML = "";
-      document.getElementById("predictionResult").style.display = "none";
-      document.getElementById("predictBtn").disabled = true;
-    }
-
-    // VIP Panel
-    function showVIP() {
-      document.getElementById("vipPanel").style.display = "block";
-    }
-    function closeVIP() {
-      document.getElementById("vipPanel").style.display = "none";
-      document.getElementById("errorMessage").style.display = "none";
-      document.getElementById("vipKey").value = "";
-    }
-    function checkVIP() {
-      const key = document.getElementById("vipKey").value;
-      if (key === "CHANDU" || key === "RRR〆TREDER PAPA") {
-        vipMode = true;
-        alert("✅ VIP Mode Activated! Enhanced Predictions Enabled.");
-        closeVIP();
+      // Smart logic: trend + reversal + random weight
+      if(bigCount > smallCount){
+        prediction = Math.random()>0.4 ? "Small (Reversal)" : "Big (Trend Continue)";
+      } else if(smallCount > bigCount){
+        prediction = Math.random()>0.4 ? "Big (Reversal)" : "Small (Trend Continue)";
       } else {
-        document.getElementById("errorMessage").style.display = "block";
+        prediction = Math.random()>0.5 ? "Big (Trend Continue)" : "Small (Trend Continue)";
       }
+
+      document.getElementById("result").innerHTML =
+        `📊 Last 6: ${results.join(", ")}<br><br>
+         🎯 Next Prediction → <b>${prediction}</b>`;
     }
   </script>
 </body>
