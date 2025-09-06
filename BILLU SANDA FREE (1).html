@@ -2,99 +2,65 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>RajaLuck – Advanced Prediction</title>
+  <title>Big-Small Predictor</title>
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
   <style>
-    body { background:#000; color:#0ff; font-family:Orbitron, sans-serif; text-align:center; }
-    h1 { font-size:40px; margin:30px 0; }
-    .box { background:#111; margin:25px auto; padding:30px; width:90%; max-width:600px;
-           border-radius:20px; box-shadow:0 0 20px #0ff; font-size:24px; }
-    input, select, button { padding:20px; margin:15px; font-size:22px; border-radius:12px; border:none; }
-    input { width:250px; text-align:center; }
-    button { background:#0ff; color:#000; cursor:pointer; font-weight:bold; }
-    button:hover { background:#00ccff; }
-    #history { margin-top:20px; text-align:left; font-size:20px; max-height:300px; overflow:auto; }
-    #resultBox { margin-top:20px; padding:20px; background:#222; border-radius:15px; font-size:26px; }
-    .btn-clear { background:#ff4444; color:#fff; }
-    .btn-clear:hover { background:#ff0000; }
+    body { font-family: Arial, sans-serif; text-align: center; background: #111; color: #fff; }
+    input, button { margin: 10px; padding: 10px; font-size: 18px; }
+    #output { margin-top: 20px; font-size: 20px; }
+    .result { padding: 10px; margin: 10px auto; width: 80%; border-radius: 10px; background: #222; }
   </style>
 </head>
 <body>
-  <h1>🎰 RajaLuck Prediction Tool</h1>
+  <h1>Image Based Big/Small Predictor</h1>
+
+  <input type="file" id="imageInput" accept="image/*">
+  <button onclick="analyzeImage()">Analyze</button>
   
-  <div class="box">
-    <input type="number" id="periodInput" placeholder="Enter Period Number">
-    <select id="resultInput">
-      <option value="Big">Big</option>
-      <option value="Small">Small</option>
-    </select><br>
-    <button onclick="addResult()">➕ Add Result</button>
-    <button class="btn-clear" onclick="clearAll()">🗑 Clear</button>
-  </div>
-
-  <div class="box">
-    <h2>📜 History (Last 10)</h2>
-    <div id="history">No results yet</div>
-  </div>
-
-  <div class="box">
-    <h2>🔮 Prediction</h2>
-    <div id="resultBox">⚡ Enter at least 6 results to predict</div>
-  </div>
+  <div id="output"></div>
 
   <script>
-    let historyData = [];
-
-    function addResult(){
-      let period = document.getElementById("periodInput").value;
-      let result = document.getElementById("resultInput").value;
-      if(!period){ alert("Enter period number!"); return; }
-
-      historyData.push({period, result});
-      if(historyData.length > 10) historyData.shift(); // keep last 10 only
-      updateHistory();
-      predict();
-      document.getElementById("periodInput").value = ""; // clear input
-    }
-
-    function updateHistory(){
-      let h = historyData.map((item, i) => 
-        `#${i+1} | Period: ${item.period} → ${item.result}`
-      ).join("<br>");
-      document.getElementById("history").innerHTML = h || "No results yet";
-    }
-
-    function predict(){
-      if(historyData.length < 6){
-        document.getElementById("resultBox").innerHTML = "⚡ Enter at least 6 results to predict";
+    async function analyzeImage() {
+      const image = document.getElementById('imageInput').files[0];
+      if (!image) {
+        alert("Please upload an image first!");
         return;
       }
 
-      let last6 = historyData.slice(-6).map(x => x.result);
-      let bigCount = last6.filter(x => x==="Big").length;
-      let smallCount = last6.filter(x => x==="Small").length;
+      document.getElementById("output").innerHTML = "⏳ Scanning...";
 
-      let nextPrediction;
-      if(bigCount > smallCount){
-        nextPrediction = "SMALL Expected (Reversal)";
-      } else if(smallCount > bigCount){
-        nextPrediction = "BIG Expected (Reversal)";
-      } else {
-        nextPrediction = Math.random() > 0.5 ? "BIG Continue" : "SMALL Continue";
+      const result = await Tesseract.recognize(image, 'eng');
+      const text = result.data.text;
+      console.log("Extracted Text:", text);
+
+      // Filter lines containing Big/Small results
+      let matches = text.match(/(\d+)\s*(Big|Small)/gi);
+      if (!matches) {
+        document.getElementById("output").innerHTML = "⚠️ Could not detect results!";
+        return;
       }
 
-      document.getElementById("resultBox").innerHTML = `
-        Analysing Last 6 Results...<br>
-        Big: ${bigCount} | Small: ${smallCount}<br><br>
-        🎯 Prediction → <b>${nextPrediction}</b>
-      `;
-    }
+      // Prepare analysis
+      let analysis = [];
+      matches.forEach(m => {
+        let parts = m.split(/\s+/);
+        analysis.push({ num: parts[0], size: parts[1] });
+      });
 
-    function clearAll(){
-      historyData = [];
-      document.getElementById("history").innerHTML = "No results yet";
-      document.getElementById("resultBox").innerHTML = "⚡ Enter at least 6 results to predict";
-      document.getElementById("periodInput").value = "";
+      // Show extracted data
+      let html = "<div class='result'><b>Extracted:</b><br>";
+      analysis.forEach(a => {
+        html += `${a.num} → ${a.size}<br>`;
+      });
+      html += "</div>";
+
+      // Simple prediction (last trend)
+      let last = analysis.slice(-1)[0];
+      let prediction = last.size === "Big" ? "Small Expected (0,2,4)" : "Big Expected (5,7,9)";
+      
+      html += `<div class='result'><b>Prediction:</b><br> ${prediction}</div>`;
+
+      document.getElementById("output").innerHTML = html;
     }
   </script>
 </body>
