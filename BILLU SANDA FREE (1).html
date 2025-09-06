@@ -2,77 +2,106 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Raja Luck Predictor</title>
-  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RajaGame Predictor</title>
   <style>
-    body { font-family: Arial, sans-serif; text-align: center; background: #111; color: #fff; }
-    input, button { margin: 10px; padding: 12px 20px; font-size: 18px; border-radius: 8px; }
-    #output { margin-top: 20px; font-size: 20px; }
-    .result { padding: 15px; margin: 15px auto; width: 80%; border-radius: 12px; background: #222; }
-    .prediction { background: #006400; color: #fff; font-size: 22px; }
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: url("https://wallpapers.com/images/hd/hacker-dark-red-background-0mfq2zjtwqj2a7uo.jpg") no-repeat center center fixed;
+      background-size: cover;
+      color: #fff;
+      text-align: center;
+    }
+    h1 {
+      margin: 20px 0;
+      font-size: 28px;
+      text-shadow: 2px 2px 5px red;
+    }
+    .container {
+      margin: 20px auto;
+      width: 90%;
+      max-width: 400px;
+      padding: 20px;
+      background: rgba(0,0,0,0.7);
+      border-radius: 15px;
+      box-shadow: 0 0 20px red;
+    }
+    input {
+      width: 45%;
+      padding: 10px;
+      margin: 5px;
+      font-size: 16px;
+      border-radius: 8px;
+      border: none;
+      text-align: center;
+    }
+    button {
+      padding: 10px 20px;
+      margin: 10px;
+      font-size: 18px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      background: red;
+      color: #fff;
+      transition: 0.3s;
+    }
+    button:hover {
+      background: darkred;
+    }
+    #result {
+      margin-top: 20px;
+      font-size: 30px;
+      font-weight: bold;
+      opacity: 0;
+      transform: scale(0.5);
+      transition: all 0.5s ease-in-out;
+    }
+    #result.show {
+      opacity: 1;
+      transform: scale(1);
+    }
   </style>
 </head>
 <body>
-  <h1>🔮 Raja Luck Big-Small Predictor</h1>
-
-  <input type="file" id="imageInput" accept="image/*">
-  <button onclick="analyzeImage()">Analyze</button>
-  
-  <div id="output"></div>
+  <h1>🔥 RAJA THE BOSS 🔥</h1>
+  <div class="container">
+    <input type="text" id="numInput" placeholder="Enter Numbers (3)">
+    <input type="text" id="bsInput" placeholder="Enter Big/Small (3)">
+    <br>
+    <button onclick="predict()">Result</button>
+    <button onclick="clearAll()">Clear</button>
+    <div id="result"></div>
+  </div>
 
   <script>
-    async function analyzeImage() {
-      const image = document.getElementById('imageInput').files[0];
-      if (!image) {
-        alert("Please upload an image first!");
+    function predict() {
+      let num = document.getElementById("numInput").value.trim();
+      let bs = document.getElementById("bsInput").value.trim();
+
+      if(num === "" || bs === "") {
+        alert("Please enter both Numbers and Big/Small!");
         return;
       }
 
-      document.getElementById("output").innerHTML = "⏳ Scanning Image...";
+      // Simple Prediction Logic (example)
+      let nextNum = Math.floor(Math.random() * 10);
+      let nextBS = (nextNum >= 5) ? "BIG" : "SMALL";
 
-      const result = await Tesseract.recognize(image, 'eng');
-      const text = result.data.text;
-      console.log("Extracted Text:", text);
+      let resultBox = document.getElementById("result");
+      resultBox.innerHTML = "Next ➝ " + nextNum + " " + nextBS;
+      resultBox.classList.add("show");
 
-      // Find Big/Small lines
-      let matches = text.match(/(\d+)\s*(Big|Small)/gi);
-      if (!matches) {
-        document.getElementById("output").innerHTML = "⚠️ Could not detect results!";
-        return;
-      }
+      setTimeout(() => {
+        resultBox.classList.remove("show");
+      }, 2000);
+    }
 
-      let analysis = [];
-      matches.forEach(m => {
-        let parts = m.split(/\s+/);
-        analysis.push({ num: parseInt(parts[0]), size: parts[1] });
-      });
-
-      // Show extracted
-      let html = "<div class='result'><b>Extracted Results:</b><br>";
-      analysis.forEach(a => html += `${a.num} → ${a.size}<br>`);
-      html += "</div>";
-
-      // Analyse last 6 rounds
-      let last6 = analysis.slice(-6);
-      let bigCount = last6.filter(a => a.size.toLowerCase() === "big").length;
-      let smallCount = last6.filter(a => a.size.toLowerCase() === "small").length;
-      let last = last6[last6.length - 1];
-
-      // Prediction logic
-      let prediction = "";
-      if (bigCount > smallCount) {
-        prediction = "Next Expected: Small (0,1,2,3,4)";
-      } else if (smallCount > bigCount) {
-        prediction = "Next Expected: Big (5,6,7,8,9)";
-      } else {
-        prediction = last.size === "Big" ? 
-          "Next Expected: Small (0,1,2,3,4)" : 
-          "Next Expected: Big (5,6,7,8,9)";
-      }
-
-      html += `<div class='result prediction'><b>${prediction}</b></div>`;
-
-      document.getElementById("output").innerHTML = html;
+    function clearAll() {
+      document.getElementById("numInput").value = "";
+      document.getElementById("bsInput").value = "";
+      document.getElementById("result").innerHTML = "";
     }
   </script>
 </body>
