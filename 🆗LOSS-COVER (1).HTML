@@ -2,56 +2,85 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>RajaLuck – Prediction Tool</title>
+  <title>RajaLuck – Advanced Prediction</title>
   <style>
-    body { background:#000; color:#0ff; font-family:Arial; text-align:center; }
-    .box { background:#111; margin:20px auto; padding:20px; width:400px; border-radius:15px; box-shadow:0 0 15px #0ff; }
-    input, button { padding:10px; margin:10px; font-size:18px; border-radius:10px; border:none; }
+    body { background:#000; color:#0ff; font-family:Orbitron, sans-serif; text-align:center; }
+    h1 { font-size:32px; margin:20px 0; }
+    .box { background:#111; margin:20px auto; padding:20px; width:500px; border-radius:15px; box-shadow:0 0 15px #0ff; }
+    input, select, button { padding:10px; margin:10px; font-size:18px; border-radius:10px; border:none; }
     button { background:#0ff; color:#000; cursor:pointer; font-weight:bold; }
     button:hover { background:#00ccff; }
-    #resultBox { margin-top:20px; padding:15px; background:#222; border-radius:10px; }
+    #history { margin-top:20px; text-align:left; font-size:16px; max-height:200px; overflow:auto; }
+    #resultBox { margin-top:20px; padding:15px; background:#222; border-radius:10px; font-size:20px; }
   </style>
 </head>
 <body>
   <h1>🎰 RajaLuck Prediction Tool</h1>
+  
   <div class="box">
-    <label>Enter Period Number:</label><br>
-    <input type="text" id="periodInput" placeholder="e.g. 20250906123"><br>
-    <button onclick="getResult()">Get Result</button>
+    <input type="text" id="periodInput" placeholder="Enter Period Number">
+    <select id="resultInput">
+      <option value="Big">Big</option>
+      <option value="Small">Small</option>
+    </select>
+    <button onclick="addResult()">Add Result</button>
   </div>
-  <div id="resultBox">⚡ Waiting for input...</div>
+
+  <div class="box">
+    <h2>📜 History (Last 10)</h2>
+    <div id="history">No results yet</div>
+  </div>
+
+  <div class="box">
+    <h2>🔮 Prediction</h2>
+    <div id="resultBox">⚡ Enter at least 6 results to predict</div>
+  </div>
 
   <script>
-    async function getResult(){
+    let historyData = [];
+
+    function addResult(){
       let period = document.getElementById("periodInput").value;
-      if(!period){
-        document.getElementById("resultBox").innerHTML = "⚠️ Please enter period number!";
+      let result = document.getElementById("resultInput").value;
+      if(!period){ alert("Enter period number!"); return; }
+
+      historyData.push({period, result});
+      if(historyData.length > 10) historyData.shift(); // keep last 10 only
+      updateHistory();
+      predict();
+    }
+
+    function updateHistory(){
+      let h = historyData.map((item, i) => 
+        `#${i+1} | Period: ${item.period} → ${item.result}`
+      ).join("<br>");
+      document.getElementById("history").innerHTML = h || "No results yet";
+    }
+
+    function predict(){
+      if(historyData.length < 6){
+        document.getElementById("resultBox").innerHTML = "⚡ Enter at least 6 results to predict";
         return;
       }
 
-      try {
-        // 👇 Yaha apna API URL daalo
-        let apiUrl = `https://lotteryapi.rajaluckapi.com/game/result?period=${period}`;
-        let res = await fetch(apiUrl);
-        let data = await res.json();
+      let last6 = historyData.slice(-6).map(x => x.result);
+      let bigCount = last6.filter(x => x==="Big").length;
+      let smallCount = last6.filter(x => x==="Small").length;
 
-        let result = data.result;   // "Big" / "Small"
-        let number = data.number;   // actual number
-        let color = data.color;     // "Red" / "Green"
-
-        // Prediction logic (simple reversal)
-        let prediction = (result === "Big") ? "Small Expected (Reversal)" : "Big Expected (Reversal)";
-
-        document.getElementById("resultBox").innerHTML = `
-          🕑 Period: <b>${period}</b><br>
-          ✅ Result: <b>${result}</b><br>
-          🎲 Number: <b>${number}</b><br>
-          🎨 Color: <b>${color}</b><br><br>
-          🎯 Prediction → <span style="color:yellow">${prediction}</span>
-        `;
-      } catch (e) {
-        document.getElementById("resultBox").innerHTML = "❌ API Error! Check URL or period number.";
+      let nextPrediction;
+      if(bigCount > smallCount){
+        nextPrediction = "SMALL Expected (Reversal)";
+      } else if(smallCount > bigCount){
+        nextPrediction = "BIG Expected (Reversal)";
+      } else {
+        nextPrediction = Math.random() > 0.5 ? "BIG Continue" : "SMALL Continue";
       }
+
+      document.getElementById("resultBox").innerHTML = `
+        Analysing Last 6 Results...<br>
+        Big: ${bigCount} | Small: ${smallCount}<br><br>
+        🎯 Prediction → <b>${nextPrediction}</b>
+      `;
     }
   </script>
 </body>
