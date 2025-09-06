@@ -1,318 +1,58 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>RajaLuck — Real-Time Prediction (HTML)</title>
-<style>
-  :root{--bg:#0b0b0d;--card:#101214;--accent:#00e6c3;--muted:#9bd;--danger:#ff6b6b}
-  body{margin:0;font-family:Inter,system-ui,Arial;background:linear-gradient(180deg,#020204,#071019);color:var(--accent);display:flex;flex-direction:column;align-items:center;min-height:100vh;padding:22px}
-  h1{margin:6px 0 18px;font-size:22px;letter-spacing:0.6px}
-  .card{width:100%;max-width:920px;background:var(--card);border-radius:12px;padding:18px;box-shadow:0 8px 30px rgba(0,0,0,0.6);margin-bottom:14px}
-  label{display:block;color:#9bd;font-size:13px;margin-bottom:6px}
-  input[type=text], select, textarea{width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.03);background:#060607;color:var(--accent);font-size:14px}
-  .row{display:flex;gap:12px;margin-top:10px}
-  .col{flex:1}
-  button{background:var(--accent);color:#001;border:none;padding:10px 14px;border-radius:10px;font-weight:700;cursor:pointer}
-  button.secondary{background:transparent;border:1px solid rgba(255,255,255,0.05);color:var(--accent)}
-  #status{font-size:13px;color:#9bd;margin-top:8px}
-  #resultBox{margin-top:14px;padding:14px;border-radius:10px;background:#060607;color:#fff;min-height:72px}
-  #history{margin-top:12px;padding:12px;border-radius:8px;background:#040405;color:#9bd;max-height:200px;overflow:auto;font-size:13px}
-  .badge{display:inline-block;padding:6px 10px;border-radius:999px;background:rgba(255,255,255,0.03);color:var(--accent);font-weight:700;margin-right:6px}
-  .muted{color:#9bd;font-size:13px}
-  .controls{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
-  hr{border:0;border-top:1px dashed rgba(255,255,255,0.03);margin:12px 0}
-  .small{font-size:12px;color:#9bd}
-</style>
+  <meta charset="UTF-8">
+  <title>RajaLuck – Prediction Tool</title>
+  <style>
+    body { background:#000; color:#0ff; font-family:Arial; text-align:center; }
+    .box { background:#111; margin:20px auto; padding:20px; width:400px; border-radius:15px; box-shadow:0 0 15px #0ff; }
+    input, button { padding:10px; margin:10px; font-size:18px; border-radius:10px; border:none; }
+    button { background:#0ff; color:#000; cursor:pointer; font-weight:bold; }
+    button:hover { background:#00ccff; }
+    #resultBox { margin-top:20px; padding:15px; background:#222; border-radius:10px; }
+  </style>
 </head>
 <body>
-
-  <h1>🤖 RajaLuck — Real-Time Prediction (HTML)</h1>
-
-  <div class="card">
-    <label>1) API URL (paste full URL that returns JSON - latest or history)</label>
-    <input id="apiUrl" type="text" placeholder="e.g. https://lotteryapi.rajaluckapi.com/game/latest or https://lotteryapi.rajaluckapi.com/game/history" />
-
-    <div class="row" style="margin-top:8px">
-      <div class="col">
-        <label>Optional: CORS Proxy (if API blocks)</label>
-        <input id="corsProxy" type="text" placeholder="Leave blank or use https://cors-anywhere.herokuapp.com/ (or your own proxy)" />
-        <div class="small muted">If fetch fails due to CORS, add a proxy URL here. Proxy must accept target URL appended after it.</div>
-      </div>
-
-      <div style="width:230px">
-        <label>Poll Interval (secs)</label>
-        <input id="interval" type="text" value="10" />
-      </div>
-    </div>
-
-    <div class="controls">
-      <button id="fetchBtn">Fetch Now & Predict</button>
-      <button id="togglePoll" class="secondary">Start Auto Poll</button>
-      <button id="clearHistory" class="secondary">Clear History</button>
-      <select id="mode" style="padding:9px;border-radius:8px;background:#060607;color:var(--accent)">
-        <option value="reversal">Reversal-Weighted</option>
-        <option value="trend">Trend-Follow</option>
-        <option value="markov">Markov (1-step)</option>
-        <option value="hybrid">Hybrid (Smart)</option>
-      </select>
-    </div>
-
-    <div id="status" class="muted">Status: Idle — paste API then click 'Fetch Now & Predict'.</div>
-    <div id="resultBox">No prediction yet.</div>
-    <hr>
-    <div class="small muted">History (last 50 Big/Small):</div>
-    <div id="history">No data yet.</div>
-
-    <hr>
-    <div class="small muted">
-      <b>How to use:</b> Paste the exact API endpoint you found from PCAP (the one returning JSON). If the API responds with a single object (latest), the script will append that. If it returns a list/array of results, the script will try to use that array as history. If CORS blocks the request in browser, use an HTTP proxy or run the HTML from a local server that proxies the API.
-    </div>
+  <h1>🎰 RajaLuck Prediction Tool</h1>
+  <div class="box">
+    <label>Enter Period Number:</label><br>
+    <input type="text" id="periodInput" placeholder="e.g. 20250906123"><br>
+    <button onclick="getResult()">Get Result</button>
   </div>
+  <div id="resultBox">⚡ Waiting for input...</div>
 
-<script>
-(() => {
-  const apiUrlInput = document.getElementById('apiUrl');
-  const corsInput = document.getElementById('corsProxy');
-  const fetchBtn = document.getElementById('fetchBtn');
-  const status = document.getElementById('status');
-  const resultBox = document.getElementById('resultBox');
-  const historyEl = document.getElementById('history');
-  const intervalInput = document.getElementById('interval');
-  const togglePoll = document.getElementById('togglePoll');
-  const clearHistoryBtn = document.getElementById('clearHistory');
-  const modeSelect = document.getElementById('mode');
-
-  let polling = false;
-  let pollTimer = null;
-  let history = []; // store only "Big" or "Small"
-  const MAX_HISTORY = 50;
-
-  function setStatus(msg){
-    status.textContent = 'Status: ' + msg;
-  }
-
-  function updateHistoryUI(){
-    if(history.length===0){ historyEl.innerHTML = 'No data yet.'; return; }
-    historyEl.innerHTML = history.slice().reverse().map((v,i)=>`<div><span class="badge">${history.length-i}</span>${v}</div>`).join('');
-  }
-
-  function pushHistory(bs){
-    if(!bs) return;
-    if(bs!=='Big' && bs!=='Small') return;
-    history.push(bs);
-    if(history.length>MAX_HISTORY) history.shift();
-    updateHistoryUI();
-  }
-
-  function parseResponseToHistory(json){
-    // try to find standard fields. Accepts: single object {period,result} or array [{...},...]
-    try {
-      if(Array.isArray(json)){
-        const mapped = json.map(item => {
-          if(item.result) return normalize(item.result);
-          // check common keys
-          if(item.bigsmall) return normalize(item.bigsmall);
-          if(item.value) return normalize(item.value);
-          return null;
-        }).filter(Boolean);
-        return mapped;
-      } else if(typeof json === 'object'){
-        // single object
-        if(json.result) return [normalize(json.result)];
-        // maybe resp contains field 'history' or 'data'
-        if(json.history && Array.isArray(json.history)){
-          return parseResponseToHistory(json.history);
-        }
-        if(json.data && Array.isArray(json.data)){
-          return parseResponseToHistory(json.data);
-        }
-      }
-    } catch(e){
-      console.warn('parseResponseToHistory error', e);
-    }
-    return null;
-  }
-
-  function normalize(v){
-    if(!v) return null;
-    v = String(v).trim();
-    // try to normalize numbers/colors -> big/small mapping may vary per API
-    const low = v.toLowerCase();
-    if(low.includes('big')) return 'Big';
-    if(low.includes('small')) return 'Small';
-    // if numeric mapping exists, try typical rule: 1-5 small, 6-10 big (example)
-    if(!isNaN(Number(v))){
-      const n = Number(v);
-      if(n >= 6) return 'Big';
-      return 'Small';
-    }
-    // colors: red/green mapping (if game uses colors)
-    if(low.includes('red')) return 'Big';   // change if different mapping
-    if(low.includes('green') || low.includes('black')) return 'Small';
-    return null;
-  }
-
-  async function fetchApiOnce(){
-    const rawUrl = apiUrlInput.value.trim();
-    if(!rawUrl){ setStatus('Please paste API URL'); return; }
-    const proxy = corsInput.value.trim();
-    const finalUrl = proxy ? (proxy.endsWith('/') ? proxy.slice(0,-1) + '/' + encodeURIComponent(rawUrl) : proxy + encodeURIComponent(rawUrl)) : rawUrl;
-
-    setStatus('Fetching...');
-    try {
-      const res = await fetch(finalUrl, { method:'GET', mode: 'cors' });
-      if(!res.ok) throw new Error('HTTP ' + res.status);
-      const json = await res.json();
-
-      // try to parse response
-      // 1) if array/object of history -> use it
-      const parsed = parseResponseToHistory(json);
-      if(parsed && parsed.length>0){
-        // add parsed items to history (take last N)
-        parsed.forEach(x => pushHistory(x));
-        setStatus('Fetched history from API ('+parsed.length+' items)');
-      } else {
-        // try to detect single latest object with fields e.g. {period, result, number}
-        if(json.result || json.bigsmall || json.number || json.value){
-          const guessed = parseResponseToHistory(json) || [];
-          guessed.forEach(x=>pushHistory(x));
-          setStatus('Fetched latest result from API');
-        } else {
-          // As fallback: show raw JSON in result box
-          resultBox.innerHTML = '<pre style="color:#9bd;white-space:pre-wrap;font-size:12px;">' + JSON.stringify(json, null, 2) + '</pre>';
-          setStatus('Fetched raw JSON (no recognizable results). Inspect raw response.');
-          return;
-        }
+  <script>
+    async function getResult(){
+      let period = document.getElementById("periodInput").value;
+      if(!period){
+        document.getElementById("resultBox").innerHTML = "⚠️ Please enter period number!";
+        return;
       }
 
-      // After updating history, compute prediction
-      const prediction = computePrediction(modeSelect.value);
-      const counts = { Big: history.filter(x=>x==='Big').length, Small: history.filter(x=>x==='Small').length };
-      resultBox.innerHTML = `
-        <div class="small muted">Latest counts — Big: <b>${counts.Big}</b> | Small: <b>${counts.Small}</b></div>
-        <div style="margin-top:10px;font-size:18px">🎯 <b>Prediction:</b> <span style="color:#fff">${prediction}</span></div>
-        <div class="muted small" style="margin-top:8px">Mode: ${modeSelect.value}</div>
-      `;
-    } catch (err){
-      console.error(err);
-      setStatus('Fetch error: ' + (err.message||err));
-      resultBox.innerHTML = `<div style="color:var(--danger)">⚠️ Fetch error — check API URL & CORS. ${err.message||''}</div>`;
-    }
-  }
+      try {
+        // 👇 Yaha apna API URL daalo
+        let apiUrl = `https://lotteryapi.rajaluckapi.com/game/result?period=${period}`;
+        let res = await fetch(apiUrl);
+        let data = await res.json();
 
-  // Simple prediction algorithms
-  function computePrediction(mode){
-    if(history.length === 0) return 'No data';
-    // last N
-    const last = history.slice(-6);
-    const last1 = history[history.length-1];
-    const last2 = history[history.length-2];
-    // counts
-    const bigCount = last.filter(x=>x==='Big').length;
-    const smallCount = last.filter(x=>x==='Small').length;
+        let result = data.result;   // "Big" / "Small"
+        let number = data.number;   // actual number
+        let color = data.color;     // "Red" / "Green"
 
-    if(mode === 'reversal'){
-      // If strong run (>3 same) -> reverse, else weighted reversal
-      const run = countRun(history);
-      if(run >= 3) return (last1 === 'Big') ? 'Small (Strong Reversal)' : 'Big (Strong Reversal)';
-      // else use weighted: higher chance to reverse proportional to run length
-      const probReverse = Math.min(0.7, 0.2 + run*0.15); // 0.2..0.7
-      return (Math.random() < probReverse) ? ((last1==='Big')?'Small (Reverse)':'Big (Reverse)') : (last1==='Big'?'Big (Continue)':'Small (Continue)');
-    }
+        // Prediction logic (simple reversal)
+        let prediction = (result === "Big") ? "Small Expected (Reversal)" : "Big Expected (Reversal)";
 
-    if(mode === 'trend'){
-      if(bigCount > smallCount) return 'Big (Trend)';
-      if(smallCount > bigCount) return 'Small (Trend)';
-      // tie -> continue last
-      return last1 + ' (Continue by tie)';
-    }
-
-    if(mode === 'markov'){
-      // 1-step Markov chain: compute P(next|last)
-      const trans = buildTransition(history);
-      const probs = trans[last1] || {'Big':0.5,'Small':0.5};
-      return sampleWeighted(probs) + ' (Markov)';
-    }
-
-    // hybrid: combine markov + reversal + trend
-    const mark = (() => {
-      const trans = buildTransition(history);
-      const probs = trans[last1] || {'Big':0.5,'Small':0.5};
-      return probs;
-    })();
-
-    // compute score = markov_prob * 0.6 + trend_bias * 0.4 (trend_bias based on counts)
-    const total = Math.max(1, bigCount+smallCount);
-    const trendBias = { Big: bigCount/total, Small: smallCount/total };
-    const score = {
-      Big: (mark.Big||0)*0.6 + (trendBias.Big||0)*0.4,
-      Small: (mark.Small||0)*0.6 + (trendBias.Small||0)*0.4
-    };
-    return (score.Big > score.Small ? 'Big (Hybrid)' : 'Small (Hybrid)');
-  }
-
-  function countRun(arr){
-    if(arr.length===0) return 0;
-    let last = arr[arr.length-1], run=1;
-    for(let i=arr.length-2;i>=0;i--){
-      if(arr[i]===last) run++; else break;
-    }
-    return run;
-  }
-
-  function buildTransition(arr){
-    // returns object like { Big: {Big:0.6, Small:0.4}, Small:{...} }
-    const transCounts = { Big:{Big:0,Small:0}, Small:{Big:0,Small:0} };
-    for(let i=0;i<arr.length-1;i++){
-      const a = arr[i], b = arr[i+1];
-      if((a==='Big' || a==='Small') && (b==='Big' || b==='Small')){
-        transCounts[a][b] = (transCounts[a][b]||0) + 1;
+        document.getElementById("resultBox").innerHTML = `
+          🕑 Period: <b>${period}</b><br>
+          ✅ Result: <b>${result}</b><br>
+          🎲 Number: <b>${number}</b><br>
+          🎨 Color: <b>${color}</b><br><br>
+          🎯 Prediction → <span style="color:yellow">${prediction}</span>
+        `;
+      } catch (e) {
+        document.getElementById("resultBox").innerHTML = "❌ API Error! Check URL or period number.";
       }
     }
-    const trans = {};
-    ['Big','Small'].forEach(k=>{
-      const s = transCounts[k].Big + transCounts[k].Small;
-      if(s===0) trans[k] = { Big:0.5, Small:0.5 };
-      else trans[k] = { Big: transCounts[k].Big/s, Small: transCounts[k].Small/s };
-    });
-    return trans;
-  }
-
-  function sampleWeighted(probs){
-    // probs = {Big:0.7, Small:0.3}
-    const r = Math.random();
-    const b = probs.Big || 0;
-    return (r < b) ? 'Big' : 'Small';
-  }
-
-  // UI actions
-  fetchBtn.addEventListener('click', fetchApiOnce);
-  clearHistoryBtn.addEventListener('click', () => { history = []; updateHistoryUI(); resultBox.innerHTML = 'Cleared history.'; setStatus('History cleared') });
-
-  togglePoll.addEventListener('click', () => {
-    polling = !polling;
-    if(polling){
-      togglePoll.textContent = 'Stop Auto Poll';
-      const secs = Math.max(2, parseInt(intervalInput.value)||10);
-      setStatus('Auto polling every ' + secs + 's');
-      pollTimer = setInterval(fetchApiOnce, secs*1000);
-      // immediate fetch
-      fetchApiOnce();
-    } else {
-      togglePoll.textContent = 'Start Auto Poll';
-      setStatus('Auto polling stopped');
-      clearInterval(pollTimer);
-      pollTimer = null;
-    }
-  });
-
-  // allow pressing Enter in API field to fetch
-  apiUrlInput.addEventListener('keydown', (e) => { if(e.key === 'Enter') fetchApiOnce(); });
-
-  // initial UI
-  updateHistoryUI();
-})();
-</script>
+  </script>
 </body>
 </html>
