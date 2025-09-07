@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Big-Small Predictor</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #1f1c2c, #928DAB);
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+    }
+    h1 { margin-bottom: 20px; }
+    .number-buttons {
+      display: grid;
+      grid-template-columns: repeat(5, 60px);
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+    .num-btn {
+      background: #333;
+      border: none;
+      padding: 15px;
+      border-radius: 10px;
+      font-size: 18px;
+      color: #fff;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    .num-btn:hover {
+      background: #ff9800;
+      transform: scale(1.1);
+    }
+    .actions { margin: 15px 0; }
+    .btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      margin: 5px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    .predict-btn { background: #4caf50; color: white; }
+    .clear-btn { background: #f44336; color: white; }
+    .btn:hover { opacity: 0.8; }
+    .display {
+      margin: 15px 0;
+      font-size: 20px;
+      font-weight: bold;
+      min-height: 40px;
+      text-align: center;
+    }
+    .history {
+      width: 100%;
+      max-width: 300px;
+      margin-top: 20px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 10px;
+      padding: 10px;
+      overflow-y: auto;
+      max-height: 200px;
+    }
+    .history div {
+      padding: 5px;
+      border-bottom: 1px solid rgba(255,255,255,0.2);
+    }
+    .animate {
+      animation: pop 0.6s ease forwards;
+    }
+    @keyframes pop {
+      0% { transform: scale(0.5); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+  <h1>🔮 Big-Small Predictor</h1>
+  
+  <div class="number-buttons" id="numberButtons"></div>
+  
+  <div class="actions">
+    <button class="btn predict-btn" onclick="predict()">PREDICT</button>
+    <button class="btn clear-btn" onclick="clearInput()">CLEAR</button>
+  </div>
+
+  <div class="display" id="resultDisplay"></div>
+
+  <div class="history" id="history"></div>
+
+  <script>
+    let input = "";
+    const maxDigits = 2;
+    const resultDisplay = document.getElementById("resultDisplay");
+    const historyBox = document.getElementById("history");
+
+    // Mapping from your image
+    const mapping = {
+      "11":"Small","22":"Small","33":"Small","44":"Big","55":"Small","66":"Big","77":"Big","88":"Big","99":"Big","00":"Small",
+      "111":"Big","222":"Small","333":"Big","444":"Big","555":"Big","666":"Small","777":"Small","888":"Big","999":"Big","000":"Big",
+      "10":"Small","11":"Small","12":"Big","13":"Small","14":"Big","15":"Big","16":"Small","17":"Small","18":"Big","19":"Small",
+      "20":"Small","21":"Small","22":"Small","23":"Small","24":"Big","25":"Small","26":"Small","27":"Small","28":"Big","29":"Small",
+      "30":"Small","31":"Big","32":"Small","33":"Small","34":"Small","35":"Big","36":"Small","37":"Small","38":"Big","39":"Big",
+      "40":"Small","41":"Small","42":"Big","43":"Big","44":"Big","45":"Small","46":"Big","47":"Big","48":"Small","49":"Small",
+      "50":"Small","51":"Small","52":"Small","53":"Big","54":"Small","55":"Small","56":"Big","57":"Small","58":"Small","59":"Big",
+      "60":"Small","61":"Small","62":"Small","63":"Big","64":"Big","65":"Small","66":"Big","67":"Small","68":"Big","69":"Small",
+      "70":"Small","71":"Small","72":"Big","73":"Small","74":"Big","75":"Small","76":"Big","77":"Big","78":"Big","79":"Big",
+      "80":"Small","81":"Small","82":"Small","83":"Big","84":"Big","85":"Small","86":"Big","87":"Small","88":"Big","89":"Big",
+      "90":"Small","91":"Small","92":"Small","93":"Small","94":"Big","95":"Small","96":"Big","97":"Small","98":"Small","99":"Big"
+    };
+
+    // Generate number buttons
+    const numContainer = document.getElementById("numberButtons");
+    for (let i = 0; i <= 9; i++) {
+      const btn = document.createElement("button");
+      btn.className = "num-btn";
+      btn.innerText = i;
+      btn.onclick = () => addNumber(i);
+      numContainer.appendChild(btn);
+    }
+
+    function addNumber(num) {
+      if (input.length < maxDigits) {
+        input += num;
+        resultDisplay.textContent = input;
+      }
+    }
+
+    function predict() {
+      if (input.length !== maxDigits) {
+        resultDisplay.textContent = "Enter 2 digits!";
+        return;
+      }
+      let prediction = mapping[input];
+      if (!prediction) prediction = "No Mapping!";
+      
+      resultDisplay.textContent = `Result: ${prediction}`;
+      resultDisplay.classList.remove("animate");
+      void resultDisplay.offsetWidth;
+      resultDisplay.classList.add("animate");
+
+      let entry = document.createElement("div");
+      entry.textContent = `${input} → ${prediction}`;
+      historyBox.prepend(entry);
+
+      if (historyBox.childNodes.length > 10) {
+        historyBox.removeChild(historyBox.lastChild);
+      }
+    }
+
+    function clearInput() {
+      input = "";
+      resultDisplay.textContent = "";
+    }
+  </script>
+</body>
+</html>
