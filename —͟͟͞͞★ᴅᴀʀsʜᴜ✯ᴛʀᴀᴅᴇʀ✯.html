@@ -1,36 +1,158 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Real Prediction Bot</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Big-Small Predictor</title>
   <style>
-    body { background:#000; color:#0ff; text-align:center; font-family:Arial; }
-    #resultBox { margin:20px; padding:20px; font-size:24px; background:#111; border-radius:15px; }
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #1f1c2c, #928DAB);
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+    }
+    h1 {
+      margin-bottom: 20px;
+    }
+    .number-buttons {
+      display: grid;
+      grid-template-columns: repeat(5, 60px);
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+    .num-btn {
+      background: #333;
+      border: none;
+      padding: 15px;
+      border-radius: 10px;
+      font-size: 18px;
+      color: #fff;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    .num-btn:hover {
+      background: #ff9800;
+      transform: scale(1.1);
+    }
+    .actions {
+      margin: 15px 0;
+    }
+    .btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      margin: 5px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    .predict-btn { background: #4caf50; color: white; }
+    .clear-btn { background: #f44336; color: white; }
+    .btn:hover { opacity: 0.8; }
+    .display {
+      margin: 15px 0;
+      font-size: 20px;
+      font-weight: bold;
+      min-height: 40px;
+      text-align: center;
+    }
+    .history {
+      width: 100%;
+      max-width: 300px;
+      margin-top: 20px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 10px;
+      padding: 10px;
+      overflow-y: auto;
+      max-height: 200px;
+    }
+    .history div {
+      padding: 5px;
+      border-bottom: 1px solid rgba(255,255,255,0.2);
+    }
+    .animate {
+      animation: pop 0.6s ease forwards;
+    }
+    @keyframes pop {
+      0% { transform: scale(0.5); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
   </style>
 </head>
 <body>
-  <h1>🤖 Real-Time Big/Small Bot</h1>
-  <button onclick="getLiveData()">Fetch Latest & Predict</button>
-  <div id="resultBox">Waiting for data...</div>
+  <h1>🔮 Big-Small Predictor</h1>
+  
+  <div class="number-buttons" id="numberButtons"></div>
+  
+  <div class="actions">
+    <button class="btn predict-btn" onclick="predict()">PREDICT</button>
+    <button class="btn clear-btn" onclick="clearInput()">CLEAR</button>
+  </div>
+
+  <div class="display" id="resultDisplay"></div>
+
+  <div class="history" id="history"></div>
 
   <script>
-    async function getLiveData(){
-      try {
-        // ⚠️ yaha apna actual API URL dalna padega
-        let res = await fetch("https://example.com/api/latest");
-        let data = await res.json();
+    let input = "";
+    const maxDigits = 2;
+    const resultDisplay = document.getElementById("resultDisplay");
+    const historyBox = document.getElementById("history");
 
-        let latest = data.result; // Big / Small
-        let period = data.period;
+    // Generate number buttons 0-9
+    const numContainer = document.getElementById("numberButtons");
+    for (let i = 0; i <= 9; i++) {
+      const btn = document.createElement("button");
+      btn.className = "num-btn";
+      btn.innerText = i;
+      btn.onclick = () => addNumber(i);
+      numContainer.appendChild(btn);
+    }
 
-        // Dummy prediction logic
-        let prediction = latest === "Big" ? "Small (Reversal)" : "Big (Reversal)";
+    function addNumber(num) {
+      if (input.length < maxDigits) {
+        input += num;
+        resultDisplay.textContent = input;
+      }
+    }
 
-        document.getElementById("resultBox").innerHTML = 
-          `🕑 Period: ${period}<br>
-           ✅ Latest: ${latest}<br>
-           🎯 Prediction → <b>${prediction}</b>`;
-      } catch (e) {
-        document.getElementById("resultBox").innerHTML = "⚠️ Error fetching API!";
+    function predict() {
+      if (input.length !== maxDigits) {
+        resultDisplay.textContent = "Enter 2 digits!";
+        return;
+      }
+      let num = parseInt(input);
+      let prediction = getPrediction(num);
+
+      resultDisplay.textContent = `Result: ${prediction}`;
+      resultDisplay.classList.remove("animate");
+      void resultDisplay.offsetWidth; 
+      resultDisplay.classList.add("animate");
+
+      let entry = document.createElement("div");
+      entry.textContent = `${input} → ${prediction}`;
+      historyBox.prepend(entry);
+
+      if (historyBox.childNodes.length > 10) {
+        historyBox.removeChild(historyBox.lastChild);
+      }
+    }
+
+    function clearInput() {
+      input = "";
+      resultDisplay.textContent = "";
+    }
+
+    function getPrediction(num) {
+      // Logic: 0-4 Small, 5-9 Big (last digit rule)
+      let lastDigit = num % 10;
+      if ([0,1,2,3,4].includes(lastDigit)) {
+        return "Small";
+      } else {
+        return "Big";
       }
     }
   </script>
