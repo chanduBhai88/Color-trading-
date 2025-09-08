@@ -1,107 +1,609 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Khatarnak Predictor Pro</title>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron&display=swap" rel="stylesheet">
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: 'Orbitron', sans-serif;
-      background: #111;
-      color: #0f0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-start;
-      min-height: 100vh;
-      padding: 20px;
-    }
-    .panel {
-      width: 100%;
-      max-width: 480px;
-      background: #222;
-      padding: 20px;
-      border-radius: 20px;
-      box-shadow: 0 0 20px #0f0;
-    }
-    .title {
-      text-align: center;
-      font-size: 28px;
-      margin-bottom: 20px;
-    }
-    .result, .prediction {
-      font-size: 20px;
-      text-align: center;
-      margin: 10px 0;
-    }
-    .timer {
-      font-size: 16px;
-      text-align: center;
-      margin-bottom: 15px;
-    }
-    .history {
-      background: #111;
-      padding: 10px;
-      border-radius: 10px;
-      max-height: 150px;
-      overflow-y: auto;
-      margin-top: 10px;
-      font-size: 14px;
-    }
-    button {
-      margin-top: 20px;
-      padding: 10px 20px;
-      font-weight: bold;
-      background: #0f0;
-      color: #000;
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Big Small 3-Level Prediction</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: white;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: rgba(0, 0, 0, 0.8);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            padding: 30px;
+            backdrop-filter: blur(10px);
+        }
+
+        .title {
+            text-align: center;
+            font-size: 2.5em;
+            margin-bottom: 30px;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: bold;
+        }
+
+        .input-section {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #fff;
+            font-size: 1.1em;
+        }
+
+        .input-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .result-input {
+            padding: 15px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1.2em;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .result-input:focus {
+            outline: none;
+            border-color: #4ecdc4;
+            background: rgba(78, 205, 196, 0.1);
+        }
+
+        .result-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .predict-btn {
+            width: 100%;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            color: white;
+            padding: 18px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.3em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .predict-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(255, 107, 107, 0.4);
+        }
+
+        .predict-btn:disabled {
+            background: #666;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .results-container {
+            display: none;
+            margin-top: 30px;
+        }
+
+        .level {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            border-left: 5px solid;
+            transition: transform 0.2s ease;
+        }
+
+        .level:hover {
+            transform: translateX(5px);
+        }
+
+        .level-1 { 
+            border-left-color: #2ed573;
+            background: linear-gradient(135deg, rgba(46, 213, 115, 0.15), rgba(46, 213, 115, 0.05));
+        }
+        .level-2 { 
+            border-left-color: #ffa502;
+            background: linear-gradient(135deg, rgba(255, 165, 2, 0.15), rgba(255, 165, 2, 0.05));
+        }
+        .level-3 { 
+            border-left-color: #ff4757;
+            background: linear-gradient(135deg, rgba(255, 71, 87, 0.15), rgba(255, 71, 87, 0.05));
+        }
+
+        .level h3 {
+            margin-bottom: 20px;
+            font-size: 1.4em;
+            text-align: center;
+        }
+
+        .level-1 h3 { color: #2ed573; }
+        .level-2 h3 { color: #ffa502; }
+        .level-3 h3 { color: #ff4757; }
+
+        .prediction-result {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .big-small-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin: 25px 0;
+        }
+
+        .size-btn {
+            padding: 20px 40px;
+            border-radius: 15px;
+            font-weight: bold;
+            color: white;
+            text-align: center;
+            border: 3px solid transparent;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.2em;
+            min-width: 120px;
+        }
+
+        .size-big { 
+            background: linear-gradient(45deg, #ff6b6b, #ee5a52);
+        }
+        .size-small { 
+            background: linear-gradient(45deg, #4ecdc4, #44a08d);
+        }
+
+        .size-btn.recommended {
+            border-color: #ffd700;
+            transform: scale(1.1);
+            box-shadow: 0 0 25px rgba(255, 215, 0, 0.6);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 25px rgba(255, 215, 0, 0.6); }
+            50% { box-shadow: 0 0 35px rgba(255, 215, 0, 0.8); }
+            100% { box-shadow: 0 0 25px rgba(255, 215, 0, 0.6); }
+        }
+
+        .confidence-bar {
+            height: 12px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 6px;
+            margin: 15px 0;
+            overflow: hidden;
+        }
+
+        .confidence-fill {
+            height: 100%;
+            border-radius: 6px;
+            transition: width 1.5s ease;
+        }
+
+        .confidence-1 { background: linear-gradient(90deg, #2ed573, #20c997); }
+        .confidence-2 { background: linear-gradient(90deg, #ffa502, #fd7e14); }
+        .confidence-3 { background: linear-gradient(90deg, #ff4757, #c44569); }
+
+        .details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .detail-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .detail-value {
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .detail-label {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+
+        .input-helper {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+
+        @media (max-width: 768px) {
+            .input-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .big-small-buttons {
+                flex-direction: column;
+                gap: 15px;
+                align-items: center;
+            }
+            
+            .title {
+                font-size: 2em;
+            }
+            
+            .details {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
 </head>
 <body>
-  <div class="panel">
-    <div class="title">Khatarnak Predictor</div>
-    <div class="timer" id="timer">Next round in: 60s</div>
-    <div class="prediction" id="prediction">Prediction: ...</div>
-    <div class="result" id="result">Result: ...</div>
-    <div class="history" id="history"></div>
-    <button onclick="resetGame()">Reset</button>
-  </div>  <script>
-    let counter = 60;
-    let interval;
-    const predictionEl = document.getElementById("prediction");
-    const resultEl = document.getElementById("result");
-    const timerEl = document.getElementById("timer");
-    const historyEl = document.getElementById("history");
-    const history = [];
+    <div class="container">
+        <h1 class="title">🎯 BIG SMALL PREDICTOR</h1>
+        
+        <div class="input-section">
+            <div class="input-group">
+                <label>📊 Enter Last 4 Results (0-9):</label>
+                <div class="input-row">
+                    <input type="number" class="result-input" id="result1" placeholder="0-9" min="0" max="9">
+                    <input type="number" class="result-input" id="result2" placeholder="0-9" min="0" max="9">
+                </div>
+                <div class="input-row" style="margin-top: 15px;">
+                    <input type="number" class="result-input" id="result3" placeholder="0-9" min="0" max="9">
+                    <input type="number" class="result-input" id="result4" placeholder="0-9" min="0" max="9">
+                </div>
+                <div class="input-helper">
+                    Enter numbers from most recent to oldest (left to right, top to bottom)
+                </div>
+            </div>
+            
+            <button class="predict-btn" onclick="generatePredictions()" id="predictBtn">
+                🚀 GET 3-LEVEL PREDICTIONS
+            </button>
+        </div>
 
-    const colors = ["Red", "Green", "Violet"];
-    const numbers = [0,1,2,3,4,5,6,7,8,9];
+        <div class="results-container" id="resultsContainer">
+            <!-- Level 1: Basic Prediction -->
+            <div class="level level-1">
+                <h3>🟢 LEVEL 1: BASIC ANALYSIS</h3>
+                <div class="confidence-bar">
+                    <div class="confidence-fill confidence-1" id="confidence1"></div>
+                </div>
+                
+                <div class="big-small-buttons" id="level1Result">
+                    <!-- Results will be inserted here -->
+                </div>
+                
+                <div class="details" id="level1Details">
+                    <!-- Details will be inserted here -->
+                </div>
+            </div>
 
-    function generatePrediction() {
-      const color = colors[Math.floor(Math.random() * colors.length)];
-      const number = numbers[Math.floor(Math.random() * numbers.length)];
-      const size = number >= 5 ? "Big" : "Small";
-      const coin = Math.random() < 0.5 ? "Heads" : "Tails";
+            <!-- Level 2: Advanced Prediction -->
+            <div class="level level-2">
+                <h3>🟡 LEVEL 2: ADVANCED PATTERN</h3>
+                <div class="confidence-bar">
+                    <div class="confidence-fill confidence-2" id="confidence2"></div>
+                </div>
+                
+                <div class="big-small-buttons" id="level2Result">
+                    <!-- Results will be inserted here -->
+                </div>
+                
+                <div class="details" id="level2Details">
+                    <!-- Details will be inserted here -->
+                </div>
+            </div>
 
-      return {
-        color,
-        number,
-        size,
-        coin
-      };
-    }
+            <!-- Level 3: Expert Prediction -->
+            <div class="level level-3">
+                <h3>🔴 LEVEL 3: AI PREDICTION</h3>
+                <div class="confidence-bar">
+                    <div class="confidence-fill confidence-3" id="confidence3"></div>
+                </div>
+                
+                <div class="big-small-buttons" id="level3Result">
+                    <!-- Results will be inserted here -->
+                </div>
+                
+                <div class="details" id="level3Details">
+                    <!-- Details will be inserted here -->
+                </div>
+            </div>
+        </div>
+    </div>
 
-    function updatePrediction(pred) {
-      predictionEl.innerText = `Prediction: Color: ${pred.color}, Size: ${pred.size}, Number: ${pred.number}, Coin: ${pred.coin}`;
-    }
+    <script>
+        let inputData = [];
 
-    function updateResult(pred) {
-      resultEl.innerText = `Result: Color: ${pred.color}, Size: ${pred.size}, Number: ${pred.number}, Coin: ${pred.coin}`;
-      history.unshift(`✅ ${new Date().toLocaleTimeString()} → ${resultEl.innerText}`);
-      if (history.length > 5) history.pop();
-      history
+        function validateInputs() {
+            const inputs = ['result1', 'result2', 'result3', 'result4'];
+            inputData = [];
+            
+            for (let inputId of inputs) {
+                const value = document.getElementById(inputId).value;
+                if (value === '' || value < 0 || value > 9) {
+                    return false;
+                }
+                inputData.push(parseInt(value));
+            }
+            return true;
+        }
+
+        function generatePredictions() {
+            if (!validateInputs()) {
+                alert('Please enter all 4 numbers (0-9)');
+                return;
+            }
+
+            document.getElementById('resultsContainer').style.display = 'block';
+            document.getElementById('resultsContainer').scrollIntoView({ behavior: 'smooth' });
+
+            // Animate confidence bars
+            setTimeout(() => {
+                document.getElementById('confidence1').style.width = '88%';
+                document.getElementById('confidence2').style.width = '75%';
+                document.getElementById('confidence3').style.width = (60 + Math.random() * 25) + '%';
+            }, 500);
+
+            // Generate all three levels
+            generateLevel1();
+            generateLevel2();
+            generateLevel3();
+        }
+
+        function generateLevel1() {
+            // Simple pattern analysis - count big vs small
+            let bigCount = 0, smallCount = 0;
+            
+            inputData.forEach(num => {
+                if (num >= 5) bigCount++;
+                else smallCount++;
+            });
+
+            // Basic contrarian approach
+            let prediction = bigCount > smallCount ? 'SMALL' : 'BIG';
+            let confidence = 88;
+            
+            // Calculate average
+            let average = inputData.reduce((a, b) => a + b, 0) / inputData.length;
+
+            document.getElementById('level1Result').innerHTML = `
+                <div class="size-btn size-big ${prediction === 'BIG' ? 'recommended' : ''}">BIG (5-9)</div>
+                <div class="size-btn size-small ${prediction === 'SMALL' ? 'recommended' : ''}">SMALL (0-4)</div>
+            `;
+
+            document.getElementById('level1Details').innerHTML = `
+                <div class="detail-card">
+                    <div class="detail-value" style="color: #2ed573;">${prediction}</div>
+                    <div class="detail-label">Prediction</div>
+                </div>
+                <div class="detail-card">
+                    <div class="detail-value" style="color: #4ecdc4;">${bigCount}:${smallCount}</div>
+                    <div class="detail-label">Big:Small Ratio</div>
+                </div>
+                <div class="detail-card">
+                    <div class="detail-value" style="color: #ffd700;">${average.toFixed(1)}</div>
+                    <div class="detail-label">Average</div>
+                </div>
+                <div class="detail-card">
+                    <div class="detail-value" style="color: #2ed573;">${confidence}%</div>
+                    <div class="detail-label">Confidence</div>
+                </div>
+            `;
+        }
+
+        function generateLevel2() {
+            // Advanced pattern analysis
+            let patterns = {
+                alternating: 0,
+                ascending: 0,
+                descending: 0,
+                consecutive: 0
+            };
+
+            // Check for patterns
+            for (let i = 1; i < inputData.length; i++) {
+                if ((inputData[i] >= 5) !== (inputData[i-1] >= 5)) patterns.alternating++;
+                if (inputData[i] > inputData[i-1]) patterns.ascending++;
+                if (inputData[i] < inputData[i-1]) patterns.descending++;
+                if (Math.abs(inputData[i] - inputData[i-1]) <= 1) patterns.consecutive++;
+            }
+
+            // Weighted scoring
+            let bigScore = 50;
+            let smallScore = 50;
+
+            // Apply pattern weights
+            if (patterns.alternating >= 2) {
+                // If alternating pattern, predict opposite of last
+                if (inputData[0] >= 5) smallScore += 20;
+                else bigScore += 20;
+            }
+
+            if (patterns.ascending >= 2) smallScore += 15;
+            if (patterns.descending >= 2) bigScore += 15;
+
+            // Recent trend analysis
+            let recentBig = 0;
+            for (let i = 0; i < 2; i++) {
+                if (inputData[i] >= 5) recentBig++;
+            }
+
+            if (recentBig >= 2) smallScore += 25;
+            else if (recentBig === 0) bigScore += 25;
+
+            let prediction = bigScore > smallScore ? 'BIG' : 'SMALL';
+            let confidence = 75;
+            let patternStrength = Math.max(patterns.alternating, patterns.ascending, patterns.descending) * 33;
+
+            document.getElementById('level2Result').innerHTML = `
+                <div class="size-btn size-big ${prediction === 'BIG' ? 'recommended' : ''}">BIG (${bigScore}%)</div>
+                <div class="size-btn size-small ${prediction === 'SMALL' ? 'recommended' : ''}">SMALL (${smallScore}%)</div>
+            `;
+
+            document.getElementById('level2Details').innerHTML = `
+                <div class="detail-card">
+                    <div class="detail-value" style="color: #ffa502;">${prediction}</div>
+                    <div class="detail-label">Best Pick</div>
+                </div>
+                <div class="detail-card">
+                    <div class="detail-value" style="color: #17a2b8;">${patterns.alternating}</div>
+                    <div class="detail-label">Alternating</div>
+                </div>
+                <div class="detail-card">
+                    <div class="detail-value" style="color: #28a745;">${patternStrength}%</div>
+                    <div class="detail-label">Pattern Strength</div>
+                </div>
+                <div class="detail-card">
+                    <div class="detail-value" style="color: #ffa502;">${confidence}%</div>
+                    <div class="detail-label">Confidence</div>
+                </div>
+            `;
+        }
+
+        function generateLevel3() {
+            // AI-like complex analysis
+            let weights = {
+                big: 45,
+                small: 45
+            };
+
+            // Multiple factor analysis
+            let factors = {
+                sequence: 0,
+                distribution: 0,
+                momentum: 0,
+                fibonacci: 0
+            };
+
+            // Sequence analysis
+            let sum = inputData.reduce((a, b) => a + b, 0);
+            if (sum % 2 === 0) factors.sequence = 15;
+            else factors.sequence = -10;
+
+            // Distribution analysis
+            let unique = [...new Set(inputData)].length;
+            factors.distribution = unique * 5;
+
+            // Momentum analysis
+            let momentum = 0;
+            for (let i = 1; i < inputData.length; i++) {
+                momentum += inputData[i] - inputData[i-1];
+            }
+            factors.momentum = momentum * 3;
+
+            // Fibonacci-like sequence check
+            for (let i = 2; i < inputData.length; i++) {
+                if (inputData[i] === (inputData[i-1] + inputData[i-2]) % 10) {
+                    factors.fibonacci += 20;
+                }
+            }
+
+            // Apply all factors
+            weights.big += factors.sequence + factors.momentum;
+            weights.small -= factors.sequence + factors.momentum;
+            weights.big += factors.distribution;
+            weights.small += factors.fibonacci;
+
+            // Normalize weights
+            let total = weights.big + weights.small;
+            weights.big = Math.round((weights.big / total) * 100);
+            weights.small = 100 - weights.big;
+
+            let prediction = weights.big > weights.small ? 'BIG' : 'SMALL';
+            let confidence = Math.min(95, Math.max(45, 55 + Math.abs(weights.big - weights.small) / 2));
+
+            // Predict probable numbers
+            let probableNumbers = [];
+            if (prediction === 'BIG') {
+                probableNumbers = [5, 6, 7, 8, 9];
+            } else {
+                probableNumbers = [0, 1, 2, 3, 4];
+            }
+
+            // Filter based on recent patterns
+            let hotNumbers = probableNumbers.filter(num => !inputData.includes(num)).slice(0, 3);
+            if (hotNumbers.length === 0) hotNumbers = probableNumbers.slice(0, 3);
+
+            document.getElementById('level3Result').innerHTML = `
+                <div class="size-btn size-big ${prediction === 'BIG' ? 'recommended' : ''}">BIG (${weights.big}%)</div>
+                <div class="size-btn size-small ${prediction === 'SMALL' ? 'recommended' : ''}">SMALL (${weights.small}%)</div>
+            `;
+
+            document.getElementById('level3Details').innerHTML = `
+                <div class="detail-card">
+                    <div class="detail-value" style="color: #ff4757;">${prediction}</div>
+                    <div class="detail-label">AI Pick</div>
+                </div>
+                <div class="detail-card">
+                    <div class="detail-value" style="color: #ffd700;">[${hotNumbers.join(',')}]</div>
+                    <div class="detail-label">Hot Numbers</div>
+                </div>
+                <div class="detail-card">
+                    <div class="detail-value" style="color: #4ecdc4;">${momentum > 0 ? '+' : ''}${momentum}</div>
+                    <div class="detail-label">Momentum</div>
+                </div>
+                <div class="detail-card">
+                    <div class="detail-value" style="color: #ff4757;">${Math.round(confidence)}%</div>
+                    <div class="detail-label">AI Confidence</div>
+                </div>
+            `;
+
+            // Update confidence bar with calculated value
+            document.getElementById('confidence3').style.width = confidence + '%';
+        }
+
+        // Auto-focus next input
+        document.addEventListener('DOMContentLoaded', function() {
+            const inputs = document.querySelectorAll('.result-input');
+            inputs.forEach((input, index) => {
+                input.addEventListener('input', function() {
+                    if (this.value.length === 1 && index < inputs.length - 1) {
+                        inputs[index + 1].focus();
+                    }
+                });
+                
+                input.addEventListener('keydown', function(e) {
+                    if (e.key === 'Backspace' && this.value === '' && index > 0) {
+                        inputs[index - 1].focus();
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
