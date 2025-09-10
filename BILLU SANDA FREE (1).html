@@ -2,106 +2,140 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>RajaGame Predictor</title>
+  <title>91 Club Wingo Predictor</title>
   <style>
     body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: url("https://wallpapers.com/images/hd/hacker-dark-red-background-0mfq2zjtwqj2a7uo.jpg") no-repeat center center fixed;
-      background-size: cover;
+      background: #111;
       color: #fff;
+      font-family: Arial, sans-serif;
       text-align: center;
+      padding: 20px;
     }
     h1 {
-      margin: 20px 0;
-      font-size: 28px;
-      text-shadow: 2px 2px 5px red;
+      color: #0ff;
     }
-    .container {
-      margin: 20px auto;
-      width: 90%;
-      max-width: 400px;
-      padding: 20px;
-      background: rgba(0,0,0,0.7);
-      border-radius: 15px;
-      box-shadow: 0 0 20px red;
+    .input-box {
+      margin: 10px 0;
     }
     input {
-      width: 45%;
       padding: 10px;
-      margin: 5px;
+      width: 60px;
+      text-align: center;
       font-size: 16px;
       border-radius: 8px;
       border: none;
-      text-align: center;
     }
     button {
       padding: 10px 20px;
       margin: 10px;
-      font-size: 18px;
       border: none;
-      border-radius: 10px;
+      border-radius: 8px;
       cursor: pointer;
-      background: red;
+      font-size: 16px;
+      font-weight: bold;
       color: #fff;
+      background: linear-gradient(45deg, #ff0080, #7928ca);
       transition: 0.3s;
     }
     button:hover {
-      background: darkred;
+      transform: scale(1.1);
     }
-    #result {
+    .result-box {
       margin-top: 20px;
-      font-size: 30px;
-      font-weight: bold;
-      opacity: 0;
-      transform: scale(0.5);
-      transition: all 0.5s ease-in-out;
+      padding: 15px;
+      border-radius: 10px;
+      background: #222;
+      font-size: 18px;
+      box-shadow: 0 0 10px #0ff;
     }
-    #result.show {
-      opacity: 1;
-      transform: scale(1);
+    .history {
+      margin-top: 20px;
+      font-size: 14px;
+      color: #ccc;
     }
   </style>
 </head>
 <body>
-  <h1>🔥 RAJA THE BOSS 🔥</h1>
-  <div class="container">
-    <input type="text" id="numInput" placeholder="Enter Numbers (3)">
-    <input type="text" id="bsInput" placeholder="Enter Big/Small (3)">
-    <br>
-    <button onclick="predict()">Result</button>
-    <button onclick="clearAll()">Clear</button>
-    <div id="result"></div>
+  <h1>91 Club Wingo Predictor</h1>
+
+  <div class="input-box">
+    <input type="number" id="num1" min="0" max="9" placeholder="0-9">
+    <input type="number" id="num2" min="0" max="9" placeholder="0-9">
+    <input type="number" id="num3" min="0" max="9" placeholder="0-9">
+    <input type="number" id="num4" min="0" max="9" placeholder="0-9">
+    <input type="number" id="num5" min="0" max="9" placeholder="0-9">
   </div>
 
-  <script>
-    function predict() {
-      let num = document.getElementById("numInput").value.trim();
-      let bs = document.getElementById("bsInput").value.trim();
+  <button onclick="predict()">Predict</button>
+  <button onclick="clearInputs()">Clear</button>
 
-      if(num === "" || bs === "") {
-        alert("Please enter both Numbers and Big/Small!");
+  <div class="result-box" id="result">Prediction will appear here...</div>
+
+  <div class="history" id="history"></div>
+
+  <script>
+    function getSize(num) {
+      if (num >= 0 && num <= 4) return "Small";
+      return "Big";
+    }
+    function getColor(num) {
+      if (num === 0 || num === 5) return "Violet";
+      if (num % 2 === 0) return "Red";
+      return "Green";
+    }
+
+    let history = [];
+
+    function predict() {
+      let nums = [];
+      for (let i = 1; i <= 5; i++) {
+        let val = document.getElementById("num" + i).value;
+        if (val !== "") nums.push(parseInt(val));
+      }
+
+      if (nums.length < 3) {
+        document.getElementById("result").innerText = "⚠️ Please enter at least 3 results!";
         return;
       }
 
-      // Simple Prediction Logic (example)
-      let nextNum = Math.floor(Math.random() * 10);
-      let nextBS = (nextNum >= 5) ? "BIG" : "SMALL";
+      let last = nums[0];
+      let prediction = "";
+      let explanation = "";
 
-      let resultBox = document.getElementById("result");
-      resultBox.innerHTML = "Next ➝ " + nextNum + " " + nextBS;
-      resultBox.classList.add("show");
+      // Violet Rule
+      if (last === 0 || last === 5) {
+        prediction = (getSize(last) === "Small") ? "Big" : "Small";
+        explanation = "Last was Violet → predicting opposite size.";
+      }
+      // Streak Rule
+      else if (getSize(nums[0]) === getSize(nums[1]) && getSize(nums[1]) === getSize(nums[2])) {
+        prediction = (getSize(nums[0]) === "Big") ? "Small" : "Big";
+        explanation = "Detected size streak → predicting opposite.";
+      }
+      // Color Streak
+      else if (getColor(nums[0]) === getColor(nums[1]) && getColor(nums[1]) === getColor(nums[2])) {
+        prediction = (getColor(nums[0]) === "Red") ? "Green" : "Red";
+        explanation = "Detected color streak → predicting opposite color.";
+      }
+      // Fallback Rule
+      else {
+        prediction = (last % 2 === 0) ? "Green Small" : "Red Big";
+        explanation = "Fallback to odd/even rule.";
+      }
 
-      setTimeout(() => {
-        resultBox.classList.remove("show");
-      }, 2000);
+      let resultText = `🎯 Prediction: ${prediction}\n📌 Reason: ${explanation}`;
+      document.getElementById("result").innerText = resultText;
+
+      history.unshift(resultText);
+      if (history.length > 10) history.pop();
+      document.getElementById("history").innerHTML = "<b>History:</b><br>" + history.join("<br>");
     }
 
-    function clearAll() {
-      document.getElementById("numInput").value = "";
-      document.getElementById("bsInput").value = "";
-      document.getElementById("result").innerHTML = "";
+    function clearInputs() {
+      for (let i = 1; i <= 5; i++) {
+        document.getElementById("num" + i).value = "";
+      }
+      document.getElementById("result").innerText = "Prediction will appear here...";
     }
   </script>
 </body>
