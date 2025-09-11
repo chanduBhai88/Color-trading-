@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Big/Small Live Pattern</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #111;
+      color: #fff;
+      text-align: center;
+      padding: 20px;
+    }
+    h1 {
+      color: #00ffcc;
+    }
+    #clock {
+      font-size: 24px;
+      margin: 15px 0;
+    }
+    .pattern {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr); /* 12 columns */
+      gap: 6px;
+      margin-top: 20px;
+    }
+    .cell {
+      padding: 6px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: bold;
+      background: #222;
+      transition: all 0.5s ease;
+    }
+    .big { color: #00ff99; }
+    .small { color: #ff4444; }
+    .active {
+      background: gold;
+      color: #000 !important;
+      animation: flash 1s ease-in-out infinite alternate;
+    }
+    @keyframes flash {
+      from { transform: scale(1); opacity: 1; }
+      to { transform: scale(1.2); opacity: 0.7; }
+    }
+  </style>
+</head>
+<body>
+  <h1>Big/Small Live Pattern (24 Hours)</h1>
+  <div id="clock"></div>
+  <div class="pattern" id="pattern"></div>
+
+  <script>
+    // Full 24-hour pattern = 1440 minutes
+    const pattern = [];
+    for (let i = 0; i < 1440; i++) {
+      pattern.push(Math.random() > 0.5 ? "Big" : "Small");
+    }
+
+    const patternContainer = document.getElementById("pattern");
+
+    // Render pattern cells
+    pattern.forEach((result, index) => {
+      const cell = document.createElement("div");
+      cell.className = "cell " + (result === "Big" ? "big" : "small");
+
+      const hour = Math.floor(index / 60);
+      const minute = index % 60;
+      cell.innerText = `${hour.toString().padStart(2,"0")}:${minute.toString().padStart(2,"0")} → ${result}`;
+      patternContainer.appendChild(cell);
+    });
+
+    const cells = document.querySelectorAll(".cell");
+
+    function updateClock() {
+      const now = new Date();
+      const h = now.getHours();
+      const m = now.getMinutes();
+      const s = now.getSeconds();
+      document.getElementById("clock").innerText =
+        `Time: ${h.toString().padStart(2,"0")}:${m.toString().padStart(2,"0")}:${s.toString().padStart(2,"0")}`;
+
+      // Reset active highlight
+      cells.forEach(c => c.classList.remove("active"));
+
+      // Highlight current minute of the day
+      const currentIndex = h * 60 + m;
+      cells[currentIndex].classList.add("active");
+    }
+
+    setInterval(updateClock, 1000);
+    updateClock();
+  </script>
+</body>
+</html>
