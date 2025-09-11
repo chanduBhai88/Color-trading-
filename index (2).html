@@ -15,22 +15,27 @@
       color: #00ffcc;
     }
     .buttons {
-      margin: 15px 0;
+      margin: 20px 0;
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 15px;
     }
     button {
-      padding: 10px 20px;
-      margin: 5px;
-      font-size: 16px;
+      padding: 20px 40px; /* bada size */
+      font-size: 22px;   /* bada text */
+      font-weight: bold;
       border: none;
-      border-radius: 8px;
+      border-radius: 12px;
       cursor: pointer;
       transition: 0.3s;
+      min-width: 150px;  /* fixed width */
     }
     .big-btn { background: #00ff99; color: #000; }
     .small-btn { background: #ff4444; color: #fff; }
     .clear-btn { background: #444; color: #fff; }
     .export-btn { background: gold; color: #000; }
-    button:hover { transform: scale(1.1); }
+    button:hover { transform: scale(1.05); }
     ul {
       margin-top: 20px;
       padding: 0;
@@ -41,7 +46,8 @@
       border-radius: 8px;
     }
     li {
-      padding: 6px;
+      padding: 10px;
+      font-size: 18px;
       border-bottom: 1px solid #333;
     }
     .big { color: #00ff99; }
