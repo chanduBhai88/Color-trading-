@@ -3,145 +3,91 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>4-Level Big/Small Predictor</title>
+  <title>Big/Small Live Pattern</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #0d0d0d;
-      color: #f5f5f5;
+      background: #111;
+      color: #fff;
       text-align: center;
       padding: 20px;
     }
     h1 {
-      color: #ffcc00;
-      margin-bottom: 20px;
-      text-shadow: 0px 0px 8px #ffcc00;
+      color: #00ffcc;
     }
-    .btn {
-      padding: 12px 20px;
-      margin: 6px;
-      border: none;
-      cursor: pointer;
+    #clock {
+      font-size: 24px;
+      margin: 15px 0;
+    }
+    .pattern {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 8px;
+      margin-top: 20px;
+    }
+    .cell {
+      padding: 10px;
+      border-radius: 8px;
       font-weight: bold;
-      border-radius: 10px;
-      transition: 0.3s;
-      font-size: 16px;
+      background: #222;
+      transition: all 0.5s ease;
     }
-    .big-btn { background: #ff4444; color: white; }
-    .small-btn { background: #448aff; color: white; }
-    .clear-btn { background: #777; color: white; }
-    .btn:hover { opacity: 0.85; transform: scale(1.05); }
-
-    .history {
-      margin: 20px auto;
-      max-width: 420px;
-      background: #1a1a1a;
-      padding: 15px;
-      border-radius: 10px;
+    .big { color: #00ff99; }
+    .small { color: #ff4444; }
+    .active {
+      background: gold;
+      color: #000 !important;
+      animation: flash 1s ease-in-out infinite alternate;
     }
-    .card {
-      background: #1a1a1a;
-      margin: 12px auto;
-      padding: 15px;
-      border-radius: 14px;
-      max-width: 420px;
-      box-shadow: 0px 0px 15px rgba(255,255,255,0.1);
-      transition: 0.3s;
+    @keyframes flash {
+      from { transform: scale(1); opacity: 1; }
+      to { transform: scale(1.2); opacity: 0.7; }
     }
-    .card:hover { box-shadow: 0px 0px 20px rgba(255,255,255,0.25); }
-    .big { color: #ff4444; font-weight: bold; }
-    .small { color: #448aff; font-weight: bold; }
   </style>
 </head>
 <body>
-  <h1>🎲 4-Level Big/Small Predictor</h1>
-
-  <div>
-    <button class="btn big-btn" onclick="addResult('Big')">➕ Big</button>
-    <button class="btn small-btn" onclick="addResult('Small')">➕ Small</button>
-    <button class="btn clear-btn" onclick="clearHistory()">🗑 Clear</button>
-  </div>
-
-  <div class="history">
-    <h3>History</h3>
-    <p id="historyList">No results yet...</p>
-  </div>
-
-  <div class="card" id="prediction1"></div>
-  <div class="card" id="prediction2"></div>
-  <div class="card" id="prediction3"></div>
-  <div class="card" id="prediction4"></div>
+  <h1>Big/Small Live Pattern</h1>
+  <div id="clock"></div>
+  <div class="pattern" id="pattern"></div>
 
   <script>
-    let history = [];
-
-    function addResult(result) {
-      history.unshift(result); // latest on top
-      if (history.length > 30) history.pop(); // keep last 30
-      updateHistory();
-      makePrediction();
+    // Dummy 60-min pattern
+    const pattern = [];
+    for (let i = 0; i < 60; i++) {
+      pattern.push(Math.random() > 0.5 ? "Big" : "Small");
     }
 
-    function clearHistory() {
-      history = [];
-      document.getElementById("historyList").innerHTML = "No results yet...";
-      for (let i = 1; i <= 4; i++) {
-        document.getElementById("prediction" + i).innerHTML = "";
+    const patternContainer = document.getElementById("pattern");
+
+    // Render pattern cells
+    pattern.forEach((result, index) => {
+      const cell = document.createElement("div");
+      cell.className = "cell " + (result === "Big" ? "big" : "small");
+      cell.innerText = `${index.toString().padStart(2,"0")}: ${result}`;
+      patternContainer.appendChild(cell);
+    });
+
+    const cells = document.querySelectorAll(".cell");
+
+    function updateClock() {
+      const now = new Date();
+      const h = now.getHours();
+      const m = now.getMinutes();
+      const s = now.getSeconds();
+      document.getElementById("clock").innerText =
+        `Time: ${h.toString().padStart(2,"0")}:${m.toString().padStart(2,"0")}:${s.toString().padStart(2,"0")}`;
+
+      // Reset all cells
+      cells.forEach(c => c.classList.remove("active"));
+
+      // Highlight current minute
+      if (m < 60) {
+        cells[m].classList.add("active");
       }
     }
 
-    function updateHistory() {
-      document.getElementById("historyList").innerHTML = history.join(" , ");
-    }
-
-    function makePrediction() {
-      if (history.length < 5) {
-        for (let i = 1; i <= 4; i++) {
-          document.getElementById("prediction" + i).innerHTML = "Add at least 5 results to see prediction.";
-        }
-        return;
-      }
-
-      // Level 1: Frequency
-      let bigCount = history.filter(r => r === "Big").length;
-      let smallCount = history.filter(r => r === "Small").length;
-      let freqPrediction = bigCount > smallCount ? "Big" : "Small";
-      document.getElementById("prediction1").innerHTML = 
-        `<h3>Level 1 (Frequency)</h3> Prediction: <span class="${freqPrediction.toLowerCase()}">${freqPrediction}</span>`;
-
-      // Level 2: Streak Breaker
-      let streakPrediction = history[0];
-      let streakLength = 1;
-      for (let i = 1; i < history.length; i++) {
-        if (history[i] === history[0]) streakLength++;
-        else break;
-      }
-      let opp = (streakPrediction === "Big") ? "Small" : "Big";
-      let streakPredict = streakLength >= 3 ? opp : streakPrediction;
-      document.getElementById("prediction2").innerHTML = 
-        `<h3>Level 2 (Streak Breaker)</h3> Prediction: <span class="${streakPredict.toLowerCase()}">${streakPredict}</span>`;
-
-      // Level 3: Pattern Detector
-      let patternPredict = history[1];
-      if (history.length >= 5) {
-        let last4 = history.slice(0, 4).reverse().join("-");
-        if (last4 === "Big-Small-Big-Small" || last4 === "Small-Big-Small-Big") {
-          patternPredict = history[0] === "Big" ? "Small" : "Big"; 
-        }
-      }
-      document.getElementById("prediction3").innerHTML = 
-        `<h3>Level 3 (Pattern)</h3> Prediction: <span class="${patternPredict.toLowerCase()}">${patternPredict}</span>`;
-
-      // Level 4: Weighted Final Mix
-      let weighted = 0;
-      weighted += (freqPrediction === "Big" ? 1 : -1);
-      weighted += (streakPredict === "Big" ? 1 : -1);
-      weighted += (patternPredict === "Big" ? 1 : -1);
-      let finalPredict = weighted >= 0 ? "Big" : "Small";
-      let confidence = Math.min(100, Math.abs(weighted) * 20 + 50);
-      document.getElementById("prediction4").innerHTML = 
-        `<h3>Level 4 (Final Mix)</h3> Prediction: <span class="${finalPredict.toLowerCase()}">${finalPredict}</span> <br>Confidence: ${confidence.toFixed(0)}%`;
-    }
+    setInterval(updateClock, 1000);
+    updateClock();
   </script>
 </body>
 </html>
