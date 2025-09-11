@@ -1,177 +1,47 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>RajaGame Predictor (With Animation & Sound)</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Big/Small Predictor</title>
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
   <style>
-    body {
-      margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background: #111;
-      color: #fff;
-    }
-
-    .container {
-      background: rgba(0, 0, 0, 0.85);
-      max-width: 400px;
-      margin: 50px auto;
-      padding: 20px;
-      border-radius: 16px;
-      box-shadow: 0 0 20px rgba(255,255,255,0.2);
-      text-align: center;
-    }
-
-    h2 {
-      margin-bottom: 20px;
-    }
-
-    .inputs {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      justify-content: center;
-      margin-bottom: 20px;
-    }
-
-    select {
-      padding: 10px;
-      font-size: 1rem;
-      border-radius: 8px;
-      border: none;
-      width: 100px;
-      text-align: center;
-    }
-
-    button {
-      width: 100%;
-      padding: 12px;
-      font-size: 1rem;
-      background-color: #28a745;
-      border: none;
-      border-radius: 10px;
-      color: white;
-      cursor: pointer;
-    }
-
-    .result {
-      margin-top: 20px;
-      font-weight: bold;
-      font-size: 1.5rem;
-      color: #ff4d4d;
-      opacity: 0;
-      transform: scale(0.9);
-      transition: all 0.5s ease-in-out;
-    }
-
-    .result.show {
-      opacity: 1;
-      transform: scale(1.2);
-      animation: pulse 1s infinite alternate;
-    }
-
-    @keyframes pulse {
-      from {
-        color: #ff4d4d;
-        text-shadow: 0 0 5px #ff4d4d;
-      }
-      to {
-        color: #00ffd5;
-        text-shadow: 0 0 10px #00ffd5;
-      }
-    }
+    body { font-family: Arial, sans-serif; background:#111; color:#fff; text-align:center; padding:20px; }
+    #output { margin-top:20px; white-space:pre-wrap; }
+    .prediction { font-size:20px; font-weight:bold; margin-top:20px; color:gold; }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h2>🎯 RajaGame Predictor</h2>
-    <div class="inputs" id="input-container"></div>
-    <button onclick="predict()">🔮 Predict Next</button>
-    <div class="result" id="result">Enter 3 numbers & 3 Big/Small values.</div>
-  </div>
-
-  <!-- Sound -->
-  <audio id="sound" src="https://cdn.pixabay.com/download/audio/2022/10/30/audio_02840b3f79.mp3?filename=success-1-6297.mp3" preload="auto"></audio>
+  <h1>Big/Small Image Predictor</h1>
+  <input type="file" id="imageInput" accept="image/*">
+  <div id="output"></div>
+  <div class="prediction" id="prediction"></div>
 
   <script>
-    const container = document.getElementById("input-container");
-    const resultBox = document.getElementById("result");
-    const sound = document.getElementById("sound");
+    document.getElementById("imageInput").addEventListener("change", async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
 
-    // Add 3 number inputs (0 to 9)
-    for (let i = 0; i < 3; i++) {
-      const numberSelect = document.createElement("select");
-      const defaultOpt = document.createElement("option");
-      defaultOpt.value = "";
-      defaultOpt.textContent = "--";
-      numberSelect.appendChild(defaultOpt);
+      const { data: { text } } = await Tesseract.recognize(file, "eng");
+      document.getElementById("output").innerText = "Extracted Text:\n" + text;
 
-      for (let n = 0; n <= 9; n++) {
-        const opt = document.createElement("option");
-        opt.value = n;
-        opt.textContent = n;
-        numberSelect.appendChild(opt);
-      }
+      // Find Big/Small results in text
+      const results = text.match(/Big|Small/gi) || [];
+      const last10 = results.slice(-10);
 
-      container.appendChild(numberSelect);
-    }
+      if (last10.length > 0) {
+        // Simple prediction logic (example): Count which is more in last 10
+        const bigCount = last10.filter(r => r.toLowerCase() === "big").length;
+        const smallCount = last10.length - bigCount;
 
-    // Add 3 Big/Small inputs
-    for (let i = 0; i < 3; i++) {
-      const bigSmallSelect = document.createElement("select");
-      ["--", "Big", "Small"].forEach(val => {
-        const opt = document.createElement("option");
-        opt.value = val === "--" ? "" : val;
-        opt.textContent = val;
-        bigSmallSelect.appendChild(opt);
-      });
+        let prediction = bigCount > smallCount ? "Next may be: SMALL" : "Next may be: BIG";
 
-      container.appendChild(bigSmallSelect);
-    }
-
-    function predict() {
-      const selects = container.querySelectorAll("select");
-
-      let numbers = [];
-      let types = [];
-
-      // First 3 are numbers
-      for (let i = 0; i < 3; i++) {
-        const val = parseInt(selects[i].value);
-        if (isNaN(val)) {
-          showResult("Please select all 3 numbers.", false);
-          return;
-        }
-        numbers.push(val);
-      }
-
-      // Next 3 are Big/Small
-      for (let i = 3; i < 6; i++) {
-        const val = selects[i].value;
-        if (!val) {
-          showResult("Please select all 3 Big/Small values.", false);
-          return;
-        }
-        types.push(val);
-      }
-
-      const bigCount = types.filter(t => t === "Big").length;
-      const smallCount = types.filter(t => t === "Small").length;
-
-      const predicted = bigCount > smallCount ? "Small" : "Big";
-      showResult(`Predicted Next: ${predicted}`, true);
-    }
-
-    function showResult(msg, success) {
-      resultBox.textContent = msg;
-      if (success) {
-        resultBox.classList.add("show");
-        sound.currentTime = 0;
-        sound.play();
+        document.getElementById("prediction").innerText = 
+          `Last 10: ${last10.join(", ")}\n${prediction}`;
       } else {
-        resultBox.classList.remove("show");
+        document.getElementById("prediction").innerText = "No Big/Small found in image.";
       }
-    }
+    });
   </script>
 </body>
 </html>
