@@ -3,103 +3,71 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>3-Level Big/Small Predictor</title>
+  <title>Smart Big/Small Bot</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #0d0d0d;
-      color: #f5f5f5;
-      text-align: center;
-      padding: 20px;
-    }
-    h1 {
-      color: #00ffcc;
-    }
-    .input-box {
-      margin: 10px;
-    }
-    input {
-      padding: 8px;
-      font-size: 16px;
-      border-radius: 8px;
-      border: none;
-      outline: none;
-      text-align: center;
-    }
-    button {
-      margin-top: 15px;
-      padding: 10px 20px;
-      font-size: 16px;
-      background: #00ffcc;
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
-      transition: 0.3s;
-    }
-    button:hover {
-      background: #00cc99;
-    }
-    .result {
-      margin-top: 20px;
-      font-size: 20px;
-      font-weight: bold;
-      color: #ffcc00;
-    }
-    .level-box {
-      margin: 10px 0;
-      padding: 10px;
-      border: 1px solid #333;
-      border-radius: 10px;
-      background: #1a1a1a;
-    }
+    body { background:#111; color:#fff; font-family:Arial; text-align:center; padding:20px; }
+    h1 { color:gold; }
+    textarea { width:80%; height:100px; padding:10px; font-size:16px; border-radius:10px; }
+    button { margin-top:15px; padding:10px 20px; font-size:16px; border:none; border-radius:10px; background:gold; color:#000; cursor:pointer; }
+    button:hover { background:orange; }
+    #result { margin-top:20px; font-size:18px; font-weight:bold; color:#0f0; white-space:pre-wrap; }
   </style>
 </head>
 <body>
-  <h1>🔥 3-Level Big/Small Predictor 🔥</h1>
+  <h1>Smart Big/Small Predictor Bot</h1>
+  <p>Apne last results likho (comma ya space se alag-alag):</p>
+  <textarea id="input"></textarea><br>
+  <button onclick="predict()">Predict Next</button>
 
-  <div class="input-box">
-    <input type="text" id="input1" placeholder="Enter Input 1">
-    <input type="text" id="input2" placeholder="Enter Input 2">
-    <input type="text" id="input3" placeholder="Enter Input 3">
-  </div>
-
-  <button onclick="predict()">Predict</button>
-  <button onclick="clearInputs()">Clear</button>
-
-  <div class="result" id="result"></div>
+  <div id="result"></div>
 
   <script>
     function predict() {
-      let val1 = document.getElementById("input1").value.trim().toLowerCase();
-      let val2 = document.getElementById("input2").value.trim().toLowerCase();
-      let val3 = document.getElementById("input3").value.trim().toLowerCase();
+      const raw = document.getElementById("input").value.trim();
+      if (!raw) return alert("Please enter some results!");
 
-      if (!val1 || !val2 || !val3) {
-        document.getElementById("result").innerHTML = "⚠️ Please fill all 3 inputs!";
+      const results = raw.split(/[\s,]+/).map(r => r.toLowerCase());
+      const filtered = results.filter(r => r === "big" || r === "small");
+
+      if (filtered.length < 5) {
+        document.getElementById("result").innerText = "Need at least 5 results!";
         return;
       }
 
-      let levels = [];
-      // Simple logic: count "big" vs "small"
-      let arr = [val1, val2, val3];
-      let bigCount = arr.filter(x => x === "big").length;
-      let smallCount = arr.filter(x => x === "small").length;
+      const last10 = filtered.slice(-10);
+      const last = filtered[filtered.length - 1];
 
-      // Level 1
-      levels.push("Level 1: " + (bigCount > smallCount ? "Big" : "Small"));
-      // Level 2
-      levels.push("Level 2: " + (bigCount % 2 === 0 ? "Small" : "Big"));
-      // Level 3
-      levels.push("Level 3: " + (smallCount % 2 === 0 ? "Big" : "Small"));
+      // 1. Streak check
+      let streak = 1;
+      for (let i = filtered.length - 2; i >= 0; i--) {
+        if (filtered[i] === last) streak++;
+        else break;
+      }
 
-      document.getElementById("result").innerHTML = levels.join("<br>");
-    }
+      // 2. Ratio check (last 10)
+      const bigCount = last10.filter(r => r === "big").length;
+      const smallCount = last10.length - bigCount;
 
-    function clearInputs() {
-      document.getElementById("input1").value = "";
-      document.getElementById("input2").value = "";
-      document.getElementById("input3").value = "";
-      document.getElementById("result").innerHTML = "";
+      // 3. Cycle check (simple alternating detection)
+      let cyclePrediction = "";
+      if (last10.length >= 4) {
+        const pattern = last10.slice(-4).join(",");
+        if (pattern === "big,small,big,small") cyclePrediction = "BIG";
+        if (pattern === "small,big,small,big") cyclePrediction = "SMALL";
+      }
+
+      // Final decision
+      let prediction = "";
+      if (streak >= 3) {
+        prediction = (last === "big") ? "Next HIGH chance: SMALL (streak break)" : "Next HIGH chance: BIG (streak break)";
+      } else if (cyclePrediction) {
+        prediction = "Cycle detected → Next: " + cyclePrediction;
+      } else {
+        prediction = bigCount > smallCount ? "Next HIGH chance: SMALL (balance)" : "Next HIGH chance: BIG (balance)";
+      }
+
+      document.getElementById("result").innerText =
+        `Last 10: ${last10.join(", ")}\nStreak: ${streak}\nBig: ${bigCount}, Small: ${smallCount}\n👉 Prediction: ${prediction}`;
     }
   </script>
 </body>
