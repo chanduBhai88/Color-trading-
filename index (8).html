@@ -3,307 +3,57 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>VIP Mod Panel</title>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+  <title>Big/Small Prediction Bot</title>
   <style>
-    body {
-      background: url("https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1920&q=80") no-repeat center center fixed;
-      background-size: cover;
-      color: #00ff00;
-      font-family: 'Orbitron', sans-serif;
-      margin: 0;
-      overflow: hidden;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-    }
-
-    h1 {
-      position: absolute;
-      top: 20px;
-      text-align: center;
-      font-size: 3em;
-      text-shadow: 0 0 10px #00ff00, 0 0 20px #00ff00;
-      animation: glitch 1s linear infinite;
-    }
-
-    button {
-      padding: 15px 30px;
-      font-size: 1.2em;
-      background: none;
-      border: 2px solid #00ff00;
-      color: #00ff00;
-      cursor: pointer;
-      border-radius: 5px;
-      text-shadow: 0 0 5px #00ff00;
-      box-shadow: 0 0 10px #00ff00;
-      transition: all 0.3s;
-      font-family: 'Orbitron', sans-serif;
-      margin: 10px;
-    }
-    button:hover {
-      background: #00ff00;
-      color: #000;
-      box-shadow: 0 0 20px #00ff00;
-    }
-
-    #timerBox {
-      display: none;
-      position: fixed;
-      background: rgba(0, 0, 0, 0.85);
-      padding: 20px;
-      border: 2px solid #00ff00;
-      border-radius: 15px;
-      box-shadow: 0 0 20px #00ff00, 0 0 40px rgba(0, 255, 0, 0.5);
-      cursor: move;
-      user-select: none;
-      width: 400px;
-      height: 420px;
-      text-align: center;
-      backdrop-filter: blur(8px);
-      animation: fadeIn 0.5s ease-in-out;
-      z-index: 10;
-    }
-    #timerBox h3 {
-      margin: 0 0 15px;
-      color: #00ff00;
-      text-shadow: 0 0 5px #00ff00;
-      font-size: 1.5em;
-    }
-
-    /* Align period number + result */
-    #period1m {
-      font-family: monospace;
-      font-size: 1.5em;
-      margin: 10px 0;
-      color: #00ffcc;
-      text-shadow: 0 0 8px #00ffcc;
-    }
-    #randomWord {
-      font-size: 2.2em;
-      color: #ff0000;
-      text-shadow: 0 0 10px #ff0000;
-      margin: 15px 0;
-      animation: pulse 1s infinite;
-    }
-    #timer1m {
-      font-family: monospace;
-      font-size: 1.3em;
-      margin: 15px 0;
-      color: #00ff00;
-      text-shadow: 0 0 5px #00ff00;
-    }
-
-    #historyBox {
-      margin-top: 15px;
-      text-align: left;
-      font-size: 1em;
-      color: #00ffcc;
-      max-height: 120px;
-      overflow-y: auto;
-      border-top: 1px solid #00ff00;
-      padding-top: 10px;
-    }
-
-    #closeButton {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      background: none;
-      border: none;
-      color: #ff0000;
-      font-size: 1.2em;
-      cursor: pointer;
-      text-shadow: 0 0 5px #ff0000;
-      transition: transform 0.2s;
-    }
-    #closeButton:hover {
-      transform: scale(1.2);
-    }
-
-    /* Login Page with separate wallpaper */
-    #loginPage {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      background: url("https://images.unsplash.com/photo-1605902711622-cfb43c4437d2?auto=format&fit=crop&w=1920&q=80") no-repeat center center;
-      background-size: cover;
-      padding: 40px;
-      border: 2px solid #00ff00;
-      border-radius: 15px;
-      box-shadow: 0 0 25px #00ff00, 0 0 50px rgba(0, 255, 0, 0.5);
-      animation: fadeIn 0.5s ease-in-out;
-      z-index: 10;
-    }
-    #loginPage h2 {
-      font-size: 2em;
-      text-shadow: 0 0 10px #00ff00;
-      margin-bottom: 20px;
-      color: #00ff00;
-    }
-    #keyInput {
-      padding: 10px;
-      font-size: 1em;
-      background: rgba(0, 0, 0, 0.8);
-      border: 2px solid #00ff00;
-      color: #00ff00;
-      border-radius: 5px;
-      width: 200px;
-      text-align: center;
-      font-family: 'Orbitron', sans-serif;
-      margin-bottom: 15px;
-      text-shadow: 0 0 5px #00ff00;
-    }
-    #keyInput:focus {
-      outline: none;
-      box-shadow: 0 0 15px #00ff00;
-    }
-    #errorMessage {
-      color: #ff0000;
-      font-size: 1em;
-      text-shadow: 0 0 5px #ff0000;
-      margin-top: 10px;
-      display: none;
-    }
-
-    @keyframes glitch {
-      2%, 64% { transform: translate(2px, 0) skew(0deg); }
-      4%, 60% { transform: translate(-2px, 0) skew(0deg); }
-      62% { transform: translate(0, 0) skew(5deg); }
-    }
-    @keyframes pulse {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.1); }
-      100% { transform: scale(1); }
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: scale(0.8); }
-      to { opacity: 1; transform: scale(1); }
-    }
+    body { background:#111; color:#fff; font-family:Arial; text-align:center; padding:20px; }
+    h1 { color:gold; }
+    textarea { width:80%; height:100px; padding:10px; font-size:16px; border-radius:10px; }
+    button { margin-top:15px; padding:10px 20px; font-size:16px; border:none; border-radius:10px; background:gold; color:#000; cursor:pointer; }
+    button:hover { background:orange; }
+    #result { margin-top:20px; font-size:18px; font-weight:bold; color:#0f0; }
   </style>
 </head>
 <body>
-  <div id="loginPage">
-    <h2>𝐑𝐑𝐑〆𝐓𝐑𝐄𝐃𝐄𝐑 LOGIN</h2>
-    <input type="text" id="keyInput" placeholder="Enter Access Key" />
-    <button onclick="checkKey()">Submit</button>
-    <button onclick="buyKey()">Buy Key</button>
-    <div id="errorMessage">Please enter correct key</div>
-  </div>
+  <h1>Big/Small Predictor Bot</h1>
+  <p>Apne last results likho (comma ya space se alag-alag):</p>
+  <textarea id="input"></textarea><br>
+  <button onclick="predict()">Predict Next</button>
 
-  <h1 style="display: none;">SERVER RUNNING</h1>
-  <button style="display: none;" onclick="toggleTimerBox()">Start Hack</button>
-
-  <div id="timerBox">
-    <button id="closeButton" onclick="toggleTimerBox()">X</button>
-    <h3>𝐑𝐑𝐑〆𝐓𝐑𝐄𝐃𝐄𝐑 PANEL</h3>
-    <div id="period1m"></div>
-    <div id="randomWord"></div>
-    <div id="timer1m"></div>
-    <div id="historyBox"><b>Last 10 Results:</b><br></div>
-  </div>
+  <div id="result"></div>
 
   <script>
-    function checkKey() {
-      const keyInput = document.getElementById('keyInput').value;
-      const errorMessage = document.getElementById('errorMessage');
-      if (keyInput === 'CHANDU') {
-        document.getElementById('loginPage').style.display = 'none';
-        document.querySelector('h1').style.display = 'block';
-        document.querySelector('button[onclick="toggleTimerBox()"]').style.display = 'block';
-        errorMessage.style.display = 'none';
+    function predict() {
+      const raw = document.getElementById("input").value.trim();
+      if (!raw) return alert("Please enter some results!");
+
+      // Split results
+      const results = raw.split(/[\s,]+/).map(r => r.toLowerCase());
+
+      // Only keep Big/Small words
+      const filtered = results.filter(r => r === "big" || r === "small");
+      if (filtered.length < 3) {
+        document.getElementById("result").innerText = "Need at least 3 results!";
+        return;
+      }
+
+      // Find streak (how many in a row before break)
+      let last = filtered[filtered.length - 1];
+      let streak = 1;
+      for (let i = filtered.length - 2; i >= 0; i--) {
+        if (filtered[i] === last) streak++;
+        else break;
+      }
+
+      // Simple rule-based prediction
+      let prediction = "";
+      if (streak >= 3) {
+        prediction = (last === "big") ? "Next HIGH CHANCE: SMALL (Break)" : "Next HIGH CHANCE: BIG (Break)";
       } else {
-        errorMessage.style.display = 'block';
+        prediction = "Next may repeat: " + last.toUpperCase();
       }
-    }
 
-    function buyKey() {
-      window.location.href = 'https://t.me/+bcfXRMfU9ppiODhl';
-    }
-
-    let timerInterval = null;
-    let history = [];
-
-    function toggleTimerBox() {
-      const timerBox = document.getElementById('timerBox');
-      if (timerBox.style.display === 'none') {
-        timerBox.style.display = 'block';
-        const windowWidth = window.innerWidth;
-        const windowHeight = window.innerHeight;
-        const boxWidth = timerBox.offsetWidth;
-        const boxHeight = timerBox.offsetHeight;
-        currentX = (windowWidth - boxWidth) / 2;
-        currentY = (windowHeight - boxHeight) / 2;
-        timerBox.style.left = currentX + 'px';
-        timerBox.style.top = currentY + 'px';
-        if (!timerInterval) startTimer();
-      } else {
-        timerBox.style.display = 'none';
-      }
-    }
-
-    function startTimer() {
-      let lastMinute = -1;
-      timerInterval = setInterval(() => {
-        const now = new Date();
-        const seconds = now.getUTCSeconds();
-        const remainingSeconds = 60 - seconds;
-        const minutes = now.getUTCMinutes();
-        const hours = now.getUTCHours();
-        const totalMinutes = hours * 60 + minutes;
-
-        if (seconds === 0 && lastMinute !== minutes) {
-          const words = ['Big', 'Small'];
-          const result = words[Math.floor(Math.random() * 2)];
-          document.getElementById('randomWord').textContent = result;
-
-          history.unshift(result);
-          if (history.length > 10) history.pop();
-
-          document.getElementById('historyBox').innerHTML = "<b>Last 10 Results:</b><br>" + history.join(" , ");
-          lastMinute = minutes;
-        }
-
-        const year = now.getUTCFullYear();
-        const month = String(now.getUTCMonth() + 1).padStart(2, '0');
-        const day = String(now.getUTCDate()).padStart(2, '0');
-        const dateStr = `${year}${month}${day}`;
-        const periodNumber = dateStr + '1000' + String(10001 + totalMinutes);
-        document.getElementById('period1m').textContent = "Period: " + periodNumber;
-
-        const formattedTime = `   00 : ${String(remainingSeconds).padStart(2, '0')}`;
-        document.getElementById('timer1m').textContent = formattedTime;
-      }, 1000);
-    }
-
-    const timerBox = document.getElementById('timerBox');
-    let isDragging = false;
-    let currentX = 0;
-    let currentY = 0;
-    let initialX, initialY;
-
-    timerBox.addEventListener('mousedown', startDragging);
-    document.addEventListener('mousemove', drag);
-    document.addEventListener('mouseup', stopDragging);
-
-    function startDragging(e) {
-      if (e.target.id === 'closeButton') return;
-      initialX = e.clientX - currentX;
-      initialY = e.clientY - currentY;
-      isDragging = true;
-    }
-    function drag(e) {
-      if (isDragging) {
-        e.preventDefault();
-        currentX = e.clientX - initialX;
-        currentY = e.clientY - initialY;
-        timerBox.style.left = currentX + 'px';
-        timerBox.style.top = currentY + 'px';
-      }
-    }
-    function stopDragging() {
-      isDragging = false;
+      document.getElementById("result").innerText =
+        `Last Sequence: ${filtered.slice(-10).join(", ")}\nStreak: ${streak}\n👉 Prediction: ${prediction}`;
     }
   </script>
 </body>
