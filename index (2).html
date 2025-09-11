@@ -2,61 +2,112 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Big/Small Pattern Builder</title>
+  <title>Big/Small Pattern Saver</title>
   <style>
-    body { background:#111; color:#fff; font-family:Arial; text-align:center; padding:20px; }
-    h1 { color:gold; }
-    .btn { margin:5px; padding:12px 20px; font-size:16px; border:none; border-radius:10px; cursor:pointer; }
-    .big-btn { background:#00ff99; color:#000; }
-    .small-btn { background:#ff4444; color:#000; }
-    .clear-btn { background:#888; color:#fff; }
-    #blocks { margin-top:20px; display:flex; flex-direction:column; gap:10px; }
-    .block { padding:10px; border-radius:8px; background:#222; font-size:16px; }
-    .block span { margin:3px; font-weight:bold; }
-    .big { color:#00ff99; }
-    .small { color:#ff4444; }
+    body {
+      font-family: Arial, sans-serif;
+      background: #111;
+      color: #fff;
+      text-align: center;
+      padding: 20px;
+    }
+    h1 {
+      color: #00ffcc;
+    }
+    .buttons {
+      margin: 15px 0;
+    }
+    button {
+      padding: 10px 20px;
+      margin: 5px;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    .big-btn { background: #00ff99; color: #000; }
+    .small-btn { background: #ff4444; color: #fff; }
+    .clear-btn { background: #444; color: #fff; }
+    .export-btn { background: gold; color: #000; }
+    button:hover { transform: scale(1.1); }
+    ul {
+      margin-top: 20px;
+      padding: 0;
+      list-style: none;
+      max-height: 400px;
+      overflow-y: auto;
+      border: 1px solid #333;
+      border-radius: 8px;
+    }
+    li {
+      padding: 6px;
+      border-bottom: 1px solid #333;
+    }
+    .big { color: #00ff99; }
+    .small { color: #ff4444; }
   </style>
 </head>
 <body>
-  <h1>Big/Small Pattern Builder</h1>
-
-  <div>
-    <button class="btn big-btn" onclick="addResult('Big')">BIG</button>
-    <button class="btn small-btn" onclick="addResult('Small')">SMALL</button>
-    <button class="btn clear-btn" onclick="clearAll()">CLEAR ALL</button>
+  <h1>Big/Small Pattern Saver</h1>
+  <div class="buttons">
+    <button class="big-btn" onclick="addResult('Big')">➕ Big</button>
+    <button class="small-btn" onclick="addResult('Small')">➕ Small</button>
+    <button class="clear-btn" onclick="clearResults()">🗑 Clear</button>
+    <button class="export-btn" onclick="exportData()">💾 Export</button>
   </div>
-
-  <div id="blocks"></div>
+  <ul id="resultList"></ul>
 
   <script>
-    let results = [];
-    let blockCount = 0;
+    // Load existing data from LocalStorage
+    let results = JSON.parse(localStorage.getItem("patternData")) || [];
+    const resultList = document.getElementById("resultList");
 
-    function addResult(value) {
-      results.push(value);
-      updateBlocks();
+    function renderResults() {
+      resultList.innerHTML = "";
+      results.forEach((res, i) => {
+        const li = document.createElement("li");
+        li.textContent = (i+1) + ". " + res;
+        li.className = res.toLowerCase();
+        resultList.appendChild(li);
+      });
     }
 
-    function updateBlocks() {
-      const blocksContainer = document.getElementById("blocks");
-      blocksContainer.innerHTML = "";
+    function addResult(type) {
+      results.push(type);
+      localStorage.setItem("patternData", JSON.stringify(results));
+      renderResults();
+    }
 
-      // Group into blocks of 10
-      for (let i = 0; i < results.length; i += 10) {
-        const group = results.slice(i, i + 10);
-        const div = document.createElement("div");
-        div.className = "block";
-        div.innerHTML = `<b>Block ${Math.floor(i/10) + 1}:</b> ` + 
-          group.map(r => `<span class="${r.toLowerCase()}">${r}</span>`).join(" ");
-        blocksContainer.appendChild(div);
+    function clearResults() {
+      if (confirm("Clear all saved results?")) {
+        results = [];
+        localStorage.removeItem("patternData");
+        renderResults();
       }
     }
 
-    function clearAll() {
-      results = [];
-      document.getElementById("blocks").innerHTML = "";
+    function exportData() {
+      const data = JSON.stringify(results);
+      const htmlContent = `
+<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"><title>Exported Big/Small Data</title></head>
+<body>
+<h2>Exported Big/Small Results</h2>
+<pre>${data}</pre>
+</body>
+</html>`;
+      const blob = new Blob([htmlContent], { type: "text/html" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "BigSmallData.html";
+      a.click();
+      URL.revokeObjectURL(url);
     }
+
+    renderResults();
   </script>
 </body>
 </html>
