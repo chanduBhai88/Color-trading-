@@ -1,121 +1,213 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>2-Level Big/Small Predictor</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Big/Small Prediction Tool</title>
   <style>
+    /* Same CSS - कोई बदलाव नहीं किया */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
     body {
-      font-family: Arial, sans-serif;
-      background: #0d0d0d;
-      color: #f5f5f5;
-      text-align: center;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
       padding: 20px;
     }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 0 25px 45px rgba(0, 0, 0, 0.1);
+    }
     h1 {
-      color: #ffcc00;
-      margin-bottom: 20px;
-      text-shadow: 0px 0px 8px #ffcc00;
+      text-align: center;
+      color: #333;
+      margin-bottom: 30px;
+      font-size: 2.5em;
+      background: linear-gradient(45deg, #667eea, #764ba2);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+    .stat-card {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      padding: 20px;
+      border-radius: 15px;
+      text-align: center;
+      transform: translateY(0);
+      transition: transform 0.3s ease;
+    }
+    .stat-card:hover {
+      transform: translateY(-5px);
+    }
+    .stat-number {
+      font-size: 2em;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+    .prediction-section {
+      background: rgba(255, 255, 255, 0.8);
+      border-radius: 15px;
+      padding: 25px;
+      margin-bottom: 30px;
+      border: 2px solid rgba(102, 126, 234, 0.2);
+    }
+    .controls {
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+      margin-bottom: 25px;
+      flex-wrap: wrap;
     }
     .btn {
-      padding: 12px 20px;
-      margin: 6px;
+      padding: 12px 25px;
       border: none;
-      cursor: pointer;
-      font-weight: bold;
-      border-radius: 10px;
-      transition: 0.3s;
+      border-radius: 25px;
       font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      background: linear-gradient(45deg, #667eea, #764ba2);
+      color: white;
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
     }
-    .big-btn { background: #ff4444; color: white; }
-    .small-btn { background: #448aff; color: white; }
-    .clear-btn { background: #777; color: white; }
-    .btn:hover { opacity: 0.85; transform: scale(1.05); }
-
-    .history {
-      margin: 20px auto;
-      max-width: 420px;
-      background: #1a1a1a;
-      padding: 15px;
-      border-radius: 10px;
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
     }
-    .card {
-      background: #1a1a1a;
-      margin: 12px auto;
-      padding: 15px;
-      border-radius: 14px;
-      max-width: 420px;
-      box-shadow: 0px 0px 15px rgba(255,255,255,0.1);
+    .recent-history {
+      display: flex;
+      gap: 5px;
+      margin-top: 15px;
+      flex-wrap: wrap;
+      justify-content: center;
     }
-    .big { color: #ff4444; font-weight: bold; }
-    .small { color: #448aff; font-weight: bold; }
+    .history-item {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 12px;
+      color: white;
+    }
+    .history-big {
+      background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+    }
+    .history-small {
+      background: linear-gradient(45deg, #4834d4, #667eea);
+    }
   </style>
 </head>
 <body>
-  <h1>🎯 2-Level Perfect Predictor</h1>
+  <div class="container">
+    <h1>🎯 Big/Small Prediction Tool</h1>
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-number" id="totalCount">0</div>
+        <div>Total Results</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number" id="bigCount">0</div>
+        <div>Big Results</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number" id="smallCount">0</div>
+        <div>Small Results</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number" id="bigPercentage">0%</div>
+        <div>Big Percentage</div>
+      </div>
+    </div>
 
-  <div>
-    <button class="btn big-btn" onclick="addResult('Big')">➕ Big</button>
-    <button class="btn small-btn" onclick="addResult('Small')">➕ Small</button>
-    <button class="btn clear-btn" onclick="clearHistory()">🗑 Clear</button>
+    <!-- Buttons to Add Results -->
+    <div class="prediction-section">
+      <h2 style="text-align:center; margin-bottom:20px;">📝 Add New Results</h2>
+      <div style="text-align:center; margin-bottom: 25px;">
+        <button class="btn" onclick="addResult('Big')" style="background: linear-gradient(45deg, #ff6b6b, #ee5a24); margin-right: 15px;">
+          Add BIG Result
+        </button>
+        <button class="btn" onclick="addResult('Small')" style="background: linear-gradient(45deg, #4834d4, #667eea);">
+          Add SMALL Result
+        </button>
+      </div>
+
+      <div class="controls">
+        <button class="btn" onclick="clearAllData()" style="background: linear-gradient(45deg, #e74c3c, #c0392b);">
+          Clear All Data
+        </button>
+      </div>
+    </div>
+
+    <!-- Show Last 3 Results -->
+    <div class="recent-history" id="recentHistory">
+      <!-- Last 3 results shown here -->
+    </div>
   </div>
 
-  <div class="history">
-    <h3>History</h3>
-    <p id="historyList">No results yet...</p>
-  </div>
-
-  <div class="card" id="prediction1"></div>
-  <div class="card" id="prediction2"></div>
-
+  <!-- JavaScript Starts Here -->
   <script>
-    let history = [];
+    let currentData = [];
 
-    function addResult(result) {
-      history.unshift(result); 
-      if (history.length > 30) history.pop();
-      updateHistory();
-      makePrediction();
+    function updateStats() {
+      const total = currentData.length;
+      const bigCount = currentData.filter(x => x === 'Big').length;
+      const smallCount = total - bigCount;
+      const bigPercentage = total > 0 ? ((bigCount / total) * 100).toFixed(1) : 0;
+
+      document.getElementById('totalCount').textContent = total;
+      document.getElementById('bigCount').textContent = bigCount;
+      document.getElementById('smallCount').textContent = smallCount;
+      document.getElementById('bigPercentage').textContent = bigPercentage + '%';
     }
 
-    function clearHistory() {
-      history = [];
-      document.getElementById("historyList").innerHTML = "No results yet...";
-      document.getElementById("prediction1").innerHTML = "";
-      document.getElementById("prediction2").innerHTML = "";
-    }
-
-    function updateHistory() {
-      document.getElementById("historyList").innerHTML = history.join(" , ");
-    }
-
-    function makePrediction() {
-      if (history.length < 6) {
-        document.getElementById("prediction1").innerHTML = 
-          `<h3>Waiting...</h3> Enter ${6 - history.length} more results to unlock predictions.`;
-        document.getElementById("prediction2").innerHTML = "";
-        return;
+    function updateRecentHistory() {
+      const historyDiv = document.getElementById("recentHistory");
+      historyDiv.innerHTML = '';
+      const recent = currentData.slice(-3);
+      for (const item of recent) {
+        const div = document.createElement('div');
+        div.className = 'history-item ' + (item === 'Big' ? 'history-big' : 'history-small');
+        div.textContent = item === 'Big' ? 'B' : 'S';
+        historyDiv.appendChild(div);
       }
-
-      // -------- Level 1: Frequency Analysis --------
-      let bigCount = history.filter(r => r === "Big").length;
-      let smallCount = history.filter(r => r === "Small").length;
-      let freqPrediction = bigCount > smallCount ? "Big" : "Small";
-      document.getElementById("prediction1").innerHTML = 
-        `<h3>Level 1 (Frequency)</h3> Next: <span class="${freqPrediction.toLowerCase()}">${freqPrediction}</span>`;
-
-      // -------- Level 2: Streak Breaker --------
-      let streakPrediction = history[0];
-      let streakLength = 1;
-      for (let i = 1; i < history.length; i++) {
-        if (history[i] === history[0]) streakLength++;
-        else break;
-      }
-      let opp = (streakPrediction === "Big") ? "Small" : "Big";
-      let streakPredict = streakLength >= 3 ? opp : streakPrediction;
-      document.getElementById("prediction2").innerHTML = 
-        `<h3>Level 2 (Streak)</h3> Next: <span class="${streakPredict.toLowerCase()}">${streakPredict}</span>`;
     }
+
+    function addResult(type) {
+      currentData.push(type);
+      if (currentData.length > 10) {
+        currentData.shift(); // Keep only last 10
+      }
+      updateStats();
+      updateRecentHistory();
+    }
+
+    function clearAllData() {
+      currentData = [];
+      updateStats();
+      updateRecentHistory();
+    }
+
+    // Initialize on load
+    updateStats();
+    updateRecentHistory();
   </script>
 </body>
 </html>
