@@ -1,187 +1,156 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="hi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Big Small Pattern Predictor</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f0f0f0;
-            padding: 20px;
-        }
-        .container {
-            background: white;
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            max-width: 500px;
-            margin: auto;
-        }
-        .input-area {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
-        button {
-            padding: 10px 15px;
-            background: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-        button.clear {
-            background: #f44336;
-        }
-        button.predict {
-            background: #9C27B0;
-        }
-        select {
-            padding: 10px;
-            border-radius: 5px;
-            border: 1px solid #ddd;
-        }
-        .history {
-            margin-top: 20px;
-            border-top: 1px solid #ddd;
-            padding-top: 10px;
-        }
-        .history-item {
-            display: inline-block;
-            margin: 5px;
-            padding: 8px 12px;
-            background: #e0e0e0;
-            border-radius: 5px;
-            font-weight: bold;
-        }
-        .big {
-            background: #FF5722;
-            color: white;
-        }
-        .small {
-            background: #2196F3;
-            color: white;
-        }
-        .prediction {
-            margin: 20px 0;
-            padding: 15px;
-            background: #4CAF50;
-            color: white;
-            border-radius: 5px;
-            text-align: center;
-            font-size: 18px;
-            display: none;
-        }
-        .section-title {
-            color: #333;
-            margin-bottom: 10px;
-        }
-        .input-count {
-            margin: 10px 0;
-            font-style: italic;
-            color: #666;
-        }
-    </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Big/Small Prediction Tool (API)</title>
+<style>
+  body{font-family:Segoe UI, sans-serif;background:linear-gradient(135deg,#0f172a,#1e293b);color:#fff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+  .card{background:rgba(255,255,255,0.06);padding:20px;border-radius:12px;max-width:540px;width:100%}
+  h1{font-size:20px;margin-bottom:12px}
+  .grid{display:flex;gap:8px;flex-wrap:wrap}
+  .btn{padding:10px 12px;border-radius:8px;border:0;cursor:pointer;background:rgba(255,255,255,0.06);color:#fff}
+  .btn:hover{background:rgba(255,255,255,0.12)}
+  .controls{margin-top:12px;display:flex;gap:8px}
+  #result{margin-top:14px;padding:12px;background:rgba(0,0,0,0.3);border-radius:8px}
+  .history{margin-top:12px;max-height:160px;overflow:auto;background:rgba(255,255,255,0.03);padding:8px;border-radius:8px}
+  .chip{display:inline-block;padding:6px 8px;margin:4px;border-radius:16px;background:rgba(255,255,255,0.04)}
+  .error{color:#ffb4b4}
+</style>
 </head>
 <body>
-    <div class="container">
-        <h2>Big/Small Pattern Predictor</h2>
-        
-        <div class="input-area">
-            <select id="bsInput">
-                <option value="Big">Big</option>
-                <option value="Small">Small</option>
-            </select>
-            <button onclick="addBS()">Add Input</button>
-            <button class="clear" onclick="clearAll()">Clear All</button>
-            <button class="predict" onclick="predictNext()" id="predictBtn" disabled>Predict Next</button>
-        </div>
+  <div class="card">
+    <h1>Big/Small Prediction Tool</h1>
+    <div>Click kar ke 8-digit B/S sequence banayein:</div>
+    <div id="inputBox" class="grid" style="margin-top:10px"></div>
 
-        <div class="input-count" id="inputCount">Inputs added: 0/8</div>
-
-        <div class="prediction" id="predictionResult"></div>
-
-        <div>
-            <h3 class="section-title">Last 8 Inputs:</h3>
-            <div id="last8"></div>
-        </div>
-
-        <div class="history">
-            <h3 class="section-title">Full History:</h3>
-            <div id="fullHistory"></div>
-        </div>
+    <div class="controls">
+      <button id="btnB" class="btn">B</button>
+      <button id="btnS" class="btn">S</button>
+      <button id="clearBtn" class="btn">Clear</button>
+      <button id="resultBtn" class="btn">Get Result</button>
     </div>
 
-    <script>
-        let history = [];
+    <div id="result"><strong>Result:</strong> <span id="resultText">--</span></div>
+    <div id="error" class="error"></div>
 
-        // Add Big/Small to history
-        function addBS() {
-            const input = document.getElementById("bsInput").value;
-            history.push(input);
-            updateDisplay();
-            
-            // Enable predict button when we have 8 inputs
-            if (history.length >= 8) {
-                document.getElementById("predictBtn").disabled = false;
-            }
-        }
+    <div class="history" id="history">
+      <strong>Last 10 Predictions:</strong>
+      <div id="histList"></div>
+    </div>
+  </div>
 
-        // Clear all data
-        function clearAll() {
-            history = [];
-            updateDisplay();
-            document.getElementById("predictionResult").style.display = 'none';
-            document.getElementById("predictBtn").disabled = true;
-        }
+<script>
+/*
+  CONFIGURE:
+  - Replace API_ENDPOINT with your API URL.
+  - If API requires a key, prefer server proxy. For quick test you can set API_KEY,
+    but DO NOT paste secrets in public chats.
+*/
+const API_ENDPOINT = "https://example.com/predict"; // <-- replace with your API endpoint
+const API_KEY = ""; // <-- optional; avoid using in browser for production
 
-        // Predict next result
-        function predictNext() {
-            if (history.length < 8) {
-                alert("Please enter at least 8 inputs first");
-                return;
-            }
-            
-            // Get last 8 inputs
-            const last8 = history.slice(-8);
-            
-            // Simple prediction logic (can be enhanced)
-            const bigCount = last8.filter(item => item === 'Big').length;
-            const smallCount = last8.filter(item => item === 'Small').length;
-            
-            let prediction = '';
-            if (bigCount > smallCount) {
-                prediction = 'Next is likely to be <span class="small">Small</span> (after ' + bigCount + ' Big)';
-            } else if (smallCount > bigCount) {
-                prediction = 'Next is likely to be <span class="big">Big</span> (after ' + smallCount + ' Small)';
-            } else {
-                prediction = 'No clear pattern (4 Big and 4 Small in last 8)';
-            }
-            
-            document.getElementById("predictionResult").innerHTML = prediction;
-            document.getElementById("predictionResult").style.display = 'block';
-        }
+// UI refs
+const inputBox = document.getElementById('inputBox');
+const btnB = document.getElementById('btnB');
+const btnS = document.getElementById('btnS');
+const clearBtn = document.getElementById('clearBtn');
+const resultBtn = document.getElementById('resultBtn');
+const resultText = document.getElementById('resultText');
+const errorDiv = document.getElementById('error');
+const histList = document.getElementById('histList');
 
-        // Update UI
-        function updateDisplay() {
-            // Update input count
-            document.getElementById("inputCount").textContent = `Inputs added: ${history.length}/8`;
-            
-            // Show Last 8 (or all if less than 8)
-            const displayCount = Math.min(history.length, 8);
-            const last8 = history.slice(-displayCount);
-            document.getElementById("last8").innerHTML = last8.map((item, index) => 
-                `<span class="history-item ${item.toLowerCase()}">${item}</span>`
-            ).join('');
+let seq = []; // stores 'B'/'S'
+let history = JSON.parse(localStorage.getItem('bs_history')||'[]');
 
-            // Show Full History
-            document.getElementById("fullHistory").innerHTML = history.map(item => 
-                `<span class="history-item ${item.toLowerCase()}">${item}</span>`
-            ).join('');
-        }
-    </script>
+// render 8 slots
+function renderSlots(){
+  inputBox.innerHTML = '';
+  for(let i=0;i<8;i++){
+    const el = document.createElement('div');
+    el.className = 'chip';
+    el.style.minWidth = '36px';
+    el.style.textAlign = 'center';
+    el.textContent = seq[i] || '-';
+    inputBox.appendChild(el);
+  }
+}
+renderSlots();
+renderHistory();
+
+btnB.onclick = () => addChar('B');
+btnS.onclick = () => addChar('S');
+clearBtn.onclick = () => { seq=[]; renderSlots(); errorDiv.textContent=''; resultText.textContent='--'; }
+resultBtn.onclick = () => {
+  errorDiv.textContent='';
+  if(seq.length !== 8){ errorDiv.textContent = 'Kripya 8 inputs bharein (B ya S).'; return; }
+  // Build payload expected by API. Modify as per your API docs.
+  const payload = { sequence: seq.join('') };
+
+  // Call API
+  resultText.textContent = 'Loading...';
+  fetch(API_ENDPOINT, {
+    method: 'POST',
+    headers: {
+      'Content-Type':'application/json',
+      // add auth header if needed:
+      ...(API_KEY ? {'Authorization': 'Bearer ' + API_KEY} : {})
+    },
+    body: JSON.stringify(payload),
+  })
+  .then(async res => {
+    if(!res.ok){
+      const t = await res.text();
+      throw new Error('Server returned ' + res.status + ' — ' + t);
+    }
+    return res.json();
+  })
+  .then(json => {
+    /*
+      Expected response formats (examples). Adjust according to your API:
+      { match: true, next: "B" }
+      { match: false }
+      { error: "..." }
+    */
+    if(json.error){ resultText.textContent = 'Error: ' + json.error; return; }
+    if(json.match === false){ resultText.textContent = 'Result No Match'; pushHistory(seq.join('') + ' → No Match'); return; }
+
+    const predicted = json.next || json.prediction || null;
+    if(!predicted){ resultText.textContent = 'Result No Match'; pushHistory(seq.join('') + ' → No Match'); return; }
+
+    resultText.textContent = predicted;
+    pushHistory(seq.join('') + ' → ' + predicted);
+  })
+  .catch(err => {
+    resultText.textContent = '--';
+    errorDiv.textContent = 'Request failed: ' + err.message;
+  });
+};
+
+function addChar(ch){
+  if(seq.length >= 8) return;
+  seq.push(ch);
+  renderSlots();
+}
+
+function pushHistory(item){
+  history.unshift({time: new Date().toISOString(), text: item});
+  if(history.length>10) history = history.slice(0,10);
+  localStorage.setItem('bs_history', JSON.stringify(history));
+  renderHistory();
+}
+
+function renderHistory(){
+  histList.innerHTML = '';
+  history.forEach(h=>{
+    const d = document.createElement('div');
+    d.className = 'chip';
+    d.style.display='block';
+    d.style.padding='6px';
+    d.textContent = `${h.text} (${new Date(h.time).toLocaleString()})`;
+    histList.appendChild(d);
+  });
+}
+</script>
 </body>
 </html>
