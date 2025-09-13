@@ -3,81 +3,112 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Big/Small Pattern Predictor</title>
+  <title>5-Input Big/Small Predictor</title>
   <style>
     body {
+      margin: 0;
       font-family: Arial, sans-serif;
-      background: linear-gradient(135deg, #141E30, #243B55);
+      background: linear-gradient(135deg, #1e3c72, #2a5298);
       color: #fff;
       text-align: center;
-      padding: 30px;
+      overflow-x: hidden;
     }
     h1 {
-      margin-bottom: 20px;
+      padding: 20px;
+      font-size: 28px;
+      background: rgba(0,0,0,0.3);
+      margin: 0;
+    }
+    #inputDisplay {
+      font-size: 26px;
+      margin: 15px 0;
+      font-weight: bold;
     }
     .buttons {
-      margin: 15px 0;
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin: 20px 0;
+      gap: 20px;
     }
     button {
-      font-size: 20px;
-      padding: 10px 20px;
-      margin: 5px;
+      flex: 1 1 40%;
+      min-height: 120px;
+      font-size: 30px;
       border: none;
-      border-radius: 8px;
+      border-radius: 15px;
       cursor: pointer;
       font-weight: bold;
+      transition: transform 0.2s;
     }
-    .btn-b { background: #ff6b6b; color: #fff; }
-    .btn-s { background: #4ecdc4; color: #fff; }
-    .btn-clear { background: #ffa502; color: #fff; }
-    .btn-result { background: #1e90ff; color: #fff; }
-    #inputDisplay {
-      font-size: 24px;
-      margin: 20px 0;
-      letter-spacing: 5px;
-      font-weight: bold;
-    }
+    button:hover { transform: scale(1.05); }
+    .btn-b { background: #ff4757; color: #fff; }
+    .btn-s { background: #2ed573; color: #fff; }
+    .btn-clear { background: #ffa502; color: #fff; flex: 1 1 90%; }
+    .btn-result { background: #1e90ff; color: #fff; flex: 1 1 90%; }
+
     #result {
-      font-size: 28px;
-      margin-top: 20px;
+      font-size: 34px;
+      margin: 20px 0;
       font-weight: bold;
       color: #ffd32a;
+      animation: fadeIn 1s ease;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.8); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    #history {
+      margin-top: 20px;
+      padding: 10px;
+      background: rgba(0,0,0,0.3);
+      border-radius: 10px;
+      font-size: 20px;
+    }
+    #history span {
+      display: inline-block;
+      margin: 5px;
+      padding: 8px 12px;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.2);
     }
   </style>
 </head>
 <body>
-  <h1>Big/Small Pattern Predictor</h1>
+  <h1>5-Input Big/Small Predictor</h1>
 
   <div id="inputDisplay">Input: </div>
 
   <div class="buttons">
-    <button class="btn-b" onclick="addInput('B')">B</button>
-    <button class="btn-s" onclick="addInput('S')">S</button>
-    <button class="btn-clear" onclick="clearInput()">Clear</button>
-    <button class="btn-result" onclick="showResult()">Result</button>
+    <button class="btn-b" onclick="addInput('B')">BIG</button>
+    <button class="btn-s" onclick="addInput('S')">SMALL</button>
+    <button class="btn-clear" onclick="clearInput()">CLEAR</button>
+    <button class="btn-result" onclick="showResult()">RESULT</button>
   </div>
 
   <div id="result">Result: </div>
 
+  <div id="history"><b>Last 10 Results:</b><br></div>
+
   <script>
     let userInput = "";
+    let history = [];
 
-    // 🔹 Raw data from your file
-    const rawData = ["Big","Small","Big","Small","Small","Big","Big","Big","Big","Big","Big","Big","Small","Big","Small","Small","Small","Small","Small","Small","Big","Small","Big","Small","Small","Big","Big","Small","Big","Small","Big","Small","Small","Big","Small","Small","Small","Small","Small","Small","Big","Big","Small","Small","Small","Big","Big","Big","Big","Small","Big","Big","Big","Big","Small","Big","Big","Small","Big","Big","Big","Small","Big","Small","Big","Big","Big","Big","Small","Big","Big","Big","Big","Small","Small","Small","Big","Small","Small","Big","Small","Small","Big","Small","Small","Big","Small","Small","Big","Small","Big","Big","Small","Small","Small","Big","Small","Big","Big","Small","Big","Big","Big","Big","Small","Small","Big","Big","Big","Big","Big","Small","Small","Small","Big","Small","Small","Small","Small","Big","Small","Big","Big","Big","Small","Big","Small","Small","Big","Big","Big","Small","Small","Big","Small","Big","Small","Small","Small","Small","Small","Small","Small","Small","Small","Big","Big","Big","Big","Small","Big","Big","Big","Big","Big","Small","Small","Big","Small","Big","Small","Big","Small","Small","Small","Big","Big","Big","Big","Big","Big","Big","Big","Big","Small","Big","Big","Small","Big","Small","Big","Small","Small","Small","Small","Small","Big","Big","Big","Small","Big","Big","Big","Small","Big","Big","Small","Big","Small","Big","Small","Small","Small","Small","Small","Small","Big","Small","Big","Big","Small","Big","Big","Big","Big","Big","Small","Big","Big","Big","Small","Small","Small","Small","Big","Small","Big","Small","Big","Small","Big","Small","Big","Big","Big","Small","Small","Small","Big","Small","Small","Big","Small","Big","Big","Big","Small","Small","Small","Big","Small","Big","Big","Big","Big","Big","Big","Big","Big","Big","Big","Big","Big","Big","Small","Small","Small","Small","Big","Big","Big","Big","Small","Small","Big","Big","Small","Small","Small","Big","Small","Small","Big","Big","Big","Small","Big","Big","Big","Big","Small","Big","Big","Big","Big","Small","Big","Small","Big","Big","Big","Small"];
-
-    // 🔹 Convert to B/S
-    const bsData = rawData.map(item => item === "Big" ? "B" : "S");
-
-    // 🔹 Build pattern database (8 → next)
-    const patternDB = {};
-    for (let i = 0; i < bsData.length - 8; i++) {
-      const pattern = bsData.slice(i, i + 8).join("");
-      const next = bsData[i + 8];
-      patternDB[pattern] = next; // overwrite if duplicate
-    }
+    // 🔹 Example Large Pattern Database (expandable)
+    const patternDB = {
+      "BBBBB": "S", "SSSSS": "B",
+      "BBBBS": "B", "BBBSS": "S",
+      "BBSSB": "B", "BSSBB": "S",
+      "SSSBB": "B", "SSBBS": "S",
+      "SBBSB": "B", "BSBBS": "S",
+      "BSBSB": "B", "SBSBS": "S",
+      "BBBSB": "S", "BBSBB": "B",
+      "SSBSS": "B", "SBBSS": "S",
+      // 👉 aur bhi add kiya ja sakta hai yaha
+    };
 
     function addInput(value) {
-      if (userInput.length < 8) {
+      if (userInput.length < 5) {
         userInput += value;
         document.getElementById("inputDisplay").innerText = "Input: " + userInput;
       }
@@ -90,15 +121,23 @@
     }
 
     function showResult() {
-      if (userInput.length === 8) {
-        if (patternDB[userInput]) {
-          document.getElementById("result").innerText = "Result: " + patternDB[userInput];
-        } else {
-          document.getElementById("result").innerText = "Result: No Match";
+      if (userInput.length === 5) {
+        let output = patternDB[userInput] || "No Match";
+        document.getElementById("result").innerText = "Result: " + output;
+        if (output !== "No Match") {
+          history.unshift(output);
+          if (history.length > 10) history.pop();
+          updateHistory();
         }
       } else {
-        document.getElementById("result").innerText = "Enter 8 digits first!";
+        document.getElementById("result").innerText = "Enter 5 inputs first!";
       }
+    }
+
+    function updateHistory() {
+      let histDiv = document.getElementById("history");
+      histDiv.innerHTML = "<b>Last 10 Results:</b><br>" +
+        history.map(r => `<span>${r}</span>`).join(" ");
     }
   </script>
 </body>
