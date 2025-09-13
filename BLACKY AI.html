@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>5-Input Big/Small Predictor</title>
+  <title>3-Level Big/Small Predictor</title>
   <style>
     body {
       margin: 0;
@@ -11,32 +11,29 @@
       background: linear-gradient(135deg, #1e3c72, #2a5298);
       color: #fff;
       text-align: center;
-      overflow-x: hidden;
     }
-    h1 {
+    h1 { margin: 20px 0; font-size: 28px; }
+    .level {
+      margin: 30px auto;
       padding: 20px;
-      font-size: 28px;
       background: rgba(0,0,0,0.3);
-      margin: 0;
-    }
-    #inputDisplay {
-      font-size: 26px;
-      margin: 15px 0;
-      font-weight: bold;
+      border-radius: 15px;
+      width: 90%;
+      max-width: 500px;
     }
     .buttons {
       display: flex;
-      justify-content: center;
       flex-wrap: wrap;
-      margin: 20px 0;
-      gap: 20px;
+      gap: 15px;
+      justify-content: center;
+      margin-top: 15px;
     }
     button {
       flex: 1 1 40%;
-      min-height: 120px;
-      font-size: 30px;
+      min-height: 100px;
+      font-size: 28px;
       border: none;
-      border-radius: 15px;
+      border-radius: 12px;
       cursor: pointer;
       font-weight: bold;
       transition: transform 0.2s;
@@ -46,24 +43,25 @@
     .btn-s { background: #2ed573; color: #fff; }
     .btn-clear { background: #ffa502; color: #fff; flex: 1 1 90%; }
     .btn-result { background: #1e90ff; color: #fff; flex: 1 1 90%; }
-
-    #result {
-      font-size: 34px;
-      margin: 20px 0;
+    .display {
+      font-size: 22px;
+      margin: 10px 0;
+      font-weight: bold;
+    }
+    .result {
+      font-size: 30px;
+      margin: 15px 0;
       font-weight: bold;
       color: #ffd32a;
-      animation: fadeIn 1s ease;
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: scale(0.8); }
-      to { opacity: 1; transform: scale(1); }
     }
     #history {
-      margin-top: 20px;
-      padding: 10px;
+      margin: 20px auto;
+      width: 90%;
+      max-width: 600px;
+      padding: 15px;
       background: rgba(0,0,0,0.3);
-      border-radius: 10px;
-      font-size: 20px;
+      border-radius: 12px;
+      font-size: 18px;
     }
     #history span {
       display: inline-block;
@@ -75,62 +73,83 @@
   </style>
 </head>
 <body>
-  <h1>5-Input Big/Small Predictor</h1>
+  <h1>3-Level Big/Small Predictor</h1>
 
-  <div id="inputDisplay">Input: </div>
-
-  <div class="buttons">
-    <button class="btn-b" onclick="addInput('B')">BIG</button>
-    <button class="btn-s" onclick="addInput('S')">SMALL</button>
-    <button class="btn-clear" onclick="clearInput()">CLEAR</button>
-    <button class="btn-result" onclick="showResult()">RESULT</button>
+  <!-- Level 1: 3 Input -->
+  <div class="level">
+    <h2>Level 1: 3 Inputs</h2>
+    <div id="input3" class="display">Input: </div>
+    <div class="buttons">
+      <button class="btn-b" onclick="addInput(3,'B')">BIG</button>
+      <button class="btn-s" onclick="addInput(3,'S')">SMALL</button>
+      <button class="btn-clear" onclick="clearInput(3)">CLEAR</button>
+      <button class="btn-result" onclick="showResult(3)">RESULT</button>
+    </div>
+    <div id="result3" class="result">Result: </div>
   </div>
 
-  <div id="result">Result: </div>
+  <!-- Level 2: 5 Input -->
+  <div class="level">
+    <h2>Level 2: 5 Inputs</h2>
+    <div id="input5" class="display">Input: </div>
+    <div class="buttons">
+      <button class="btn-b" onclick="addInput(5,'B')">BIG</button>
+      <button class="btn-s" onclick="addInput(5,'S')">SMALL</button>
+      <button class="btn-clear" onclick="clearInput(5)">CLEAR</button>
+      <button class="btn-result" onclick="showResult(5)">RESULT</button>
+    </div>
+    <div id="result5" class="result">Result: </div>
+  </div>
 
+  <!-- Level 3: 8 Input -->
+  <div class="level">
+    <h2>Level 3: 8 Inputs</h2>
+    <div id="input8" class="display">Input: </div>
+    <div class="buttons">
+      <button class="btn-b" onclick="addInput(8,'B')">BIG</button>
+      <button class="btn-s" onclick="addInput(8,'S')">SMALL</button>
+      <button class="btn-clear" onclick="clearInput(8)">CLEAR</button>
+      <button class="btn-result" onclick="showResult(8)">RESULT</button>
+    </div>
+    <div id="result8" class="result">Result: </div>
+  </div>
+
+  <!-- History -->
   <div id="history"><b>Last 10 Results:</b><br></div>
 
   <script>
-    let userInput = "";
+    let inputs = {3:"", 5:"", 8:""};
     let history = [];
 
-    // 🔹 Example Large Pattern Database (expandable)
-    const patternDB = {
-      "BBBBB": "S", "SSSSS": "B",
-      "BBBBS": "B", "BBBSS": "S",
-      "BBSSB": "B", "BSSBB": "S",
-      "SSSBB": "B", "SSBBS": "S",
-      "SBBSB": "B", "BSBBS": "S",
-      "BSBSB": "B", "SBSBS": "S",
-      "BBBSB": "S", "BBSBB": "B",
-      "SSBSS": "B", "SBBSS": "S",
-      // 👉 aur bhi add kiya ja sakta hai yaha
-    };
+    // 🔹 Simple AI-Style Rule: Opposite of last input
+    function predict(pattern) {
+      if (!pattern) return "B";
+      let last = pattern[pattern.length-1];
+      return last === "B" ? "S" : "B";
+    }
 
-    function addInput(value) {
-      if (userInput.length < 5) {
-        userInput += value;
-        document.getElementById("inputDisplay").innerText = "Input: " + userInput;
+    function addInput(level, val) {
+      if (inputs[level].length < level) {
+        inputs[level] += val;
+        document.getElementById("input"+level).innerText = "Input: " + inputs[level];
       }
     }
 
-    function clearInput() {
-      userInput = "";
-      document.getElementById("inputDisplay").innerText = "Input: ";
-      document.getElementById("result").innerText = "Result: ";
+    function clearInput(level) {
+      inputs[level] = "";
+      document.getElementById("input"+level).innerText = "Input: ";
+      document.getElementById("result"+level).innerText = "Result: ";
     }
 
-    function showResult() {
-      if (userInput.length === 5) {
-        let output = patternDB[userInput] || "No Match";
-        document.getElementById("result").innerText = "Result: " + output;
-        if (output !== "No Match") {
-          history.unshift(output);
-          if (history.length > 10) history.pop();
-          updateHistory();
-        }
+    function showResult(level) {
+      if (inputs[level].length === level) {
+        let output = predict(inputs[level]);
+        document.getElementById("result"+level).innerText = "Result: " + output;
+        history.unshift(`L${level}:${output}`);
+        if (history.length > 10) history.pop();
+        updateHistory();
       } else {
-        document.getElementById("result").innerText = "Enter 5 inputs first!";
+        document.getElementById("result"+level).innerText = "Enter "+level+" inputs first!";
       }
     }
 
