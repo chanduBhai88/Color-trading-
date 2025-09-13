@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pattern Prediction Tool</title>
+  <title>Big/Small Pattern Predictor</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -46,7 +46,7 @@
   </style>
 </head>
 <body>
-  <h1>Pattern Prediction Tool</h1>
+  <h1>Big/Small Pattern Predictor</h1>
 
   <div id="inputDisplay">Input: </div>
 
@@ -62,14 +62,19 @@
   <script>
     let userInput = "";
 
-    // 🔹 Apna database yaha banaye
-    const patternDB = {
-      "SSBBSBBS": "S",
-      "BBSBSSBB": "B",
-      "BBBSSSSB": "S",
-      "SSSSBBBB": "B"
-      // Apne hisaab se aur patterns add karna
-    };
+    // 🔹 Raw data from your file
+    const rawData = ["Big","Small","Big","Small","Small","Big","Big","Big","Big","Big","Big","Big","Small","Big","Small","Small","Small","Small","Small","Small","Big","Small","Big","Small","Small","Big","Big","Small","Big","Small","Big","Small","Small","Big","Small","Small","Small","Small","Small","Small","Big","Big","Small","Small","Small","Big","Big","Big","Big","Small","Big","Big","Big","Big","Small","Big","Big","Small","Big","Big","Big","Small","Big","Small","Big","Big","Big","Big","Small","Big","Big","Big","Big","Small","Small","Small","Big","Small","Small","Big","Small","Small","Big","Small","Small","Big","Small","Small","Big","Small","Big","Big","Small","Small","Small","Big","Small","Big","Big","Small","Big","Big","Big","Big","Small","Small","Big","Big","Big","Big","Big","Small","Small","Small","Big","Small","Small","Small","Small","Big","Small","Big","Big","Big","Small","Big","Small","Small","Big","Big","Big","Small","Small","Big","Small","Big","Small","Small","Small","Small","Small","Small","Small","Small","Small","Big","Big","Big","Big","Small","Big","Big","Big","Big","Big","Small","Small","Big","Small","Big","Small","Big","Small","Small","Small","Big","Big","Big","Big","Big","Big","Big","Big","Big","Small","Big","Big","Small","Big","Small","Big","Small","Small","Small","Small","Small","Big","Big","Big","Small","Big","Big","Big","Small","Big","Big","Small","Big","Small","Big","Small","Small","Small","Small","Small","Small","Big","Small","Big","Big","Small","Big","Big","Big","Big","Big","Small","Big","Big","Big","Small","Small","Small","Small","Big","Small","Big","Small","Big","Small","Big","Small","Big","Big","Big","Small","Small","Small","Big","Small","Small","Big","Small","Big","Big","Big","Small","Small","Small","Big","Small","Big","Big","Big","Big","Big","Big","Big","Big","Big","Big","Big","Big","Big","Small","Small","Small","Small","Big","Big","Big","Big","Small","Small","Big","Big","Small","Small","Small","Big","Small","Small","Big","Big","Big","Small","Big","Big","Big","Big","Small","Big","Big","Big","Big","Small","Big","Small","Big","Big","Big","Small"];
+
+    // 🔹 Convert to B/S
+    const bsData = rawData.map(item => item === "Big" ? "B" : "S");
+
+    // 🔹 Build pattern database (8 → next)
+    const patternDB = {};
+    for (let i = 0; i < bsData.length - 8; i++) {
+      const pattern = bsData.slice(i, i + 8).join("");
+      const next = bsData[i + 8];
+      patternDB[pattern] = next; // overwrite if duplicate
+    }
 
     function addInput(value) {
       if (userInput.length < 8) {
