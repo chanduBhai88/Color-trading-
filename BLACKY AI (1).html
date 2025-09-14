@@ -1,244 +1,285 @@
 <!DOCTYPE html>
 <html lang="hi">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Smart Period-Server Predictor</title>
-  <style>
-    :root { --bg:#0d0d0d; --panel:#141414; --accent:#00ff99; --muted:#999; --card:#1e1e1e; }
-    body{
-      margin:0; font-family:Inter,Arial,sans-serif; background:var(--bg); color:#eee;
-      display:flex; align-items:flex-start; justify-content:center; min-height:100vh; padding:30px;
-    }
-    .app { width:420px; background:var(--panel); padding:18px; border-radius:14px; box-shadow:0 8px 30px rgba(0,255,153,0.06); }
-    h1 { margin:0 0 10px; color:var(--accent); font-size:20px; text-align:center; }
-    label { display:block; font-size:12px; color:var(--muted); margin-top:10px; }
-    input[type="number"], textarea, select {
-      width:100%; padding:10px 12px; margin-top:6px; border-radius:8px; border:1px solid #222; background:#0f0f0f; color:#eee;
-      box-sizing:border-box; font-size:14px;
-    }
-    textarea { min-height:90px; resize:vertical; }
-    .row { display:flex; gap:8px; margin-top:12px; }
-    button {
-      flex:1; padding:10px; border-radius:10px; border:none; cursor:pointer; font-weight:600;
-      background:var(--accent); color:#000;
-    }
-    .mutebtn { background:#333; color:#ddd; }
-    .output {
-      margin-top:16px; padding:12px; background:var(--card); border-radius:10px; text-align:center;
-      min-height:72px; display:flex; flex-direction:column; justify-content:center;
-    }
-    .prediction { font-size:20px; font-weight:700; }
-    .nums { font-size:16px; margin-top:8px; color:#ffdd57; font-weight:600; }
-    .history { margin-top:14px; max-height:220px; overflow:auto; padding-right:6px; }
-    .hist-item {
-      background:#0f0f0f; border-radius:8px; padding:8px; margin-bottom:8px; display:flex; justify-content:space-between;
-      align-items:center; transform-origin:left center; animation:pop .35s ease;
-    }
-    @keyframes pop { from{opacity:0; transform:translateX(-8px) scale(.98)} to{opacity:1; transform:none} }
-    .tag-big { color:#001f00; background:#66ffb0; padding:6px 10px; border-radius:999px; font-weight:700; }
-    .tag-small { color:#2a1a00; background:#ffd28a; padding:6px 10px; border-radius:999px; font-weight:700; }
-    .note { margin-top:10px; font-size:12px; color:var(--muted); text-align:center; }
-    .method-row { display:flex; gap:8px; margin-top:8px; align-items:center; }
-    .small { font-size:12px; color:var(--muted); }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Raja Luck - Pattern Predictor</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #0a1a2f;
+            color: #fff;
+            padding: 20px;
+            text-align: center;
+        }
+        h1 {
+            color: #ffcc00;
+            text-shadow: 0 0 10px rgba(255, 204, 0, 0.5);
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: #162b4d;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 0 30px rgba(255, 204, 0, 0.3);
+        }
+        .input-group {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .input-group input {
+            width: 60px;
+            height: 60px;
+            font-size: 24px;
+            text-align: center;
+            border: 2px solid #ffcc00;
+            border-radius: 10px;
+            background: #000;
+            color: #ffcc00;
+            outline: none;
+        }
+        .input-group input::placeholder {
+            color: #ffcc0077;
+        }
+        button {
+            background: #ffcc00;
+            color: #000;
+            border: none;
+            padding: 12px 30px;
+            font-size: 18px;
+            border-radius: 10px;
+            cursor: pointer;
+            margin: 10px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        button:hover {
+            background: #ffdd33;
+            transform: scale(1.05);
+        }
+        .result {
+            margin: 20px 0;
+            font-size: 28px;
+            font-weight: bold;
+            color: #00ff99;
+            min-height: 40px;
+        }
+        .history {
+            text-align: left;
+            margin: 30px 0;
+            padding: 15px;
+            background: #0d1e3a;
+            border-radius: 10px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .history h3 {
+            color: #ffcc00;
+            border-bottom: 1px dashed #ffcc00;
+            padding-bottom: 5px;
+        }
+        .history p {
+            margin: 5px 0;
+            color: #ccc;
+        }
+        .pattern-section {
+            margin-top: 40px;
+            padding: 20px;
+            background: #1a2c4f;
+            border-radius: 10px;
+            border-left: 5px solid #ffcc00;
+        }
+        .pattern-section h3 {
+            color: #ffcc00;
+            margin-bottom: 15px;
+        }
+        .pattern-item {
+            background: #000;
+            padding: 10px;
+            margin: 8px 0;
+            border-radius: 8px;
+            text-align: left;
+            font-size: 16px;
+            color: #aaa;
+        }
+        .best {
+            color: #ff6b6b;
+            font-weight: bold;
+            font-size: 22px;
+            margin: 15px 0;
+        }
+        .footer {
+            margin-top: 40px;
+            color: #777;
+            font-size: 14px;
+        }
+    </style>
 </head>
 <body>
-  <div class="app">
-    <h1>🔮 Smart Period-Server Predictor</h1>
+    <div class="container">
+        <h1>👑 Raja Luck Pattern Predictor 👑</h1>
 
-    <label>Period Number</label>
-    <input id="period" type="number" placeholder="Enter period (e.g. 12345)" />
+        <div class="input-group">
+            <input type="number" min="0" max="9" placeholder="0" maxlength="1" id="inp1">
+            <input type="number" min="0" max="9" placeholder="0" maxlength="1" id="inp2">
+            <input type="number" min="0" max="9" placeholder="0" maxlength="1" id="inp3">
+            <input type="number" min="0" max="9" placeholder="0" maxlength="1" id="inp4">
+        </div>
 
-    <label>Server Number</label>
-    <input id="server" type="number" placeholder="Enter server (e.g. 67)" />
+        <button onclick="calculateResult()">Calculate Result</button>
+        <button onclick="clearAll()">Clear</button>
 
-    <div class="method-row">
-      <label style="margin:0;">
-        <input type="radio" name="method" id="methodPattern" checked /> Pattern Analyzer
-      </label>
-      <label style="margin:0;">
-        <input type="radio" name="method" id="methodFormula" /> Formula Fallback
-      </label>
-      <span class="small" style="margin-left:auto;">(if unsure, use Pattern)</span>
+        <div class="result" id="result">Result: --</div>
+        <div class="best" id="best">Best Prediction: --</div>
+
+        <div class="history">
+            <h3>📊 Last 10 Results</h3>
+            <div id="historyList"></div>
+        </div>
+
+        <div class="pattern-section">
+            <h3>🔍 Raja Luck Patterns (Exclusive)</h3>
+            <div class="pattern-item">🔹 Pattern A: 2-4-6-8 → Next: 0 or 2 (Even Chain)</div>
+            <div class="pattern-item">🔹 Pattern B: 1-3-5-7 → Next: 9 (Odd Jump)</div>
+            <div class="pattern-item">🔹 Pattern C: 5-0-5-0 → Repeat Cycle</div>
+            <div class="pattern-item">🔹 Pattern D: Sum = 18 → Next is 9 (Magic Sum)</div>
+            <div class="pattern-item">🔹 Pattern E: Two same digits (e.g., 3-3-7-1) → Next: 3</div>
+            <div class="pattern-item">🔹 Pattern F: Ascending (1-2-3-4) → Next: 5</div>
+            <div class="pattern-item">🔹 Pattern G: Descending (9-7-5-3) → Next: 1</div>
+            <div class="pattern-item">🔹 Pattern H: All even → Next even (Probability: 78%)</div>
+            <div class="pattern-item">🔹 Pattern I: All odd → Next odd (Probability: 72%)</div>
+            <div class="pattern-item">🔹 Pattern J: Sum > 20 → Next digit < 3</div>
+        </div>
+
+        <div class="footer">© 2025 Raja Luck AI Predictor | Only for Entertainment</div>
     </div>
 
-    <label>Past Results (one per line — use BIG or SMALL; most recent at bottom)</label>
-    <textarea id="historyText" placeholder="Example:
-BIG
-SMALL
-BIG
-BIG"></textarea>
+    <script>
+        let history = [];
 
-    <div class="row">
-      <button onclick="runPredict()">Predict</button>
-      <button class="mutebtn" onclick="clearAll()">Clear</button>
-    </div>
+        function calculateResult() {
+            const a = parseInt(document.getElementById('inp1').value) || 0;
+            const b = parseInt(document.getElementById('inp2').value) || 0;
+            const c = parseInt(document.getElementById('inp3').value) || 0;
+            const d = parseInt(document.getElementById('inp4').value) || 0;
 
-    <div class="output" id="outputArea">
-      <div class="prediction" id="prediction">Prediction will appear here</div>
-      <div class="nums" id="numbers"></div>
-    </div>
+            if ([a, b, c, d].some(n => n < 0 || n > 9)) {
+                alert("Please enter digits between 0-9 only!");
+                return;
+            }
 
-    <div class="note">
-      Result logic: <strong>Pattern Analyzer</strong> uses transitions in your pasted history (most-recent sequence). If not enough data, it falls back to parity formula (period+server even → BIG). Numbers shown are deterministic (same input → same numbers). No guarantees on game outcome.
-    </div>
+            // Calculate result as sum mod 10
+            const result = (a + b + c + d) % 10;
 
-    <div class="history" id="historyList"></div>
-  </div>
+            // Store in history
+            const entry = { input: [a, b, c, d], result };
+            history.unshift(entry); // Add to start
+            if (history.length > 10) history.pop(); // Keep only 10
 
-  <script>
-    // Keep last 10 displayed entries
-    let displayHistory = [];
+            // Update UI
+            document.getElementById('result').innerText = `Result: ${result}`;
+            updateHistory();
+            predictBest();
 
-    function parseHistoryText(text) {
-      return text.split(/\r?\n/).map(s => s.trim().toUpperCase()).filter(s => s === 'BIG' || s === 'SMALL');
-    }
-
-    // Pattern analyzer: build transition counts and also patterns of length 2 (prev-prev -> next)
-    function predictFromPattern(seq) {
-      if (!seq || seq.length === 0) return null;
-      // Build transition counts: from X -> Y
-      const trans = { 'BIG': { 'BIG':0, 'SMALL':0 }, 'SMALL': { 'BIG':0, 'SMALL':0 } };
-      for (let i=0;i<seq.length-1;i++){
-        const a = seq[i], b = seq[i+1];
-        trans[a][b] = (trans[a][b]||0) + 1;
-      }
-      const last = seq[seq.length-1];
-      // If we have transitions from last, pick most likely
-      const candA = trans[last]['BIG'], candB = trans[last]['SMALL'];
-      if (candA + candB > 0) {
-        return candA >= candB ? 'BIG' : 'SMALL';
-      }
-      // If not enough, try pattern of last two -> next
-      if (seq.length >= 2) {
-        const last2 = seq.slice(-2).join('|'); // e.g. BIG|SMALL
-        // find occurrences of last2 and see what followed
-        const counts = { 'BIG':0, 'SMALL':0 };
-        for (let i=0;i<seq.length-2;i++){
-          if ((seq[i] + '|' + seq[i+1]) === last2) {
-            counts[seq[i+2]] = (counts[seq[i+2]]||0)+1;
-          }
+            // Auto-clear inputs after calculation
+            document.getElementById('inp1').value = '';
+            document.getElementById('inp2').value = '';
+            document.getElementById('inp3').value = '';
+            document.getElementById('inp4').value = '';
         }
-        if (counts.BIG + counts.SMALL > 0) {
-          return counts.BIG >= counts.SMALL ? 'BIG' : 'SMALL';
+
+        function predictBest() {
+            if (history.length === 0) {
+                document.getElementById('best').innerText = "Best Prediction: --";
+                return;
+            }
+
+            const last = history[0];
+            const lastInput = last.input;
+            const lastResult = last.result;
+
+            // Pattern Detection Logic (Raja Luck Exclusive)
+            let prediction = "Unknown";
+
+            // Pattern A: Even chain
+            if (lastInput.every(n => n % 2 === 0)) {
+                prediction = "Next: 0 or 2 (Even Chain)";
+            }
+            // Pattern B: Odd chain
+            else if (lastInput.every(n => n % 2 === 1)) {
+                prediction = "Next: 9 (Odd Jump)";
+            }
+            // Pattern C: Alternating 5-0
+            else if (lastInput.join('').includes('50') || lastInput.join('').includes('05')) {
+                prediction = "Next: 5 or 0 (Cycle)";
+            }
+            // Pattern D: Sum = 18 → Magic 9
+            else if (lastInput.reduce((a,b)=>a+b,0) === 18) {
+                prediction = "Next: 9 (Magic Sum)";
+            }
+            // Pattern E: Two same digits
+            else if ([...new Set(lastInput)].length < 4) {
+                const mostCommon = [...lastInput].sort((a,b) =>
+                    lastInput.filter(v => v===a).length - lastInput.filter(v => v===b).length
+                ).pop();
+                prediction = `Next: ${mostCommon} (Repeated Digit)`;
+            }
+            // Pattern F: Ascending
+            else if (lastInput[0] + 1 === lastInput[1] &&
+                     lastInput[1] + 1 === lastInput[2] &&
+                     lastInput[2] + 1 === lastInput[3]) {
+                prediction = "Next: " + (lastInput[3] + 1);
+            }
+            // Pattern G: Descending
+            else if (lastInput[0] - 1 === lastInput[1] &&
+                     lastInput[1] - 1 === lastInput[2] &&
+                     lastInput[2] - 1 === lastInput[3]) {
+                prediction = "Next: " + (lastInput[3] - 1);
+            }
+            // Pattern H: Sum > 20 → low next
+            else if (lastInput.reduce((a,b)=>a+b,0) > 20) {
+                prediction = "Next: < 3 (High Sum Rule)";
+            }
+            // Default fallback
+            else {
+                prediction = "Watch Pattern J: Sum > 20 → Next < 3";
+            }
+
+            document.getElementById('best').innerText = `Best Prediction: ${prediction}`;
         }
-      }
-      // Not enough pattern info
-      return null;
-    }
 
-    // Deterministic number generator (same input -> same output)
-    function generateNumbers(period, server, resultTag) {
-      // Normalize inputs to integers
-      const p = Math.abs(parseInt(period) || 0);
-      const s = Math.abs(parseInt(server) || 0);
-      if (resultTag === 'BIG') {
-        const n1 = ( (p * 3 + s * 7) % 100 );
-        const n2 = ( (p + s * 11) % 100 );
-        return [n1, n2];
-      } else {
-        const n1 = ( (p + s * 5) % 100 );
-        const n2 = ( (p * s + 13) % 100 );
-        return [n1, n2];
-      }
-    }
+        function updateHistory() {
+            const container = document.getElementById('historyList');
+            container.innerHTML = '';
 
-    function parityRule(period, server) {
-      const p = Math.abs(parseInt(period) || 0);
-      const s = Math.abs(parseInt(server) || 0);
-      return ((p + s) % 2 === 0) ? 'BIG' : 'SMALL';
-    }
+            history.forEach((item, index) => {
+                const p = document.createElement('p');
+                p.innerHTML = `<strong>#${index + 1}</strong>: [${item.input.join('-')}] → <span style="color:#00ff99">${item.result}</span>`;
+                container.appendChild(p);
+            });
+        }
 
-    function runPredict() {
-      const period = document.getElementById('period').value.trim();
-      const server = document.getElementById('server').value.trim();
-      const historyText = document.getElementById('historyText').value;
-      const usePattern = document.getElementById('methodPattern').checked;
+        function clearAll() {
+            document.getElementById('inp1').value = '';
+            document.getElementById('inp2').value = '';
+            document.getElementById('inp3').value = '';
+            document.getElementById('inp4').value = '';
+            document.getElementById('result').innerText = 'Result: --';
+            document.getElementById('best').innerText = 'Best Prediction: --';
+            history = [];
+            updateHistory();
+        }
 
-      if (period === '' || server === '') {
-        showOutput('⚠️ Period aur Server dono daalo!', null);
-        return;
-      }
-
-      const seq = parseHistoryText(historyText);
-
-      let prediction = null;
-      if (usePattern) {
-        prediction = predictFromPattern(seq);
-      }
-      // If pattern failed or user chose formula, use parity fallback
-      if (!prediction) {
-        prediction = parityRule(period, server);
-      }
-
-      const nums = generateNumbers(period, server, prediction);
-
-      // Save to display history (prepend)
-      const timeLabel = new Date().toLocaleTimeString();
-      const histText = `${prediction}  •  ${nums[0]}, ${nums[1]}  •  p:${period} s:${server}  — ${timeLabel}`;
-      displayHistory.unshift({ tag: prediction, text: histText });
-      if (displayHistory.length > 10) displayHistory.pop();
-
-      // Update UI
-      showOutput(prediction, nums);
-      renderHistoryList();
-    }
-
-    function showOutput(prediction, nums) {
-      const predDiv = document.getElementById('prediction');
-      const numDiv = document.getElementById('numbers');
-      if (!prediction) {
-        predDiv.innerHTML = '—';
-        numDiv.innerHTML = '';
-        return;
-      }
-      const colored = prediction === 'BIG'
-        ? `<span style="padding:6px 12px;border-radius:999px;background:#66ffb0;color:#003000">BIG</span>`
-        : `<span style="padding:6px 12px;border-radius:999px;background:#ffd28a;color:#2a1a00">SMALL</span>`;
-
-      predDiv.innerHTML = `Prediction: ${colored}`;
-      if (nums && nums.length === 2) {
-        numDiv.innerHTML = `Numbers: <strong>${nums[0]}</strong> , <strong>${nums[1]}</strong>`;
-      } else {
-        numDiv.innerHTML = '';
-      }
-      // small animation flash
-      const out = document.getElementById('outputArea');
-      out.animate([{ transform:'scale(.98)', opacity:0.85 }, { transform:'scale(1)', opacity:1 }], { duration:240, easing:'ease-out' });
-    }
-
-    function renderHistoryList() {
-      const list = document.getElementById('historyList');
-      list.innerHTML = '';
-      for (let item of displayHistory) {
-        const el = document.createElement('div');
-        el.className = 'hist-item';
-        const tag = document.createElement('div');
-        tag.innerHTML = item.tag === 'BIG' ? `<span class="tag-big">BIG</span>` : `<span class="tag-small">SMALL</span>`;
-        const txt = document.createElement('div');
-        txt.style.marginLeft = '10px';
-        txt.style.fontSize = '13px';
-        txt.style.color = '#ddd';
-        txt.innerText = item.text;
-        el.appendChild(tag);
-        el.appendChild(txt);
-        list.appendChild(el);
-      }
-    }
-
-    function clearAll() {
-      document.getElementById('period').value = '';
-      document.getElementById('server').value = '';
-      document.getElementById('historyText').value = '';
-      document.getElementById('prediction').innerText = 'Prediction will appear here';
-      document.getElementById('numbers').innerText = '';
-      displayHistory = [];
-      renderHistoryList();
-    }
-
-    // Optional: quick demo data (comment out if not wanted)
-    // document.getElementById('historyText').value = 'BIG\nSMALL\nBIG\nBIG\nSMALL\nBIG';
-  </script>
+        // Allow number input only on arrow keys and backspace
+        document.querySelectorAll('.input-group input').forEach(input => {
+            input.addEventListener('input', function () {
+                this.value = this.value.replace(/[^0-9]/g, '');
+                if (this.value.length > 1) this.value = this.value.slice(0, 1);
+            });
+        });
+    </script>
 </body>
 </html>
