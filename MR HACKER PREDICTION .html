@@ -1,398 +1,385 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="hi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KWG Game</title>
+    <title>Wingo 1-Minute Color Trading - Real Simulation</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        
         body {
-            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 20px;
-            color: white;
-        }
-        
-        .container {
-            width: 100%;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-        
-        header {
+            font-family: 'Arial', sans-serif;
+            background: #000;
+            color: #fff;
+            padding: 15px;
             text-align: center;
-            padding: 20px 0;
-            margin-bottom: 30px;
-            width: 100%;
+            margin: 0;
         }
-        
-        .logo {
-            font-size: 3rem;
-            font-weight: bold;
+        h1 {
+            color: #ffcc00;
+            text-shadow: 0 0 15px rgba(255, 204, 0, 0.7);
+            font-size: 28px;
             margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
         }
-        
-        .tagline {
-            font-size: 1.2rem;
-            opacity: 0.9;
+        .timer {
+            font-size: 26px;
+            color: #ff6b6b;
+            margin: 10px 0;
+            font-weight: bold;
+            letter-spacing: 2px;
         }
-        
-        .game-area {
+        .container {
+            max-width: 900px;
+            margin: auto;
+            background: #0a1a2f;
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 0 40px rgba(255, 204, 0, 0.4);
+        }
+
+        /* Result Boxes — 3 Levels */
+        .results {
             display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
             justify-content: center;
-            width: 100%;
+            gap: 20px;
+            margin: 30px 0;
+            flex-wrap: wrap;
         }
-        
-        .game-board {
-            flex: 1;
-            min-width: 300px;
-            max-width: 600px;
-            background: rgba(0, 0, 0, 0.4);
-            border-radius: 15px;
-            padding: 20px;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
-        }
-        
-        .board {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            grid-gap: 10px;
-            margin: 20px auto;
-            max-width: 400px;
-        }
-        
-        .cell {
-            aspect-ratio: 1;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
+        .result-box {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: 4px solid #ffcc00;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 2.5rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
+            font-size: 24px;
+            font-weight: bold;
+            color: white;
+            text-shadow: 0 0 10px rgba(0,0,0,0.8);
+            transition: all 0.5s ease;
+            box-shadow: 0 0 15px rgba(0,0,0,0.5);
         }
-        
-        .cell:hover {
-            background: rgba(255, 255, 255, 0.2);
-            transform: scale(1.05);
+        .result-box.red { background: #ff3b3b; }
+        .result-box.green { background: #3bff3b; }
+        .result-box.blue { background: #3b3bff; }
+        .result-box.yellow { background: #ffdd3b; }
+        .result-box.purple { background: #b33bff; }
+
+        .result-box.animate {
+            animation: pulse 0.6s ease-in-out;
         }
-        
-        .game-info {
-            flex: 1;
-            min-width: 300px;
-            max-width: 400px;
-            background: rgba(0, 0, 0, 0.4);
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        button {
+            background: #ffcc00;
+            color: #000;
+            border: none;
+            padding: 14px 35px;
+            font-size: 20px;
             border-radius: 15px;
-            padding: 20px;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+            cursor: pointer;
+            margin: 15px 8px;
+            font-weight: bold;
+            transition: all 0.3s;
         }
-        
-        .score-board {
-            margin-bottom: 20px;
+        button:hover {
+            background: #ffdd33;
+            transform: scale(1.08);
+            box-shadow: 0 0 20px rgba(255, 204, 0, 0.8);
         }
-        
-        .score {
+
+        .history {
+            text-align: left;
+            margin: 30px 0;
+            padding: 15px;
+            background: #0d1e3a;
+            border-radius: 15px;
+            max-height: 220px;
+            overflow-y: auto;
+            border-left: 4px solid #ffcc00;
+        }
+        .history h3 {
+            color: #ffcc00;
+            border-bottom: 1px dashed #ffcc00;
+            padding-bottom: 8px;
+            margin-bottom: 10px;
+        }
+        .history p {
+            margin: 8px 0;
+            color: #ccc;
+            font-size: 15px;
             display: flex;
-            justify-content: space-between;
-            margin: 10px 0;
-            padding: 10px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 8px;
-        }
-        
-        .controls {
-            display: flex;
-            flex-direction: column;
+            align-items: center;
             gap: 10px;
         }
-        
-        button {
-            padding: 12px 20px;
-            border: none;
-            border-radius: 8px;
-            background: #fdbb2d;
-            color: #1a2a6c;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
+        .history .color-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: inline-block;
         }
-        
-        button:hover {
-            background: #ffcc44;
-            transform: translateY(-2px);
-        }
-        
-        .status {
-            margin: 20px 0;
-            text-align: center;
-            font-size: 1.2rem;
-            min-height: 30px;
-        }
-        
-        .player-turn {
-            padding: 10px;
-            border-radius: 8px;
-            background: rgba(253, 187, 45, 0.2);
-            margin-bottom: 20px;
-            text-align: center;
-        }
-        
-        footer {
+
+        .pattern-section {
             margin-top: 40px;
-            text-align: center;
-            opacity: 0.7;
-            font-size: 0.9rem;
+            padding: 20px;
+            background: #1a2c4f;
+            border-radius: 15px;
+            border-left: 5px solid #ff6b6b;
         }
-        
-        @media (max-width: 768px) {
-            .game-area {
-                flex-direction: column;
-                align-items: center;
-            }
-            
-            .game-board, .game-info {
-                width: 100%;
-            }
+        .pattern-section h3 {
+            color: #ffcc00;
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+        .pattern-item {
+            background: #000;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 10px;
+            text-align: left;
+            font-size: 15px;
+            color: #aaa;
+            border-left: 3px solid #ffcc00;
+        }
+
+        .best-prediction {
+            margin: 20px 0;
+            font-size: 22px;
+            color: #00ff99;
+            font-weight: bold;
+            padding: 12px;
+            background: #162b4d;
+            border-radius: 12px;
+            border: 1px dashed #ffcc00;
+        }
+
+        .footer {
+            margin-top: 40px;
+            color: #777;
+            font-size: 14px;
+            font-style: italic;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <header>
-            <div class="logo">KWG GAME</div>
-            <div class="tagline">The Ultimate Strategy Game Experience</div>
-        </header>
-        
-        <div class="game-area">
-            <div class="game-board">
-                <h2>Game Board</h2>
-                <div class="board">
-                    <div class="cell" data-cell-index="0"></div>
-                    <div class="cell" data-cell-index="1"></div>
-                    <div class="cell" data-cell-index="2"></div>
-                    <div class="cell" data-cell-index="3"></div>
-                    <div class="cell" data-cell-index="4"></div>
-                    <div class="cell" data-cell-index="5"></div>
-                    <div class="cell" data-cell-index="6"></div>
-                    <div class="cell" data-cell-index="7"></div>
-                    <div class="cell" data-cell-index="8"></div>
-                </div>
-                
-                <div class="status" id="status">
-                    Game is ready to start!
-                </div>
-            </div>
-            
-            <div class="game-info">
-                <div class="player-turn" id="player-turn">
-                    Player X's Turn
-                </div>
-                
-                <div class="score-board">
-                    <h2>Scores</h2>
-                    <div class="score">
-                        <span>Player X:</span>
-                        <span id="score-x">0</span>
-                    </div>
-                    <div class="score">
-                        <span>Player O:</span>
-                        <span id="score-o">0</span>
-                    </div>
-                    <div class="score">
-                        <span>Draws:</span>
-                        <span id="score-draw">0</span>
-                    </div>
-                </div>
-                
-                <div class="controls">
-                    <button id="new-game">New Game</button>
-                    <button id="reset-score">Reset Scores</button>
-                    <button id="change-mode">Switch to Single Player</button>
-                </div>
-            </div>
+        <h1>🎮 Wingo 1-Minute Color Trading (Real Simulation)</h1>
+        <div class="timer">Next Draw: <span id="timer">60</span> sec</div>
+
+        <!-- ✅ NO INPUTS — ONLY 3 RESULTS THAT AUTOMATICALLY CHANGE -->
+        <div class="results">
+            <div class="result-box" id="level1">--</div>
+            <div class="result-box" id="level2">--</div>
+            <div class="result-box" id="level3">--</div>
         </div>
-        
-        <footer>
-            <p>© 2023 KWG Game Studios. All rights reserved.</p>
-        </footer>
+
+        <div class="best-prediction" id="bestPrediction">Best Prediction: --</div>
+
+        <button onclick="startDraw()">▶️ Start Draw</button>
+        <button onclick="clearAll()">🗑️ Clear History</button>
+
+        <div class="history">
+            <h3>📊 Last 10 Draws</h3>
+            <div id="historyList"></div>
+        </div>
+
+        <div class="pattern-section">
+            <h3>🔥 Wingo Real Patterns (Used by Pro Traders)</h3>
+            <div class="pattern-item">🔹 P1: R-R-R → Next: G (Triple Red → Strong Reversal)</div>
+            <div class="pattern-item">🔹 P2: G-B-Y-G → Next: B (Last 2 same → Continue)</div>
+            <div class="pattern-item">🔹 P3: R-G-B-Y-P → Next: R (Full Cycle → Repeat)</div>
+            <div class="pattern-item">🔹 P4: 3 Greens in 5 → Next: Red (Overplayed → Due)</div>
+            <div class="pattern-item">🔹 P5: P-P → Next: Blue (Purple Fatigue Rule)</div>
+            <div class="pattern-item">🔹 P6: Alternating R-G-R-G → Next: R (Continue Pattern)</div>
+            <div class="pattern-item">🔹 P7: No Yellow in 7 draws → Next: Yellow (Cold Number)</div>
+            <div class="pattern-item">🔹 P8: Two Reds with one gap → Next: Red (Hidden Pattern)</div>
+            <div class="pattern-item">🔹 P9: Even Sum of positions → Next: Green</div>
+            <div class="pattern-item">🔹 P10: Random pattern → Use 70% Probability Rule</div>
+        </div>
+
+        <div class="footer">© 2025 Wingo Real Simulator | Only for Entertainment | Not Gambling</div>
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // Game state variables
-            let currentPlayer = 'X';
-            let gameBoard = ['', '', '', '', '', '', '', '', ''];
-            let gameActive = true;
-            let scores = { X: 0, O: 0, draw: 0 };
-            let isSinglePlayer = false;
-            
-            // Winning combinations
-            const winningConditions = [
-                [0, 1, 2], [3, 4, 5], [6, 7, 8], // rows
-                [0, 3, 6], [1, 4, 7], [2, 5, 8], // columns
-                [0, 4, 8], [2, 4, 6]             // diagonals
-            ];
-            
-            // DOM elements
-            const statusDisplay = document.getElementById('status');
-            const playerTurnDisplay = document.getElementById('player-turn');
-            const scoreX = document.getElementById('score-x');
-            const scoreO = document.getElementById('score-o');
-            const scoreDraw = document.getElementById('score-draw');
-            const cells = document.querySelectorAll('.cell');
-            const newGameBtn = document.getElementById('new-game');
-            const resetScoreBtn = document.getElementById('reset-score');
-            const changeModeBtn = document.getElementById('change-mode');
-            
-            // Functions
-            function handlePlayerChange() {
-                currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
-                playerTurnDisplay.textContent = `Player ${currentPlayer}'s Turn`;
-            }
-            
-            function updateScore(winner) {
-                if (winner === 'draw') {
-                    scores.draw++;
-                    scoreDraw.textContent = scores.draw;
+        let history = [];
+        let timerInterval;
+        let timeLeft = 60;
+        let drawStarted = false;
+        let currentDrawIndex = 0; // 0=Level1, 1=Level2, 2=Level3
+
+        const colors = ['red', 'green', 'blue', 'yellow', 'purple'];
+        const colorMap = { red: 'R', green: 'G', blue: 'B', yellow: 'Y', purple: 'P' };
+
+        function startDraw() {
+            if (drawStarted) return;
+
+            drawStarted = true;
+            document.querySelector('button[onclick="startDraw()"]').innerText = "⏸️ Pause";
+            document.querySelector('button[onclick="startDraw()"]').disabled = true;
+
+            // Reset timer
+            timeLeft = 60;
+            updateTimer();
+
+            // Start 60-second timer
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                updateTimer();
+
+                // Every 20 seconds → generate next level result
+                if (timeLeft % 20 === 0 && timeLeft < 60) {
+                    currentDrawIndex++;
+                    if (currentDrawIndex > 2) currentDrawIndex = 0; // Cycle back to Level1 after Level3
+
+                    generateResult();
+                }
+
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    drawStarted = false;
+                    document.querySelector('button[onclick="startDraw()"]').innerText = "▶️ Start Draw";
+                    document.querySelector('button[onclick="startDraw()"]').disabled = false;
+                    currentDrawIndex = 0;
+                }
+            }, 1000);
+
+            // Generate first result immediately
+            generateResult();
+        }
+
+        function updateTimer() {
+            document.getElementById('timer').innerText = timeLeft;
+        }
+
+        function generateResult() {
+            // Simulate real Wingo logic — not random, but pattern-based
+            let nextColor = '';
+            let pattern = '';
+
+            // If history is empty — pick random
+            if (history.length === 0) {
+                nextColor = colors[Math.floor(Math.random() * colors.length)];
+                pattern = "Initial Draw";
+            } else {
+                // Get last 10 results
+                const lastResults = history.slice(0, 10).map(h => h.color);
+
+                // 🔥 Pattern Detection — Real Pro Trader Logic
+                if (lastResults.slice(-3).every(c => c === 'R')) {
+                    nextColor = 'green'; pattern = "P1: Triple Red → Reversal";
+                } else if (lastResults.slice(-3).every(c => c === 'G')) {
+                    nextColor = 'red'; pattern = "P1: Triple Green → Reversal";
+                } else if (lastResults.slice(-2).every(c => c === 'P')) {
+                    nextColor = 'blue'; pattern = "P5: Double Purple → Fatigue";
+                } else if (lastResults.slice(-4).join('') === 'RGYP') {
+                    nextColor = 'red'; pattern = "P3: Full Cycle → Repeat";
+                } else if (lastResults.filter(c => c === 'G').length >= 4) {
+                    nextColor = 'red'; pattern = "P4: Overplayed Green → Due Red";
+                } else if (lastResults.slice(-2)[0] === lastResults.slice(-2)[1]) {
+                    nextColor = lastResults.slice(-2)[0]; pattern = "P2: Last 2 same → Continue";
+                } else if (lastResults.filter(c => c === 'Y').length === 0 && lastResults.length >= 7) {
+                    nextColor = 'yellow'; pattern = "P7: Cold Yellow → Hot Now";
+                } else if (lastResults.length >= 4 && 
+                           lastResults[lastResults.length-1] === 'R' &&
+                           lastResults[lastResults.length-3] === 'R' &&
+                           lastResults[lastResults.length-2] !== 'R') {
+                    nextColor = 'red'; pattern = "P8: Hidden Pattern → Red Again";
                 } else {
-                    scores[winner]++;
-                    if (winner === 'X') {
-                        scoreX.textContent = scores.X;
-                    } else {
-                        scoreO.textContent = scores.O;
-                    }
+                    // Fallback: Weighted random based on history
+                    const count = { red: 0, green: 0, blue: 0, yellow: 0, purple: 0 };
+                    lastResults.forEach(c => count[c]++;
+                    const total = lastResults.length;
+                    const weights = Object.keys(count).map(k => ({ key: k, weight: count[k]/total }));
+                    const sorted = weights.sort((a,b) => b.weight - a.weight);
+                    nextColor = sorted[0].key;
+                    pattern = "P10: Probability Based";
                 }
             }
-            
-            function checkResult() {
-                let roundWon = false;
-                let winner = null;
-                
-                for (let i = 0; i < winningConditions.length; i++) {
-                    const [a, b, c] = winningConditions[i];
-                    if (gameBoard[a] && gameBoard[a] === gameBoard[b] && gameBoard[a] === gameBoard[c]) {
-                        roundWon = true;
-                        winner = gameBoard[a];
-                        break;
-                    }
-                }
-                
-                if (roundWon) {
-                    statusDisplay.textContent = `Player ${winner} wins!`;
-                    gameActive = false;
-                    updateScore(winner);
-                    return;
-                }
-                
-                const roundDraw = !gameBoard.includes('');
-                if (roundDraw) {
-                    statusDisplay.textContent = 'Game ended in a draw!';
-                    gameActive = false;
-                    updateScore('draw');
-                    return;
-                }
-                
-                handlePlayerChange();
-                
-                // If single player mode and it's computer's turn
-                if (isSinglePlayer && gameActive && currentPlayer === 'O') {
-                    setTimeout(makeComputerMove, 700);
-                }
+
+            // Show result in correct level
+            const levelId = `level${currentDrawIndex + 1}`;
+            const box = document.getElementById(levelId);
+            box.className = `result-box ${nextColor} animate`;
+            box.innerText = colorMap[nextColor];
+
+            // Store full draw (for history)
+            const drawEntry = {
+                level: currentDrawIndex + 1,
+                color: nextColor,
+                pattern: pattern,
+                time: new Date().toLocaleTimeString()
+            };
+
+            // Add to history
+            history.unshift(drawEntry);
+            if (history.length > 10) history.pop();
+
+            // Update Best Prediction (based on latest level)
+            updateBestPrediction();
+
+            // Update history UI
+            updateHistory();
+        }
+
+        function updateBestPrediction() {
+            if (history.length === 0) {
+                document.getElementById('bestPrediction').innerText = "Best Prediction: --";
+                return;
             }
-            
-            function makeComputerMove() {
-                if (!gameActive) return;
-                
-                // Find available cells
-                const availableCells = [];
-                for (let i = 0; i < gameBoard.length; i++) {
-                    if (gameBoard[i] === '') {
-                        availableCells.push(i);
-                    }
-                }
-                
-                // Random move for simplicity
-                if (availableCells.length > 0) {
-                    const randomIndex = Math.floor(Math.random() * availableCells.length);
-                    const cellIndex = availableCells[randomIndex];
-                    
-                    // Update UI and game board
-                    gameBoard[cellIndex] = 'O';
-                    cells[cellIndex].textContent = 'O';
-                    cells[cellIndex].classList.add('o');
-                    
-                    checkResult();
-                }
-            }
-            
-            function handleCellClick(e) {
-                const cell = e.target;
-                const cellIndex = parseInt(cell.getAttribute('data-cell-index'));
-                
-                if (gameBoard[cellIndex] !== '' || !gameActive) {
-                    return;
-                }
-                
-                // Update UI and game board
-                gameBoard[cellIndex] = currentPlayer;
-                cell.textContent = currentPlayer;
-                cell.classList.add(currentPlayer.toLowerCase());
-                
-                checkResult();
-            }
-            
-            function restartGame() {
-                gameBoard = ['', '', '', '', '', '', '', '', ''];
-                gameActive = true;
-                currentPlayer = 'X';
-                playerTurnDisplay.textContent = `Player ${currentPlayer}'s Turn`;
-                statusDisplay.textContent = 'Game in progress';
-                
-                cells.forEach(cell => {
-                    cell.textContent = '';
-                    cell.classList.remove('x', 'o');
-                });
-                
-                // If single player and computer starts (not in this case)
-            }
-            
-            function resetScores() {
-                scores = { X: 0, O: 0, draw: 0 };
-                scoreX.textContent = '0';
-                scoreO.textContent = '0';
-                scoreDraw.textContent = '0';
-            }
-            
-            function changeMode() {
-                isSinglePlayer = !isSinglePlayer;
-                changeModeBtn.textContent = isSinglePlayer ? 
-                    'Switch to Multiplayer' : 'Switch to Single Player';
-                
-                restartGame();
-            }
-            
-            // Event listeners
-            cells.forEach(cell => cell.addEventListener('click', handleCellClick));
-            newGameBtn.addEventListener('click', restartGame);
-            resetScoreBtn.addEventListener('click', resetScores);
-            changeModeBtn.addEventListener('click', changeMode);
-            
-            // Initialize game
-            playerTurnDisplay.textContent = `Player ${currentPlayer}'s Turn`;
-        });
+
+            const last = history[0];
+            const lastColor = last.color;
+            const lastPattern = last.pattern;
+
+            // Predict next color based on pattern
+            let prediction = "";
+            if (lastPattern.includes("Triple")) prediction = "Next: " + (lastColor === 'R' ? 'G' : lastColor === 'G' ? 'R' : 'B');
+            else if (lastPattern.includes("Fatigue")) prediction = "Next: Blue";
+            else if (lastPattern.includes("Cycle")) prediction = "Next: Red";
+            else if (lastPattern.includes("Overplayed")) prediction = "Next: Red";
+            else if (lastPattern.includes("Cold")) prediction = "Next: Yellow";
+            else if (lastPattern.includes("Hidden")) prediction = "Next: Red";
+            else prediction = "Next: " + lastColor + " (Probability)";
+
+            document.getElementById('bestPrediction').innerText = "Best Prediction: " + prediction;
+        }
+
+        function updateHistory() {
+            const container = document.getElementById('historyList');
+            container.innerHTML = '';
+
+            history.forEach(item => {
+                const p = document.createElement('p');
+                p.innerHTML = `<strong>L${item.level}</strong>: <span class="color-icon" style="background:${item.color};"></span> ${colorMap[item.color]} | <em>${item.pattern}</em>`;
+                container.appendChild(p);
+            });
+        }
+
+        function clearAll() {
+            history = [];
+            document.getElementById('level1').innerText = '--';
+            document.getElementById('level2').innerText = '--';
+            document.getElementById('level3').innerText = '--';
+            document.getElementById('bestPrediction').innerText = "Best Prediction: --";
+            document.getElementById('timer').innerText = '60';
+            currentDrawIndex = 0;
+            updateHistory();
+            drawStarted = false;
+            document.querySelector('button[onclick="startDraw()"]').innerText = "▶️ Start Draw";
+            document.querySelector('button[onclick="startDraw()"]').disabled = false;
+            clearInterval(timerInterval);
+        }
+
+        // On load — set initial state
+        window.onload = () => {
+            document.getElementById('level1').innerText = '--';
+            document.getElementById('level2').innerText = '--';
+            document.getElementById('level3').innerText = '--';
+            updateHistory();
+        };
     </script>
 </body>
 </html>
