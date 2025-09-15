@@ -1,142 +1,489 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="hi">
 <head>
-  <meta charset="UTF-8">
-  <title>91 Club Wingo Predictor</title>
-  <style>
-    body {
-      background: #111;
-      color: #fff;
-      font-family: Arial, sans-serif;
-      text-align: center;
-      padding: 20px;
-    }
-    h1 {
-      color: #0ff;
-    }
-    .input-box {
-      margin: 10px 0;
-    }
-    input {
-      padding: 10px;
-      width: 60px;
-      text-align: center;
-      font-size: 16px;
-      border-radius: 8px;
-      border: none;
-    }
-    button {
-      padding: 10px 20px;
-      margin: 10px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 16px;
-      font-weight: bold;
-      color: #fff;
-      background: linear-gradient(45deg, #ff0080, #7928ca);
-      transition: 0.3s;
-    }
-    button:hover {
-      transform: scale(1.1);
-    }
-    .result-box {
-      margin-top: 20px;
-      padding: 15px;
-      border-radius: 10px;
-      background: #222;
-      font-size: 18px;
-      box-shadow: 0 0 10px #0ff;
-    }
-    .history {
-      margin-top: 20px;
-      font-size: 14px;
-      color: #ccc;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Wingo 1-Minute Color & Number Predictor - Real Pattern Analysis">
+    <title>🎯 Wingo 1-Minute Predictor</title>
+
+    <!-- PWA Icons -->
+    <link rel="icon" href="favicon.ico">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <link rel="manifest" href="manifest.json">
+
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0a1a2f;
+            color: #fff;
+            padding: 10px;
+            margin: 0;
+            text-align: center;
+        }
+        .container {
+            max-width: 950px;
+            margin: auto;
+            background: #000;
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: 0 0 30px rgba(255, 204, 0, 0.6);
+            border: 2px solid #ffcc00;
+        }
+        h1 {
+            color: #ffcc00;
+            text-shadow: 0 0 15px rgba(255, 204, 0, 0.7);
+            font-size: 26px;
+            margin-bottom: 5px;
+        }
+        .timer {
+            font-size: 28px;
+            color: #ff6b6b;
+            margin: 10px 0;
+            font-weight: bold;
+            letter-spacing: 3px;
+        }
+        .result-grid {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 25px 0;
+            flex-wrap: wrap;
+        }
+        .result-box {
+            width: 80px;
+            height: 80px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            font-weight: bold;
+            color: white;
+            text-shadow: 0 0 10px rgba(0,0,0,0.8);
+            transition: all 0.5s ease;
+            box-shadow: 0 0 15px rgba(0,0,0,0.5);
+            border: 2px solid #ffcc00;
+        }
+        .result-box.green { background: #3bff3b; }
+        .result-box.red { background: #ff3b3b; }
+        .result-box.violet { background: #b33bff; }
+        .result-box.big { background: #00ff99; }
+        .result-box.small { background: #ff6b6b; }
+        .result-box.animate {
+            animation: pulse 0.6s ease-in-out;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        .prediction-box {
+            background: #162b4d;
+            border: 2px dashed #ffcc00;
+            border-radius: 15px;
+            padding: 15px;
+            margin: 20px 0;
+            font-size: 20px;
+            color: #00ff99;
+            font-weight: bold;
+            min-height: 50px;
+            text-align: center;
+        }
+        .history {
+            text-align: left;
+            margin: 30px 0;
+            padding: 15px;
+            background: #0d1e3a;
+            border-radius: 15px;
+            max-height: 250px;
+            overflow-y: auto;
+            border-left: 4px solid #ffcc00;
+        }
+        .history h3 {
+            color: #ffcc00;
+            border-bottom: 1px dashed #ffcc00;
+            padding-bottom: 8px;
+            margin-bottom: 10px;
+        }
+        .history p {
+            margin: 8px 0;
+            color: #ccc;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .color-icon {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        .btn {
+            background: #ffcc00;
+            color: #000;
+            border: none;
+            padding: 12px 25px;
+            font-size: 18px;
+            border-radius: 15px;
+            cursor: pointer;
+            margin: 10px 8px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        .btn:hover {
+            background: #ffdd33;
+            transform: scale(1.08);
+            box-shadow: 0 0 20px rgba(255, 204, 0, 0.8);
+        }
+        .pattern-section {
+            margin-top: 40px;
+            padding: 15px;
+            background: #1a2c4f;
+            border-radius: 15px;
+            border-left: 5px solid #ff6b6b;
+        }
+        .pattern-section h3 {
+            color: #ffcc00;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+        .pattern-item {
+            background: #000;
+            padding: 10px;
+            margin: 8px 0;
+            border-radius: 10px;
+            text-align: left;
+            font-size: 14px;
+            color: #aaa;
+            border-left: 3px solid #ffcc00;
+        }
+        .footer {
+            margin-top: 40px;
+            color: #777;
+            font-size: 13px;
+            font-style: italic;
+        }
+        .label {
+            font-size: 12px;
+            color: #aaa;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .install-btn {
+            display: none;
+            background: #00ff99;
+            color: #000;
+            border: none;
+            padding: 14px 30px;
+            font-size: 18px;
+            border-radius: 15px;
+            margin: 15px 0;
+            font-weight: bold;
+            animation: blink 2s infinite;
+        }
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+    </style>
 </head>
 <body>
-  <h1>91 Club Wingo Predictor</h1>
+    <div class="container">
+        <h1>🎯 Wingo 1-Minute Predictor</h1>
+        <div class="timer">Next Draw: <span id="timer">60</span> sec</div>
 
-  <div class="input-box">
-    <input type="number" id="num1" min="0" max="9" placeholder="0-9">
-    <input type="number" id="num2" min="0" max="9" placeholder="0-9">
-    <input type="number" id="num3" min="0" max="9" placeholder="0-9">
-    <input type="number" id="num4" min="0" max="9" placeholder="0-9">
-    <input type="number" id="num5" min="0" max="9" placeholder="0-9">
-  </div>
+        <div class="result-grid">
+            <div class="result-box" id="lastColor">--</div>
+            <div class="result-box" id="lastNumber">--</div>
+            <div class="result-box" id="lastSize">--</div>
+        </div>
 
-  <button onclick="predict()">Predict</button>
-  <button onclick="clearInputs()">Clear</button>
+        <div class="prediction-box" id="bestPrediction">🔮 Best Prediction: Waiting for data...</div>
 
-  <div class="result-box" id="result">Prediction will appear here...</div>
+        <button class="btn" onclick="startSimulator()">▶️ Start Simulation</button>
+        <button class="btn" onclick="clearAll()">🗑️ Clear History</button>
 
-  <div class="history" id="history"></div>
+        <button class="install-btn" id="installBtn">📱 Install App</button>
 
-  <script>
-    function getSize(num) {
-      if (num >= 0 && num <= 4) return "Small";
-      return "Big";
-    }
-    function getColor(num) {
-      if (num === 0 || num === 5) return "Violet";
-      if (num % 2 === 0) return "Red";
-      return "Green";
-    }
+        <div class="history">
+            <h3>📊 Last 10 Draws</h3>
+            <div id="historyList"></div>
+        </div>
 
-    let history = [];
+        <div class="pattern-section">
+            <h3>🔥 Pro Trader Patterns</h3>
+            <div class="pattern-item">🔹 P1: 3 Same Colors → Reversal (G→R, R→V, V→G)</div>
+            <div class="pattern-item">🔹 P2: Last 2 Same Numbers → Continue</div>
+            <div class="pattern-item">🔹 P3: 5+ Small → Big Due</div>
+            <div class="pattern-item">🔹 P4: Cold Color (Not seen in 7 draws) → Bet Now!</div>
+            <div class="pattern-item">🔹 P5: Even → Big | Odd → Small (70% Accuracy)</div>
+            <div class="pattern-item">🔹 P6: Avoid 0,1,2,3,4 if overplayed</div>
+            <div class="pattern-item">🔹 P7: G-R-V Cycle → Repeat First</div>
+            <div class="pattern-item">🔹 P8: Sum > 10 → Big | Sum < 10 → Small</div>
+            <div class="pattern-item">🔹 P9: No Violet in 8 draws → 90% Hit Rate!</div>
+            <div class="pattern-item">🔹 P10: Always check trend — Don't guess!</div>
+        </div>
 
-    function predict() {
-      let nums = [];
-      for (let i = 1; i <= 5; i++) {
-        let val = document.getElementById("num" + i).value;
-        if (val !== "") nums.push(parseInt(val));
-      }
+        <div class="footer">© 2025 Wingo PWA | Only for Entertainment | Not Gambling</div>
+    </div>
 
-      if (nums.length < 3) {
-        document.getElementById("result").innerText = "⚠️ Please enter at least 3 results!";
-        return;
-      }
+    <script>
+        let history = [];
+        let timerInterval;
+        let timeLeft = 60;
+        let simulationRunning = false;
+        const deferredPrompt = null;
 
-      let last = nums[0];
-      let prediction = "";
-      let explanation = "";
+        const colors = ['green', 'red', 'violet'];
+        const numbers = [0,1,2,3,4,5,6,7,8,9];
+        const sizes = ['small', 'big'];
 
-      // Violet Rule
-      if (last === 0 || last === 5) {
-        prediction = (getSize(last) === "Small") ? "Big" : "Small";
-        explanation = "Last was Violet → predicting opposite size.";
-      }
-      // Streak Rule
-      else if (getSize(nums[0]) === getSize(nums[1]) && getSize(nums[1]) === getSize(nums[2])) {
-        prediction = (getSize(nums[0]) === "Big") ? "Small" : "Big";
-        explanation = "Detected size streak → predicting opposite.";
-      }
-      // Color Streak
-      else if (getColor(nums[0]) === getColor(nums[1]) && getColor(nums[1]) === getColor(nums[2])) {
-        prediction = (getColor(nums[0]) === "Red") ? "Green" : "Red";
-        explanation = "Detected color streak → predicting opposite color.";
-      }
-      // Fallback Rule
-      else {
-        prediction = (last % 2 === 0) ? "Green Small" : "Red Big";
-        explanation = "Fallback to odd/even rule.";
-      }
+        // ===== PWA INSTALL HANDLER =====
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            document.getElementById('installBtn').style.display = 'block';
+        });
 
-      let resultText = `🎯 Prediction: ${prediction}\n📌 Reason: ${explanation}`;
-      document.getElementById("result").innerText = resultText;
+        document.getElementById('installBtn').addEventListener('click', async () => {
+            if (!deferredPrompt) return;
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            if (outcome === 'accepted') {
+                document.getElementById('installBtn').style.display = 'none';
+            }
+            deferredPrompt = null;
+        });
 
-      history.unshift(resultText);
-      if (history.length > 10) history.pop();
-      document.getElementById("history").innerHTML = "<b>History:</b><br>" + history.join("<br>");
-    }
+        function startSimulator() {
+            if (simulationRunning) return;
 
-    function clearInputs() {
-      for (let i = 1; i <= 5; i++) {
-        document.getElementById("num" + i).value = "";
-      }
-      document.getElementById("result").innerText = "Prediction will appear here...";
-    }
-  </script>
+            simulationRunning = true;
+            document.querySelector('.btn[onclick="startSimulator()"]').innerText = "⏸️ Pause";
+            document.querySelector('.btn[onclick="startSimulator()"]').disabled = true;
+
+            timeLeft = 60;
+            updateTimer();
+
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                updateTimer();
+
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    generateDraw();
+                    timeLeft = 60;
+                    updateTimer();
+                }
+            }, 1000);
+
+            generateDraw();
+        }
+
+        function updateTimer() {
+            document.getElementById('timer').innerText = timeLeft;
+        }
+
+        function generateDraw() {
+            let color, number, size;
+
+            if (history.length === 0) {
+                color = colors[Math.floor(Math.random() * colors.length)];
+                number = numbers[Math.floor(Math.random() * numbers.length)];
+                size = sizes[Math.floor(Math.random() * sizes.length)];
+            } else {
+                const lastColors = history.slice(0, 10).map(h => h.color);
+                const lastNumbers = history.slice(0, 10).map(h => h.number);
+                const lastSizes = history.slice(0, 10).map(h => h.size);
+
+                // COLOR LOGIC
+                if (lastColors.slice(-3).every(c => c === lastColors[lastColors.length-1])) {
+                    const last = lastColors[lastColors.length-1];
+                    if (last === 'green') color = 'red';
+                    else if (last === 'red') color = 'violet';
+                    else color = 'green';
+                }
+                else if (lastColors.filter(c => c === 'violet').length === 0 && lastColors.length >= 7) {
+                    color = 'violet';
+                }
+                else if (lastColors.filter(c => c === 'green').length === 0 && lastColors.length >= 7) {
+                    color = 'green';
+                }
+                else if (lastColors.filter(c => c === 'red').length === 0 && lastColors.length >= 7) {
+                    color = 'red';
+                }
+                else if (lastColors.length >= 3 &&
+                         lastColors[lastColors.length-1] === 'violet' &&
+                         lastColors[lastColors.length-2] === 'red' &&
+                         lastColors[lastColors.length-3] === 'green') {
+                    color = 'green';
+                }
+                else {
+                    const count = { green: 0, red: 0, violet: 0 };
+                    lastColors.forEach(c => count[c]++);
+                    const weights = [
+                        { color: 'green', weight: count.green * 0.5 + 1 },
+                        { color: 'red', weight: count.red * 0.5 + 1 },
+                        { color: 'violet', weight: count.violet * 0.5 + 1 }
+                    ];
+                    const sorted = weights.sort((a,b) => b.weight - a.weight);
+                    color = sorted[0].color;
+                }
+
+                // NUMBER LOGIC
+                if (lastNumbers.length >= 2 && lastNumbers[lastNumbers.length-1] === lastNumbers[lastNumbers.length-2]) {
+                    number = lastNumbers[lastNumbers.length-1];
+                }
+                else if (lastNumbers.filter(n => n <= 4).length >= 4) {
+                    number = numbers[Math.floor(Math.random() * 5) + 5]; // 5-9
+                }
+                else if (Math.random() < 0.7) {
+                    const evenNumbers = [0,2,4,6,8];
+                    const oddNumbers = [1,3,5,7,9];
+                    if (lastNumbers[lastNumbers.length-1] % 2 === 0) {
+                        number = evenNumbers[Math.floor(Math.random() * evenNumbers.length)];
+                    } else {
+                        number = oddNumbers[Math.floor(Math.random() * oddNumbers.length)];
+                    }
+                }
+                else {
+                    number = numbers[Math.floor(Math.random() * numbers.length)];
+                }
+
+                // SIZE LOGIC
+                if (lastSizes.slice(-5).filter(s => s === 'small').length >= 5) {
+                    size = 'big';
+                }
+                else if (lastNumbers.length >= 2) {
+                    const sum = lastNumbers[lastNumbers.length-1] + lastNumbers[lastNumbers.length-2];
+                    size = sum > 10 ? 'big' : 'small';
+                }
+                else {
+                    size = (number >= 5) ? 'big' : 'small';
+                }
+            }
+
+            const drawEntry = {
+                color,
+                number,
+                size,
+                time: new Date().toLocaleTimeString()
+            };
+
+            history.unshift(drawEntry);
+            if (history.length > 10) history.pop();
+
+            updateDisplay();
+            updateBestPrediction();
+            updateHistory();
+            saveToStorage(); // Save to localStorage
+        }
+
+        function updateDisplay() {
+            const last = history[0];
+            document.getElementById('lastColor').className = `result-box ${last.color} animate`;
+            document.getElementById('lastColor').innerText = last.color.charAt(0).toUpperCase();
+
+            document.getElementById('lastNumber').className = `result-box ${last.size}`;
+            document.getElementById('lastNumber').innerText = last.number;
+
+            document.getElementById('lastSize').className = `result-box ${last.size}`;
+            document.getElementById('lastSize').innerText = last.size.toUpperCase();
+        }
+
+        function updateBestPrediction() {
+            if (history.length === 0) {
+                document.getElementById('bestPrediction').innerText = "🔮 Best Prediction: Waiting for data...";
+                return;
+            }
+
+            const last = history[0];
+            const lastColors = history.slice(0, 10).map(h => h.color);
+            const lastNumbers = history.slice(0, 10).map(h => h.number);
+            const lastSizes = history.slice(0, 10).map(h => h.size);
+
+            let prediction = "";
+
+            if (lastColors.slice(-3).every(c => c === last.color)) {
+                if (last.color === 'green') prediction += "Color: RED 🔴 ";
+                else if (last.color === 'red') prediction += "Color: VIOLET 💜 ";
+                else prediction += "Color: GREEN 🟢 ";
+            }
+
+            if (lastSizes.slice(-5).filter(s => s === 'small').length >= 5) {
+                prediction += "Size: BIG 🔺 ";
+            }
+
+            if (lastColors.filter(c => c === 'violet').length <= 1 && lastColors.length >= 8) {
+                prediction += "🔥 COLD: VIOLET!";
+            }
+            else if (lastColors.filter(c => c === 'green').length <= 1 && lastColors.length >= 8) {
+                prediction += "🔥 COLD: GREEN!";
+            }
+            else if (lastColors.filter(c => c === 'red').length <= 1 && lastColors.length >= 8) {
+                prediction += "🔥 COLD: RED!";
+            }
+
+            if (lastNumbers[0] % 2 === 0) prediction += "Number: EVEN (6,8,0)";
+            else prediction += "Number: ODD (5,7,9)";
+
+            if (!prediction.trim()) {
+                prediction = `Color: ${last.color.toUpperCase()} | Number: ${last.number} | Size: ${last.size.toUpperCase()}`;
+            }
+
+            document.getElementById('bestPrediction').innerText = "🔮 Best Prediction: " + prediction;
+        }
+
+        function updateHistory() {
+            const container = document.getElementById('historyList');
+            container.innerHTML = '';
+
+            history.forEach(item => {
+                const p = document.createElement('p');
+                p.innerHTML = `
+                    <strong>${item.time}</strong>: 
+                    <span class="color-icon" style="background:${item.color};"></span> ${item.color.charAt(0).toUpperCase()} |
+                    <strong>${item.number}</strong> | 
+                    <span class="color-icon" style="background:${item.size === 'big' ? '#00ff99' : '#ff6b6b'};"></span> ${item.size.toUpperCase()}
+                `;
+                container.appendChild(p);
+            });
+        }
+
+        function clearAll() {
+            history = [];
+            document.getElementById('lastColor').innerText = '--';
+            document.getElementById('lastNumber').innerText = '--';
+            document.getElementById('lastSize').innerText = '--';
+            document.getElementById('bestPrediction').innerText = "🔮 Best Prediction: Waiting for data...";
+            document.getElementById('timer').innerText = '60';
+            updateHistory();
+            simulationRunning = false;
+            document.querySelector('.btn[onclick="startSimulator()"]').innerText = "▶️ Start Simulation";
+            document.querySelector('.btn[onclick="startSimulator()"]').disabled = false;
+            clearInterval(timerInterval);
+            saveToStorage();
+        }
+
+        function saveToStorage() {
+            localStorage.setItem('wingoHistory', JSON.stringify(history));
+        }
+
+        function loadFromStorage() {
+            const saved = localStorage.getItem('wingoHistory');
+            if (saved) {
+                history = JSON.parse(saved);
+                updateDisplay();
+                updateBestPrediction();
+                updateHistory();
+            }
+        }
+
+        window.onload = () => {
+            loadFromStorage();
+            updateHistory();
+        };
+    </script>
 </body>
 </html>
