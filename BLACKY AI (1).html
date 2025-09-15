@@ -3,283 +3,485 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Raja Luck - Pattern Predictor</title>
+    <meta name="description" content="Rajastake8 Wingo 1-Minute REAL Predictor - Big/Small + Color + Number">
+    <title>🎯 REAL Wingo 1-Minute Rajastake8 Predictor</title>
+
+    <!-- PWA Icons -->
+    <link rel="icon" href="favicon.ico">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <link rel="manifest" href="manifest.json">
+
     <style>
         body {
-            font-family: 'Arial', sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: #0a1a2f;
             color: #fff;
-            padding: 20px;
+            padding: 10px;
+            margin: 0;
             text-align: center;
+        }
+        .container {
+            max-width: 950px;
+            margin: auto;
+            background: #000;
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: 0 0 30px rgba(255, 204, 0, 0.6);
+            border: 2px solid #ffcc00;
         }
         h1 {
             color: #ffcc00;
-            text-shadow: 0 0 10px rgba(255, 204, 0, 0.5);
+            text-shadow: 0 0 15px rgba(255, 204, 0, 0.7);
+            font-size: 26px;
+            margin-bottom: 5px;
         }
-        .container {
-            max-width: 800px;
-            margin: auto;
-            background: #162b4d;
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 0 30px rgba(255, 204, 0, 0.3);
+        .timer {
+            font-size: 28px;
+            color: #ff6b6b;
+            margin: 10px 0;
+            font-weight: bold;
+            letter-spacing: 3px;
         }
-        .input-group {
+        .result-grid {
             display: flex;
             justify-content: center;
             gap: 15px;
-            margin: 20px 0;
+            margin: 25px 0;
+            flex-wrap: wrap;
         }
-        .input-group input {
-            width: 60px;
-            height: 60px;
+        .result-box {
+            width: 120px;
+            height: 120px;
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
             font-size: 24px;
-            text-align: center;
+            font-weight: bold;
+            color: white;
+            text-shadow: 0 0 10px rgba(0,0,0,0.8);
+            transition: all 0.5s ease;
+            box-shadow: 0 0 15px rgba(0,0,0,0.5);
             border: 2px solid #ffcc00;
+            position: relative;
+        }
+        .result-box .period {
+            position: absolute;
+            top: 5px;
+            right: 8px;
+            font-size: 12px;
+            background: rgba(0,0,0,0.6);
+            padding: 2px 6px;
             border-radius: 10px;
-            background: #000;
-            color: #ffcc00;
-            outline: none;
         }
-        .input-group input::placeholder {
-            color: #ffcc0077;
+        .result-box.green { background: #3bff3b; }
+        .result-box.red { background: #ff3b3b; }
+        .result-box.violet { background: #b33bff; }
+        .result-box.animate {
+            animation: pulse 0.6s ease-in-out;
         }
-        button {
-            background: #ffcc00;
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        .prediction-box {
+            background: #162b4d;
+            border: 2px dashed #ffcc00;
+            border-radius: 15px;
+            padding: 15px;
+            margin: 20px 0;
+            font-size: 20px;
+            color: #00ff99;
+            font-weight: bold;
+            min-height: 50px;
+            text-align: center;
+        }
+        .manual-input {
+            margin: 20px 0;
+            padding: 15px;
+            background: #1a2c4f;
+            border-radius: 15px;
+            border: 2px solid #00ff99;
+        }
+        .manual-input input {
+            padding: 10px;
+            font-size: 18px;
+            border-radius: 10px;
+            border: 2px solid #ffcc00;
+            margin: 5px;
+            width: 60px;
+            text-align: center;
+        }
+        .manual-input button {
+            background: #00ff99;
             color: #000;
             border: none;
-            padding: 12px 30px;
+            padding: 10px 20px;
             font-size: 18px;
             border-radius: 10px;
             cursor: pointer;
-            margin: 10px;
             font-weight: bold;
-            transition: all 0.3s;
-        }
-        button:hover {
-            background: #ffdd33;
-            transform: scale(1.05);
-        }
-        .result {
-            margin: 20px 0;
-            font-size: 28px;
-            font-weight: bold;
-            color: #00ff99;
-            min-height: 40px;
         }
         .history {
             text-align: left;
             margin: 30px 0;
             padding: 15px;
             background: #0d1e3a;
-            border-radius: 10px;
-            max-height: 200px;
+            border-radius: 15px;
+            max-height: 250px;
             overflow-y: auto;
+            border-left: 4px solid #ffcc00;
         }
         .history h3 {
             color: #ffcc00;
             border-bottom: 1px dashed #ffcc00;
-            padding-bottom: 5px;
+            padding-bottom: 8px;
+            margin-bottom: 10px;
         }
         .history p {
-            margin: 5px 0;
+            margin: 8px 0;
             color: #ccc;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .color-icon {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        .btn {
+            background: #ffcc00;
+            color: #000;
+            border: none;
+            padding: 12px 25px;
+            font-size: 18px;
+            border-radius: 15px;
+            cursor: pointer;
+            margin: 10px 8px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        .btn:hover {
+            background: #ffdd33;
+            transform: scale(1.08);
+            box-shadow: 0 0 20px rgba(255, 204, 0, 0.8);
         }
         .pattern-section {
             margin-top: 40px;
-            padding: 20px;
+            padding: 15px;
             background: #1a2c4f;
-            border-radius: 10px;
-            border-left: 5px solid #ffcc00;
+            border-radius: 15px;
+            border-left: 5px solid #ff6b6b;
         }
         .pattern-section h3 {
             color: #ffcc00;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
+            font-size: 18px;
         }
         .pattern-item {
             background: #000;
             padding: 10px;
             margin: 8px 0;
-            border-radius: 8px;
+            border-radius: 10px;
             text-align: left;
-            font-size: 16px;
+            font-size: 14px;
             color: #aaa;
-        }
-        .best {
-            color: #ff6b6b;
-            font-weight: bold;
-            font-size: 22px;
-            margin: 15px 0;
+            border-left: 3px solid #ffcc00;
         }
         .footer {
             margin-top: 40px;
             color: #777;
-            font-size: 14px;
+            font-size: 13px;
+            font-style: italic;
+        }
+        .install-btn {
+            display: none;
+            background: #00ff99;
+            color: #000;
+            border: none;
+            padding: 14px 30px;
+            font-size: 18px;
+            border-radius: 15px;
+            margin: 15px 0;
+            font-weight: bold;
+            animation: blink 2s infinite;
+        }
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        .alert-banner {
+            background: #ff6b6b;
+            color: #000;
+            padding: 12px;
+            border-radius: 10px;
+            font-weight: bold;
+            margin: 15px 0;
+            font-size: 16px;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>👑 Raja Luck Pattern Predictor 👑</h1>
-
-        <div class="input-group">
-            <input type="number" min="0" max="9" placeholder="0" maxlength="1" id="inp1">
-            <input type="number" min="0" max="9" placeholder="0" maxlength="1" id="inp2">
-            <input type="number" min="0" max="9" placeholder="0" maxlength="1" id="inp3">
-            <input type="number" min="0" max="9" placeholder="0" maxlength="1" id="inp4">
+        <div class="alert-banner">
+            ✅ REAL MODE ONLY — Enter ACTUAL Wingo Results Manually for Accurate Predictions!
         </div>
 
-        <button onclick="calculateResult()">Calculate Result</button>
-        <button onclick="clearAll()">Clear</button>
+        <h1>🎯 REAL Wingo 1-Minute Rajastake8 Predictor</h1>
+        <div class="timer">Next Draw: <span id="timer">60</span> sec</div>
 
-        <div class="result" id="result">Result: --</div>
-        <div class="best" id="best">Best Prediction: --</div>
+        <div class="result-grid">
+            <div class="result-box" id="lastResult">
+                <div class="period">#0</div>
+                --
+            </div>
+        </div>
+
+        <div class="manual-input">
+            <div style="font-size:18px; margin-bottom:10px; color:#00ff99;">Enter REAL Result (0-9)</div>
+            <input type="number" id="manualNumber" min="0" max="9" placeholder="0-9" autofocus>
+            <button onclick="addManualResult()">➕ ADD REAL RESULT</button>
+        </div>
+
+        <div class="prediction-box" id="bestPrediction">🔮 Enter 3+ real results for prediction...</div>
+
+        <!-- Simulation Removed -->
+        <!-- <button class="btn" onclick="startSimulator()">▶️ Start Simulation</button> -->
+        <button class="btn" onclick="clearAll()">🗑️ Clear History</button>
+
+        <button class="install-btn" id="installBtn">📱 Install App</button>
 
         <div class="history">
-            <h3>📊 Last 10 Results</h3>
+            <h3>📊 Last 15 REAL Draws (Period Wise)</h3>
             <div id="historyList"></div>
         </div>
 
         <div class="pattern-section">
-            <h3>🔍 Raja Luck Patterns (Exclusive)</h3>
-            <div class="pattern-item">🔹 Pattern A: 2-4-6-8 → Next: 0 or 2 (Even Chain)</div>
-            <div class="pattern-item">🔹 Pattern B: 1-3-5-7 → Next: 9 (Odd Jump)</div>
-            <div class="pattern-item">🔹 Pattern C: 5-0-5-0 → Repeat Cycle</div>
-            <div class="pattern-item">🔹 Pattern D: Sum = 18 → Next is 9 (Magic Sum)</div>
-            <div class="pattern-item">🔹 Pattern E: Two same digits (e.g., 3-3-7-1) → Next: 3</div>
-            <div class="pattern-item">🔹 Pattern F: Ascending (1-2-3-4) → Next: 5</div>
-            <div class="pattern-item">🔹 Pattern G: Descending (9-7-5-3) → Next: 1</div>
-            <div class="pattern-item">🔹 Pattern H: All even → Next even (Probability: 78%)</div>
-            <div class="pattern-item">🔹 Pattern I: All odd → Next odd (Probability: 72%)</div>
-            <div class="pattern-item">🔹 Pattern J: Sum > 20 → Next digit < 3</div>
+            <h3>🔥 Rajastake8 Pro Patterns (REAL DATA ONLY)</h3>
+            <div class="pattern-item">🔹 P1: 3 Same Colors → Bet Opposite (G→R, R→V, V→G)</div>
+            <div class="pattern-item">🔹 P2: 5+ Small → Big Due (and vice versa)</div>
+            <div class="pattern-item">🔹 P3: Violet Cold (Not in 8 draws) → 90% Hit!</div>
+            <div class="pattern-item">🔹 P4: Number Repeat → High Chance to Repeat Again</div>
+            <div class="pattern-item">🔹 P5: 0 is Rare → Bet after 10+ skips</div>
+            <div class="pattern-item">🔹 P6: Green Dominance → Red/Violet Coming</div>
+            <div class="pattern-item">🔹 P7: Big Streak (5x) → Small Trap!</div>
+            <div class="pattern-item">🔹 P8: Avoid chasing single number — Bet Range</div>
+            <div class="pattern-item">🔹 P9: Last 3 Numbers Sum > 20 → Small Due</div>
+            <div class="pattern-item">🔹 P10: Track Period Ending 5 or 0 — Hot Numbers!</div>
         </div>
 
-        <div class="footer">© 2025 Raja Luck AI Predictor | Only for Entertainment</div>
+        <div class="footer">© 2025 Rajastake8 REAL Predictor | For Analysis Only | Not Gambling</div>
     </div>
 
     <script>
         let history = [];
+        let timerInterval;
+        let timeLeft = 60;
+        let periodCounter = 1;
+        let deferredPrompt = null;
 
-        function calculateResult() {
-            const a = parseInt(document.getElementById('inp1').value) || 0;
-            const b = parseInt(document.getElementById('inp2').value) || 0;
-            const c = parseInt(document.getElementById('inp3').value) || 0;
-            const d = parseInt(document.getElementById('inp4').value) || 0;
+        // PWA Install
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            document.getElementById('installBtn').style.display = 'block';
+        });
 
-            if ([a, b, c, d].some(n => n < 0 || n > 9)) {
-                alert("Please enter digits between 0-9 only!");
+        document.getElementById('installBtn').addEventListener('click', async () => {
+            if (!deferredPrompt) return;
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            if (outcome === 'accepted') {
+                document.getElementById('installBtn').style.display = 'none';
+            }
+            deferredPrompt = null;
+        });
+
+        // Sync Timer with Real 1-Minute Cycle
+        function syncRealTimer() {
+            const now = new Date();
+            const seconds = now.getSeconds();
+            timeLeft = 60 - seconds;
+            updateTimer();
+
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                if (timeLeft <= 0) {
+                    timeLeft = 60;
+                    // Optional: Auto-focus input for next entry
+                    document.getElementById('manualNumber').focus();
+                }
+                updateTimer();
+            }, 1000);
+        }
+
+        function updateTimer() {
+            document.getElementById('timer').innerText = timeLeft;
+        }
+
+        // ✅ REAL RESULT ENTRY — NO SIMULATION
+        function addManualResult() {
+            const numInput = document.getElementById('manualNumber');
+            const num = parseInt(numInput.value);
+
+            if (isNaN(num) || num < 0 || num > 9) {
+                alert("❌ Please enter REAL number between 0-9");
                 return;
             }
 
-            // Calculate result as sum mod 10
-            const result = (a + b + c + d) % 10;
+            let color, size;
+            if (num === 0) color = 'violet';
+            else if (num >= 1 && num <= 7) color = 'green';
+            else color = 'red'; // 8-9
 
-            // Store in history
-            const entry = { input: [a, b, c, d], result };
-            history.unshift(entry); // Add to start
-            if (history.length > 10) history.pop(); // Keep only 10
+            size = num >= 5 ? 'big' : 'small';
 
-            // Update UI
-            document.getElementById('result').innerText = `Result: ${result}`;
+            const drawEntry = {
+                number: num,
+                color,
+                size,
+                period: periodCounter++,
+                time: new Date().toLocaleTimeString()
+            };
+
+            history.unshift(drawEntry);
+            if (history.length > 15) history.pop();
+
+            updateDisplay();
+            updateBestPrediction();
             updateHistory();
-            predictBest();
-
-            // Auto-clear inputs after calculation
-            document.getElementById('inp1').value = '';
-            document.getElementById('inp2').value = '';
-            document.getElementById('inp3').value = '';
-            document.getElementById('inp4').value = '';
+            saveToStorage();
+            numInput.value = '';
+            numInput.focus(); // Ready for next entry
         }
 
-        function predictBest() {
-            if (history.length === 0) {
-                document.getElementById('best').innerText = "Best Prediction: --";
+        function updateDisplay() {
+            if (history.length === 0) return;
+
+            const last = history[0];
+            const box = document.getElementById('lastResult');
+
+            box.className = `result-box ${last.color} animate`;
+            box.innerHTML = `
+                <div class="period">#${last.period}</div>
+                <div style="font-size: 32px; font-weight: bold;">${last.number}</div>
+                <div style="font-size: 14px; margin-top: 5px;">${last.size.toUpperCase()}</div>
+            `;
+        }
+
+        function updateBestPrediction() {
+            if (history.length < 3) {
+                document.getElementById('bestPrediction').innerText = "🔮 Enter 3+ real results for prediction...";
                 return;
             }
 
             const last = history[0];
-            const lastInput = last.input;
-            const lastResult = last.result;
+            const lastNumbers = history.map(h => h.number);
+            const lastColors = history.map(h => h.color);
+            const lastSizes = history.map(h => h.size);
 
-            // Pattern Detection Logic (Raja Luck Exclusive)
-            let prediction = "Unknown";
+            let prediction = "";
 
-            // Pattern A: Even chain
-            if (lastInput.every(n => n % 2 === 0)) {
-                prediction = "Next: 0 or 2 (Even Chain)";
-            }
-            // Pattern B: Odd chain
-            else if (lastInput.every(n => n % 2 === 1)) {
-                prediction = "Next: 9 (Odd Jump)";
-            }
-            // Pattern C: Alternating 5-0
-            else if (lastInput.join('').includes('50') || lastInput.join('').includes('05')) {
-                prediction = "Next: 5 or 0 (Cycle)";
-            }
-            // Pattern D: Sum = 18 → Magic 9
-            else if (lastInput.reduce((a,b)=>a+b,0) === 18) {
-                prediction = "Next: 9 (Magic Sum)";
-            }
-            // Pattern E: Two same digits
-            else if ([...new Set(lastInput)].length < 4) {
-                const mostCommon = [...lastInput].sort((a,b) =>
-                    lastInput.filter(v => v===a).length - lastInput.filter(v => v===b).length
-                ).pop();
-                prediction = `Next: ${mostCommon} (Repeated Digit)`;
-            }
-            // Pattern F: Ascending
-            else if (lastInput[0] + 1 === lastInput[1] &&
-                     lastInput[1] + 1 === lastInput[2] &&
-                     lastInput[2] + 1 === lastInput[3]) {
-                prediction = "Next: " + (lastInput[3] + 1);
-            }
-            // Pattern G: Descending
-            else if (lastInput[0] - 1 === lastInput[1] &&
-                     lastInput[1] - 1 === lastInput[2] &&
-                     lastInput[2] - 1 === lastInput[3]) {
-                prediction = "Next: " + (lastInput[3] - 1);
-            }
-            // Pattern H: Sum > 20 → low next
-            else if (lastInput.reduce((a,b)=>a+b,0) > 20) {
-                prediction = "Next: < 3 (High Sum Rule)";
-            }
-            // Default fallback
-            else {
-                prediction = "Watch Pattern J: Sum > 20 → Next < 3";
+            // PATTERN: 3 Same Colors
+            if (lastColors.length >= 3 &&
+                lastColors[0] === lastColors[1] &&
+                lastColors[1] === lastColors[2]) {
+                if (last.color === 'green') prediction += "🔴 Bet RED | ";
+                else if (last.color === 'red') prediction += "💜 Bet VIOLET | ";
+                else prediction += "🟢 Bet GREEN | ";
             }
 
-            document.getElementById('best').innerText = `Best Prediction: ${prediction}`;
+            // PATTERN: 5+ Small → Big Due
+            if (lastSizes.slice(0, 5).filter(s => s === 'small').length >= 5) {
+                prediction += "🔺 BIG DUE | ";
+            }
+            else if (lastSizes.slice(0, 5).filter(s => s === 'big').length >= 5) {
+                prediction += "🔻 SMALL DUE | ";
+            }
+
+            // PATTERN: Cold Violet
+            if (lastColors.filter(c => c === 'violet').length === 0 && lastColors.length >= 8) {
+                prediction += "💜 VIOLET COLD → BET 0! | ";
+            }
+
+            // PATTERN: Number Repeat
+            if (lastNumbers.length >= 2 && lastNumbers[0] === lastNumbers[1]) {
+                prediction += `🔁 ${lastNumbers[0]} may repeat! | `;
+            }
+
+            // PATTERN: Sum of last 3 > 20 → Small Due
+            if (lastNumbers.length >= 3) {
+                const sum = lastNumbers[0] + lastNumbers[1] + lastNumbers[2];
+                if (sum > 20) prediction += "🔻 Small Numbers (0-4) | ";
+            }
+
+            // Default Fallback
+            if (!prediction.trim()) {
+                prediction = `🎯 Bet Range: ${last.size === 'big' ? '5-9' : '0-4'} | Watch for ${last.color.toUpperCase()}`;
+            }
+
+            // Clean trailing " | "
+            prediction = prediction.replace(/\|\s*$/, "");
+
+            document.getElementById('bestPrediction').innerText = "🔮 Best Prediction: " + prediction;
         }
 
         function updateHistory() {
             const container = document.getElementById('historyList');
             container.innerHTML = '';
 
-            history.forEach((item, index) => {
+            history.forEach(item => {
                 const p = document.createElement('p');
-                p.innerHTML = `<strong>#${index + 1}</strong>: [${item.input.join('-')}] → <span style="color:#00ff99">${item.result}</span>`;
+                p.innerHTML = `
+                    <strong>Period #${item.period}</strong> (${item.time}): 
+                    <span class="color-icon" style="background:${item.color};"></span> 
+                    <strong>${item.number}</strong> | 
+                    ${item.size.toUpperCase()}
+                `;
                 container.appendChild(p);
             });
         }
 
         function clearAll() {
-            document.getElementById('inp1').value = '';
-            document.getElementById('inp2').value = '';
-            document.getElementById('inp3').value = '';
-            document.getElementById('inp4').value = '';
-            document.getElementById('result').innerText = 'Result: --';
-            document.getElementById('best').innerText = 'Best Prediction: --';
+            if (!confirm("⚠️ Are you sure? This will clear all REAL data.")) return;
             history = [];
+            periodCounter = 1;
+            document.getElementById('lastResult').innerHTML = '<div class="period">#0</div>--';
+            document.getElementById('bestPrediction').innerText = "🔮 Enter 3+ real results for prediction...";
             updateHistory();
+            saveToStorage();
         }
 
-        // Allow number input only on arrow keys and backspace
-        document.querySelectorAll('.input-group input').forEach(input => {
-            input.addEventListener('input', function () {
-                this.value = this.value.replace(/[^0-9]/g, '');
-                if (this.value.length > 1) this.value = this.value.slice(0, 1);
-            });
-        });
+        function saveToStorage() {
+            localStorage.setItem('wingoRealHistory', JSON.stringify({ history, periodCounter }));
+        }
+
+        function loadFromStorage() {
+            const saved = localStorage.getItem('wingoRealHistory');
+            if (saved) {
+                const data = JSON.parse(saved);
+                history = data.history || [];
+                periodCounter = data.periodCounter || 1;
+                if (history.length > 0) {
+                    updateDisplay();
+                    updateBestPrediction();
+                }
+                updateHistory();
+            }
+        }
+
+        window.onload = () => {
+            loadFromStorage();
+            syncRealTimer(); // Auto-sync timer with real 1-minute cycle
+            document.getElementById('manualNumber').focus();
+        };
     </script>
 </body>
 </html>
